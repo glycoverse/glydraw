@@ -1,10 +1,10 @@
 Package: glydraw
-Title: What the Package Does (One Line, Title Case)
+Title: Draw beautiful SNFG cartoons.
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+    person("Xisong", "Feng", , "1225774778@qq.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0009-0000-4057-1295"))
+Description: Draw beautiful SNFG cartoons.
 License: MIT + file LICENSE
 Suggests: 
     testthat (>= 3.0.0)
