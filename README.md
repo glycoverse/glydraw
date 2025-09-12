@@ -22,14 +22,14 @@ You can install the latest release of glydraw from
 [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("glycoverse/glydraw@*release")
+# install.packages("remotes")
+remotes::install_github("glycoverse/glydraw@*release")
 ```
 
 Or install the development version:
 
 ``` r
-devtools::install_github("glycoverse/glydraw")
+remotes::install_github("glycoverse/glydraw")
 ```
 
 ## Example
