@@ -428,12 +428,12 @@ glycoform_info <- function(structure){
 annotation_coordinate <- function(chil_glyx, chil_glyy, par_glyx, par_glyy){
   chil_direction <- matrix(c(par_glyx-chil_glyx, par_glyy-chil_glyy),ncol = 1, byrow = FALSE)
   par_direction <- matrix(c(chil_glyx-par_glyx, chil_glyy-par_glyy),ncol = 1, byrow = FALSE)
-  chil_location <- 0.2*chil_direction/norm(chil_direction, type = '2') # 设定注释字符与顶点的相对距离
-  par_location <- 0.2*par_direction/norm(par_direction, type = '2')
-  chil_rotate_matrix <- matrix(c(cos(1/9*pi),sin(1/9*pi),
-                                 -sin(1/9*pi),cos(1/9*pi)), ncol = 2, byrow = TRUE) # 旋转10度的旋转矩阵
-  par_rotate_matrix <- matrix(c(cos(1/9*pi),-sin(1/9*pi),
-                                sin(1/9*pi),cos(1/9*pi)), ncol = 2, byrow = TRUE)
+  chil_location <- 0.35*chil_direction/norm(chil_direction, type = '2') # 设定注释字符与顶点的相对距离
+  par_location <- 0.35*par_direction/norm(par_direction, type = '2')
+  chil_rotate_matrix <- matrix(c(cos(1/8*pi),sin(1/8*pi),
+                                 -sin(1/8*pi),cos(1/8*pi)), ncol = 2, byrow = TRUE) # 旋转10度的旋转矩阵
+  par_rotate_matrix <- matrix(c(cos(1/8*pi),-sin(1/8*pi),
+                                sin(1/8*pi),cos(1/8*pi)), ncol = 2, byrow = TRUE)
   chil_annot_loc <- chil_rotate_matrix %*% chil_location
   par_annot_loc <- par_rotate_matrix %*% par_location
   annot_loc <- list("chil" = chil_annot_loc, "par" = par_annot_loc)
@@ -469,7 +469,7 @@ gly_annotation <- function(structure,coor){
   }
   colnames(struc_annot_coor) <- c('vertice','annot','x','y')
   struc_annot_coor$annot[struc_annot_coor$annot == 'b1'] <- 'β'
-  struc_annot_coor$annot[struc_annot_coor$annot == 'a1'] <- 'α'
+  struc_annot_coor$annot[struc_annot_coor$annot %in% c('a1','a2')] <- 'α'
   # 转换字符为数值
   struc_annot_coor$x <- as.numeric(struc_annot_coor$x)
   struc_annot_coor$y <- as.numeric(struc_annot_coor$y)
@@ -489,8 +489,8 @@ gly_draw <- function(structure){
   gly_list <- data.frame(coor,'glycoform' = glycoform_info(structure))
   struc_annotation <- gly_annotation(structure,coor)
   # 创建颜色和形状的映射
-  color <- c('GlcNAc'= '#3300CC','Man'='#339933','Gal'='#FFCC33','Fuc'='#CC0000','Fuc_down'='#CC0000','GalNAc'='#FFCC33')
-  shape <- c('GlcNAc'= 22,'Man'=21,'Gal'=21,'Fuc'=25,'Fuc_down'=24,'GalNAc'=22)
+  color <- c('GlcNAc'= '#3300CC','Man'='#339933','Gal'='#FFCC33','Fuc'='#CC0000','Fuc_down'='#CC0000','GalNAc'='#FFCC33','Neu5Ac'='#FF00FF')
+  shape <- c('GlcNAc'= 22,'Man'=21,'Gal'=21,'Fuc'=25,'Fuc_down'=24,'GalNAc'=22,'Neu5Ac'=23)
 
   # 匹配顶点的颜色和形状
   gly_color <- color[as.character(gly_list$glycoform)]
@@ -498,42 +498,36 @@ gly_draw <- function(structure){
   gly_shape <- shape[as.character(gly_list$glycoform)]
   names(gly_shape) = NULL
 
+  # connect information
+  gly_connect <- connect_info(structure, coor)
+  connect_df <- data.frame(
+    start_x = gly_connect$start_x,
+    start_y = gly_connect$start_y,
+    end_x   = gly_connect$end_x,
+    end_y   = gly_connect$end_y
+  )
+
   # 绘图
   gly_graph <- ggplot2::ggplot()+
-    ggplot2::xlab("")+
-    ggplot2::ylab("")+
-    ggplot2::ggtitle("")+
-    ggplot2::coord_equal() +
-    # ggplot2::theme_bw()+
-    ggplot2::geom_segment(ggplot2::aes(x = connect_info(structure,gly_list)$start_x,
-                     y = connect_info(structure,gly_list)$start_y,
-                     xend = connect_info(structure,gly_list)$end_x,
-                     yend = connect_info(structure,gly_list)$end_y,))+
+    ggplot2::geom_segment(data = connect_df,
+                          ggplot2::aes(x = start_x, y = start_y,
+                                       xend = end_x, yend = end_y),
+                          linewidth = 1.5)+
     ggplot2::geom_point(ggplot2::aes(x=gly_list[,'x'],y=gly_list[,'y']),
-               shape=gly_shape,fill=gly_color,size=6,color='black',stroke=0.5)+
+                        shape=gly_shape,fill=gly_color,size=12,color='black',stroke=0.5)+
     ggplot2::geom_text(data = struc_annotation,
-                       ggplot2::aes(x = x, y = y, label = annot))+
-    ggplot2::theme(text=ggplot2::element_text(family="arial"))+
-    ggplot2::theme_void()
+                       ggplot2::aes(x = x, y = y, label = annot),
+                       family = 'Arial',
+                       size = 8,
+                       hjust = 0.5,
+                       vjust = 0.5)+
+    ggplot2::coord_fixed(ratio = 1, clip = "off") +
+    ggplot2::scale_x_continuous(expand = ggplot2::expansion(mult = 0.05))+
+    ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = 0.05))+
+    ggplot2::theme_void(base_family = 'Arial')+
+    ggplot2::theme(
+      text = ggplot2::element_text(size = 10),
+      plot.margin = ggplot2::margin(10, 10, 10, 10)
+    )
   return(gly_graph)
-}
-
-test_structure <- c(
-  'α-D-Galp-(1→3)[α-L-Fucp-(1→2)]-β-D-Galp-(1→?)-β-D-GlcpNAc-(1→3)[α-D-Galp-(1→3)[α-L-Fucp-(1→2)]-β-D-Galp-(1→?)-β-D-GlcpNAc-(1→6)]-β-D-Galp-(1→4)-β-D-GlcpNAc-(1→3)-β-D-Galp-(1→3)[α-D-Galp-(1→3)[α-L-Fucp-(1→2)]-β-D-Galp-(1→4)-β-D-GlcpNAc-(1→6)]-α-D-GalpNAc-(1→',
-  "β-D-Galp-(1→4)-β-D-GlcpNAc-(1→2)[β-D-Galp-(1→4)-β-D-GlcpNAc-(1→4)]-α-D-Manp-(1→3)[β-D-Galp-(1→4)-β-D-GlcpNAc-(1→2)-α-D-Manp-(1→6)]-β-D-Manp-(1→4)-β-D-GlcpNAc-(1→4)[α-L-Fucp-(1→6)]-β-D-GlcpNAc-(1→",
-  'α-L-Fucp-(1→2)-β-D-Galp-(1→4)-β-D-GlcpNAc-(1→3)[α-L-Fucp-(1→2)-β-D-Galp-(1→4)-β-D-GlcpNAc-(1→6)]-β-D-Galp-(1→4)-β-D-GlcpNAc-(1→3)-β-D-Galp-(1→3)[α-L-Fucp-(1→2)-β-D-Galp-(1→4)-β-D-GlcpNAc-(1→6)]-α-D-GalpNAc-(1→',
-  'α-L-Fucp-(1→2)-β-D-Galp-(1→4)-β-D-GlcpNAc-(1→2)[α-D-Galp-(1→3)[α-L-Fucp-(1→2)]-β-D-Galp-(1→4)-β-D-GlcpNAc-(1→4)]-α-D-Manp-(1→3)[α-D-Galp-(1→3)[α-L-Fucp-(1→2)]-β-D-Galp-(1→4)-β-D-GlcpNAc-(1→2)[α-L-Fucp-(1→2)-β-D-Galp-(1→4)-β-D-GlcpNAc-(1→6)]-α-D-Manp-(1→6)]-β-D-Manp-(1→4)-β-D-GlcpNAc-(1→4)[α-L-Fucp-(1→6)]-β-D-GlcpNAc-(1→',
-  'α-L-Fucp-(1→2)-β-D-Galp-(1→4)-β-D-GlcpNAc-(1→2)-α-D-Manp-(1→3)[β-D-GlcpNAc-(1→4)][α-L-Fucp-(1→2)-β-D-Galp-(1→4)-β-D-GlcpNAc-(1→2)-α-D-Manp-(1→6)]-β-D-Manp-(1→4)-β-D-GlcpNAc-(1→4)-β-D-GlcpNAc-(1→',
-  'α-D-GalpNAc-(1→3)[α-L-Fucp-(1→2)]-β-D-Galp-(1→4)-β-D-GlcpNAc-(1→2)-α-D-Manp-(1→3)[β-D-GlcpNAc-(1→4)][β-D-Galp-(1→4)-β-D-GlcpNAc-(1→2)-α-D-Manp-(1→6)]-β-D-Manp-(1→4)-β-D-GlcpNAc-(1→4)[α-L-Fucp-(1→6)]-β-D-GlcpNAc-(1→',
-  'α-D-Manp-(1→3)[β-D-Galp-(1→4)-β-D-GlcpNAc-(1→2)[β-D-Galp-(1→4)-β-D-GlcpNAc-(1→6)]-α-D-Manp-(1→6)]-β-D-Manp-(1→4)-β-D-GlcpNAc-(1→4)-β-D-GlcpNAc-(1→',
-  'α-L-Fucp-(1→2)-β-D-Galp-(1→?)-β-D-GlcpNAc-(1→3)[α-L-Fucp-(1→2)-β-D-Galp-(1→4)-β-D-GlcpNAc-(1→6)]-β-D-Galp-(1→?)-β-D-GlcpNAc-(1→3)[α-D-GalpNAc-(1→3)[α-L-Fucp-(1→2)]-β-D-Galp-(1→4)-β-D-GlcpNAc-(1→6)]-β-D-Galp-(1→?)-β-D-GlcpNAc-(1→3)-β-D-Galp-(1→3)[α-D-GalpNAc-(1→3)[α-L-Fucp-(1→2)]-β-D-Galp-(1→4)-β-D-GlcpNAc-(1→6)]-α-D-GalpNAc-(1→',
-  'α-D-GalpNAc-(1→3)[α-L-Fucp-(1→2)]-β-D-Galp-(1→3)[α-L-Fucp-(1→3)]-β-D-GlcpNAc-(1→3)[α-D-GalpNAc-(1→3)[α-L-Fucp-(1→2)]-β-D-Galp-(1→3)-β-D-GlcpNAc-(1→3)]-β-D-Galp-(1→3)-β-D-GlcpNAc-(1→3)-β-D-Galp-(1→3)[β-D-Galp-(1→4)-β-D-GlcpNAc-(1→6)]-α-D-GalpNAc-(1→'
-)
-# 'WURCS=2.0/4,18,17/[a2112h-1a_1-5_2*NCC/3=O][a2112h-1b_1-5][a2122h-1b_1-5_2*NCC/3=O][a1221m-1a_1-5]/1-2-3-2-3-2-3-3-2-4-3-2-4-1-3-2-4-1/a3-b1_a6-o1_b3-c1_d3-e1_d6-k1_f3-g1_f6-h1_h4-i1_i2-j1_k4-l1_l2-m1_l3-n1_o4-p1_p2-q1_p3-r1_c?-d1_e?-f1'
-for (i in test_structure){
-  gly_test <- glyparse::parse_iupac_extended(i)
-  structure <- glyrepr::get_structure_graphs(gly_test)
-  # gly_test2 <- parse_iupac_condensed(as.character(gly_test))
-  draw <- gly_draw(structure)
-  print(draw)
 }
