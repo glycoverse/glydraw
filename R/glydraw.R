@@ -69,8 +69,8 @@ glycan_dict <- list(
 )
 
 glycan_shape <- list(
-  'Hex' = data.frame(x=c(-1,-1,1,1,-1), # The center is the Core of shape
-                     y=c(-1,1,1,-1,-1)),
+  'Hex' = data.frame(x=cos(seq(0,2*pi,length.out = 50)), # The center is the Core of shape
+                     y=sin(seq(0,2*pi,length.out = 50))),
   'HexNAc' = data.frame(x=c(-1,-1,1,1,-1),
                         y=c(-1,1,1,-1,-1)),
   'HexN' = data.frame(x=c(-1,1,1,-1),
@@ -82,7 +82,9 @@ glycan_shape <- list(
                       xx=c(1,0,-1,1),
                       yy=c(0,-1,0,0)),
   'dHex' = data.frame(x=c(-1,0,1,-1),
-                      y=c(0,sqrt(3),0,0)), # The center is the Midpoint of the Base
+                      y=c(-0.33*sqrt(3),0.67*sqrt(3),-0.33*sqrt(3),-0.33*sqrt(3))), # The center is the Midpoint of the Base
+  'dHexUp' = data.frame(x=c(-1,0,1,-1),
+                        y=c(0.33*sqrt(3),-0.67*sqrt(3),0.33*sqrt(3),0.33*sqrt(3))),
   'dHexNAc' = data.frame(x=c(0,1,0,0),
                          y=c(0.67*sqrt(3),-0.33*sqrt(3),-0.33*sqrt(3),0.67*sqrt(3)),
                          xx=c(0,-1,0,0),
@@ -315,17 +317,21 @@ process_multiple_branches <- function(coor,structure,ver){
     pos <- out_degree(structure,ver)[j+1] # 路径上出度>1顶点的位置
     pos_max <- out_degree(structure,ver)[num] # 路径上序号第二大的出度>1顶点的位置
     neigh_pos <- igraph::neighbors(structure,pos) # 相邻顶点的位置
-    if (length(neigh_pos)==2){
+    neigh_linkage <- as.numeric(sub('.*-','',igraph::E(structure)$linkage[neigh_pos]))
+    arrange_neigh_pos <- neigh_pos[order(neigh_linkage,decreasing = TRUE)]
+    # 判断节点的子节点是否在列中间
+    ver_neigh_pos <- igraph::neighbors(structure,ver)
+    chil_in_middle <- mid_pos(structure,coor,min(ver_neigh_pos),pos) | mid_pos(structure,coor,max(ver_neigh_pos),pos) # TRUE or FALSE
+    if (length(arrange_neigh_pos)==2){
       # 多分支路径上节点偏移满足等比规律,越靠右的分支节点偏移越小,在子模块中间的分支节点还需要加0.25的偏移量
       # 在子模块边缘的分支节点不需要另加0.25的偏移量
-      coor <- offset_chil_coor(structure,neigh_pos[1],coor,1/(2**(num-j+1))+0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
-      coor <- offset_chil_coor(structure,neigh_pos[2],coor,-1/(2**(num-j+1))-0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
-
+      coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,1/(2**(num-j+1))+0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
+      coor <- offset_chil_coor(structure,arrange_neigh_pos[2],coor,-1/(2**(num-j+1))-0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
     }
-    else if(length(neigh_pos)==3){
+    else if(length(arrange_neigh_pos)==3 && chil_in_middle){
       # 多分支路径上节点偏移满足等比规律,越靠右的分支节点偏移越小,在子模块中间的分支节点还需要加0.25的偏移量
-      coor <- offset_chil_coor(structure,neigh_pos[1],coor,1/(2**(num-j))+0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
-      coor <- offset_chil_coor(structure,neigh_pos[3],coor,-1/(2**(num-j))-0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
+      coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,1/(2**(num-j))+0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
+      coor <- offset_chil_coor(structure,arrange_neigh_pos[3],coor,-1/(2**(num-j))-0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
     }
   }
   return(coor)
@@ -343,13 +349,15 @@ process_multiple_branches <- function(coor,structure,ver){
 #' @examples process_two_neighbors(coor, structure, 5)
 process_two_neighbors <- function(coor,structure,ver){
   neigh_pos <- igraph::neighbors(structure,ver) # 相邻顶点的位置
+  neigh_linkage <- as.numeric(sub('.*-','',igraph::E(structure)$linkage[neigh_pos]))
+  arrange_neigh_pos <- neigh_pos[order(neigh_linkage,decreasing = TRUE)]
   if (out_degree(structure,ver)[1] == 1){
-    coor <- offset_chil_coor(structure,neigh_pos[1],coor,0.5)
-    coor <- offset_chil_coor(structure,neigh_pos[2],coor,-0.5)
+    coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,0.5)
+    coor <- offset_chil_coor(structure,arrange_neigh_pos[2],coor,-0.5)
   }
   else if(out_degree(structure,ver)[1] >= 1){ # 顶点到起始点路径上有超过1个分支
-    coor <- offset_chil_coor(structure,neigh_pos[1],coor,0.5)
-    coor <- offset_chil_coor(structure,neigh_pos[2],coor,-0.5)
+    coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,0.5)
+    coor <- offset_chil_coor(structure,arrange_neigh_pos[2],coor,-0.5)
     coor <- process_multiple_branches(coor,structure,ver)
   }
   return(coor)
@@ -367,13 +375,15 @@ process_two_neighbors <- function(coor,structure,ver){
 #' @examples process_three_neighbors(coor, structure, 6)
 process_three_neighbors <- function(coor,structure,ver){
   neigh_pos <- igraph::neighbors(structure,ver) # 相邻顶点的位置
+  neigh_linkage <- as.numeric(sub('.*-','',igraph::E(structure)$linkage[neigh_pos]))
+  arrange_neigh_pos <- neigh_pos[order(neigh_linkage,decreasing = TRUE)]
   if (out_degree(structure,ver)[1] == 1){
-    coor <- offset_chil_coor(structure,neigh_pos[1],coor,1)
-    coor <- offset_chil_coor(structure,neigh_pos[3],coor,-1)
+    coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,1)
+    coor <- offset_chil_coor(structure,arrange_neigh_pos[3],coor,-1)
   }
   else if(out_degree(structure,ver)[1] >= 1){ # 顶点到起始点路径上有超过1个分支
-    coor <- offset_chil_coor(structure,neigh_pos[1],coor,1)
-    coor <- offset_chil_coor(structure,neigh_pos[3],coor,-1)
+    coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,1)
+    coor <- offset_chil_coor(structure,arrange_neigh_pos[3],coor,-1)
     coor <- process_multiple_branches(coor,structure,ver)
   }
   return(coor)
@@ -395,14 +405,16 @@ process_contain_fucose_neighbors <- function(coor,structure,ver){
   fuc_pos <- neigh_pos[which(neigh_pos$mono=='Fuc')]
   # 获取其余邻点的位置
   other_neigh_pos <- neigh_pos[!neigh_pos %in% c(fuc_pos)]
+  neigh_linkage <- as.numeric(sub('.*-','',igraph::E(structure)$linkage[other_neigh_pos]))
+  arrange_other_neigh_pos <- other_neigh_pos[order(neigh_linkage,decreasing = TRUE)]
   # 其余邻点按两个邻点的逻辑处理
   if (out_degree(structure,ver)[1] == 1){
-    coor <- offset_chil_coor(structure,other_neigh_pos[1],coor,0.5)
-    coor <- offset_chil_coor(structure,other_neigh_pos[2],coor,-0.5)
+    coor <- offset_chil_coor(structure,arrange_other_neigh_pos[1],coor,0.5)
+    coor <- offset_chil_coor(structure,arrange_other_neigh_pos[2],coor,-0.5)
   }
   else if(out_degree(structure,ver)[1] >= 1){ # 顶点到起始点路径上有超过1个分支
-    coor <- offset_chil_coor(structure,other_neigh_pos[1],coor,0.5)
-    coor <- offset_chil_coor(structure,other_neigh_pos[2],coor,-0.5)
+    coor <- offset_chil_coor(structure,arrange_other_neigh_pos[1],coor,0.5)
+    coor <- offset_chil_coor(structure,arrange_other_neigh_pos[2],coor,-0.5)
     coor <- process_multiple_branches(coor,structure,ver)
   }
   return(coor)
@@ -418,7 +430,7 @@ process_contain_fucose_neighbors <- function(coor,structure,ver){
 #' @examples coor_cal(structure)
 coor_cal <- function(structure){
   coor <- coor_initialization(structure) # 初始化坐标
-  structure_length <- seq(1,length(structure)) # 生成可迭代序列
+  structure_length <- seq(length(structure),1) # 生成可迭代序列
   # 先处理不含岩藻糖的分支节点
   for (i in structure_length) {
     gly_neighbors <- igraph::neighbors(structure,i)
@@ -466,35 +478,18 @@ coor_cal <- function(structure){
 #'
 #' @examples connect_info(structure, coor)
 connect_info <- function(structure,coor){
-  start_x <- c()
-  end_x <- c()
-  start_y <- c()
-  end_y <- c()
-  structure_length <- seq(1,length(structure))
-  for(i in structure_length){
-    gly_neighbors <- igraph::neighbors(structure,i)
-    neighbors_num <- length(gly_neighbors)
-    if (neighbors_num == 1){
-      start_x <- append(start_x, coor[i,'x'])
-      end_x <- append(end_x, coor[gly_neighbors,'x'])
-      start_y <- append(start_y, coor[i,'y'])
-      end_y <- append(end_y, coor[gly_neighbors,'y'])
-    }
-    else if(neighbors_num == 2){
-      start_x <- append(start_x, c(coor[i,'x'],coor[i,'x']))
-      end_x <- append(end_x, c(coor[gly_neighbors,'x'][1],coor[gly_neighbors,'x'][2]))
-      start_y <- append(start_y, c(coor[i,'y'],coor[i,'y']))
-      end_y <- append(end_y, c(coor[gly_neighbors,'y'][1],coor[gly_neighbors,'y'][2]))
-    }
-    else if(neighbors_num == 3){
-      start_x <- append(start_x, c(coor[i,'x'],coor[i,'x'],coor[i,'x']))
-      end_x <- append(end_x, c(coor[gly_neighbors,'x'][1],coor[gly_neighbors,'x'][2],coor[gly_neighbors,'x'][3]))
-      start_y <- append(start_y, c(coor[i,'y'],coor[i,'y'],coor[i,'y']))
-      end_y <- append(end_y, c(coor[gly_neighbors,'y'][1],coor[gly_neighbors,'y'][2],coor[gly_neighbors,'y'][3]))
-    }
+  edges <- igraph::as_edgelist(structure, names = FALSE)
+
+  if (nrow(edges) == 0) {
+    return(list(start_x = numeric(0), start_y = numeric(0), end_x = numeric(0), end_y = numeric(0)))
   }
-  conn_info <- list(start_x=start_x, start_y=start_y, end_x=end_x, end_y=end_y)
-  return(conn_info)
+
+  list(
+    start_x = coor[edges[, 1], 'x'],
+    start_y = coor[edges[, 1], 'y'],
+    end_x = coor[edges[, 2], 'x'],
+    end_y = coor[edges[, 2], 'y']
+  )
 }
 
 # 获取糖型信息用于绘图,主要是Fuc的位置
@@ -509,8 +504,8 @@ connect_info <- function(structure,coor){
 glycoform_info <- function(structure){
   glycoform <- igraph::V(structure)$mono
   for (i in c(which(glycoform == 'Fuc'))){
-    if (fuc_offset(structure,i)=='-0.99'){
-      glycoform[i] <- 'Fuc_down'
+    if (fuc_offset(structure,i)=='0.99'){
+      glycoform[i] <- 'FucUp'
     }
   }
   return(glycoform)
@@ -581,6 +576,40 @@ gly_annotation <- function(structure,coor){
 
 #' Title
 #'
+#' @param gly_list
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+create_polygon_coor <- function(gly_list) {
+  polygon_coor <- gly_list |>
+    purrr::pmap_dfr(function(center_x, center_y, glycoform) {
+      composition <- glycan_dict[[glycoform]][1] # Mapping the Composition of Glycoform, e.g.'Fuc'->'dHex'
+      df1 <- data.frame(
+        point_x = c(0.15 * glycan_shape[[composition]]$x + center_x),
+        point_y = c(0.15 * glycan_shape[[composition]]$y + center_y),
+        # For Distinguishing the Coordinates of each point
+        group = paste0(glycoform, center_x, "_", center_y),
+        color = glycan_dict[[glycoform]][2]
+      )
+      if (length(glycan_dict[[glycoform]]) > 2) {
+        df2 <- data.frame(
+          point_x = c(0.15 * glycan_shape[[composition]]$xx + center_x),
+          point_y = c(0.15 * glycan_shape[[composition]]$yy + center_y),
+          # For Distinguishing the Coordinates of each point
+          group = paste0(glycoform, center_x, "_", center_y, 'remain'),
+          color = glycan_dict[[glycoform]][3]
+        )
+        df1 <- dplyr::bind_rows(df1, df2)
+      }
+      return(df1)
+    })
+  return(polygon_coor)
+}
+
+#' Title
+#'
 #' @param structure
 #'
 #' @returns
@@ -593,27 +622,7 @@ gly_draw <- function(structure){
   # Rename colnames of gly_list
   colnames(gly_list) <- c('center_x','center_y','glycoform')
   # Draw Glycan Shape, where gly_list contains center_x, center_y, glycoform 3 columns
-  polygon_coor <- gly_list |>
-    purrr::pmap_dfr(function(center_x, center_y, glycoform){
-      composition <- glycan_dict[[glycoform]][1] # Mapping the Composition of Glycoform, e.g.'Fuc'->'dHex'
-      df1 <- data.frame(
-        point_x = c(0.1*glycan_shape[[composition]]$x + center_x),
-        point_y = c(0.1*glycan_shape[[composition]]$y + center_y),
-        # For Distinguishing the Coordinates of each point
-        group = paste0(glycoform, center_x, "_", center_y),
-        color = glycan_dict[[glycoform]][2])
-      if (length(glycan_dict[[glycoform]]) > 2){
-        df2 <- data.frame(
-          point_x = c(0.1*glycan_shape[[composition]]$xx + center_x),
-          point_y = c(0.1*glycan_shape[[composition]]$yy + center_y),
-          # For Distinguishing the Coordinates of each point
-          group = paste0(glycoform, center_x, "_", center_y,'remain'),
-          color = glycan_dict[[glycoform]][3])
-        df1 <- dplyr::bind_rows(df1,df2)
-      }
-      return(df1)
-    })
-
+  polygon_coor <- create_polygon_coor(gly_list)
   filled_color <- glycan_color[as.character(polygon_coor$color)]
 
   struc_annotation <- gly_annotation(structure,coor)
@@ -627,25 +636,27 @@ gly_draw <- function(structure){
     end_y   = gly_connect$end_y
   )
 
+  x_span <- diff(range(coor[,1]))
+  y_span <- diff(range(coor[,2]))
+  text_size <- 8/mean(c(x_span, y_span))
+
   # 绘图
   gly_graph <- ggplot2::ggplot()+
     ggplot2::geom_segment(data = connect_df,
                           ggplot2::aes(x = start_x, y = start_y,
                                        xend = end_x, yend = end_y),
-                          linewidth = 1.5)+
+                          linewidth = 1)+
     ggplot2::geom_polygon(data = polygon_coor,
                           ggplot2::aes(x = point_x, y = point_y, group = group),
-                          fill=filled_color,color='black')+
+                          fill=filled_color, color='black',linewidth = 1)+
     ggplot2::geom_text(data = struc_annotation,
                        ggplot2::aes(x = x, y = y, label = annot),
-                       family = 'Arial',
-                       size = 8,
+                       family = 'TT Arial',
+                       size = text_size,
                        hjust = 0.5,
                        vjust = 0.5)+
     ggplot2::coord_fixed(ratio = 1, clip = "off") +
-    ggplot2::scale_x_continuous(expand = ggplot2::expansion(mult = 0.05))+
-    ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = 0.05))+
-    ggplot2::theme_void(base_family = 'Arial')+
+    ggplot2::theme_void(base_family = 'TT Arial')+
     ggplot2::theme(
       text = ggplot2::element_text(size = 10),
       plot.margin = ggplot2::margin(10, 10, 10, 10)
