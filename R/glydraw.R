@@ -105,18 +105,19 @@ glycan_shape <- list(
 
 #' Title Initialize Vertices Coordinate
 #'
-#' @param structure igraph
+#' @param structure an igraph object
 #'
-#' @returns Initialized Coordinate that Y=0, X are correct
+#' @returns Initialized Coordinate which Y=0, X are correct
 #' @noRd
 coor_initialization <- function(structure){
   ver_num <- length(structure)
   coor <- matrix(
-    ini_xy <- rep(0,2*ver_num), # 两列值均为0,维度与structure一致的矩阵
+    ini_xy <- rep(0,2*ver_num),
     ncol = 2
   )
   colnames(coor) <- c('x','y')
-  init_X <- igraph::distances(structure)[length(structure),]*(-1) # 初始位置为length(structure);所有顶点到1号点的最短距离,即横坐标
+  # Gain x coordinate, where initial position of the structure is length(structure)
+  init_X <- igraph::distances(structure)[length(structure),]*(-1)
   coor[,'x'] <- init_X
   for (i in seq(1,length(structure))){
     if (igraph::V(structure)[[i]]$mono == 'Fuc'){
@@ -128,13 +129,13 @@ coor_initialization <- function(structure){
 
 #' Title Find Sequence Number of Sub-module
 #'
-#' @param structure
-#' @param ver
+#' @param structure an igraph object
+#' @param ver an integer
 #'
-#' @returns
+#' @returns the child vertices of structure
 #' @export
 #'
-#' @examples
+#' @examples chil_coor(structure, 3)
 chil_coor <- function(structure,ver){
   vers <- igraph::bfs(structure, ver, mode='out',unreachable = FALSE)$order
   return(vers)
@@ -142,15 +143,15 @@ chil_coor <- function(structure,ver){
 
 #' Title Offset y-Coordinate of Vertex Sub-module
 #'
-#' @param structure
-#' @param ver
-#' @param coor
-#' @param offset
+#' @param structure an igraph object
+#' @param ver an integer
+#' @param coor a matrix
+#' @param offset a float
 #'
-#' @returns
+#' @returns offset coordinate
 #' @export
 #'
-#' @examples
+#' @examples offset_chil_coor(structure, 3, coor, 0.5)
 offset_chil_coor <- function(structure,ver,coor,offset){
   vers <- chil_coor(structure,ver)
   coor[vers,'y'] <- coor[vers,'y']+offset
@@ -159,15 +160,15 @@ offset_chil_coor <- function(structure,ver,coor,offset){
 
 #' Title Calculate the Amount and Sequence Number of Vertices that Out-degree >= 2 along the Path
 #'
-#' @param structure
-#' @param ver the Sequence Number of Vertex
+#' @param structure an igraph integer
+#' @param ver the Sequence Number of Vertices
 #'
-#' @returns
+#' @returns the number of vertices which neighbors >=2 on the path between vertex and begin vertex
 #' @export
 #'
 #' @examples out_degree(structure, 1)
 out_degree <- function(structure,ver){
-  path_vertex <- igraph::shortest_paths(structure,length(structure),ver)$vpath[[1]] # 顶点到起始点的最短路径
+  path_vertex <- igraph::shortest_paths(structure,length(structure),ver)$vpath[[1]]
   num <- 0
   pos <- c()
   for (i in path_vertex){
@@ -182,21 +183,21 @@ out_degree <- function(structure,ver){
 
 #' Title Judge whether the Vertex is in the Middle Position of Sub-module
 #'
-#' @param structure
-#' @param coor
-#' @param ver
-#' @param par_ver
+#' @param structure an igraph object
+#' @param coor a matrix
+#' @param ver an integer
+#' @param par_ver an integer
 #'
-#' @returns
+#' @returns bool
 #' @export
 #'
 #' @examples mid_pos(structure, coor, 1, 3)
 mid_pos <- function(structure,coor,ver,par_ver){
   pos_mid <- FALSE
-  vers <- chil_coor(structure,par_ver) # 子模块内顶点的位置
-  col_vers <- vers[which(coor[vers,'x']==coor[ver,'x'])] # 子模块内与之同一横坐标的顶点的位置
+  vers <- chil_coor(structure,par_ver)
+  col_vers <- vers[which(coor[vers,'x']==coor[ver,'x'])]
   ver_y <- coor[ver,'y']
-  col_y <- sort(coor[col_vers,'y']) # 纵列上所有点的纵坐标
+  col_y <- sort(coor[col_vers,'y'])
   if (ver_y != min(col_y) && ver_y != max(col_y)){
     pos_mid <- TRUE
   }
@@ -205,22 +206,21 @@ mid_pos <- function(structure,coor,ver,par_ver){
 
 #' Title Judge whether the 'Fucose' Vertex is in the Middle Position of Sub-module
 #'
-#' @param structure
-#' @param coor
-#' @param ver
-#' @param par_ver
+#' @param structure an igraph object
+#' @param coor a matrix
+#' @param ver an integer
+#' @param par_ver an integer
 #'
-#' @returns
+#' @returns bool
 #' @export
 #'
 #' @examples fuc_mid_pos(structure, coor, 1, 3)
 fuc_mid_pos <- function(structure,coor,ver,par_ver){
-  vers <- chil_coor(structure,par_ver) # 子模块内顶点的位置
-  col_vers <- vers[which(coor[vers,'x']==coor[ver,'x'])] # 子模块内与之同一横坐标的顶点的位置
+  vers <- chil_coor(structure,par_ver)
+  col_vers <- vers[which(coor[vers,'x']==coor[ver,'x'])]
   ver_y <- coor[ver,'y']
-  col_y <- sort(coor[col_vers,'y']) # 子模块中岩藻糖所处纵列上所有点的纵坐标
+  col_y <- sort(coor[col_vers,'y'])
   ver_index <- which(col_y == ver_y)
-  # 判断该点是否与纵列上前后两个点差值小于1
   lag_diff <- abs(col_y - dplyr::lag(col_y)) < 1
   lead_diff <- abs(col_y - dplyr::lead(col_y)) < 1
   result <- lag_diff & lead_diff
@@ -230,16 +230,16 @@ fuc_mid_pos <- function(structure,coor,ver,par_ver){
 
 #' Title Calculate the Amount and Sequence Number of Vertices that Out-degree >= 2 from Specified 'Fucose' vertex along the Path
 #'
-#' @param structure
-#' @param ver
-#' @param coor
+#' @param structure an igraph object
+#' @param ver an integer
+#' @param coor a matrix
 #'
 #' @returns the Amount and Sequence Number of vertices that Out-degree >= 2
 #' @export
 #'
-#' @examples
+#' @examples fuc_out_degree(structure, 6, coor)
 fuc_out_degree <- function(structure,ver,coor){
-  path_vertex <- igraph::shortest_paths(structure,length(structure),ver)$vpath[[1]] # 顶点到起始点的最短路径
+  path_vertex <- igraph::shortest_paths(structure,length(structure),ver)$vpath[[1]]
   num <- 0
   pos <- c()
   for (i in path_vertex){
@@ -255,8 +255,8 @@ fuc_out_degree <- function(structure,ver,coor){
 
 #' Title Process the y-Coordinate of 'Fucose' Vertex
 #'
-#' @param structure
-#' @param fuc_pos
+#' @param structure an igraph object
+#' @param fuc_pos an integer
 #'
 #' @returns the Offset of Specified 'Fucose' Vertex
 #' @export
@@ -265,7 +265,7 @@ fuc_out_degree <- function(structure,ver,coor){
 fuc_offset <- function(structure,fuc_pos){
   linkage_str <- igraph::E(structure)[fuc_pos]$linkage
   linkage_pos <- strsplit(linkage_str,'-')[[1]][2]
-  offset <- 0.99 # 0.99是为了后续判断岩藻糖是否在中间位置
+  offset <- 0.99
   if (linkage_pos == '2'){
     offset <- -0.99
   }
@@ -274,10 +274,10 @@ fuc_offset <- function(structure,fuc_pos){
 
 #' Title Process the Vertices which Out-degree >=2 along the Path
 #'
-#' @param coor
-#' @param structure
-#' @param fuc_pos
-#' @param temp_coor
+#' @param coor a matrix
+#' @param structure an igraph object
+#' @param fuc_pos an integer
+#' @param temp_coor a matrix
 #'
 #' @returns Processed Coordinate
 #' @export
@@ -302,34 +302,30 @@ process_fucose_branches <- function(coor,structure,fuc_pos,temp_coor){
 
 #' Title Process the Vertices which Out-degree >=2 and more than 2 Father Vertices that Out-degree >= 2 along the Path
 #'
-#' @param coor
-#' @param structure
-#' @param ver
+#' @param coor a matrix
+#' @param structure an igraph object
+#' @param ver an integer
 #'
-#' @returns Processed Coordinate
+#' @returns Processed coordinate
 #' @export
 #'
 #' @examples process_multiple_branches(coor, structure, 3)
 process_multiple_branches <- function(coor,structure,ver){
-  num <- out_degree(structure,ver)[1] # 路径上出度>1顶点的数量
-  # 遍历分支节点到1号顶点路径上所有分支节点
-  for(j in seq(1,num-1)){ # 遍历除自身以外的前面所有分支节点
-    pos <- out_degree(structure,ver)[j+1] # 路径上出度>1顶点的位置
-    pos_max <- out_degree(structure,ver)[num] # 路径上序号第二大的出度>1顶点的位置
-    neigh_pos <- igraph::neighbors(structure,pos) # 相邻顶点的位置
+  num <- out_degree(structure,ver)[1] # Numbers of vertices which out-degree > 1 (e.g. branch vertices)
+  for(j in seq(1,num-1)){ # Traverse all branch vertices except for self
+    pos <- out_degree(structure,ver)[j+1]
+    pos_max <- out_degree(structure,ver)[num] # Position of branch vertices with second largest index
+    neigh_pos <- igraph::neighbors(structure,pos)
     neigh_linkage <- as.numeric(sub('.*-','',igraph::E(structure)$linkage[neigh_pos]))
     arrange_neigh_pos <- neigh_pos[order(neigh_linkage,decreasing = TRUE)]
-    # 判断节点的子节点是否在列中间
+    # Judge whether child vertex is in the middle
     ver_neigh_pos <- igraph::neighbors(structure,ver)
     chil_in_middle <- mid_pos(structure,coor,min(ver_neigh_pos),pos) | mid_pos(structure,coor,max(ver_neigh_pos),pos) # TRUE or FALSE
     if (length(arrange_neigh_pos)==2){
-      # 多分支路径上节点偏移满足等比规律,越靠右的分支节点偏移越小,在子模块中间的分支节点还需要加0.25的偏移量
-      # 在子模块边缘的分支节点不需要另加0.25的偏移量
       coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,1/(2**(num-j+1))+0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
       coor <- offset_chil_coor(structure,arrange_neigh_pos[2],coor,-1/(2**(num-j+1))-0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
     }
     else if(length(arrange_neigh_pos)==3 && chil_in_middle){
-      # 多分支路径上节点偏移满足等比规律,越靠右的分支节点偏移越小,在子模块中间的分支节点还需要加0.25的偏移量
       coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,1/(2**(num-j))+0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
       coor <- offset_chil_coor(structure,arrange_neigh_pos[3],coor,-1/(2**(num-j))-0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
     }
@@ -339,23 +335,23 @@ process_multiple_branches <- function(coor,structure,ver){
 
 #' Title Process the Vertices which Out-degree =2 along the Path
 #'
-#' @param coor
-#' @param structure
-#' @param ver
+#' @param coor a matrix
+#' @param structure an igraph object
+#' @param ver an integer
 #'
-#' @returns Processed Coordinate
+#' @returns Processed coordinate
 #' @export
 #'
 #' @examples process_two_neighbors(coor, structure, 5)
 process_two_neighbors <- function(coor,structure,ver){
-  neigh_pos <- igraph::neighbors(structure,ver) # 相邻顶点的位置
+  neigh_pos <- igraph::neighbors(structure,ver)
   neigh_linkage <- as.numeric(sub('.*-','',igraph::E(structure)$linkage[neigh_pos]))
   arrange_neigh_pos <- neigh_pos[order(neigh_linkage,decreasing = TRUE)]
   if (out_degree(structure,ver)[1] == 1){
     coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,0.5)
     coor <- offset_chil_coor(structure,arrange_neigh_pos[2],coor,-0.5)
   }
-  else if(out_degree(structure,ver)[1] >= 1){ # 顶点到起始点路径上有超过1个分支
+  else if(out_degree(structure,ver)[1] >= 1){ # More than 1 branch along the path支
     coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,0.5)
     coor <- offset_chil_coor(structure,arrange_neigh_pos[2],coor,-0.5)
     coor <- process_multiple_branches(coor,structure,ver)
@@ -365,23 +361,23 @@ process_two_neighbors <- function(coor,structure,ver){
 
 #' Title Process the Vertices which Out-degree =3 along the Path
 #'
-#' @param coor
-#' @param structure
-#' @param ver
+#' @param coor a matrix
+#' @param structure an igraph object
+#' @param ver an integer
 #'
-#' @returns Processed Coordinate
+#' @returns Processed coordinate
 #' @export
 #'
 #' @examples process_three_neighbors(coor, structure, 6)
 process_three_neighbors <- function(coor,structure,ver){
-  neigh_pos <- igraph::neighbors(structure,ver) # 相邻顶点的位置
+  neigh_pos <- igraph::neighbors(structure,ver)
   neigh_linkage <- as.numeric(sub('.*-','',igraph::E(structure)$linkage[neigh_pos]))
   arrange_neigh_pos <- neigh_pos[order(neigh_linkage,decreasing = TRUE)]
   if (out_degree(structure,ver)[1] == 1){
     coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,1)
     coor <- offset_chil_coor(structure,arrange_neigh_pos[3],coor,-1)
   }
-  else if(out_degree(structure,ver)[1] >= 1){ # 顶点到起始点路径上有超过1个分支
+  else if(out_degree(structure,ver)[1] >= 1){ # More than 1 branch along the path
     coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,1)
     coor <- offset_chil_coor(structure,arrange_neigh_pos[3],coor,-1)
     coor <- process_multiple_branches(coor,structure,ver)
@@ -391,28 +387,28 @@ process_three_neighbors <- function(coor,structure,ver){
 
 #' Title Process the Vertices adjacent to 'Fucose'
 #'
-#' @param coor
-#' @param structure
-#' @param ver
+#' @param coor a matrix
+#' @param structure an igraph object
+#' @param ver an integer
 #'
-#' @returns Processed Coordinate
+#' @returns Processed coordinate
 #' @export
 #'
 #' @examples process_contain_fucose_neighbors(coor, structure, 7)
 process_contain_fucose_neighbors <- function(coor,structure,ver){
-  # 获取Fuc的位置
+  # Gain 'Fuc' position
   neigh_pos <- igraph::neighbors(structure,ver)
   fuc_pos <- neigh_pos[which(neigh_pos$mono=='Fuc')]
-  # 获取其余邻点的位置
+  # Gain other vertices position
   other_neigh_pos <- neigh_pos[!neigh_pos %in% c(fuc_pos)]
   neigh_linkage <- as.numeric(sub('.*-','',igraph::E(structure)$linkage[other_neigh_pos]))
   arrange_other_neigh_pos <- other_neigh_pos[order(neigh_linkage,decreasing = TRUE)]
-  # 其余邻点按两个邻点的逻辑处理
+  # Process other vertices coordinate
   if (out_degree(structure,ver)[1] == 1){
     coor <- offset_chil_coor(structure,arrange_other_neigh_pos[1],coor,0.5)
     coor <- offset_chil_coor(structure,arrange_other_neigh_pos[2],coor,-0.5)
   }
-  else if(out_degree(structure,ver)[1] >= 1){ # 顶点到起始点路径上有超过1个分支
+  else if(out_degree(structure,ver)[1] >= 1){ # More than 1 branch along the path
     coor <- offset_chil_coor(structure,arrange_other_neigh_pos[1],coor,0.5)
     coor <- offset_chil_coor(structure,arrange_other_neigh_pos[2],coor,-0.5)
     coor <- process_multiple_branches(coor,structure,ver)
@@ -422,16 +418,15 @@ process_contain_fucose_neighbors <- function(coor,structure,ver){
 
 #' Title Process the Coordinate of all Vertices
 #'
-#' @param structure
+#' @param structure an igraph object
 #'
 #' @returns Processed Coordinate
 #' @export
 #'
 #' @examples coor_cal(structure)
 coor_cal <- function(structure){
-  coor <- coor_initialization(structure) # 初始化坐标
-  structure_length <- seq(length(structure),1) # 生成可迭代序列
-  # 先处理不含岩藻糖的分支节点
+  coor <- coor_initialization(structure)
+  structure_length <- seq(length(structure),1)
   for (i in structure_length) {
     gly_neighbors <- igraph::neighbors(structure,i)
     if (length(gly_neighbors) == 2 &&
@@ -447,15 +442,12 @@ coor_cal <- function(structure){
       coor <- process_contain_fucose_neighbors(coor,structure,i)
     }
   }
-  # 处理含岩藻糖的分支节点
   fuc_list <- c()
   for (i in structure_length){
     if ('Fuc' %in% igraph::neighbors(structure,i)$mono){
-      # 获取Fuc的位置
       neigh_pos <- igraph::neighbors(structure,i)
       fuc_pos <- neigh_pos[which(neigh_pos$mono=='Fuc')]
       fuc_list <- c(fuc_list,fuc_pos)
-      # 偏移Fuc节点
       coor[fuc_pos,'y'] <- coor[fuc_pos,'y']+fuc_offset(structure,fuc_pos)
     }
   }
@@ -470,8 +462,8 @@ coor_cal <- function(structure){
 
 #' Title Analysis the Connection Information of all Vertices
 #'
-#' @param structure
-#' @param coor
+#' @param structure an igraph object
+#' @param coor a matrix
 #'
 #' @returns Connection Information
 #' @export
@@ -479,7 +471,6 @@ coor_cal <- function(structure){
 #' @examples connect_info(structure, coor)
 connect_info <- function(structure,coor){
   edges <- igraph::as_edgelist(structure, names = FALSE)
-
   if (nrow(edges) == 0) {
     return(list(start_x = numeric(0), start_y = numeric(0), end_x = numeric(0), end_y = numeric(0)))
   }
@@ -492,15 +483,14 @@ connect_info <- function(structure,coor){
   )
 }
 
-# 获取糖型信息用于绘图,主要是Fuc的位置
-#' Title
+#' Title Gain the glycoforms corresponding to the vertices
 #'
-#' @param structure
+#' @param structure an igraph object
 #'
-#' @returns
+#' @returns list of glycoform
 #' @export
 #'
-#' @examples
+#' @examples glycoform_info(structure)
 glycoform_info <- function(structure){
   glycoform <- igraph::V(structure)$mono
   for (i in c(which(glycoform == 'Fuc'))){
@@ -511,25 +501,24 @@ glycoform_info <- function(structure){
   return(glycoform)
 }
 
-# 确定注释字符的坐标
-#' Title
+#' Title Adjust the coordinate of glycan annotation text
 #'
-#' @param chil_glyx
-#' @param chil_glyy
-#' @param par_glyx
-#' @param par_glyy
+#' @param chil_glyx a float
+#' @param chil_glyy a float
+#' @param par_glyx a float
+#' @param par_glyy a float
 #'
-#' @returns
+#' @returns coordinate list of annotations
 #' @export
 #'
-#' @examples
+#' @examples annotation_coordinate(chil_glyx, chil_glyy, par_glyx, par_glyy)
 annotation_coordinate <- function(chil_glyx, chil_glyy, par_glyx, par_glyy){
   chil_direction <- matrix(c(par_glyx-chil_glyx, par_glyy-chil_glyy),ncol = 1, byrow = FALSE)
   par_direction <- matrix(c(chil_glyx-par_glyx, chil_glyy-par_glyy),ncol = 1, byrow = FALSE)
-  chil_location <- 0.35*chil_direction/norm(chil_direction, type = '2') # 设定注释字符与顶点的相对距离
+  chil_location <- 0.35*chil_direction/norm(chil_direction, type = '2')
   par_location <- 0.35*par_direction/norm(par_direction, type = '2')
   chil_rotate_matrix <- matrix(c(cos(1/8*pi),sin(1/8*pi),
-                                 -sin(1/8*pi),cos(1/8*pi)), ncol = 2, byrow = TRUE) # 旋转10度的旋转矩阵
+                                 -sin(1/8*pi),cos(1/8*pi)), ncol = 2, byrow = TRUE)
   par_rotate_matrix <- matrix(c(cos(1/8*pi),-sin(1/8*pi),
                                 sin(1/8*pi),cos(1/8*pi)), ncol = 2, byrow = TRUE)
   chil_annot_loc <- chil_rotate_matrix %*% chil_location
@@ -538,50 +527,48 @@ annotation_coordinate <- function(chil_glyx, chil_glyy, par_glyx, par_glyy){
   return(annot_loc)
 }
 
-#' Title
+#' Title Map the glycan coordinate and annotation text
 #'
-#' @param structure
-#' @param coor
+#' @param structure an igraph object
+#' @param coor a matrix
 #'
-#' @returns
+#' @returns dataframe of glycan annotation and coordinate
 #' @export
 #'
-#' @examples
+#' @examples gly_annotation(structure,coor)
 gly_annotation <- function(structure,coor){
   structure_length <- length(structure)
-  struc_annot_coor <- data.frame(matrix(nrow = 0, ncol = 4)) # 用于储存各注释坐标
-  # 遍历除糖起始点以外的所有顶点
+  struc_annot_coor <- data.frame(matrix(nrow = 0, ncol = 4))
   for (ver in seq(1,structure_length-1)){
     par_ver <- dplyr::nth(as.vector(igraph::shortest_paths(structure,length(structure),ver)$vpath[[1]]),-2) # 相邻母顶点的序号
-    # 读取顶点注释信息并计算注释信息与顶点的相对位置
+    # Read annotation information and relative position
     linkage_str <- igraph::E(structure)[ver]$linkage
     gly_annot_coor <- annotation_coordinate(coor[ver,1],coor[ver,2],coor[par_ver,1],coor[par_ver,2])
-    # 得到顶点及母顶点的(annotation,x,y)信息
+    # Calculate annotation coordinate >> c(annotate_information, x, y)
     chil_annotation <- c(ver, strsplit(linkage_str,'-')[[1]][1])
     chil_annotation <- c(chil_annotation, as.vector(gly_annot_coor$chil)+coor[ver,])
     par_annotation <- c(par_ver,strsplit(linkage_str,'-')[[1]][2])
     par_annotation <- c(par_annotation, as.vector(gly_annot_coor$par)+coor[par_ver,])
-    # 合并到dataframe
+    # Bind to data.frame
     struc_annot_coor <- rbind(struc_annot_coor, chil_annotation)
     struc_annot_coor <- rbind(struc_annot_coor, par_annotation)
   }
   colnames(struc_annot_coor) <- c('vertice','annot','x','y')
   struc_annot_coor$annot[struc_annot_coor$annot == 'b1'] <- 'β'
   struc_annot_coor$annot[struc_annot_coor$annot %in% c('a1','a2')] <- 'α'
-  # 转换字符为数值
   struc_annot_coor$x <- as.numeric(struc_annot_coor$x)
   struc_annot_coor$y <- as.numeric(struc_annot_coor$y)
   return(struc_annot_coor)
 }
 
-#' Title
+#' Title Match the coordinates of glycan shape
 #'
-#' @param gly_list
+#' @param gly_list a list
 #'
-#' @returns
+#' @returns the coordinate list of glycan shape
 #' @export
 #'
-#' @examples
+#' @examples create_polygon_coor(gly_list)
 create_polygon_coor <- function(gly_list) {
   polygon_coor <- gly_list |>
     purrr::pmap_dfr(function(center_x, center_y, glycoform) {
@@ -608,11 +595,11 @@ create_polygon_coor <- function(gly_list) {
   return(polygon_coor)
 }
 
-#' Title
+#' Title Draw the image based on the coordinates
 #'
-#' @param structure
+#' @param structure an igraph object
 #'
-#' @returns
+#' @returns ggplot2 object
 #' @export
 #'
 #' @examples glydraw(structure)
@@ -640,7 +627,6 @@ gly_draw <- function(structure){
   y_span <- diff(range(coor[,2]))
   text_size <- 8/mean(c(x_span, y_span))
 
-  # 绘图
   gly_graph <- ggplot2::ggplot()+
     ggplot2::geom_segment(data = connect_df,
                           ggplot2::aes(x = start_x, y = start_y,
