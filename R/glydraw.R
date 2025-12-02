@@ -37,6 +37,7 @@ glycan_dict <- list(
   'Qui'=c('dHex','glyBlue'),'Rha'=c('dHex','glyGreen'),
   '6dGul'=c('dHex','glyOrange'),'6dAlt'=c('dHex','glyPink'),
   '6dTal'=c('dHex','glyLightBlue'),'Fuc'=c('dHex','glyRed'),
+  'FucUp'=c('dHexUp','glyRed'),
 
   'dHexNAc'=c('dHexNAc','glyWhite','glyWhite'),
   'QuiNAc'=c('dHexNAc','glyBlue','glyWhite'),'RhaNAc'=c('dHexNAc','glyGreen','glyWhite'),
@@ -266,7 +267,7 @@ fuc_offset <- function(structure,fuc_pos){
   linkage_str <- igraph::E(structure)[fuc_pos]$linkage
   linkage_pos <- strsplit(linkage_str,'-')[[1]][2]
   offset <- 0.99
-  if (linkage_pos == '2'){
+  if (linkage_pos %in% c('2','3')){
     offset <- -0.99
   }
   return(offset)
@@ -625,16 +626,17 @@ gly_draw <- function(structure){
 
   x_span <- diff(range(coor[,1]))
   y_span <- diff(range(coor[,2]))
-  text_size <- 8/mean(c(x_span, y_span))
+  text_size <- 12/mean(c(x_span, y_span))
+  line_width <- 2/mean(c(x_span, y_span))
 
   gly_graph <- ggplot2::ggplot()+
     ggplot2::geom_segment(data = connect_df,
                           ggplot2::aes(x = start_x, y = start_y,
                                        xend = end_x, yend = end_y),
-                          linewidth = 1)+
+                          linewidth = line_width)+
     ggplot2::geom_polygon(data = polygon_coor,
                           ggplot2::aes(x = point_x, y = point_y, group = group),
-                          fill=filled_color, color='black',linewidth = 1)+
+                          fill=filled_color, color='black',linewidth = line_width)+
     ggplot2::geom_text(data = struc_annotation,
                        ggplot2::aes(x = x, y = y, label = annot),
                        family = 'TT Arial',
