@@ -137,6 +137,7 @@ coor_initialization <- function(structure){
 #' @export
 #'
 #' @examples chil_coor(structure, 3)
+#' @noRd
 chil_coor <- function(structure,ver){
   vers <- igraph::bfs(structure, ver, mode='out',unreachable = FALSE)$order
   return(vers)
@@ -153,6 +154,7 @@ chil_coor <- function(structure,ver){
 #' @export
 #'
 #' @examples offset_chil_coor(structure, 3, coor, 0.5)
+#' @noRd
 offset_chil_coor <- function(structure,ver,coor,offset){
   vers <- chil_coor(structure,ver)
   coor[vers,'y'] <- coor[vers,'y']+offset
@@ -168,6 +170,7 @@ offset_chil_coor <- function(structure,ver,coor,offset){
 #' @export
 #'
 #' @examples out_degree(structure, 1)
+#' @noRd
 out_degree <- function(structure,ver){
   path_vertex <- igraph::shortest_paths(structure,length(structure),ver)$vpath[[1]]
   num <- 0
@@ -193,6 +196,7 @@ out_degree <- function(structure,ver){
 #' @export
 #'
 #' @examples mid_pos(structure, coor, 1, 3)
+#' @noRd
 mid_pos <- function(structure,coor,ver,par_ver){
   pos_mid <- FALSE
   vers <- chil_coor(structure,par_ver)
@@ -216,6 +220,7 @@ mid_pos <- function(structure,coor,ver,par_ver){
 #' @export
 #'
 #' @examples fuc_mid_pos(structure, coor, 1, 3)
+#' @noRd
 fuc_mid_pos <- function(structure,coor,ver,par_ver){
   vers <- chil_coor(structure,par_ver)
   col_vers <- vers[which(coor[vers,'x']==coor[ver,'x'])]
@@ -239,6 +244,7 @@ fuc_mid_pos <- function(structure,coor,ver,par_ver){
 #' @export
 #'
 #' @examples fuc_out_degree(structure, 6, coor)
+#' @noRd
 fuc_out_degree <- function(structure,ver,coor){
   path_vertex <- igraph::shortest_paths(structure,length(structure),ver)$vpath[[1]]
   num <- 0
@@ -263,6 +269,7 @@ fuc_out_degree <- function(structure,ver,coor){
 #' @export
 #'
 #' @examples fuc_offset(structure, 1)
+#' @noRd
 fuc_offset <- function(structure,fuc_pos){
   linkage_str <- igraph::E(structure)[fuc_pos]$linkage
   linkage_pos <- strsplit(linkage_str,'-')[[1]][2]
@@ -284,6 +291,7 @@ fuc_offset <- function(structure,fuc_pos){
 #' @export
 #'
 #' @examples process_fucose_branches(coor, structure, 2, temp_coor)
+#' @noRd
 process_fucose_branches <- function(coor,structure,fuc_pos,temp_coor){
   num <- fuc_out_degree(structure,fuc_pos,temp_coor)[1]
   for (i in seq(1,num)){
@@ -311,6 +319,7 @@ process_fucose_branches <- function(coor,structure,fuc_pos,temp_coor){
 #' @export
 #'
 #' @examples process_multiple_branches(coor, structure, 3)
+#' @noRd
 process_multiple_branches <- function(coor,structure,ver){
   num <- out_degree(structure,ver)[1] # Numbers of vertices which out-degree > 1 (e.g. branch vertices)
   for(j in seq(1,num-1)){ # Traverse all branch vertices except for self
@@ -344,6 +353,7 @@ process_multiple_branches <- function(coor,structure,ver){
 #' @export
 #'
 #' @examples process_two_neighbors(coor, structure, 5)
+#' @noRd
 process_two_neighbors <- function(coor,structure,ver){
   neigh_pos <- igraph::neighbors(structure,ver)
   neigh_linkage <- as.numeric(sub('.*-','',igraph::E(structure)$linkage[neigh_pos]))
@@ -370,6 +380,7 @@ process_two_neighbors <- function(coor,structure,ver){
 #' @export
 #'
 #' @examples process_three_neighbors(coor, structure, 6)
+#' @noRd
 process_three_neighbors <- function(coor,structure,ver){
   neigh_pos <- igraph::neighbors(structure,ver)
   neigh_linkage <- as.numeric(sub('.*-','',igraph::E(structure)$linkage[neigh_pos]))
@@ -396,6 +407,7 @@ process_three_neighbors <- function(coor,structure,ver){
 #' @export
 #'
 #' @examples process_contain_fucose_neighbors(coor, structure, 7)
+#' @noRd
 process_contain_fucose_neighbors <- function(coor,structure,ver){
   # Gain 'Fuc' position
   neigh_pos <- igraph::neighbors(structure,ver)
@@ -425,6 +437,7 @@ process_contain_fucose_neighbors <- function(coor,structure,ver){
 #' @export
 #'
 #' @examples coor_cal(structure)
+#' @noRd
 coor_cal <- function(structure){
   coor <- coor_initialization(structure)
   structure_length <- seq(length(structure),1)
@@ -470,6 +483,7 @@ coor_cal <- function(structure){
 #' @export
 #'
 #' @examples connect_info(structure, coor)
+#' @noRd
 connect_info <- function(structure,coor){
   edges <- igraph::as_edgelist(structure, names = FALSE)
   if (nrow(edges) == 0) {
@@ -492,6 +506,7 @@ connect_info <- function(structure,coor){
 #' @export
 #'
 #' @examples glycoform_info(structure)
+#' @noRd
 glycoform_info <- function(structure){
   glycoform <- igraph::V(structure)$mono
   for (i in c(which(glycoform == 'Fuc'))){
@@ -513,6 +528,7 @@ glycoform_info <- function(structure){
 #' @export
 #'
 #' @examples annotation_coordinate(chil_glyx, chil_glyy, par_glyx, par_glyy)
+#' @noRd
 annotation_coordinate <- function(chil_glyx, chil_glyy, par_glyx, par_glyy){
   chil_direction <- matrix(c(par_glyx-chil_glyx, par_glyy-chil_glyy),ncol = 1, byrow = FALSE)
   par_direction <- matrix(c(chil_glyx-par_glyx, chil_glyy-par_glyy),ncol = 1, byrow = FALSE)
@@ -537,6 +553,7 @@ annotation_coordinate <- function(chil_glyx, chil_glyy, par_glyx, par_glyy){
 #' @export
 #'
 #' @examples gly_annotation(structure,coor)
+#' @noRd
 gly_annotation <- function(structure,coor){
   structure_length <- length(structure)
   struc_annot_coor <- data.frame(matrix(nrow = 0, ncol = 4))
@@ -555,8 +572,8 @@ gly_annotation <- function(structure,coor){
     struc_annot_coor <- rbind(struc_annot_coor, par_annotation)
   }
   colnames(struc_annot_coor) <- c('vertice','annot','x','y')
-  struc_annot_coor$annot[struc_annot_coor$annot == 'b1'] <- 'β'
-  struc_annot_coor$annot[struc_annot_coor$annot %in% c('a1','a2')] <- 'α'
+  struc_annot_coor$annot[struc_annot_coor$annot == 'b1'] <- stringi::stri_enc_toascii('β')
+  struc_annot_coor$annot[struc_annot_coor$annot %in% c('a1','a2')] <- stringi::stri_enc_toascii('α')
   struc_annot_coor$x <- as.numeric(struc_annot_coor$x)
   struc_annot_coor$y <- as.numeric(struc_annot_coor$y)
   return(struc_annot_coor)
@@ -570,6 +587,7 @@ gly_annotation <- function(structure,coor){
 #' @export
 #'
 #' @examples create_polygon_coor(gly_list)
+#' @noRd
 create_polygon_coor <- function(gly_list) {
   polygon_coor <- gly_list |>
     purrr::pmap_dfr(function(center_x, center_y, glycoform) {
@@ -631,14 +649,14 @@ gly_draw <- function(structure){
 
   gly_graph <- ggplot2::ggplot()+
     ggplot2::geom_segment(data = connect_df,
-                          ggplot2::aes(x = start_x, y = start_y,
-                                       xend = end_x, yend = end_y),
+                          ggplot2::aes(x = .data$start_x, y = .data$start_y,
+                                       xend = .data$end_x, yend = .data$end_y),
                           linewidth = line_width)+
     ggplot2::geom_polygon(data = polygon_coor,
-                          ggplot2::aes(x = point_x, y = point_y, group = group),
+                          ggplot2::aes(x = .data$point_x, y = .data$point_y, group = .data$group),
                           fill=filled_color, color='black',linewidth = line_width)+
     ggplot2::geom_text(data = struc_annotation,
-                       ggplot2::aes(x = x, y = y, label = annot),
+                       ggplot2::aes(x = .data$x, y = .data$y, label = .data$annot),
                        family = 'TT Arial',
                        size = text_size,
                        hjust = 0.5,
