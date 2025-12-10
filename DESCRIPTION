@@ -20,6 +20,7 @@ Imports:
     ggplot2,
     igraph,
     purrr,
-    stringi
-Remotes:  
+    glyparse,
+    cli
+Remotes: 
     glycoverse/glyrepr@*release
