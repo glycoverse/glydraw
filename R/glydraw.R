@@ -555,8 +555,8 @@ gly_annotation <- function(structure,coor){
     struc_annot_coor <- rbind(struc_annot_coor, par_annotation)
   }
   colnames(struc_annot_coor) <- c('vertice','annot','x','y')
-  struc_annot_coor$annot[struc_annot_coor$annot == 'b1'] <- '\u03b2'
-  struc_annot_coor$annot[struc_annot_coor$annot %in% c('a1','a2')] <- '\u03b1'
+  struc_annot_coor$annot[struc_annot_coor$annot == 'b1'] <- 'b'
+  struc_annot_coor$annot[struc_annot_coor$annot %in% c('a1','a2')] <- 'a'
   struc_annot_coor$x <- as.numeric(struc_annot_coor$x)
   struc_annot_coor$y <- as.numeric(struc_annot_coor$y)
   return(struc_annot_coor)
@@ -630,7 +630,7 @@ draw_cartoon <- function(structure){
   x_span <- diff(range(coor[,1]))
   y_span <- diff(range(coor[,2]))
   text_size <- 12/mean(c(x_span, y_span))
-  line_width <- 2/mean(c(x_span, y_span))
+  line_width <- 1/mean(c(x_span, y_span))
 
   gly_graph <- ggplot2::ggplot()+
     ggplot2::geom_segment(data = connect_df,
