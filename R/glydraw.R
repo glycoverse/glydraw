@@ -642,12 +642,11 @@ draw_cartoon <- function(structure){
                           fill=filled_color, color='black',linewidth = line_width)+
     ggplot2::geom_text(data = struc_annotation,
                        ggplot2::aes(x = .data$x, y = .data$y, label = .data$annot),
-                       family = 'TT Arial',
                        size = text_size,
                        hjust = 0.5,
                        vjust = 0.5)+
     ggplot2::coord_fixed(ratio = 1, clip = "off") +
-    ggplot2::theme_void(base_family = 'TT Arial')+
+    ggplot2::theme_void()+
     ggplot2::theme(
       text = ggplot2::element_text(size = 10),
       plot.margin = ggplot2::margin(10, 10, 10, 10)
