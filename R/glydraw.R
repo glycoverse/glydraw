@@ -134,7 +134,6 @@ coor_initialization <- function(structure){
 #' @param ver an integer
 #'
 #' @returns the child vertices of structure
-#' @export
 #'
 #' @examples chil_coor(structure, 3)
 #' @noRd
@@ -151,7 +150,6 @@ chil_coor <- function(structure,ver){
 #' @param offset a float
 #'
 #' @returns offset coordinate
-#' @export
 #'
 #' @examples offset_chil_coor(structure, 3, coor, 0.5)
 #' @noRd
@@ -167,7 +165,6 @@ offset_chil_coor <- function(structure,ver,coor,offset){
 #' @param ver the Sequence Number of Vertices
 #'
 #' @returns the number of vertices which neighbors >=2 on the path between vertex and begin vertex
-#' @export
 #'
 #' @examples out_degree(structure, 1)
 #' @noRd
@@ -193,7 +190,6 @@ out_degree <- function(structure,ver){
 #' @param par_ver an integer
 #'
 #' @returns bool
-#' @export
 #'
 #' @examples mid_pos(structure, coor, 1, 3)
 #' @noRd
@@ -217,7 +213,6 @@ mid_pos <- function(structure,coor,ver,par_ver){
 #' @param par_ver an integer
 #'
 #' @returns bool
-#' @export
 #'
 #' @examples fuc_mid_pos(structure, coor, 1, 3)
 #' @noRd
@@ -241,7 +236,6 @@ fuc_mid_pos <- function(structure,coor,ver,par_ver){
 #' @param coor a matrix
 #'
 #' @returns the Amount and Sequence Number of vertices that Out-degree >= 2
-#' @export
 #'
 #' @examples fuc_out_degree(structure, 6, coor)
 #' @noRd
@@ -266,7 +260,6 @@ fuc_out_degree <- function(structure,ver,coor){
 #' @param fuc_pos an integer
 #'
 #' @returns the Offset of Specified 'Fucose' Vertex
-#' @export
 #'
 #' @examples fuc_offset(structure, 1)
 #' @noRd
@@ -288,7 +281,6 @@ fuc_offset <- function(structure,fuc_pos){
 #' @param temp_coor a matrix
 #'
 #' @returns Processed Coordinate
-#' @export
 #'
 #' @examples process_fucose_branches(coor, structure, 2, temp_coor)
 #' @noRd
@@ -316,7 +308,6 @@ process_fucose_branches <- function(coor,structure,fuc_pos,temp_coor){
 #' @param ver an integer
 #'
 #' @returns Processed coordinate
-#' @export
 #'
 #' @examples process_multiple_branches(coor, structure, 3)
 #' @noRd
@@ -350,7 +341,6 @@ process_multiple_branches <- function(coor,structure,ver){
 #' @param ver an integer
 #'
 #' @returns Processed coordinate
-#' @export
 #'
 #' @examples process_two_neighbors(coor, structure, 5)
 #' @noRd
@@ -377,7 +367,6 @@ process_two_neighbors <- function(coor,structure,ver){
 #' @param ver an integer
 #'
 #' @returns Processed coordinate
-#' @export
 #'
 #' @examples process_three_neighbors(coor, structure, 6)
 #' @noRd
@@ -404,7 +393,6 @@ process_three_neighbors <- function(coor,structure,ver){
 #' @param ver an integer
 #'
 #' @returns Processed coordinate
-#' @export
 #'
 #' @examples process_contain_fucose_neighbors(coor, structure, 7)
 #' @noRd
@@ -434,7 +422,6 @@ process_contain_fucose_neighbors <- function(coor,structure,ver){
 #' @param structure an igraph object
 #'
 #' @returns Processed Coordinate
-#' @export
 #'
 #' @examples coor_cal(structure)
 #' @noRd
@@ -480,7 +467,6 @@ coor_cal <- function(structure){
 #' @param coor a matrix
 #'
 #' @returns Connection Information
-#' @export
 #'
 #' @examples connect_info(structure, coor)
 #' @noRd
@@ -503,7 +489,6 @@ connect_info <- function(structure,coor){
 #' @param structure an igraph object
 #'
 #' @returns list of glycoform
-#' @export
 #'
 #' @examples glycoform_info(structure)
 #' @noRd
@@ -525,7 +510,6 @@ glycoform_info <- function(structure){
 #' @param par_glyy a float
 #'
 #' @returns coordinate list of annotations
-#' @export
 #'
 #' @examples annotation_coordinate(chil_glyx, chil_glyy, par_glyx, par_glyy)
 #' @noRd
@@ -550,7 +534,6 @@ annotation_coordinate <- function(chil_glyx, chil_glyy, par_glyx, par_glyy){
 #' @param coor a matrix
 #'
 #' @returns dataframe of glycan annotation and coordinate
-#' @export
 #'
 #' @examples gly_annotation(structure,coor)
 #' @noRd
@@ -572,8 +555,8 @@ gly_annotation <- function(structure,coor){
     struc_annot_coor <- rbind(struc_annot_coor, par_annotation)
   }
   colnames(struc_annot_coor) <- c('vertice','annot','x','y')
-  struc_annot_coor$annot[struc_annot_coor$annot == 'b1'] <- stringi::stri_enc_toascii('β')
-  struc_annot_coor$annot[struc_annot_coor$annot %in% c('a1','a2')] <- stringi::stri_enc_toascii('α')
+  struc_annot_coor$annot[struc_annot_coor$annot == 'b1'] <- charToRaw('β')
+  struc_annot_coor$annot[struc_annot_coor$annot %in% c('a1','a2')] <- charToRaw('α')
   struc_annot_coor$x <- as.numeric(struc_annot_coor$x)
   struc_annot_coor$y <- as.numeric(struc_annot_coor$y)
   return(struc_annot_coor)
@@ -584,7 +567,6 @@ gly_annotation <- function(structure,coor){
 #' @param gly_list a list
 #'
 #' @returns the coordinate list of glycan shape
-#' @export
 #'
 #' @examples create_polygon_coor(gly_list)
 #' @noRd
@@ -621,8 +603,8 @@ create_polygon_coor <- function(gly_list) {
 #' @returns ggplot2 object
 #' @export
 #'
-#' @examples glydraw(structure)
-gly_draw <- function(structure){
+#' @examples draw_cartoon(structure)
+draw_cartoon <- function(structure){
   coor <- coor_cal(structure)
   gly_list <- data.frame(coor,'glycoform' = glycoform_info(structure))
   # Rename colnames of gly_list
