@@ -14,6 +14,12 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 URL: https://glycoverse.github.io/glydraw/
 Imports: 
-    glyrepr (>= 0.7.4)
+    glyrepr (>= 0.7.4),
+    rlang,
+    dplyr,
+    ggplot2,
+    igraph,
+    purrr,
+    stringi
 Remotes:  
     glycoverse/glyrepr@*release
