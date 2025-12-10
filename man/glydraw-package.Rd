@@ -4,7 +4,7 @@
 \name{glydraw-package}
 \alias{glydraw}
 \alias{glydraw-package}
-\title{glydraw: Draw beautiful SNFG cartoons.}
+\title{glydraw: Draw beautiful SNFG cartoons}
 \description{
 Draw beautiful SNFG cartoons.
 }
