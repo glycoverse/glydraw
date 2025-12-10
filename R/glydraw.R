@@ -603,8 +603,11 @@ create_polygon_coor <- function(gly_list) {
 #' @returns ggplot2 object
 #' @export
 #'
-#' @examples draw_cartoon(structure)
+#' @examples
+#' draw_cartoon("Gal(b1-3)GalNAc(a1-")
 draw_cartoon <- function(structure){
+  structure <- .ensure_one_structure(structure)
+  structure <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
   coor <- coor_cal(structure)
   gly_list <- data.frame(coor,'glycoform' = glycoform_info(structure))
   # Rename colnames of gly_list
@@ -650,4 +653,22 @@ draw_cartoon <- function(structure){
       plot.margin = ggplot2::margin(10, 10, 10, 10)
     )
   return(gly_graph)
+}
+
+.ensure_one_structure <- function(x) {
+  if (is.character(x)) {
+    x <- glyparse::auto_parse(x)
+  } else if (!glyrepr::is_glycan_structure(x)) {
+    cli::cli_abort(c(
+      "{.arg structure} must be either a structure string or {.fn glyrepr::glycan_structure}.",
+      "x" = "Got: {.cls {class(x)}}."
+    ))
+  }
+  if (length(x) > 1) {
+    cli::cli_abort(c(
+      "Must provide exactly one glycan structure.",
+      "x" = "Get length: {.val {length(x)}}."
+    ))
+  }
+  x
 }

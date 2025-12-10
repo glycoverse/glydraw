@@ -16,5 +16,5 @@ ggplot2 object
 Title Draw the image based on the coordinates
 }
 \examples{
-draw_cartoon(structure)
+draw_cartoon("Gal(b1-3)GalNAc(a1-")
 }
