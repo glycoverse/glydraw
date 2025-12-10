@@ -352,7 +352,7 @@ process_two_neighbors <- function(coor,structure,ver){
     coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,0.5)
     coor <- offset_chil_coor(structure,arrange_neigh_pos[2],coor,-0.5)
   }
-  else if(out_degree(structure,ver)[1] >= 1){ # More than 1 branch along the path支
+  else if(out_degree(structure,ver)[1] >= 1){ # More than 1 branch along the path
     coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,0.5)
     coor <- offset_chil_coor(structure,arrange_neigh_pos[2],coor,-0.5)
     coor <- process_multiple_branches(coor,structure,ver)
@@ -541,7 +541,7 @@ gly_annotation <- function(structure,coor){
   structure_length <- length(structure)
   struc_annot_coor <- data.frame(matrix(nrow = 0, ncol = 4))
   for (ver in seq(1,structure_length-1)){
-    par_ver <- dplyr::nth(as.vector(igraph::shortest_paths(structure,length(structure),ver)$vpath[[1]]),-2) # 相邻母顶点的序号
+    par_ver <- dplyr::nth(as.vector(igraph::shortest_paths(structure,length(structure),ver)$vpath[[1]]),-2)
     # Read annotation information and relative position
     linkage_str <- igraph::E(structure)[ver]$linkage
     gly_annot_coor <- annotation_coordinate(coor[ver,1],coor[ver,2],coor[par_ver,1],coor[par_ver,2])
@@ -555,8 +555,8 @@ gly_annotation <- function(structure,coor){
     struc_annot_coor <- rbind(struc_annot_coor, par_annotation)
   }
   colnames(struc_annot_coor) <- c('vertice','annot','x','y')
-  struc_annot_coor$annot[struc_annot_coor$annot == 'b1'] <- charToRaw('β')
-  struc_annot_coor$annot[struc_annot_coor$annot %in% c('a1','a2')] <- charToRaw('α')
+  struc_annot_coor$annot[struc_annot_coor$annot == 'b1'] <- '\u03b2'
+  struc_annot_coor$annot[struc_annot_coor$annot %in% c('a1','a2')] <- '\u03b1'
   struc_annot_coor$x <- as.numeric(struc_annot_coor$x)
   struc_annot_coor$y <- as.numeric(struc_annot_coor$y)
   return(struc_annot_coor)
