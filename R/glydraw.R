@@ -570,21 +570,21 @@ gly_annotation <- function(structure,coor){
 #'
 #' @examples create_polygon_coor(gly_list)
 #' @noRd
-create_polygon_coor <- function(gly_list) {
+create_polygon_coor <- function(gly_list, point_size) {
   polygon_coor <- gly_list |>
     purrr::pmap_dfr(function(center_x, center_y, glycoform) {
       composition <- glycan_dict[[glycoform]][1] # Mapping the Composition of Glycoform, e.g.'Fuc'->'dHex'
       df1 <- data.frame(
-        point_x = c(0.15 * glycan_shape[[composition]]$x + center_x),
-        point_y = c(0.15 * glycan_shape[[composition]]$y + center_y),
+        point_x = c(point_size * glycan_shape[[composition]]$x + center_x),
+        point_y = c(point_size * glycan_shape[[composition]]$y + center_y),
         # For Distinguishing the Coordinates of each point
         group = paste0(glycoform, center_x, "_", center_y),
         color = glycan_dict[[glycoform]][2]
       )
       if (length(glycan_dict[[glycoform]]) > 2) {
         df2 <- data.frame(
-          point_x = c(0.15 * glycan_shape[[composition]]$xx + center_x),
-          point_y = c(0.15 * glycan_shape[[composition]]$yy + center_y),
+          point_x = c(point_size * glycan_shape[[composition]]$xx + center_x),
+          point_y = c(point_size * glycan_shape[[composition]]$yy + center_y),
           # For Distinguishing the Coordinates of each point
           group = paste0(glycoform, center_x, "_", center_y, 'remain'),
           color = glycan_dict[[glycoform]][3]
@@ -605,15 +605,17 @@ create_polygon_coor <- function(gly_list) {
 #'
 #' @examples
 #' draw_cartoon("Gal(b1-3)GalNAc(a1-")
-draw_cartoon <- function(structure){
+draw_cartoon <- function(structure, point_size = 0.15){
+  point_size <<- point_size
   structure <- .ensure_one_structure(structure)
   structure <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
-  coor <- coor_cal(structure)
+  # Coordinate of Glycans
+  coor <<- coor_cal(structure)
   gly_list <- data.frame(coor,'glycoform' = glycoform_info(structure))
   # Rename colnames of gly_list
   colnames(gly_list) <- c('center_x','center_y','glycoform')
   # Draw Glycan Shape, where gly_list contains center_x, center_y, glycoform 3 columns
-  polygon_coor <- create_polygon_coor(gly_list)
+  polygon_coor <- create_polygon_coor(gly_list, point_size)
   filled_color <- glycan_color[as.character(polygon_coor$color)]
 
   struc_annotation <- gly_annotation(structure,coor)
@@ -627,31 +629,46 @@ draw_cartoon <- function(structure){
     end_y   = gly_connect$end_y
   )
 
-  x_span <- diff(range(coor[,1]))
-  y_span <- diff(range(coor[,2]))
-  text_size <- 12/mean(c(x_span, y_span))
-  line_width <- 1/mean(c(x_span, y_span))
-
   gly_graph <- ggplot2::ggplot()+
     ggplot2::geom_segment(data = connect_df,
                           ggplot2::aes(x = .data$start_x, y = .data$start_y,
                                        xend = .data$end_x, yend = .data$end_y),
-                          linewidth = line_width)+
+                          linewidth = 0.5)+
     ggplot2::geom_polygon(data = polygon_coor,
                           ggplot2::aes(x = .data$point_x, y = .data$point_y, group = .data$group),
-                          fill=filled_color, color='black',linewidth = line_width)+
+                          fill=filled_color, color='black',linewidth = 0.5)+
     ggplot2::geom_text(data = struc_annotation,
                        ggplot2::aes(x = .data$x, y = .data$y, label = .data$annot),
-                       size = text_size,
+                       size = 6,
                        hjust = 0.5,
                        vjust = 0.5)+
     ggplot2::coord_fixed(ratio = 1, clip = "off") +
-    ggplot2::theme_void()+
+    ggplot2::theme_void()
     ggplot2::theme(
-      text = ggplot2::element_text(size = 10),
       plot.margin = ggplot2::margin(10, 10, 10, 10)
     )
   return(gly_graph)
+}
+
+#' Save glycan cartoon image to local device
+#'
+#' @param cartoon ggplot2 object
+#' @param filename file name of glycan cartoon
+#' @param path save path
+#' @param dpi dots per inch, default = 300
+#'
+#' @returns
+#' @export
+#'
+#' @examples save_cartoon(cartoon, "p1.png", "D:/", dpi = 300)
+save_cartoon <- function(cartoon, filename, path, dpi=300){
+  x_span <- diff(range(coor[,1]))
+  y_span <- diff(range(coor[,2]))
+  width <- 3*(x_span + 2*point_size) # Glycan radius is relatively small, so times 3
+  height <- 3*(y_span + 2*point_size) + 0.5 # Plus 0.5 for text displaying.
+  # Save image with absolute pixel size ensuring the same glycan size.
+  ggplot2::ggsave(filename = filename, path = path, plot = cartoon,
+                  width = 118*width, height = 118*height, units = 'px', dpi = dpi)
 }
 
 .ensure_one_structure <- function(x) {
