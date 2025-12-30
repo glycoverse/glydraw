@@ -555,8 +555,8 @@ gly_annotation <- function(structure,coor){
     struc_annot_coor <- rbind(struc_annot_coor, par_annotation)
   }
   colnames(struc_annot_coor) <- c('vertice','annot','x','y')
-  struc_annot_coor$annot[struc_annot_coor$annot == 'b1'] <- 'b'
-  struc_annot_coor$annot[struc_annot_coor$annot %in% c('a1','a2')] <- 'a'
+  struc_annot_coor$annot[struc_annot_coor$annot == 'b1'] <- "beta"
+  struc_annot_coor$annot[struc_annot_coor$annot %in% c('a1','a2')] <- "alpha"
   struc_annot_coor$x <- as.numeric(struc_annot_coor$x)
   struc_annot_coor$y <- as.numeric(struc_annot_coor$y)
   return(struc_annot_coor)
@@ -618,7 +618,7 @@ draw_cartoon <- function(structure, point_size = 0.15){
   polygon_coor <- create_polygon_coor(gly_list, point_size)
   filled_color <- glycan_color[as.character(polygon_coor$color)]
 
-  struc_annotation <- gly_annotation(structure,coor)
+  struc_annotation <<- gly_annotation(structure,coor)
 
   # connect information
   gly_connect <- connect_info(structure, coor)
@@ -639,6 +639,7 @@ draw_cartoon <- function(structure, point_size = 0.15){
                           fill=filled_color, color='black',linewidth = 0.5)+
     ggplot2::geom_text(data = struc_annotation,
                        ggplot2::aes(x = .data$x, y = .data$y, label = .data$annot),
+                       parse = TRUE,
                        size = 6,
                        hjust = 0.5,
                        vjust = 0.5)+
@@ -650,17 +651,17 @@ draw_cartoon <- function(structure, point_size = 0.15){
   return(gly_graph)
 }
 
-#' Save glycan cartoon image to local device
+#' Save fixed-size glycan cartoon image to local device.
 #'
 #' @param cartoon ggplot2 object
 #' @param filename file name of glycan cartoon
 #' @param path save path
 #' @param dpi dots per inch, default = 300
 #'
-#' @returns
+#' @returns NULL, this function is for image saving.
 #' @export
 #'
-#' @examples save_cartoon(cartoon, "p1.png", "D:/", dpi = 300)
+#' @examples save_cartoon(draw_cartoon("Gal(b1-3)GalNAc(a1-"), "p1.png", "D:/", dpi = 300)
 save_cartoon <- function(cartoon, filename, path, dpi=300){
   x_span <- diff(range(coor[,1]))
   y_span <- diff(range(coor[,2]))
