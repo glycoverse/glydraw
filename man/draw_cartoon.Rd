@@ -4,7 +4,7 @@
 \alias{draw_cartoon}
 \title{Title Draw the image based on the coordinates}
 \usage{
-draw_cartoon(structure)
+draw_cartoon(structure, point_size = 0.15)
 }
 \arguments{
 \item{structure}{an igraph object}
