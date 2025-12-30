@@ -605,7 +605,7 @@ create_polygon_coor <- function(gly_list, point_size) {
 #'
 #' @examples
 #' draw_cartoon("Gal(b1-3)GalNAc(a1-")
-draw_cartoon <- function(structure, point_size = 0.15){
+draw_cartoon <- function(structure, point_size = 0.15, annotate = TRUE){
   point_size <<- point_size
   structure <- .ensure_one_structure(structure)
   structure <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
@@ -637,17 +637,20 @@ draw_cartoon <- function(structure, point_size = 0.15){
     ggplot2::geom_polygon(data = polygon_coor,
                           ggplot2::aes(x = .data$point_x, y = .data$point_y, group = .data$group),
                           fill=filled_color, color='black',linewidth = 0.5)+
-    ggplot2::geom_text(data = struc_annotation,
-                       ggplot2::aes(x = .data$x, y = .data$y, label = .data$annot),
-                       parse = TRUE,
-                       size = 6,
-                       hjust = 0.5,
-                       vjust = 0.5)+
     ggplot2::coord_fixed(ratio = 1, clip = "off") +
     ggplot2::theme_void()
     ggplot2::theme(
       plot.margin = ggplot2::margin(10, 10, 10, 10)
     )
+  if (annotate){
+    gly_graph <- gly_graph+
+      ggplot2::geom_text(data = struc_annotation,
+                       ggplot2::aes(x = .data$x, y = .data$y, label = .data$annot),
+                       parse = TRUE,
+                       size = 6,
+                       hjust = 0.5,
+                       vjust = 0.5)
+  }
   return(gly_graph)
 }
 
