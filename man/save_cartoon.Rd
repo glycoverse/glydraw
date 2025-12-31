@@ -22,5 +22,6 @@ NULL, this function is for image saving.
 Save fixed-size glycan cartoon image to local device.
 }
 \examples{
-save_cartoon(draw_cartoon("Gal(b1-3)GalNAc(a1-"), "p1.png", "D:/", dpi = 300)
+cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
+save_cartoon(cartoon, "p1.png", tempdir(), dpi = 300)
 }

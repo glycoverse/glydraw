@@ -596,9 +596,13 @@ create_polygon_coor <- function(gly_list, point_size) {
   return(polygon_coor)
 }
 
-#' Title Draw the image based on the coordinates
+#' Draw the image based on the coordinates
 #'
-#' @param structure an igraph object
+#' @param structure A [glyrepr::glycan_structure()] scalar,
+#'   or a string or any glycan structure text nomenclatures.
+#' @param point_size The glycan size.
+#' @param annotate Add annotation or not.
+#' @param orien The orientation of glycan structure.
 #'
 #' @returns ggplot2 object
 #' @export
@@ -672,7 +676,9 @@ draw_cartoon <- function(structure, point_size = 0.15, annotate = TRUE, orien = 
 #' @returns NULL, this function is for image saving.
 #' @export
 #'
-#' @examples save_cartoon(draw_cartoon("Gal(b1-3)GalNAc(a1-"), "p1.png", "D:/", dpi = 300)
+#' @examples
+#' cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
+#' save_cartoon(cartoon, "p1.png", tempdir(), dpi = 300)
 save_cartoon <- function(cartoon, filename, path, dpi=300){
   width <- 3*diff(ggplot2::get_panel_scales(cartoon)$x$range$range)
   height <- 3*diff(ggplot2::get_panel_scales(cartoon)$y$range$range)

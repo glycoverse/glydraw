@@ -2,18 +2,30 @@
 % Please edit documentation in R/glydraw.R
 \name{draw_cartoon}
 \alias{draw_cartoon}
-\title{Title Draw the image based on the coordinates}
+\title{Draw the image based on the coordinates}
 \usage{
-draw_cartoon(structure, point_size = 0.15)
+draw_cartoon(
+  structure,
+  point_size = 0.15,
+  annotate = TRUE,
+  orien = c("H", "V")
+)
 }
 \arguments{
-\item{structure}{an igraph object}
+\item{structure}{A \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}} scalar,
+or a string or any glycan structure text nomenclatures.}
+
+\item{point_size}{The glycan size.}
+
+\item{annotate}{Add annotation or not.}
+
+\item{orien}{The orientation of glycan structure.}
 }
 \value{
 ggplot2 object
 }
 \description{
-Title Draw the image based on the coordinates
+Draw the image based on the coordinates
 }
 \examples{
 draw_cartoon("Gal(b1-3)GalNAc(a1-")
