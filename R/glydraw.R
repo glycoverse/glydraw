@@ -605,12 +605,20 @@ create_polygon_coor <- function(gly_list, point_size) {
 #'
 #' @examples
 #' draw_cartoon("Gal(b1-3)GalNAc(a1-")
-draw_cartoon <- function(structure, point_size = 0.15, annotate = TRUE){
-  point_size <<- point_size
+draw_cartoon <- function(structure, point_size = 0.15, annotate = TRUE, orien = c("H","V")){
+  orien <- match.arg(orien)
+  point_size <- point_size
   structure <- .ensure_one_structure(structure)
   structure <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
   # Coordinate of Glycans
-  coor <<- coor_cal(structure)
+  if (orien == 'H'){
+    coor <<- coor_cal(structure)
+  } else{
+    coor <- coor_cal(structure)
+    temp <- coor
+    coor[,1] <- temp[,2]
+    coor[,2] <- -temp[,1]
+  }
   gly_list <- data.frame(coor,'glycoform' = glycoform_info(structure))
   # Rename colnames of gly_list
   colnames(gly_list) <- c('center_x','center_y','glycoform')
