@@ -1,6 +1,6 @@
 Package: glydraw
 Title: Draw beautiful SNFG cartoons
-Version: 0.1.0
+Version: 0.1.0.9000
 Authors@R: 
     person("Xisong", "Feng", , "1225774778@qq.com", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0000-4057-1295"))
