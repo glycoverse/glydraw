@@ -612,7 +612,7 @@ draw_cartoon <- function(structure, point_size = 0.15, annotate = TRUE, orien = 
   structure <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
   # Coordinate of Glycans
   if (orien == 'H'){
-    coor <<- coor_cal(structure)
+    coor <- coor_cal(structure)
   } else{
     coor <- coor_cal(structure)
     temp <- coor
@@ -626,7 +626,7 @@ draw_cartoon <- function(structure, point_size = 0.15, annotate = TRUE, orien = 
   polygon_coor <- create_polygon_coor(gly_list, point_size)
   filled_color <- glycan_color[as.character(polygon_coor$color)]
 
-  struc_annotation <<- gly_annotation(structure,coor)
+  struc_annotation <- gly_annotation(structure,coor)
 
   # connect information
   gly_connect <- connect_info(structure, coor)
@@ -674,10 +674,8 @@ draw_cartoon <- function(structure, point_size = 0.15, annotate = TRUE, orien = 
 #'
 #' @examples save_cartoon(draw_cartoon("Gal(b1-3)GalNAc(a1-"), "p1.png", "D:/", dpi = 300)
 save_cartoon <- function(cartoon, filename, path, dpi=300){
-  x_span <- diff(range(coor[,1]))
-  y_span <- diff(range(coor[,2]))
-  width <- 3*(x_span + 2*point_size) # Glycan radius is relatively small, so times 3
-  height <- 3*(y_span + 2*point_size) + 0.5 # Plus 0.5 for text displaying.
+  width <- 3*diff(ggplot2::get_panel_scales(cartoon)$x$range$range)
+  height <- 3*diff(ggplot2::get_panel_scales(cartoon)$y$range$range)
   # Save image with absolute pixel size ensuring the same glycan size.
   ggplot2::ggsave(filename = filename, path = path, plot = cartoon,
                   width = 118*width, height = 118*height, units = 'px', dpi = dpi)
