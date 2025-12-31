@@ -1,25 +1,18 @@
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # glydraw
 
 <!-- badges: start -->
 
-[![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![CRAN
-status](https://www.r-pkg.org/badges/version/glydraw)](https://CRAN.R-project.org/package=glydraw)
-[![R-CMD-check](https://github.com/glycoverse/glydraw/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/glycoverse/glydraw/actions/workflows/R-CMD-check.yaml)
-[![Codecov test
-coverage](https://codecov.io/gh/glycoverse/glydraw/graph/badge.svg)](https://app.codecov.io/gh/glycoverse/glydraw)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental) [![CRAN status](https://www.r-pkg.org/badges/version/glydraw)](https://CRAN.R-project.org/package=glydraw) [![R-CMD-check](https://github.com/glycoverse/glydraw/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/glycoverse/glydraw/actions/workflows/R-CMD-check.yaml) [![Codecov test coverage](https://codecov.io/gh/glycoverse/glydraw/graph/badge.svg)](https://app.codecov.io/gh/glycoverse/glydraw)
+
 <!-- badges: end -->
 
-The goal of glydraw is to …
+The goal of glydraw is to draw glycan structures with glycan nomenclature.
 
 ## Installation
 
-You can install the latest release of glydraw from
-[GitHub](https://github.com/) with:
+You can install the latest release of glydraw from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("remotes")
@@ -38,29 +31,24 @@ This is a basic example which shows you how to solve a common problem:
 
 ``` r
 library(glydraw)
-## basic example code
+# basic example code
+draw_cartoon("Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-")
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
+<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%"/>
 
 ``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
+# If you want to hide the annotation (default add annotation):
+draw_cartoon("Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-", annotate = FALSE)
 ```
 
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this.
+<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%"/>
 
-You can also embed plots, for example:
+``` r
+# If you want to draw structure vertically (default horizontally):
+draw_cartoon("Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-", orien = 'V')
+```
 
-<img src="man/figures/README-pressure-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%"/>
 
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub and CRAN.
+It is necessary to declare that pictures displayed in RStudio is different from those saved with `save_cartoon()`, because the size need to be dynamically adjusted by `save_cartoon()`. You can check the correct glycan pictures after saved by `save_cartoon()`.
