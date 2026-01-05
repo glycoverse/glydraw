@@ -600,18 +600,17 @@ create_polygon_coor <- function(gly_list, point_size) {
 #'
 #' @param structure A [glyrepr::glycan_structure()] scalar,
 #'   or a string or any glycan structure text nomenclatures.
-#' @param point_size The glycan size.
 #' @param annotate Add annotation or not.
 #' @param orien The orientation of glycan structure.
+#' @param dpi Dots per inch, set image resolution
 #'
 #' @returns ggplot2 object
 #' @export
 #'
 #' @examples
 #' draw_cartoon("Gal(b1-3)GalNAc(a1-")
-draw_cartoon <- function(structure, point_size = 0.15, annotate = TRUE, orien = c("H","V")){
+draw_cartoon <- function(structure, annotate = TRUE, orien = c("H","V"), dpi = 300){
   orien <- match.arg(orien)
-  point_size <- point_size
   structure <- .ensure_one_structure(structure)
   structure <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
   # Coordinate of Glycans
@@ -627,7 +626,7 @@ draw_cartoon <- function(structure, point_size = 0.15, annotate = TRUE, orien = 
   # Rename colnames of gly_list
   colnames(gly_list) <- c('center_x','center_y','glycoform')
   # Draw Glycan Shape, where gly_list contains center_x, center_y, glycoform 3 columns
-  polygon_coor <- create_polygon_coor(gly_list, point_size)
+  polygon_coor <- create_polygon_coor(gly_list, 0.15)
   filled_color <- glycan_color[as.character(polygon_coor$color)]
 
   struc_annotation <- gly_annotation(structure,coor)
@@ -649,11 +648,9 @@ draw_cartoon <- function(structure, point_size = 0.15, annotate = TRUE, orien = 
     ggplot2::geom_polygon(data = polygon_coor,
                           ggplot2::aes(x = .data$point_x, y = .data$point_y, group = .data$group),
                           fill=filled_color, color='black',linewidth = 0.5)+
-    ggplot2::coord_fixed(ratio = 1, clip = "off") +
+    ggplot2::coord_fixed(ratio = 1, clip = "off")+
     ggplot2::theme_void()
-    ggplot2::theme(
-      plot.margin = ggplot2::margin(10, 10, 10, 10)
-    )
+
   if (annotate){
     gly_graph <- gly_graph+
       ggplot2::geom_text(data = struc_annotation,
@@ -663,6 +660,14 @@ draw_cartoon <- function(structure, point_size = 0.15, annotate = TRUE, orien = 
                        hjust = 0.5,
                        vjust = 0.5)
   }
+
+  # adjust displaying size dynamically
+  width <- 3*diff(ggplot2::get_panel_scales(gly_graph)$x$range$range)
+  height <- 3*diff(ggplot2::get_panel_scales(gly_graph)$y$range$range) + 0.3
+  factor <- dpi/2.54
+
+  gly_graph <- gly_graph+
+    ggview::canvas(width = factor*width, height = factor*height, units = "px", dpi = dpi)
   return(gly_graph)
 }
 
@@ -678,13 +683,10 @@ draw_cartoon <- function(structure, point_size = 0.15, annotate = TRUE, orien = 
 #'
 #' @examples
 #' cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
-#' save_cartoon(cartoon, "p1.png", tempdir(), dpi = 300)
-save_cartoon <- function(cartoon, filename, path, dpi=300){
-  width <- 3*diff(ggplot2::get_panel_scales(cartoon)$x$range$range)
-  height <- 3*diff(ggplot2::get_panel_scales(cartoon)$y$range$range)
-  # Save image with absolute pixel size ensuring the same glycan size.
-  ggplot2::ggsave(filename = filename, path = path, plot = cartoon,
-                  width = 118*width, height = 118*height, units = 'px', dpi = dpi)
+#' save_cartoon(cartoon, "p1.png", tempdir(),dpi = 300)
+save_cartoon <- function(cartoon, filename, path){
+  file <- paste(path, '/',filename, sep = '')
+  ggview::save_ggplot(plot = cartoon, file = file)
 }
 
 .ensure_one_structure <- function(x) {
