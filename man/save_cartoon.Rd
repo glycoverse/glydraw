@@ -4,7 +4,7 @@
 \alias{save_cartoon}
 \title{Save fixed-size glycan cartoon image to local device.}
 \usage{
-save_cartoon(cartoon, filename, path, dpi = 300)
+save_cartoon(cartoon, filename, path)
 }
 \arguments{
 \item{cartoon}{ggplot2 object}
@@ -23,5 +23,5 @@ Save fixed-size glycan cartoon image to local device.
 }
 \examples{
 cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
-save_cartoon(cartoon, "p1.png", tempdir(), dpi = 300)
+save_cartoon(cartoon, "p1.png", tempdir(),dpi = 300)
 }

@@ -4,22 +4,17 @@
 \alias{draw_cartoon}
 \title{Draw the image based on the coordinates}
 \usage{
-draw_cartoon(
-  structure,
-  point_size = 0.15,
-  annotate = TRUE,
-  orien = c("H", "V")
-)
+draw_cartoon(structure, annotate = TRUE, orien = c("H", "V"), dpi = 300)
 }
 \arguments{
 \item{structure}{A \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}} scalar,
 or a string or any glycan structure text nomenclatures.}
 
-\item{point_size}{The glycan size.}
-
 \item{annotate}{Add annotation or not.}
 
 \item{orien}{The orientation of glycan structure.}
+
+\item{dpi}{Dots per inch, set image resolution}
 }
 \value{
 ggplot2 object
