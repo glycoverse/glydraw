@@ -2,13 +2,15 @@
 
 ## glydraw (development version)
 
+## glydraw 0.2.0
+
 ### Breaking changes
 
 - Signature of
   [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md)
   is changed into
   `draw_cartoon(structure, mono_size = 0.2, show_linkage = TRUE, orient = "H", ...)`
-  for better semantic.
+  for better semantics.
 
 ### New features
 
