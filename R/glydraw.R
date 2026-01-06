@@ -680,10 +680,17 @@ draw_cartoon <- function(structure, mono_size = 0.2, show_linkage = TRUE, orient
 }
 
 #' @export
-print.glydraw_cartoon <- function(x, ...) {
+print.glydraw_cartoon <- function(x, border_px = 50, dpi = 300, ...) {
   plot <- .strip_glydraw_class(x)
-  size <- .decide_size(plot)
-  ggimage::ggpreview(plot = plot, width = size$width, height = size$height, units = "px")
+  plot <- .apply_border(plot, border_px, dpi = dpi)
+  size <- .decide_size(plot, border_px = border_px)
+  ggimage::ggpreview(
+    plot = plot,
+    width = size$width,
+    height = size$height,
+    units = "px",
+    dpi = dpi
+  )
   invisible(x)
 }
 
@@ -702,14 +709,16 @@ print.glydraw_cartoon <- function(x, ...) {
 #'   path and filename are combined to create the fully qualified file name.
 #'   Defaults to the working directory.
 #' @param dpi Dots per inch, default = 300.
+#' @param border_px Width of the border around the image in pixels. Default 50.
 #'
 #' @export
 #' @examples
 #' cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
 #' save_cartoon(cartoon, "p1.png", tempdir(), dpi = 300)
-save_cartoon <- function(cartoon, filename, path = NULL, dpi = 300){
+save_cartoon <- function(cartoon, filename, path = NULL, dpi = 300, border_px = 50){
   plot <- .strip_glydraw_class(cartoon)
-  size <- .decide_size(plot)
+  plot <- .apply_border(plot, border_px, dpi = dpi)
+  size <- .decide_size(plot, border_px = border_px)
   # Save image with absolute pixel size ensuring the same glycan size.
   ggplot2::ggsave(
     filename = filename,
@@ -722,10 +731,28 @@ save_cartoon <- function(cartoon, filename, path = NULL, dpi = 300){
   )
 }
 
-.decide_size <- function(cartoon) {
-  width <- 3 * 118 * diff(ggplot2::get_panel_scales(cartoon)$x$range$range)
-  height <- 3 * 118 * diff(ggplot2::get_panel_scales(cartoon)$y$range$range)
+.decide_size <- function(cartoon, border_px = 0) {
+  panel_width <- 3 * 118 * diff(ggplot2::get_panel_scales(cartoon)$x$range$range)
+  panel_height <- 3 * 118 * diff(ggplot2::get_panel_scales(cartoon)$y$range$range)
+  width <- panel_width + 2 * border_px
+  height <- panel_height + 2 * border_px
   return(list(width = width, height = height))
+}
+
+.apply_border <- function(plot, border_px, dpi = 300) {
+  if (is.null(border_px) || border_px <= 0) {
+    return(plot)
+  }
+  border_pt <- (border_px / dpi) * 72
+  plot + ggplot2::theme(
+    plot.margin = ggplot2::margin(
+      t = border_pt,
+      r = border_pt,
+      b = border_pt,
+      l = border_pt,
+      unit = "pt"
+    )
+  )
 }
 
 .strip_glydraw_class <- function(x) {
