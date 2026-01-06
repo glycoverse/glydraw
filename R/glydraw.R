@@ -706,7 +706,7 @@ print.glydraw_cartoon <- function(x, ...) {
 #' @examples
 #' cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
 #' save_cartoon(cartoon, "p1.png", tempdir(), dpi = 300)
-save_cartoon <- function(cartoon, filename, path, dpi=300){
+save_cartoon <- function(cartoon, filename, path = NULL, dpi = 300){
   plot <- .strip_glydraw_class(cartoon)
   size <- .decide_size(plot)
   # Save image with absolute pixel size ensuring the same glycan size.
