@@ -516,8 +516,8 @@ glycoform_info <- function(structure){
 annotation_coordinate <- function(chil_glyx, chil_glyy, par_glyx, par_glyy){
   chil_direction <- matrix(c(par_glyx-chil_glyx, par_glyy-chil_glyy),ncol = 1, byrow = FALSE)
   par_direction <- matrix(c(chil_glyx-par_glyx, chil_glyy-par_glyy),ncol = 1, byrow = FALSE)
-  chil_location <- 0.35*chil_direction/norm(chil_direction, type = '2')
-  par_location <- 0.35*par_direction/norm(par_direction, type = '2')
+  chil_location <- 0.4*chil_direction/norm(chil_direction, type = '2')
+  par_location <- 0.4*par_direction/norm(par_direction, type = '2')
   chil_rotate_matrix <- matrix(c(cos(1/8*pi),sin(1/8*pi),
                                  -sin(1/8*pi),cos(1/8*pi)), ncol = 2, byrow = TRUE)
   par_rotate_matrix <- matrix(c(cos(1/8*pi),-sin(1/8*pi),
