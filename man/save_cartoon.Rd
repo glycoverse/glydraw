@@ -7,19 +7,23 @@
 save_cartoon(cartoon, filename, path, dpi = 300)
 }
 \arguments{
-\item{cartoon}{ggplot2 object}
+\item{cartoon}{A ggplot2 object returned by \code{\link[=draw_cartoon]{draw_cartoon()}}.}
 
-\item{filename}{file name of glycan cartoon}
+\item{filename}{File name of glycan cartoon.}
 
-\item{path}{save path}
+\item{path}{Path of the directory to save plot to:
+path and filename are combined to create the fully qualified file name.
+Defaults to the working directory.}
 
-\item{dpi}{dots per inch, default = 300}
-}
-\value{
-NULL, this function is for image saving.
+\item{dpi}{Dots per inch, default = 300.}
 }
 \description{
-Save fixed-size glycan cartoon image to local device.
+In theory, you can just use \code{ggplot2::ggsave()} to save the cartoons plotted by \code{\link[=draw_cartoon]{draw_cartoon()}}.
+However, you can have trouble finding the best sizes for each cartoon
+to make them look alike.
+This function is designed to save the cartoons with self-adjusted sizes,
+based on the size of the glycans,
+so that when glycans with different sizes are put together, they will look alike.
 }
 \examples{
 cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
