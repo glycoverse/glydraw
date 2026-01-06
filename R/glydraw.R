@@ -539,8 +539,16 @@ annotation_coordinate <- function(chil_glyx, chil_glyy, par_glyx, par_glyy){
 #' @noRd
 gly_annotation <- function(structure,coor){
   structure_length <- length(structure)
+  if (igraph::ecount(structure) == 0) {
+    return(data.frame(
+      vertice = integer(0),
+      annot = character(0),
+      x = numeric(0),
+      y = numeric(0)
+    ))
+  }
   struc_annot_coor <- data.frame(matrix(nrow = 0, ncol = 4))
-  for (ver in seq(1,structure_length-1)){
+  for (ver in seq_len(structure_length - 1)){
     par_ver <- dplyr::nth(as.vector(igraph::shortest_paths(structure,length(structure),ver)$vpath[[1]]),-2)
     # Read annotation information and relative position
     linkage_str <- igraph::E(structure)[ver]$linkage
