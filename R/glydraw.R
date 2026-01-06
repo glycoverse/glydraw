@@ -663,7 +663,6 @@ draw_cartoon <- function(structure, mono_size = 0.2, show_linkage = TRUE, orient
     )+
     ggplot2::coord_fixed(ratio = 1, clip = "off") +
     ggplot2::theme_void()
-    ggplot2::theme(plot.margin = ggplot2::margin(10, 10, 10, 10))
   if (show_linkage){
     gly_graph <- gly_graph+
       ggplot2::geom_text(
