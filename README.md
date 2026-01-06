@@ -36,31 +36,19 @@ remotes::install_github("glycoverse/glydraw")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+Call `draw_cartoon()` to plot a SNFG:
 
 ``` r
 library(glydraw)
-# basic example code
-draw_cartoon("Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-")
+
+draw_cartoon("Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-")
 ```
 
-<img src="man/figures/README-unnamed-chunk-2-1.png" alt="" width="100%" />
+<img src="man/figures/N-core.png" width="400" />
+
+And call `save_cartoon()` to save it to a file:
 
 ``` r
-# If you want to hide the annotation (default add annotation):
-draw_cartoon("Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-", show_linkage = FALSE)
+cartoon <- draw_cartoon("Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-")
+save_cartoon(cartoon, "N-core.png", dpi = 300)
 ```
-
-<img src="man/figures/README-unnamed-chunk-3-1.png" alt="" width="100%" />
-
-``` r
-# If you want to draw structure vertically (default horizontally):
-draw_cartoon("Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-", orient = 'V')
-```
-
-<img src="man/figures/README-unnamed-chunk-4-1.png" alt="" width="100%" />
-
-It is necessary to declare that pictures displayed in RStudio is
-different from those saved with `save_cartoon()`, because the size need
-to be dynamically adjusted by `save_cartoon()`. You can check the
-correct glycan pictures after saved by `save_cartoon()`.
