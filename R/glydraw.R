@@ -516,12 +516,13 @@ glycoform_info <- function(structure){
 annotation_coordinate <- function(chil_glyx, chil_glyy, par_glyx, par_glyy){
   chil_direction <- matrix(c(par_glyx-chil_glyx, par_glyy-chil_glyy),ncol = 1, byrow = FALSE)
   par_direction <- matrix(c(chil_glyx-par_glyx, chil_glyy-par_glyy),ncol = 1, byrow = FALSE)
-  chil_location <- 0.35*chil_direction/norm(chil_direction, type = '2')
-  par_location <- 0.35*par_direction/norm(par_direction, type = '2')
-  chil_rotate_matrix <- matrix(c(cos(1/8*pi),sin(1/8*pi),
-                                 -sin(1/8*pi),cos(1/8*pi)), ncol = 2, byrow = TRUE)
-  par_rotate_matrix <- matrix(c(cos(1/8*pi),-sin(1/8*pi),
-                                sin(1/8*pi),cos(1/8*pi)), ncol = 2, byrow = TRUE)
+  chil_location <- 0.4*chil_direction/norm(chil_direction, type = '2')
+  par_location <- 0.4*par_direction/norm(par_direction, type = '2')
+  rotate_angle <- 1/10 * pi
+  chil_rotate_matrix <- matrix(c(cos(rotate_angle),sin(rotate_angle),
+                                 -sin(rotate_angle),cos(rotate_angle)), ncol = 2, byrow = TRUE)
+  par_rotate_matrix <- matrix(c(cos(rotate_angle),-sin(rotate_angle),
+                                sin(rotate_angle),cos(rotate_angle)), ncol = 2, byrow = TRUE)
   chil_annot_loc <- chil_rotate_matrix %*% chil_location
   par_annot_loc <- par_rotate_matrix %*% par_location
   annot_loc <- list("chil" = chil_annot_loc, "par" = par_annot_loc)
@@ -539,8 +540,16 @@ annotation_coordinate <- function(chil_glyx, chil_glyy, par_glyx, par_glyy){
 #' @noRd
 gly_annotation <- function(structure,coor){
   structure_length <- length(structure)
+  if (igraph::ecount(structure) == 0) {
+    return(data.frame(
+      vertice = integer(0),
+      annot = character(0),
+      x = numeric(0),
+      y = numeric(0)
+    ))
+  }
   struc_annot_coor <- data.frame(matrix(nrow = 0, ncol = 4))
-  for (ver in seq(1,structure_length-1)){
+  for (ver in seq_len(structure_length - 1)){
     par_ver <- dplyr::nth(as.vector(igraph::shortest_paths(structure,length(structure),ver)$vpath[[1]]),-2)
     # Read annotation information and relative position
     linkage_str <- igraph::E(structure)[ver]$linkage
@@ -560,6 +569,100 @@ gly_annotation <- function(structure,coor){
   struc_annot_coor$x <- as.numeric(struc_annot_coor$x)
   struc_annot_coor$y <- as.numeric(struc_annot_coor$y)
   return(struc_annot_coor)
+}
+
+#' Title Map the coordinate of reducing end annotation and segment
+#'
+#' @param structure an igraph object
+#' @param coor a matrix
+#'
+#' @returns list of reducing end annotation and segment
+#'
+#' @examples reducing_end_annotation(structure, coor)
+#' @noRd
+reducing_end_annotation <- function(structure, coor) {
+  anomer <- igraph::graph_attr(structure, "anomer")
+  if (length(anomer) == 0 || is.na(anomer) || anomer == "") {
+    return(list(
+      annotation = data.frame(
+        vertice = character(0),
+        annot = character(0),
+        x = numeric(0),
+        y = numeric(0)
+      ),
+      segment = data.frame(
+        start_x = numeric(0),
+        start_y = numeric(0),
+        end_x = numeric(0),
+        end_y = numeric(0)
+      )
+    ))
+  }
+  label <- tolower(substr(anomer, 1, 1))
+  if (label == "a") {
+    label <- "alpha"
+  } else if (label == "b") {
+    label <- "beta"
+  } else {
+    return(list(
+      annotation = data.frame(
+        vertice = character(0),
+        annot = character(0),
+        x = numeric(0),
+        y = numeric(0)
+      ),
+      segment = data.frame(
+        start_x = numeric(0),
+        start_y = numeric(0),
+        end_x = numeric(0),
+        end_y = numeric(0)
+      )
+    ))
+  }
+  root <- length(structure)
+  root_coor <- c(x = as.numeric(coor[root, 1]), y = as.numeric(coor[root, 2]))
+  neigh_idx <- as.integer(igraph::neighbors(structure, root))
+  if (length(neigh_idx) == 0) {
+    direction <- c(x = 1, y = 0)
+  } else {
+    neigh_coor <- coor[neigh_idx, , drop = FALSE]
+    mean_vec <- c(
+      x = mean(as.numeric(neigh_coor[, 1])),
+      y = mean(as.numeric(neigh_coor[, 2]))
+    ) - root_coor
+    vec_norm <- sqrt(sum(mean_vec^2))
+    if (is.na(vec_norm) || vec_norm == 0) {
+      direction <- c(x = 1, y = 0)
+    } else {
+      direction <- -mean_vec / vec_norm
+    }
+  }
+  line_length <- 0.4
+  label_offset <- 0.2
+  line_end <- root_coor + line_length * direction
+  rotate_angle <- 1/10 * pi
+  rotate_matrix <- matrix(
+    c(cos(rotate_angle), sin(rotate_angle), -sin(rotate_angle), cos(rotate_angle)),
+    ncol = 2,
+    byrow = TRUE
+  )
+  label_vec <- (line_length + label_offset) * direction
+  annot_loc <- 0.7 * rotate_matrix %*% matrix(label_vec, ncol = 1)
+  annot_coor <- root_coor + as.vector(annot_loc)
+  list(
+    annotation = data.frame(
+      vertice = as.character(root),
+      annot = label,
+      x = as.numeric(annot_coor["x"]),
+      y = as.numeric(annot_coor["y"])
+    ),
+    segment = data.frame(
+      start_x = as.numeric(root_coor["x"]),
+      start_y = as.numeric(root_coor["y"]),
+      end_x = as.numeric(line_end["x"]),
+      end_y = as.numeric(line_end["y"])
+    )
+  )
 }
 
 #' Title Match the coordinates of glycan shape
@@ -596,25 +699,27 @@ create_polygon_coor <- function(gly_list, point_size) {
   return(polygon_coor)
 }
 
-#' Draw the image based on the coordinates
+#' Draw a Symbol Nomenclature For Glycan (SNFG)
 #'
 #' @param structure A [glyrepr::glycan_structure()] scalar,
 #'   or a string or any glycan structure text nomenclatures.
-#' @param annotate Add annotation or not.
-#' @param orien The orientation of glycan structure.
-#' @param dpi Dots per inch, set image resolution
+#' @param mono_size Sizes of the monosaccharide. Default to 0.2.
+#'   Setting this to large might make the residue overlap with linkage annotations.
+#' @param show_linkage Show linkage annotation or not. Default is TRUE.
+#' @param orient The orientation of glycan structure. "H" for horizontal, "V" for vertical.
+#'   Default is "H"
 #'
-#' @returns ggplot2 object
+#' @returns a ggplot2 object
 #' @export
 #'
 #' @examples
 #' draw_cartoon("Gal(b1-3)GalNAc(a1-")
-draw_cartoon <- function(structure, annotate = TRUE, orien = c("H","V"), dpi = 300){
-  orien <- match.arg(orien)
+draw_cartoon <- function(structure, mono_size = 0.2, show_linkage = TRUE, orient = c("H","V")){
   structure <- .ensure_one_structure(structure)
   structure <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
+  orient <- rlang::arg_match(orient)
   # Coordinate of Glycans
-  if (orien == 'H'){
+  if (orient == 'H'){
     coor <- coor_cal(structure)
   } else{
     coor <- coor_cal(structure)
@@ -626,10 +731,12 @@ draw_cartoon <- function(structure, annotate = TRUE, orien = c("H","V"), dpi = 3
   # Rename colnames of gly_list
   colnames(gly_list) <- c('center_x','center_y','glycoform')
   # Draw Glycan Shape, where gly_list contains center_x, center_y, glycoform 3 columns
-  polygon_coor <- create_polygon_coor(gly_list, 0.15)
+  polygon_coor <- create_polygon_coor(gly_list, mono_size)
   filled_color <- glycan_color[as.character(polygon_coor$color)]
 
   struc_annotation <- gly_annotation(structure,coor)
+  reducing_info <- reducing_end_annotation(structure, coor)
+  struc_annotation <- dplyr::bind_rows(struc_annotation, reducing_info$annotation)
 
   # connect information
   gly_connect <- connect_info(structure, coor)
@@ -639,54 +746,115 @@ draw_cartoon <- function(structure, annotate = TRUE, orien = c("H","V"), dpi = 3
     end_x   = gly_connect$end_x,
     end_y   = gly_connect$end_y
   )
+  connect_df <- dplyr::bind_rows(connect_df, reducing_info$segment)
 
   gly_graph <- ggplot2::ggplot()+
-    ggplot2::geom_segment(data = connect_df,
-                          ggplot2::aes(x = .data$start_x, y = .data$start_y,
-                                       xend = .data$end_x, yend = .data$end_y),
-                          linewidth = 0.5)+
-    ggplot2::geom_polygon(data = polygon_coor,
-                          ggplot2::aes(x = .data$point_x, y = .data$point_y, group = .data$group),
-                          fill=filled_color, color='black',linewidth = 0.5)+
-    ggplot2::coord_fixed(ratio = 1, clip = "off")+
+    ggplot2::geom_segment(
+      data = connect_df,
+      ggplot2::aes(x = .data$start_x, y = .data$start_y, xend = .data$end_x, yend = .data$end_y),
+      linewidth = 0.5
+    )+
+    ggplot2::geom_polygon(
+      data = polygon_coor,
+      ggplot2::aes(x = .data$point_x, y = .data$point_y, group = .data$group),
+      fill=filled_color, color='black',linewidth = 0.5
+    )+
+    ggplot2::coord_fixed(ratio = 1, clip = "off") +
     ggplot2::theme_void()
-
-  if (annotate){
+  if (show_linkage){
     gly_graph <- gly_graph+
-      ggplot2::geom_text(data = struc_annotation,
-                       ggplot2::aes(x = .data$x, y = .data$y, label = .data$annot),
-                       parse = TRUE,
-                       size = 6,
-                       hjust = 0.5,
-                       vjust = 0.5)
+      ggplot2::geom_text(
+        data = struc_annotation,
+        ggplot2::aes(x = .data$x, y = .data$y, label = .data$annot),
+        parse = TRUE,
+        size = 6,
+        hjust = 0.5,
+        vjust = 0.5
+      )
   }
+  class(gly_graph) <- c("glydraw_cartoon", class(gly_graph))
+  gly_graph
+}
 
-  # adjust displaying size dynamically
-  width <- 3*diff(ggplot2::get_panel_scales(gly_graph)$x$range$range)
-  height <- 3*diff(ggplot2::get_panel_scales(gly_graph)$y$range$range) + 0.3
-  factor <- dpi/2.54
-
-  gly_graph <- gly_graph+
-    ggview::canvas(width = factor*width, height = factor*height, units = "px", dpi = dpi)
-  return(gly_graph)
+#' @export
+print.glydraw_cartoon <- function(x, border_px = 50, dpi = 300, ...) {
+  plot <- .strip_glydraw_class(x)
+  plot <- .apply_border(plot, border_px, dpi = dpi)
+  size <- .decide_size(plot, border_px = border_px)
+  ggimage::ggpreview(
+    plot = plot,
+    width = size$width,
+    height = size$height,
+    units = "px",
+    dpi = dpi
+  )
+  invisible(x)
 }
 
 #' Save fixed-size glycan cartoon image to local device.
 #'
-#' @param cartoon ggplot2 object
-#' @param filename file name of glycan cartoon
-#' @param path save path
-#' @param dpi dots per inch, default = 300
+#' In theory, you can just use `ggplot2::ggsave()` to save the cartoons plotted by [draw_cartoon()].
+#' However, you can have trouble finding the best sizes for each cartoon
+#' to make them look alike.
+#' This function is designed to save the cartoons with self-adjusted sizes,
+#' based on the size of the glycans,
+#' so that when glycans with different sizes are put together, they will look alike.
 #'
-#' @returns NULL, this function is for image saving.
+#' @param cartoon A ggplot2 object returned by [draw_cartoon()].
+#' @param filename File name of glycan cartoon.
+#' @param path Path of the directory to save plot to:
+#'   path and filename are combined to create the fully qualified file name.
+#'   Defaults to the working directory.
+#' @param dpi Dots per inch, default = 300.
+#' @param border_px Width of the border around the image in pixels. Default 50.
+#'
 #' @export
-#'
 #' @examples
 #' cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
-#' save_cartoon(cartoon, "p1.png", tempdir(),dpi = 300)
-save_cartoon <- function(cartoon, filename, path){
-  file <- paste(path, '/',filename, sep = '')
-  ggview::save_ggplot(plot = cartoon, file = file)
+#' save_cartoon(cartoon, "p1.png", tempdir(), dpi = 300)
+save_cartoon <- function(cartoon, filename, path = NULL, dpi = 300, border_px = 50){
+  plot <- .strip_glydraw_class(cartoon)
+  plot <- .apply_border(plot, border_px, dpi = dpi)
+  size <- .decide_size(plot, border_px = border_px)
+  # Save image with absolute pixel size ensuring the same glycan size.
+  ggplot2::ggsave(
+    filename = filename,
+    path = path,
+    plot = plot,
+    width = size$width,
+    height = size$height,
+    units = 'px',
+    dpi = dpi
+  )
+}
+
+.decide_size <- function(cartoon, border_px = 0) {
+  panel_width <- 3 * 118 * diff(ggplot2::get_panel_scales(cartoon)$x$range$range)
+  panel_height <- 3 * 118 * diff(ggplot2::get_panel_scales(cartoon)$y$range$range)
+  width <- panel_width + 2 * border_px
+  height <- panel_height + 2 * border_px
+  return(list(width = width, height = height))
+}
+
+.apply_border <- function(plot, border_px, dpi = 300) {
+  if (is.null(border_px) || border_px <= 0) {
+    return(plot)
+  }
+  border_pt <- (border_px / dpi) * 72
+  plot + ggplot2::theme(
+    plot.margin = ggplot2::margin(
+      t = border_pt,
+      r = border_pt,
+      b = border_pt,
+      l = border_pt,
+      unit = "pt"
+    )
+  )
+}
+
+.strip_glydraw_class <- function(x) {
+  class(x) <- setdiff(class(x), "glydraw_cartoon")
+  x
 }
 
 .ensure_one_structure <- function(x) {

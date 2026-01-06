@@ -1,18 +1,27 @@
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# glydraw
+# glydraw <a href="https://glycoverse.github.io/glydraw/"><img src="man/figures/logo.png" align="right" height="138" /></a>
 
 <!-- badges: start -->
 
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental) [![CRAN status](https://www.r-pkg.org/badges/version/glydraw)](https://CRAN.R-project.org/package=glydraw) [![R-CMD-check](https://github.com/glycoverse/glydraw/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/glycoverse/glydraw/actions/workflows/R-CMD-check.yaml) [![Codecov test coverage](https://codecov.io/gh/glycoverse/glydraw/graph/badge.svg)](https://app.codecov.io/gh/glycoverse/glydraw)
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/glydraw)](https://CRAN.R-project.org/package=glydraw)
+[![R-CMD-check](https://github.com/glycoverse/glydraw/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/glycoverse/glydraw/actions/workflows/R-CMD-check.yaml)
+[![Codecov test
+coverage](https://codecov.io/gh/glycoverse/glydraw/graph/badge.svg)](https://app.codecov.io/gh/glycoverse/glydraw)
 
 <!-- badges: end -->
 
-The goal of glydraw is to draw glycan structures with glycan nomenclature.
+The goal of glydraw is to draw published-ready Structure Nomenclature
+For Glycans (SNFG). We use ggplot2 as the backend to draw the cartoons.
 
 ## Installation
 
-You can install the latest release of glydraw from [GitHub](https://github.com/) with:
+You can install the latest release of glydraw from
+[GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("remotes")
@@ -35,20 +44,23 @@ library(glydraw)
 draw_cartoon("Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-")
 ```
 
-<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%"/>
+<img src="man/figures/README-unnamed-chunk-2-1.png" alt="" width="100%" />
 
 ``` r
 # If you want to hide the annotation (default add annotation):
-draw_cartoon("Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-", annotate = FALSE)
+draw_cartoon("Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-", show_linkage = FALSE)
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%"/>
+<img src="man/figures/README-unnamed-chunk-3-1.png" alt="" width="100%" />
 
 ``` r
 # If you want to draw structure vertically (default horizontally):
-draw_cartoon("Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-", orien = 'V')
+draw_cartoon("Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-", orient = 'V')
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%"/>
+<img src="man/figures/README-unnamed-chunk-4-1.png" alt="" width="100%" />
 
-It is necessary to declare that pictures displayed in RStudio is different from those saved with `save_cartoon()`, because the size need to be dynamically adjusted by `save_cartoon()`. You can check the correct glycan pictures after saved by `save_cartoon()`.
+It is necessary to declare that pictures displayed in RStudio is
+different from those saved with `save_cartoon()`, because the size need
+to be dynamically adjusted by `save_cartoon()`. You can check the
+correct glycan pictures after saved by `save_cartoon()`.
