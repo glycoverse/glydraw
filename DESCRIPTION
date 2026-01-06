@@ -22,6 +22,6 @@ Imports:
     purrr,
     glyparse,
     cli,
-    ggimage
+    ggview
 Remotes: 
     glycoverse/glyrepr@*release
