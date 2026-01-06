@@ -1,8 +1,8 @@
-# glydraw (development version)
+# glydraw 0.2.0
 
 ## Breaking changes
 
-* Signature of `draw_cartoon()` is changed into `draw_cartoon(structure, mono_size = 0.2, show_linkage = TRUE, orient = "H", ...)` for better semantic.
+* Signature of `draw_cartoon()` is changed into `draw_cartoon(structure, mono_size = 0.2, show_linkage = TRUE, orient = "H", ...)` for better semantics.
 
 ## New features
 
