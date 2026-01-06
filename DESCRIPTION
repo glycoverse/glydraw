@@ -21,6 +21,7 @@ Imports:
     igraph,
     purrr,
     glyparse,
-    cli
+    cli,
+    ggimage
 Remotes: 
     glycoverse/glyrepr@*release

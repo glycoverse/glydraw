@@ -643,28 +643,32 @@ draw_cartoon <- function(structure, mono_size = 0.2, show_linkage = TRUE, orient
   )
 
   gly_graph <- ggplot2::ggplot()+
-    ggplot2::geom_segment(data = connect_df,
-                          ggplot2::aes(x = .data$start_x, y = .data$start_y,
-                                       xend = .data$end_x, yend = .data$end_y),
-                          linewidth = 0.5)+
-    ggplot2::geom_polygon(data = polygon_coor,
-                          ggplot2::aes(x = .data$point_x, y = .data$point_y, group = .data$group),
-                          fill=filled_color, color='black',linewidth = 0.5)+
+    ggplot2::geom_segment(
+      data = connect_df,
+      ggplot2::aes(x = .data$start_x, y = .data$start_y, xend = .data$end_x, yend = .data$end_y),
+      linewidth = 0.5
+    )+
+    ggplot2::geom_polygon(
+      data = polygon_coor,
+      ggplot2::aes(x = .data$point_x, y = .data$point_y, group = .data$group),
+      fill=filled_color, color='black',linewidth = 0.5
+    )+
     ggplot2::coord_fixed(ratio = 1, clip = "off") +
     ggplot2::theme_void()
-    ggplot2::theme(
-      plot.margin = ggplot2::margin(10, 10, 10, 10)
-    )
+    ggplot2::theme(plot.margin = ggplot2::margin(10, 10, 10, 10))
   if (show_linkage){
     gly_graph <- gly_graph+
-      ggplot2::geom_text(data = struc_annotation,
-                       ggplot2::aes(x = .data$x, y = .data$y, label = .data$annot),
-                       parse = TRUE,
-                       size = 8,
-                       hjust = 0.5,
-                       vjust = 0.5)
+      ggplot2::geom_text(
+        data = struc_annotation,
+        ggplot2::aes(x = .data$x, y = .data$y, label = .data$annot),
+        parse = TRUE,
+        size = 6,
+        hjust = 0.5,
+        vjust = 0.5
+      )
   }
-  return(gly_graph)
+  size <- .decide_size(gly_graph) 
+  ggimage::ggpreview(plot = gly_graph, width = size$width, height = size$height, units = "px")
 }
 
 #' Save fixed-size glycan cartoon image to local device.
@@ -688,11 +692,23 @@ draw_cartoon <- function(structure, mono_size = 0.2, show_linkage = TRUE, orient
 #' cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
 #' save_cartoon(cartoon, "p1.png", tempdir(), dpi = 300)
 save_cartoon <- function(cartoon, filename, path, dpi=300){
-  width <- 3*diff(ggplot2::get_panel_scales(cartoon)$x$range$range)
-  height <- 3*diff(ggplot2::get_panel_scales(cartoon)$y$range$range)
+  size <- .decide_size(cartoon)
   # Save image with absolute pixel size ensuring the same glycan size.
-  ggplot2::ggsave(filename = filename, path = path, plot = cartoon,
-                  width = 118*width, height = 118*height, units = 'px', dpi = dpi)
+  ggplot2::ggsave(
+    filename = filename,
+    path = path,
+    plot = cartoon,
+    width = size$width,
+    height = size$height,
+    units = 'px',
+    dpi = dpi
+  )
+}
+
+.decide_size <- function(cartoon) {
+  width <- 3 * 118 * diff(ggplot2::get_panel_scales(cartoon)$x$range$range)
+  height <- 3 * 118 * diff(ggplot2::get_panel_scales(cartoon)$y$range$range)
+  return(list(width = width, height = height))
 }
 
 .ensure_one_structure <- function(x) {
