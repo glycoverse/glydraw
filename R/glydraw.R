@@ -609,7 +609,7 @@ create_polygon_coor <- function(gly_list, point_size) {
 #'
 #' @examples
 #' draw_cartoon("Gal(b1-3)GalNAc(a1-")
-draw_cartoon <- function(structure, point_size = 0.15, annotate = TRUE, orien = c("H","V")){
+draw_cartoon <- function(structure, point_size = 0.2, annotate = TRUE, orien = c("H","V")){
   orien <- match.arg(orien)
   point_size <- point_size
   structure <- .ensure_one_structure(structure)
@@ -659,7 +659,7 @@ draw_cartoon <- function(structure, point_size = 0.15, annotate = TRUE, orien = 
       ggplot2::geom_text(data = struc_annotation,
                        ggplot2::aes(x = .data$x, y = .data$y, label = .data$annot),
                        parse = TRUE,
-                       size = 6,
+                       size = 8,
                        hjust = 0.5,
                        vjust = 0.5)
   }
