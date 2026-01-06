@@ -48,14 +48,14 @@ draw_cartoon("Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-")
 
 ``` r
 # If you want to hide the annotation (default add annotation):
-draw_cartoon("Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-", annotate = FALSE)
+draw_cartoon("Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-", show_linkage = FALSE)
 ```
 
 <img src="man/figures/README-unnamed-chunk-3-1.png" alt="" width="100%" />
 
 ``` r
 # If you want to draw structure vertically (default horizontally):
-draw_cartoon("Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-", orien = 'V')
+draw_cartoon("Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-", orient = 'V')
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" alt="" width="100%" />

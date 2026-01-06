@@ -596,26 +596,27 @@ create_polygon_coor <- function(gly_list, point_size) {
   return(polygon_coor)
 }
 
-#' Draw the image based on the coordinates
+#' Draw a Symbol Nomenclature For Glycan (SNFG)
 #'
 #' @param structure A [glyrepr::glycan_structure()] scalar,
 #'   or a string or any glycan structure text nomenclatures.
-#' @param point_size The glycan size.
-#' @param annotate Add annotation or not.
-#' @param orien The orientation of glycan structure.
+#' @param mono_size Sizes of the monosaccharide. Default to 0.2.
+#'   Setting this to large might make the residue overlap with linkage annotations.
+#' @param show_linkage Show linkage annotation or not. Default is TRUE.
+#' @param orient The orientation of glycan structure. "H" for horizontal, "V" for vertical.
+#'   Default is "H"
 #'
-#' @returns ggplot2 object
+#' @returns a ggplot2 object
 #' @export
 #'
 #' @examples
 #' draw_cartoon("Gal(b1-3)GalNAc(a1-")
-draw_cartoon <- function(structure, point_size = 0.2, annotate = TRUE, orien = c("H","V")){
-  orien <- match.arg(orien)
-  point_size <- point_size
+draw_cartoon <- function(structure, mono_size = 0.2, show_linkage = TRUE, orient = c("H","V")){
   structure <- .ensure_one_structure(structure)
   structure <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
+  orient <- rlang::arg_match(orient)
   # Coordinate of Glycans
-  if (orien == 'H'){
+  if (orient == 'H'){
     coor <- coor_cal(structure)
   } else{
     coor <- coor_cal(structure)
@@ -627,7 +628,7 @@ draw_cartoon <- function(structure, point_size = 0.2, annotate = TRUE, orien = c
   # Rename colnames of gly_list
   colnames(gly_list) <- c('center_x','center_y','glycoform')
   # Draw Glycan Shape, where gly_list contains center_x, center_y, glycoform 3 columns
-  polygon_coor <- create_polygon_coor(gly_list, point_size)
+  polygon_coor <- create_polygon_coor(gly_list, mono_size)
   filled_color <- glycan_color[as.character(polygon_coor$color)]
 
   struc_annotation <- gly_annotation(structure,coor)
@@ -654,7 +655,7 @@ draw_cartoon <- function(structure, point_size = 0.2, annotate = TRUE, orien = c
     ggplot2::theme(
       plot.margin = ggplot2::margin(10, 10, 10, 10)
     )
-  if (annotate){
+  if (show_linkage){
     gly_graph <- gly_graph+
       ggplot2::geom_text(data = struc_annotation,
                        ggplot2::aes(x = .data$x, y = .data$y, label = .data$annot),

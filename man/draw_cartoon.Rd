@@ -2,30 +2,32 @@
 % Please edit documentation in R/glydraw.R
 \name{draw_cartoon}
 \alias{draw_cartoon}
-\title{Draw the image based on the coordinates}
+\title{Draw a Symbol Nomenclature For Glycan (SNFG)}
 \usage{
 draw_cartoon(
   structure,
-  point_size = 0.15,
-  annotate = TRUE,
-  orien = c("H", "V")
+  mono_size = 0.2,
+  show_linkage = TRUE,
+  orient = c("H", "V")
 )
 }
 \arguments{
 \item{structure}{A \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}} scalar,
 or a string or any glycan structure text nomenclatures.}
 
-\item{point_size}{The glycan size.}
+\item{mono_size}{Sizes of the monosaccharide. Default to 0.2.
+Setting this to large might make the residue overlap with linkage annotations.}
 
-\item{annotate}{Add annotation or not.}
+\item{show_linkage}{Show linkage annotation or not. Default is TRUE.}
 
-\item{orien}{The orientation of glycan structure.}
+\item{orient}{The orientation of glycan structure. "H" for horizontal, "V" for vertical.
+Default is "H"}
 }
 \value{
-ggplot2 object
+a ggplot2 object
 }
 \description{
-Draw the image based on the coordinates
+Draw a Symbol Nomenclature For Glycan (SNFG)
 }
 \examples{
 draw_cartoon("Gal(b1-3)GalNAc(a1-")
