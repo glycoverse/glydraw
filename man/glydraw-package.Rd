@@ -6,6 +6,8 @@
 \alias{glydraw-package}
 \title{glydraw: Draw beautiful SNFG cartoons}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 Draw beautiful SNFG cartoons.
 }
 \seealso{
