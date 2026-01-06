@@ -571,6 +571,100 @@ gly_annotation <- function(structure,coor){
   return(struc_annot_coor)
 }
 
+#' Title Map the coordinate of reducing end annotation and segment
+#'
+#' @param structure an igraph object
+#' @param coor a matrix
+#'
+#' @returns list of reducing end annotation and segment
+#'
+#' @examples reducing_end_annotation(structure, coor)
+#' @noRd
+reducing_end_annotation <- function(structure, coor) {
+  anomer <- igraph::graph_attr(structure, "anomer")
+  if (length(anomer) == 0 || is.na(anomer) || anomer == "") {
+    return(list(
+      annotation = data.frame(
+        vertice = character(0),
+        annot = character(0),
+        x = numeric(0),
+        y = numeric(0)
+      ),
+      segment = data.frame(
+        start_x = numeric(0),
+        start_y = numeric(0),
+        end_x = numeric(0),
+        end_y = numeric(0)
+      )
+    ))
+  }
+  label <- tolower(substr(anomer, 1, 1))
+  if (label == "a") {
+    label <- "alpha"
+  } else if (label == "b") {
+    label <- "beta"
+  } else {
+    return(list(
+      annotation = data.frame(
+        vertice = character(0),
+        annot = character(0),
+        x = numeric(0),
+        y = numeric(0)
+      ),
+      segment = data.frame(
+        start_x = numeric(0),
+        start_y = numeric(0),
+        end_x = numeric(0),
+        end_y = numeric(0)
+      )
+    ))
+  }
+  root <- length(structure)
+  root_coor <- c(x = as.numeric(coor[root, 1]), y = as.numeric(coor[root, 2]))
+  neigh_idx <- as.integer(igraph::neighbors(structure, root))
+  if (length(neigh_idx) == 0) {
+    direction <- c(x = 1, y = 0)
+  } else {
+    neigh_coor <- coor[neigh_idx, , drop = FALSE]
+    mean_vec <- c(
+      x = mean(as.numeric(neigh_coor[, 1])),
+      y = mean(as.numeric(neigh_coor[, 2]))
+    ) - root_coor
+    vec_norm <- sqrt(sum(mean_vec^2))
+    if (is.na(vec_norm) || vec_norm == 0) {
+      direction <- c(x = 1, y = 0)
+    } else {
+      direction <- -mean_vec / vec_norm
+    }
+  }
+  line_length <- 0.4
+  label_offset <- 0.2
+  line_end <- root_coor + line_length * direction
+  rotate_angle <- 1/10 * pi
+  rotate_matrix <- matrix(
+    c(cos(rotate_angle), sin(rotate_angle), -sin(rotate_angle), cos(rotate_angle)),
+    ncol = 2,
+    byrow = TRUE
+  )
+  label_vec <- (line_length + label_offset) * direction
+  annot_loc <- 0.7 * rotate_matrix %*% matrix(label_vec, ncol = 1)
+  annot_coor <- root_coor + as.vector(annot_loc)
+  list(
+    annotation = data.frame(
+      vertice = as.character(root),
+      annot = label,
+      x = as.numeric(annot_coor["x"]),
+      y = as.numeric(annot_coor["y"])
+    ),
+    segment = data.frame(
+      start_x = as.numeric(root_coor["x"]),
+      start_y = as.numeric(root_coor["y"]),
+      end_x = as.numeric(line_end["x"]),
+      end_y = as.numeric(line_end["y"])
+    )
+  )
+}
+
 #' Title Match the coordinates of glycan shape
 #'
 #' @param gly_list a list
@@ -641,6 +735,8 @@ draw_cartoon <- function(structure, mono_size = 0.2, show_linkage = TRUE, orient
   filled_color <- glycan_color[as.character(polygon_coor$color)]
 
   struc_annotation <- gly_annotation(structure,coor)
+  reducing_info <- reducing_end_annotation(structure, coor)
+  struc_annotation <- dplyr::bind_rows(struc_annotation, reducing_info$annotation)
 
   # connect information
   gly_connect <- connect_info(structure, coor)
@@ -650,6 +746,7 @@ draw_cartoon <- function(structure, mono_size = 0.2, show_linkage = TRUE, orient
     end_x   = gly_connect$end_x,
     end_y   = gly_connect$end_y
   )
+  connect_df <- dplyr::bind_rows(connect_df, reducing_info$segment)
 
   gly_graph <- ggplot2::ggplot()+
     ggplot2::geom_segment(
