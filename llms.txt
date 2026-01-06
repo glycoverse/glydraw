@@ -1,7 +1,7 @@
 # glydraw
 
-The goal of glydraw is to draw glycan structures with glycan
-nomenclature.
+The goal of glydraw is to draw published-ready Structure Nomenclature
+For Glycans (SNFG). We use ggplot2 as the backend to draw the cartoons.
 
 ## Installation
 
@@ -33,14 +33,14 @@ draw_cartoon("Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-")
 
 ``` r
 # If you want to hide the annotation (default add annotation):
-draw_cartoon("Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-", annotate = FALSE)
+draw_cartoon("Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-", show_linkage = FALSE)
 ```
 
 ![](reference/figures/README-unnamed-chunk-3-1.png)
 
 ``` r
 # If you want to draw structure vertically (default horizontally):
-draw_cartoon("Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-", orien = 'V')
+draw_cartoon("Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-", orient = 'V')
 ```
 
 ![](reference/figures/README-unnamed-chunk-4-1.png)
@@ -58,7 +58,7 @@ You can check the correct glycan pictures after saved by
 ## All functions
 
 - [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md)
-  : Draw the image based on the coordinates
+  : Draw a Symbol Nomenclature For Glycan (SNFG)
 - [`save_cartoon()`](https://glycoverse.github.io/glydraw/reference/save_cartoon.md)
   : Save fixed-size glycan cartoon image to local device.
 

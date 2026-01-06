@@ -1,15 +1,15 @@
-# Draw the image based on the coordinates
+# Draw a Symbol Nomenclature For Glycan (SNFG)
 
-Draw the image based on the coordinates
+Draw a Symbol Nomenclature For Glycan (SNFG)
 
 ## Usage
 
 ``` r
 draw_cartoon(
   structure,
-  point_size = 0.15,
-  annotate = TRUE,
-  orien = c("H", "V")
+  mono_size = 0.2,
+  show_linkage = TRUE,
+  orient = c("H", "V")
 )
 ```
 
@@ -21,21 +21,23 @@ draw_cartoon(
   [`glyrepr::glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/glycan_structure.html)
   scalar, or a string or any glycan structure text nomenclatures.
 
-- point_size:
+- mono_size:
 
-  The glycan size.
+  Sizes of the monosaccharide. Default to 0.2. Setting this to large
+  might make the residue overlap with linkage annotations.
 
-- annotate:
+- show_linkage:
 
-  Add annotation or not.
+  Show linkage annotation or not. Default is TRUE.
 
-- orien:
+- orient:
 
-  The orientation of glycan structure.
+  The orientation of glycan structure. "H" for horizontal, "V" for
+  vertical. Default is "H"
 
 ## Value
 
-ggplot2 object
+a ggplot2 object
 
 ## Examples
 
