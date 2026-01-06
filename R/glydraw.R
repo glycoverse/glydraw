@@ -674,12 +674,20 @@ draw_cartoon <- function(structure, mono_size = 0.2, show_linkage = TRUE, orient
         vjust = 0.5
       )
   }
-  size <- .decide_size(gly_graph) 
-  ggimage::ggpreview(plot = gly_graph, width = size$width, height = size$height, units = "px")
+  class(gly_graph) <- c("glydraw_cartoon", class(gly_graph))
+  gly_graph
+}
+
+#' @export
+print.glydraw_cartoon <- function(x, ...) {
+  plot <- .strip_glydraw_class(x)
+  size <- .decide_size(plot)
+  ggimage::ggpreview(plot = plot, width = size$width, height = size$height, units = "px")
+  invisible(x)
 }
 
 #' Save fixed-size glycan cartoon image to local device.
-#' 
+#'
 #' In theory, you can just use `ggplot2::ggsave()` to save the cartoons plotted by [draw_cartoon()].
 #' However, you can have trouble finding the best sizes for each cartoon
 #' to make them look alike.
@@ -699,12 +707,13 @@ draw_cartoon <- function(structure, mono_size = 0.2, show_linkage = TRUE, orient
 #' cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
 #' save_cartoon(cartoon, "p1.png", tempdir(), dpi = 300)
 save_cartoon <- function(cartoon, filename, path, dpi=300){
-  size <- .decide_size(cartoon)
+  plot <- .strip_glydraw_class(cartoon)
+  size <- .decide_size(plot)
   # Save image with absolute pixel size ensuring the same glycan size.
   ggplot2::ggsave(
     filename = filename,
     path = path,
-    plot = cartoon,
+    plot = plot,
     width = size$width,
     height = size$height,
     units = 'px',
@@ -716,6 +725,11 @@ save_cartoon <- function(cartoon, filename, path, dpi=300){
   width <- 3 * 118 * diff(ggplot2::get_panel_scales(cartoon)$x$range$range)
   height <- 3 * 118 * diff(ggplot2::get_panel_scales(cartoon)$y$range$range)
   return(list(width = width, height = height))
+}
+
+.strip_glydraw_class <- function(x) {
+  class(x) <- setdiff(class(x), "glydraw_cartoon")
+  x
 }
 
 .ensure_one_structure <- function(x) {
