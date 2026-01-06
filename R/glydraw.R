@@ -518,10 +518,11 @@ annotation_coordinate <- function(chil_glyx, chil_glyy, par_glyx, par_glyy){
   par_direction <- matrix(c(chil_glyx-par_glyx, chil_glyy-par_glyy),ncol = 1, byrow = FALSE)
   chil_location <- 0.4*chil_direction/norm(chil_direction, type = '2')
   par_location <- 0.4*par_direction/norm(par_direction, type = '2')
-  chil_rotate_matrix <- matrix(c(cos(1/8*pi),sin(1/8*pi),
-                                 -sin(1/8*pi),cos(1/8*pi)), ncol = 2, byrow = TRUE)
-  par_rotate_matrix <- matrix(c(cos(1/8*pi),-sin(1/8*pi),
-                                sin(1/8*pi),cos(1/8*pi)), ncol = 2, byrow = TRUE)
+  rotate_angle <- 1/10 * pi
+  chil_rotate_matrix <- matrix(c(cos(rotate_angle),sin(rotate_angle),
+                                 -sin(rotate_angle),cos(rotate_angle)), ncol = 2, byrow = TRUE)
+  par_rotate_matrix <- matrix(c(cos(rotate_angle),-sin(rotate_angle),
+                                sin(rotate_angle),cos(rotate_angle)), ncol = 2, byrow = TRUE)
   chil_annot_loc <- chil_rotate_matrix %*% chil_location
   par_annot_loc <- par_rotate_matrix %*% par_location
   annot_loc <- list("chil" = chil_annot_loc, "par" = par_annot_loc)
