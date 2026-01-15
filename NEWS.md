@@ -1,4 +1,4 @@
-# glydraw (development version)
+# glydraw 0.3.0
 
 ## Breaking changes
 
