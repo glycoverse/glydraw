@@ -1,5 +1,20 @@
 # Changelog
 
+## glydraw (development version)
+
+### Breaking changes
+
+- Remove the `border_px` and `path` parameters from
+  [`save_cartoon()`](https://glycoverse.github.io/glydraw/reference/save_cartoon.md).
+
+### Minor improvements and bug fixes
+
+- Now we use `ggview` instead of `ggimage` for size fixing, which relies
+  on
+  [`rstudioapi::viewer()`](https://rstudio.github.io/rstudioapi/reference/viewer.html)
+  to display the plot. You might feel some difference in the display
+  effect, but the SNFG itself keeps the same.
+
 ## glydraw 0.2.0
 
 ### Breaking changes

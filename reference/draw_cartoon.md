@@ -43,4 +43,5 @@ a ggplot2 object
 
 ``` r
 draw_cartoon("Gal(b1-3)GalNAc(a1-")
+#> Error: RStudio not running
 ```

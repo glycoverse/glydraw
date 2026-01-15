@@ -12,7 +12,7 @@ glycans with different sizes are put together, they will look alike.
 ## Usage
 
 ``` r
-save_cartoon(cartoon, filename, path = NULL, dpi = 300, border_px = 50)
+save_cartoon(cartoon, file, dpi = 300)
 ```
 
 ## Arguments
@@ -22,27 +22,17 @@ save_cartoon(cartoon, filename, path = NULL, dpi = 300, border_px = 50)
   A ggplot2 object returned by
   [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md).
 
-- filename:
+- file:
 
   File name of glycan cartoon.
-
-- path:
-
-  Path of the directory to save plot to: path and filename are combined
-  to create the fully qualified file name. Defaults to the working
-  directory.
 
 - dpi:
 
   Dots per inch, default = 300.
 
-- border_px:
-
-  Width of the border around the image in pixels. Default 50.
-
 ## Examples
 
 ``` r
 cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
-save_cartoon(cartoon, "p1.png", tempdir(), dpi = 300)
+# save_cartoon(cartoon, "p1.png", dpi = 300)
 ```

@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">glydraw</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,21 +70,16 @@
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
-<p>This is a basic example which shows you how to solve a common problem:</p>
+<p>Call <code><a href="reference/draw_cartoon.html">draw_cartoon()</a></code> to plot a SNFG:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glycoverse.github.io/glydraw/">glydraw</a></span><span class="op">)</span></span>
-<span><span class="co"># basic example code</span></span>
-<span><span class="fu"><a href="reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="st">"Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-2-1.png" alt="" width="100%"></p>
+<span></span>
+<span><span class="fu"><a href="reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="st">"Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/N-core.png" width="400"></p>
+<p>And call <code><a href="reference/save_cartoon.html">save_cartoon()</a></code> to save it to a file:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># If you want to hide the annotation (default add annotation):</span></span>
-<span><span class="fu"><a href="reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="st">"Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-"</span>, show_linkage <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-3-1.png" alt="" width="100%"></p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># If you want to draw structure vertically (default horizontally):</span></span>
-<span><span class="fu"><a href="reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="st">"Man(a1-3)[Man(a1-4)]Man(a1-3)GlcNAc(a1-4)GlcNAc(a1-"</span>, orient <span class="op">=</span> <span class="st">'V'</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-4-1.png" alt="" width="100%"></p>
-<p>It is necessary to declare that pictures displayed in RStudio is different from those saved with <code><a href="reference/save_cartoon.html">save_cartoon()</a></code>, because the size need to be dynamically adjusted by <code><a href="reference/save_cartoon.html">save_cartoon()</a></code>. You can check the correct glycan pictures after saved by <code><a href="reference/save_cartoon.html">save_cartoon()</a></code>.</p>
+<code class="sourceCode R"><span><span class="va">cartoon</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="st">"Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/save_cartoon.html">save_cartoon</a></span><span class="op">(</span><span class="va">cartoon</span>, <span class="st">"N-core.png"</span>, dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">
