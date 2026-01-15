@@ -30,5 +30,7 @@ a ggplot2 object
 Draw a Symbol Nomenclature For Glycan (SNFG)
 }
 \examples{
+\dontrun{
 draw_cartoon("Gal(b1-3)GalNAc(a1-")
+}
 }

@@ -22,6 +22,8 @@ based on the size of the glycans,
 so that when glycans with different sizes are put together, they will look alike.
 }
 \examples{
+\dontrun{
 cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
-# save_cartoon(cartoon, "p1.png", dpi = 300)
+save_cartoon(cartoon, "p1.png", dpi = 300)
+}
 }
