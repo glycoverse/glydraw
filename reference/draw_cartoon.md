@@ -42,6 +42,7 @@ a ggplot2 object
 ## Examples
 
 ``` r
+if (FALSE) { # \dontrun{
 draw_cartoon("Gal(b1-3)GalNAc(a1-")
-#> Error: RStudio not running
+} # }
 ```

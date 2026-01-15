@@ -33,6 +33,8 @@ save_cartoon(cartoon, file, dpi = 300)
 ## Examples
 
 ``` r
+if (FALSE) { # \dontrun{
 cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
-# save_cartoon(cartoon, "p1.png", dpi = 300)
+save_cartoon(cartoon, "p1.png", dpi = 300)
+} # }
 ```
