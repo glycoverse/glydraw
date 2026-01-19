@@ -1,5 +1,7 @@
 # glydraw (development version)
 
+# glydraw 0.3.0
+
 ## Breaking changes
 
 * Remove the `border_px` and `path` parameters from `save_cartoon()`.

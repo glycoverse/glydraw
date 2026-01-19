@@ -728,7 +728,9 @@ create_polygon_coor <- function(gly_list, point_size) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' draw_cartoon("Gal(b1-3)GalNAc(a1-")
+#' }
 draw_cartoon <- function(structure, mono_size = 0.2, show_linkage = TRUE, orient = c("H","V")){
   structure <- .ensure_one_structure(structure)
   structure <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
@@ -821,8 +823,10 @@ draw_cartoon <- function(structure, mono_size = 0.2, show_linkage = TRUE, orient
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
-#' save_cartoon(cartoon, "p1.png", tempdir(),dpi = 300)
+#' save_cartoon(cartoon, "p1.png", dpi = 300)
+#' }
 save_cartoon <- function(cartoon, file, dpi = 300){
   checkmate::assert_class(cartoon, "glydraw_cartoon")
   ggview::save_ggplot(file = file, plot = cartoon, units = 'px', dpi = dpi)
