@@ -381,7 +381,7 @@ process_three_neighbors <- function(coor,structure,ver){
     coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,1)
     coor <- offset_chil_coor(structure,arrange_neigh_pos[3],coor,-1)
   }
-  else if(out_degree(structure,ver)[1] >= 1){ # More than 1 branch along the path
+  else if(out_degree(structure,ver)[1] >= 2){ # More than 1 branch along the path
     coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,1)
     coor <- offset_chil_coor(structure,arrange_neigh_pos[3],coor,-1)
     coor <- process_multiple_branches(coor,structure,ver)
@@ -412,7 +412,7 @@ process_contain_fucose_neighbors <- function(coor,structure,ver){
     coor <- offset_chil_coor(structure,arrange_other_neigh_pos[1],coor,0.5)
     coor <- offset_chil_coor(structure,arrange_other_neigh_pos[2],coor,-0.5)
   }
-  else if(out_degree(structure,ver)[1] >= 1){ # More than 1 branch along the path
+  else if(out_degree(structure,ver)[1] >= 2){ # More than 1 branch along the path
     coor <- offset_chil_coor(structure,arrange_other_neigh_pos[1],coor,0.5)
     coor <- offset_chil_coor(structure,arrange_other_neigh_pos[2],coor,-0.5)
     coor <- process_multiple_branches(coor,structure,ver)
