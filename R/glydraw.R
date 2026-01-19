@@ -740,6 +740,18 @@ draw_cartoon <- function(structure, mono_size = 0.2, show_linkage = TRUE, orient
   struc_annotation <- gly_annotation(structure,coor)
   reducing_info <- reducing_end_annotation(structure, coor)
   struc_annotation <- dplyr::bind_rows(struc_annotation, reducing_info$annotation)
+  # Escape '?' to prevent conflict with parse = TRUE
+  struc_annotation <- struc_annotation |>
+    dplyr::mutate(
+      annot_label = dplyr::case_when(
+        annot == "?" ~ '~"?"',
+
+        grepl("^\\?\\d+", annot) ~
+          paste0('~"', struc_annotation$annot, '"'),
+
+        TRUE ~ struc_annotation$annot
+      )
+    )
 
   # connect information
   gly_connect <- connect_info(structure, coor)
@@ -768,7 +780,7 @@ draw_cartoon <- function(structure, mono_size = 0.2, show_linkage = TRUE, orient
     gly_graph <- gly_graph+
       ggplot2::geom_text(
         data = struc_annotation,
-        ggplot2::aes(x = .data$x, y = .data$y, label = .data$annot),
+        ggplot2::aes(x = .data$x, y = .data$y, label = .data$annot_label),
         parse = TRUE,
         size = 6,
         hjust = 0.5,
