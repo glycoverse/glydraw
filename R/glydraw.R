@@ -289,13 +289,16 @@ process_fucose_branches <- function(coor,structure,fuc_pos,temp_coor){
   for (i in seq(1,num)){
     par_pos <- fuc_out_degree(structure,fuc_pos,temp_coor)[i+1]
     neigh_pos <- igraph::neighbors(structure,par_pos)
+    neigh_linkage <- as.numeric(sub('.*-','',igraph::E(structure)$linkage[neigh_pos]))
+    arrange_neigh_pos <- neigh_pos[order(neigh_linkage,decreasing = TRUE)]
+
     if (length(neigh_pos) == 2){
-      coor <- offset_chil_coor(structure,neigh_pos[1],coor,1/(2**(num-i+1)))
-      coor <- offset_chil_coor(structure,neigh_pos[2],coor,-1/(2**(num-i+1)))
+      coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,1/(2**(num-i+1)))
+      coor <- offset_chil_coor(structure,arrange_neigh_pos[2],coor,-1/(2**(num-i+1)))
     }
     else if (length(neigh_pos) == 3){
-      coor <- offset_chil_coor(structure,neigh_pos[1],coor,1/(2**(num-i+1)))
-      coor <- offset_chil_coor(structure,neigh_pos[3],coor,-1/(2**(num-i+1)))
+      coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,1/(2**(num-i+1)))
+      coor <- offset_chil_coor(structure,arrange_neigh_pos[3],coor,-1/(2**(num-i+1)))
     }
   }
   return(coor)
