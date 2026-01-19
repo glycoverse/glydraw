@@ -275,8 +275,8 @@ fuc_offset <- function(structure,fuc_pos){
 
 #' Sorting the linkage locations of neighbor vertices
 #'
-#' @param structure
-#' @param par_pos
+#' @param structure an igraph object
+#' @param ver the vertex position
 #'
 #' @returns The sorting neighbor positions
 #'
