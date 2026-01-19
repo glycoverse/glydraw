@@ -772,23 +772,11 @@ draw_cartoon <- function(structure, mono_size = 0.2, show_linkage = TRUE, orient
         vjust = 0.5
       )
   }
-  class(gly_graph) <- c("glydraw_cartoon", class(gly_graph))
-  gly_graph
-}
-
-#' @export
-print.glydraw_cartoon <- function(x, border_px = 50, dpi = 300, ...) {
-  plot <- .strip_glydraw_class(x)
-  plot <- .apply_border(plot, border_px, dpi = dpi)
-  size <- .decide_size(plot, border_px = border_px)
-  ggimage::ggpreview(
-    plot = plot,
-    width = size$width,
-    height = size$height,
-    units = "px",
-    dpi = dpi
-  )
-  invisible(x)
+  gly_graph <- .apply_border(gly_graph, 50 / 300 * 72)
+  size <- .decide_size(gly_graph, border_px = 50)
+  gly_graph <- gly_graph +
+    ggview::canvas(width = size$width, height = size$height, units = "px", dpi = 300)
+  structure(gly_graph, class = c("glydraw_cartoon", class(gly_graph)))
 }
 
 #' Save fixed-size glycan cartoon image to local device.
@@ -801,31 +789,16 @@ print.glydraw_cartoon <- function(x, border_px = 50, dpi = 300, ...) {
 #' so that when glycans with different sizes are put together, they will look alike.
 #'
 #' @param cartoon A ggplot2 object returned by [draw_cartoon()].
-#' @param filename File name of glycan cartoon.
-#' @param path Path of the directory to save plot to:
-#'   path and filename are combined to create the fully qualified file name.
-#'   Defaults to the working directory.
+#' @param file File name of glycan cartoon.
 #' @param dpi Dots per inch, default = 300.
-#' @param border_px Width of the border around the image in pixels. Default 50.
 #'
 #' @export
 #' @examples
 #' cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
-#' save_cartoon(cartoon, "p1.png", tempdir(), dpi = 300)
-save_cartoon <- function(cartoon, filename, path = NULL, dpi = 300, border_px = 50){
-  plot <- .strip_glydraw_class(cartoon)
-  plot <- .apply_border(plot, border_px, dpi = dpi)
-  size <- .decide_size(plot, border_px = border_px)
-  # Save image with absolute pixel size ensuring the same glycan size.
-  ggplot2::ggsave(
-    filename = filename,
-    path = path,
-    plot = plot,
-    width = size$width,
-    height = size$height,
-    units = 'px',
-    dpi = dpi
-  )
+#' # save_cartoon(cartoon, "p1.png", dpi = 300)
+save_cartoon <- function(cartoon, file, dpi = 300){
+  checkmate::assert_class(cartoon, "glydraw_cartoon")
+  ggview::save_ggplot(file = file, plot = cartoon, units = 'px', dpi = dpi)
 }
 
 .decide_size <- function(cartoon, border_px = 0) {
@@ -836,11 +809,10 @@ save_cartoon <- function(cartoon, filename, path = NULL, dpi = 300, border_px = 
   return(list(width = width, height = height))
 }
 
-.apply_border <- function(plot, border_px, dpi = 300) {
-  if (is.null(border_px) || border_px <= 0) {
+.apply_border <- function(plot, border_pt) {
+  if (is.null(border_pt) || border_pt <= 0) {
     return(plot)
   }
-  border_pt <- (border_px / dpi) * 72
   plot + ggplot2::theme(
     plot.margin = ggplot2::margin(
       t = border_pt,
