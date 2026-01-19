@@ -822,7 +822,7 @@ draw_cartoon <- function(structure, mono_size = 0.2, show_linkage = TRUE, orient
 #' @export
 #' @examples
 #' cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
-#' # save_cartoon(cartoon, "p1.png", dpi = 300)
+#' save_cartoon(cartoon, "p1.png", tempdir(),dpi = 300)
 save_cartoon <- function(cartoon, file, dpi = 300){
   checkmate::assert_class(cartoon, "glydraw_cartoon")
   ggview::save_ggplot(file = file, plot = cartoon, units = 'px', dpi = dpi)
