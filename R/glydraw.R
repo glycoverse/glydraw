@@ -273,6 +273,32 @@ fuc_offset <- function(structure,fuc_pos){
   return(offset)
 }
 
+#' Sorting the linkage locations of neighbor vertices
+#'
+#' @param structure
+#' @param par_pos
+#'
+#' @returns The sorting neighbor positions
+#'
+#' @noRd
+.neigh_pos_order <- function(structure, ver){
+  neigh_pos <- igraph::neighbors(structure,ver) # Get neighbor vertices
+  fuc_pos <- neigh_pos[which(neigh_pos$mono=='Fuc')]
+  if (length(fuc_pos) != 0){
+    neigh_pos <- neigh_pos[!neigh_pos %in% c(fuc_pos)] # Exclude Fucose in neighbor vertices
+  }
+  linkage_chars <- sub('.*-', '', igraph::E(structure)$linkage[neigh_pos])
+  neigh_linkage <- suppressWarnings(as.numeric(linkage_chars))
+
+  if (!all(is.na(neigh_linkage))) {
+    neigh_linkage[is.na(neigh_linkage)] <- -Inf # Set '?' or '3/6' type as bottom
+    arrange_neigh_pos <- neigh_pos[order(neigh_linkage, decreasing = TRUE)]
+    return(arrange_neigh_pos)
+  } else {
+    return(neigh_pos) # No sorting if all linkages are '?' or '3/6' type
+  }
+}
+
 #' Title Process the Vertices which Out-degree >=2 along the Path
 #'
 #' @param coor a matrix
@@ -288,9 +314,7 @@ process_fucose_branches <- function(coor,structure,fuc_pos,temp_coor){
   num <- fuc_out_degree(structure,fuc_pos,temp_coor)[1]
   for (i in seq(1,num)){
     par_pos <- fuc_out_degree(structure,fuc_pos,temp_coor)[i+1]
-    neigh_pos <- igraph::neighbors(structure,par_pos)
-    neigh_linkage <- as.numeric(sub('.*-','',igraph::E(structure)$linkage[neigh_pos]))
-    arrange_neigh_pos <- neigh_pos[order(neigh_linkage,decreasing = TRUE)]
+    arrange_neigh_pos <- .neigh_pos_order(structure, par_pos)
 
     if (length(neigh_pos) == 2){
       coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,1/(2**(num-i+1)))
@@ -319,9 +343,7 @@ process_multiple_branches <- function(coor,structure,ver){
   for(j in seq(1,num-1)){ # Traverse all branch vertices except for self
     pos <- out_degree(structure,ver)[j+1]
     pos_max <- out_degree(structure,ver)[num] # Position of branch vertices with second largest index
-    neigh_pos <- igraph::neighbors(structure,pos)
-    neigh_linkage <- as.numeric(sub('.*-','',igraph::E(structure)$linkage[neigh_pos]))
-    arrange_neigh_pos <- neigh_pos[order(neigh_linkage,decreasing = TRUE)]
+    arrange_neigh_pos <- .neigh_pos_order(structure, pos)
     # Judge whether child vertex is in the middle
     ver_neigh_pos <- igraph::neighbors(structure,ver)
     chil_in_middle <- mid_pos(structure,coor,min(ver_neigh_pos),pos) | mid_pos(structure,coor,max(ver_neigh_pos),pos) # TRUE or FALSE
@@ -348,9 +370,7 @@ process_multiple_branches <- function(coor,structure,ver){
 #' @examples process_two_neighbors(coor, structure, 5)
 #' @noRd
 process_two_neighbors <- function(coor,structure,ver){
-  neigh_pos <- igraph::neighbors(structure,ver)
-  neigh_linkage <- as.numeric(sub('.*-','',igraph::E(structure)$linkage[neigh_pos]))
-  arrange_neigh_pos <- neigh_pos[order(neigh_linkage,decreasing = TRUE)]
+  arrange_neigh_pos <- .neigh_pos_order(structure, ver)
   if (out_degree(structure,ver)[1] == 1){
     coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,0.5)
     coor <- offset_chil_coor(structure,arrange_neigh_pos[2],coor,-0.5)
@@ -374,9 +394,7 @@ process_two_neighbors <- function(coor,structure,ver){
 #' @examples process_three_neighbors(coor, structure, 6)
 #' @noRd
 process_three_neighbors <- function(coor,structure,ver){
-  neigh_pos <- igraph::neighbors(structure,ver)
-  neigh_linkage <- as.numeric(sub('.*-','',igraph::E(structure)$linkage[neigh_pos]))
-  arrange_neigh_pos <- neigh_pos[order(neigh_linkage,decreasing = TRUE)]
+  arrange_neigh_pos <- .neigh_pos_order(structure, ver)
   if (out_degree(structure,ver)[1] == 1){
     coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,1)
     coor <- offset_chil_coor(structure,arrange_neigh_pos[3],coor,-1)
@@ -400,13 +418,7 @@ process_three_neighbors <- function(coor,structure,ver){
 #' @examples process_contain_fucose_neighbors(coor, structure, 7)
 #' @noRd
 process_contain_fucose_neighbors <- function(coor,structure,ver){
-  # Gain 'Fuc' position
-  neigh_pos <- igraph::neighbors(structure,ver)
-  fuc_pos <- neigh_pos[which(neigh_pos$mono=='Fuc')]
-  # Gain other vertices position
-  other_neigh_pos <- neigh_pos[!neigh_pos %in% c(fuc_pos)]
-  neigh_linkage <- as.numeric(sub('.*-','',igraph::E(structure)$linkage[other_neigh_pos]))
-  arrange_other_neigh_pos <- other_neigh_pos[order(neigh_linkage,decreasing = TRUE)]
+  arrange_other_neigh_pos <- .neigh_pos_order(structure, ver)
   # Process other vertices coordinate
   if (out_degree(structure,ver)[1] == 1){
     coor <- offset_chil_coor(structure,arrange_other_neigh_pos[1],coor,0.5)
