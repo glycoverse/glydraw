@@ -861,14 +861,17 @@ save_cartoon <- function(cartoon, file, dpi = 300){
 }
 
 .ensure_one_structure <- function(x) {
-  if (is.character(x)) {
+  if (glyrepr::is_glycan_structure(x)) {
+    x <- x
+  } else if (is.character(x)) {
     x <- glyparse::auto_parse(x)
-  } else if (!glyrepr::is_glycan_structure(x)) {
+  } else {
     cli::cli_abort(c(
       "{.arg structure} must be either a structure string or {.fn glyrepr::glycan_structure}.",
       "x" = "Got: {.cls {class(x)}}."
     ))
   }
+
   if (length(x) > 1) {
     cli::cli_abort(c(
       "Must provide exactly one glycan structure.",
