@@ -1,4 +1,9 @@
-# glydraw (development version)
+# glydraw 0.3.1
+
+## Minor improvements and bug fixes
+
+* Update dependency to glyrepr 0.10.0.
+* Fix various bugs including illegal character processing, fucose arrangement, and display sizing issues.
 
 # glydraw 0.3.0
 
