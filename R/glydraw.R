@@ -718,8 +718,6 @@ create_polygon_coor <- function(gly_list, point_size) {
 #'
 #' @param structure A [glyrepr::glycan_structure()] scalar,
 #'   or a string or any glycan structure text nomenclatures.
-#' @param mono_size Sizes of the monosaccharide. Default to 0.2.
-#'   Setting this to large might make the residue overlap with linkage annotations.
 #' @param show_linkage Show linkage annotation or not. Default is TRUE.
 #' @param orient The orientation of glycan structure. "H" for horizontal, "V" for vertical.
 #'   Default is "H"
@@ -731,7 +729,7 @@ create_polygon_coor <- function(gly_list, point_size) {
 #' \dontrun{
 #' draw_cartoon("Gal(b1-3)GalNAc(a1-")
 #' }
-draw_cartoon <- function(structure, mono_size = 0.2, show_linkage = TRUE, orient = c("H","V")){
+draw_cartoon <- function(structure, show_linkage = TRUE, orient = c("H","V")){
   structure <- .ensure_one_structure(structure)
   structure <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
   orient <- rlang::arg_match(orient)
@@ -748,7 +746,7 @@ draw_cartoon <- function(structure, mono_size = 0.2, show_linkage = TRUE, orient
   # Rename colnames of gly_list
   colnames(gly_list) <- c('center_x','center_y','glycoform')
   # Draw Glycan Shape, where gly_list contains center_x, center_y, glycoform 3 columns
-  polygon_coor <- create_polygon_coor(gly_list, mono_size)
+  polygon_coor <- create_polygon_coor(gly_list, 0.2)
   filled_color <- glycan_color[as.character(polygon_coor$color)]
 
   struc_annotation <- gly_annotation(structure,coor)
