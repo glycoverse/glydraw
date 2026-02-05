@@ -689,15 +689,17 @@ reducing_end_annotation <- function(structure, coor) {
 #' @examples create_polygon_coor(gly_list)
 #' @noRd
 create_polygon_coor <- function(gly_list, point_size) {
+  # Progressively read and process lines in gly_list
   polygon_coor <- gly_list |>
-    purrr::pmap_dfr(function(center_x, center_y, glycoform) {
+    purrr::pmap_dfr(function(center_x, center_y, glycoform, transparency) {
       composition <- glycan_dict[[glycoform]][1] # Mapping the Composition of Glycoform, e.g.'Fuc'->'dHex'
       df1 <- data.frame(
         point_x = c(point_size * glycan_shape[[composition]]$x + center_x),
         point_y = c(point_size * glycan_shape[[composition]]$y + center_y),
         # For Distinguishing the Coordinates of each point
         group = paste0(glycoform, center_x, "_", center_y),
-        color = glycan_dict[[glycoform]][2]
+        color = glycan_dict[[glycoform]][2],
+        alpha = transparency
       )
       if (length(glycan_dict[[glycoform]]) > 2) {
         df2 <- data.frame(
@@ -705,7 +707,8 @@ create_polygon_coor <- function(gly_list, point_size) {
           point_y = c(point_size * glycan_shape[[composition]]$yy + center_y),
           # For Distinguishing the Coordinates of each point
           group = paste0(glycoform, center_x, "_", center_y, 'remain'),
-          color = glycan_dict[[glycoform]][3]
+          color = glycan_dict[[glycoform]][3],
+          alpha = transparency
         )
         df1 <- dplyr::bind_rows(df1, df2)
       }
@@ -729,9 +732,10 @@ create_polygon_coor <- function(gly_list, point_size) {
 #' \dontrun{
 #' draw_cartoon("Gal(b1-3)GalNAc(a1-")
 #' }
-draw_cartoon <- function(structure, show_linkage = TRUE, orient = c("H","V")){
+draw_cartoon <- function(structure, show_linkage = TRUE, orient = c("H","V"), highlight = NULL){
   structure <- .ensure_one_structure(structure)
   structure <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
+  highlight <- .ensure_highlight_para(highlight, length(structure))
   orient <- rlang::arg_match(orient)
   # Coordinate of Glycans
   if (orient == 'H'){
@@ -742,9 +746,18 @@ draw_cartoon <- function(structure, show_linkage = TRUE, orient = c("H","V")){
     coor[,1] <- temp[,2]
     coor[,2] <- -temp[,1]
   }
+
   gly_list <- data.frame(coor,'glycoform' = glycoform_info(structure))
+
+  # Process highlight points, highlight vertices 1.0, others 0.3
+  if (!is.null(highlight)){
+    ver_transparency <- replace(rep(0.3, length(structure)), highlight, 1.0)
+    gly_list$transparency <- ver_transparency
+  }else {
+    gly_list$transparency <- 1.0
+  }
   # Rename colnames of gly_list
-  colnames(gly_list) <- c('center_x','center_y','glycoform')
+  colnames(gly_list) <- c('center_x','center_y','glycoform','transparency')
   # Draw Glycan Shape, where gly_list contains center_x, center_y, glycoform 3 columns
   polygon_coor <- create_polygon_coor(gly_list, 0.2)
   filled_color <- glycan_color[as.character(polygon_coor$color)]
@@ -782,12 +795,18 @@ draw_cartoon <- function(structure, show_linkage = TRUE, orient = c("H","V")){
       linewidth = 0.5
     )+
     ggplot2::geom_polygon(
+      data = polygon_coor, # Masking the segment with white color
+      ggplot2::aes(x = .data$point_x, y = .data$point_y, group = .data$group),
+      fill="white",color='black',linewidth = 0.5
+    )+
+    ggplot2::geom_polygon(
       data = polygon_coor,
       ggplot2::aes(x = .data$point_x, y = .data$point_y, group = .data$group),
-      fill=filled_color, color='black',linewidth = 0.5
+      fill = filled_color,color = 'black',linewidth = 0.5, alpha = polygon_coor$alpha
     )+
     ggplot2::coord_fixed(ratio = 1, clip = "off") +
-    ggplot2::theme_void()
+    ggplot2::theme_void()+
+    ggplot2::theme(legend.position = "none")
   if (show_linkage){
     gly_graph <- gly_graph+
       ggplot2::geom_text(
@@ -851,6 +870,15 @@ save_cartoon <- function(cartoon, file, dpi = 300){
       unit = "pt"
     )
   )
+}
+
+.ensure_highlight_para <- function(x, gly_vertices) {
+  if (!is.numeric(x) && !is.null(x)) {
+    cli::cli_abort("highlight parameter {.emph {x}} must be numeric")
+  } else if (!all(x %in% seq(1,gly_vertices))) {
+    cli::cli_abort("highlight parameter {.emph {x}} was out of range {.emph 1~{gly_vertices}}")
+  }
+  x
 }
 
 .strip_glydraw_class <- function(x) {
