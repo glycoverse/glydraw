@@ -4,19 +4,11 @@
 \alias{draw_cartoon}
 \title{Draw a Symbol Nomenclature For Glycan (SNFG)}
 \usage{
-draw_cartoon(
-  structure,
-  mono_size = 0.2,
-  show_linkage = TRUE,
-  orient = c("H", "V")
-)
+draw_cartoon(structure, show_linkage = TRUE, orient = c("H", "V"))
 }
 \arguments{
 \item{structure}{A \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}} scalar,
 or a string or any glycan structure text nomenclatures.}
-
-\item{mono_size}{Sizes of the monosaccharide. Default to 0.2.
-Setting this to large might make the residue overlap with linkage annotations.}
 
 \item{show_linkage}{Show linkage annotation or not. Default is TRUE.}
 
