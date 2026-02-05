@@ -770,6 +770,7 @@ draw_cartoon <- function(structure, show_linkage = TRUE, orient = c("H","V"), hi
     dplyr::mutate(
       annot_label = dplyr::case_when(
         annot == "?" ~ '~"?"',
+        annot == "??" ~ '~"??"',
 
         grepl("^\\?\\d+", annot) ~
           paste0('~"', struc_annotation$annot, '"'),
