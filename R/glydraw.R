@@ -346,14 +346,25 @@ process_multiple_branches <- function(coor,structure,ver){
     arrange_neigh_pos <- .neigh_pos_order(structure, pos)
     # Judge whether child vertex is in the middle
     ver_neigh_pos <- igraph::neighbors(structure,ver)
-    chil_in_middle <- mid_pos(structure,coor,min(ver_neigh_pos),pos) | mid_pos(structure,coor,max(ver_neigh_pos),pos) # TRUE or FALSE
+    num_neigh <- length(ver_neigh_pos)
+    chil_in_middle <- mid_pos(structure,coor,min(ver_neigh_pos),pos) | mid_pos(structure,coor,max(ver_neigh_pos),pos)
     if (length(arrange_neigh_pos)==2){
-      coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,1/(2**(num-j+1))+0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
-      coor <- offset_chil_coor(structure,arrange_neigh_pos[2],coor,-1/(2**(num-j+1))-0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
+      # Different number of ver's neighbor leads to different offset rule.
+      # (3-num_neigh) means when the number of ver's neighbor=3, value=0; 2->1.
+      coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,
+                               1/(2**(num-j+(3-num_neigh)))+0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
+      coor <- offset_chil_coor(structure,arrange_neigh_pos[2],coor,
+                               -1/(2**(num-j+(3-num_neigh)))-0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
     }
     else if(length(arrange_neigh_pos)==3 && chil_in_middle){
-      coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,1/(2**(num-j))+0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
-      coor <- offset_chil_coor(structure,arrange_neigh_pos[3],coor,-1/(2**(num-j))-0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
+      # For neighbors=3 vertex, the offset should not be consistent.
+      # Only offset the neighbor vertex included in the path along the specified vertex to start vertex.
+      path_vertex <- igraph::shortest_paths(structure,length(structure),ver)$vpath[[1]]
+      offset_index <- which(arrange_neigh_pos %in% path_vertex) # Index of the neighbor to be offset.
+      # (2-offset_index) means when offset_index=1, value=1; 2->0; 3->-1, adjusting offset direction.
+      # (2-num_neigh) means when the number of ver's neighbor=3, value=-1; 2->0.
+      coor <- offset_chil_coor(structure, arrange_neigh_pos[offset_index], coor,
+                             (2-offset_index)*(1/(2**(num-j+(2-num_neigh)))+0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max)))
     }
   }
   return(coor)
