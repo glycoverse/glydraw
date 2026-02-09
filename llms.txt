@@ -6,23 +6,25 @@ For Glycans (SNFG). We use ggplot2 as the backend to draw the cartoons.
 ## Installation
 
 You can install the latest release of glydraw from
-[r-universe](https://glycoverse.r-universe.dev/glydraw):
+[r-universe](https://glycoverse.r-universe.dev/glydraw)
+(**recommended**):
 
 ``` r
-install.packages('glydraw', repos = c('https://glycoverse.r-universe.dev', 'https://cloud.r-project.org'))
+# install.packages("pak")
+pak::repo_add(glycoverse = "https://glycoverse.r-universe.dev")
+pak::pkg_install("glydraw")
 ```
 
 Or from [GitHub](https://github.com/glycoverse/glydraw):
 
 ``` r
-# install.packages("remotes")
-remotes::install_github("glycoverse/glydraw@*release")
+pak::pkg_install("glycoverse/glydraw@*release")
 ```
 
-Or install the development version:
+Or install the development version (NOT recommended):
 
 ``` r
-remotes::install_github("glycoverse/glydraw")
+pak::pkg_install("glycoverse/glydraw")
 ```
 
 ## Example
