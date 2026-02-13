@@ -5,6 +5,17 @@ For Glycans (SNFG). We use ggplot2 as the backend to draw the cartoons.
 
 ## Installation
 
+### Install glycoverse
+
+We recommend installing the meta-package
+[glycoverse](https://github.com/glycoverse/glycoverse), which includes
+this package and other core glycoverse packages.
+
+### Install glydraw alone
+
+If you don’t want to install all glycoverse packages, you can only
+install glydraw.
+
 You can install the latest release of glydraw from
 [r-universe](https://glycoverse.r-universe.dev/glydraw)
 (**recommended**):
@@ -26,6 +37,11 @@ Or install the development version (NOT recommended):
 ``` r
 pak::pkg_install("glycoverse/glydraw")
 ```
+
+**Note:** Tips and troubleshooting for the meta-package
+[glycoverse](https://github.com/glycoverse/glycoverse) are also
+applicable here: [Installation of
+glycoverse](https://github.com/glycoverse/glycoverse#installation).
 
 ## Example
 
