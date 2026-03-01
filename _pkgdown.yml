@@ -2,3 +2,5 @@ url: https://glycoverse.github.io/glydraw/
 template:
   bootstrap: 5
 
+development:
+  mode: auto
