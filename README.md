@@ -9,6 +9,8 @@
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/glydraw)](https://CRAN.R-project.org/package=glydraw)
+[![R-universe
+version](https://glycoverse.r-universe.dev/glydraw/badges/version)](https://glycoverse.r-universe.dev/glydraw)
 [![R-CMD-check](https://github.com/glycoverse/glydraw/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/glycoverse/glydraw/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/glycoverse/glydraw/graph/badge.svg)](https://app.codecov.io/gh/glycoverse/glydraw)
@@ -20,19 +22,43 @@ For Glycans (SNFG). We use ggplot2 as the backend to draw the cartoons.
 
 ## Installation
 
+### Install glycoverse
+
+We recommend installing the meta-package
+[glycoverse](https://github.com/glycoverse/glycoverse), which includes
+this package and other core glycoverse packages.
+
+### Install glydraw alone
+
+If you don’t want to install all glycoverse packages, you can only
+install glydraw.
+
 You can install the latest release of glydraw from
-[GitHub](https://github.com/) with:
+[r-universe](https://glycoverse.r-universe.dev/glydraw)
+(**recommended**):
 
 ``` r
-# install.packages("remotes")
-remotes::install_github("glycoverse/glydraw@*release")
+# install.packages("pak")
+pak::repo_add(glycoverse = "https://glycoverse.r-universe.dev")
+pak::pkg_install("glydraw")
 ```
 
-Or install the development version:
+Or from [GitHub](https://github.com/glycoverse/glydraw):
 
 ``` r
-remotes::install_github("glycoverse/glydraw")
+pak::pkg_install("glycoverse/glydraw@*release")
 ```
+
+Or install the development version (NOT recommended):
+
+``` r
+pak::pkg_install("glycoverse/glydraw")
+```
+
+**Note:** Tips and troubleshooting for the meta-package
+[glycoverse](https://github.com/glycoverse/glycoverse) are also
+applicable here: [Installation of
+glycoverse](https://github.com/glycoverse/glycoverse#installation).
 
 ## Example
 
