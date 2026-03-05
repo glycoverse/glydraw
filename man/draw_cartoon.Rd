@@ -4,7 +4,12 @@
 \alias{draw_cartoon}
 \title{Draw a Symbol Nomenclature For Glycan (SNFG)}
 \usage{
-draw_cartoon(structure, show_linkage = TRUE, orient = c("H", "V"))
+draw_cartoon(
+  structure,
+  show_linkage = TRUE,
+  orient = c("H", "V"),
+  highlight = NULL
+)
 }
 \arguments{
 \item{structure}{A \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}} scalar,
@@ -14,6 +19,8 @@ or a string or any glycan structure text nomenclatures.}
 
 \item{orient}{The orientation of glycan structure. "H" for horizontal, "V" for vertical.
 Default is "H"}
+
+\item{highlight}{highlight specified monosaccharides.}
 }
 \value{
 a ggplot2 object
