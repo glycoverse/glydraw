@@ -735,6 +735,7 @@ create_polygon_coor <- function(gly_list, point_size) {
 #' @param show_linkage Show linkage annotation or not. Default is TRUE.
 #' @param orient The orientation of glycan structure. "H" for horizontal, "V" for vertical.
 #'   Default is "H"
+#' @param highlight highlight specified monosaccharides.
 #'
 #' @returns a ggplot2 object
 #' @export
