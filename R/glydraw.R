@@ -346,14 +346,25 @@ process_multiple_branches <- function(coor,structure,ver){
     arrange_neigh_pos <- .neigh_pos_order(structure, pos)
     # Judge whether child vertex is in the middle
     ver_neigh_pos <- igraph::neighbors(structure,ver)
-    chil_in_middle <- mid_pos(structure,coor,min(ver_neigh_pos),pos) | mid_pos(structure,coor,max(ver_neigh_pos),pos) # TRUE or FALSE
+    num_neigh <- length(ver_neigh_pos)
+    chil_in_middle <- mid_pos(structure,coor,min(ver_neigh_pos),pos) | mid_pos(structure,coor,max(ver_neigh_pos),pos)
     if (length(arrange_neigh_pos)==2){
-      coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,1/(2**(num-j+1))+0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
-      coor <- offset_chil_coor(structure,arrange_neigh_pos[2],coor,-1/(2**(num-j+1))-0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
+      # Different number of ver's neighbor leads to different offset rule.
+      # (3-num_neigh) means when the number of ver's neighbor=3, value=0; 2->1.
+      coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,
+                               1/(2**(num-j+(3-num_neigh)))+0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
+      coor <- offset_chil_coor(structure,arrange_neigh_pos[2],coor,
+                               -1/(2**(num-j+(3-num_neigh)))-0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
     }
     else if(length(arrange_neigh_pos)==3 && chil_in_middle){
-      coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,1/(2**(num-j))+0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
-      coor <- offset_chil_coor(structure,arrange_neigh_pos[3],coor,-1/(2**(num-j))-0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
+      # For neighbors=3 vertex, the offset should not be consistent.
+      # Only offset the neighbor vertex included in the path along the specified vertex to start vertex.
+      path_vertex <- igraph::shortest_paths(structure,length(structure),ver)$vpath[[1]]
+      offset_index <- which(arrange_neigh_pos %in% path_vertex) # Index of the neighbor to be offset.
+      # (2-offset_index) means when offset_index=1, value=1; 2->0; 3->-1, adjusting offset direction.
+      # (2-num_neigh) means when the number of ver's neighbor=3, value=-1; 2->0.
+      coor <- offset_chil_coor(structure, arrange_neigh_pos[offset_index], coor,
+                             (2-offset_index)*(1/(2**(num-j+(2-num_neigh)))+0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max)))
     }
   }
   return(coor)
@@ -689,15 +700,17 @@ reducing_end_annotation <- function(structure, coor) {
 #' @examples create_polygon_coor(gly_list)
 #' @noRd
 create_polygon_coor <- function(gly_list, point_size) {
+  # Progressively read and process lines in gly_list
   polygon_coor <- gly_list |>
-    purrr::pmap_dfr(function(center_x, center_y, glycoform) {
+    purrr::pmap_dfr(function(center_x, center_y, glycoform, transparency) {
       composition <- glycan_dict[[glycoform]][1] # Mapping the Composition of Glycoform, e.g.'Fuc'->'dHex'
       df1 <- data.frame(
         point_x = c(point_size * glycan_shape[[composition]]$x + center_x),
         point_y = c(point_size * glycan_shape[[composition]]$y + center_y),
         # For Distinguishing the Coordinates of each point
         group = paste0(glycoform, center_x, "_", center_y),
-        color = glycan_dict[[glycoform]][2]
+        color = glycan_dict[[glycoform]][2],
+        alpha = transparency
       )
       if (length(glycan_dict[[glycoform]]) > 2) {
         df2 <- data.frame(
@@ -705,7 +718,8 @@ create_polygon_coor <- function(gly_list, point_size) {
           point_y = c(point_size * glycan_shape[[composition]]$yy + center_y),
           # For Distinguishing the Coordinates of each point
           group = paste0(glycoform, center_x, "_", center_y, 'remain'),
-          color = glycan_dict[[glycoform]][3]
+          color = glycan_dict[[glycoform]][3],
+          alpha = transparency
         )
         df1 <- dplyr::bind_rows(df1, df2)
       }
@@ -718,11 +732,10 @@ create_polygon_coor <- function(gly_list, point_size) {
 #'
 #' @param structure A [glyrepr::glycan_structure()] scalar,
 #'   or a string or any glycan structure text nomenclatures.
-#' @param mono_size Sizes of the monosaccharide. Default to 0.2.
-#'   Setting this to large might make the residue overlap with linkage annotations.
 #' @param show_linkage Show linkage annotation or not. Default is TRUE.
 #' @param orient The orientation of glycan structure. "H" for horizontal, "V" for vertical.
 #'   Default is "H"
+#' @param highlight highlight specified monosaccharides.
 #'
 #' @returns a ggplot2 object
 #' @export
@@ -731,9 +744,10 @@ create_polygon_coor <- function(gly_list, point_size) {
 #' \dontrun{
 #' draw_cartoon("Gal(b1-3)GalNAc(a1-")
 #' }
-draw_cartoon <- function(structure, mono_size = 0.2, show_linkage = TRUE, orient = c("H","V")){
+draw_cartoon <- function(structure, show_linkage = TRUE, orient = c("H","V"), highlight = NULL){
   structure <- .ensure_one_structure(structure)
   structure <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
+  highlight <- .ensure_highlight_para(highlight, length(structure))
   orient <- rlang::arg_match(orient)
   # Coordinate of Glycans
   if (orient == 'H'){
@@ -744,11 +758,20 @@ draw_cartoon <- function(structure, mono_size = 0.2, show_linkage = TRUE, orient
     coor[,1] <- temp[,2]
     coor[,2] <- -temp[,1]
   }
+
   gly_list <- data.frame(coor,'glycoform' = glycoform_info(structure))
+
+  # Process highlight points, highlight vertices 1.0, others 0.3
+  if (!is.null(highlight)){
+    ver_transparency <- replace(rep(0.3, length(structure)), highlight, 1.0)
+    gly_list$transparency <- ver_transparency
+  }else {
+    gly_list$transparency <- 1.0
+  }
   # Rename colnames of gly_list
-  colnames(gly_list) <- c('center_x','center_y','glycoform')
+  colnames(gly_list) <- c('center_x','center_y','glycoform','transparency')
   # Draw Glycan Shape, where gly_list contains center_x, center_y, glycoform 3 columns
-  polygon_coor <- create_polygon_coor(gly_list, mono_size)
+  polygon_coor <- create_polygon_coor(gly_list, 0.2)
   filled_color <- glycan_color[as.character(polygon_coor$color)]
 
   struc_annotation <- gly_annotation(structure,coor)
@@ -759,6 +782,7 @@ draw_cartoon <- function(structure, mono_size = 0.2, show_linkage = TRUE, orient
     dplyr::mutate(
       annot_label = dplyr::case_when(
         annot == "?" ~ '~"?"',
+        annot == "??" ~ '~"??"',
 
         grepl("^\\?\\d+", annot) ~
           paste0('~"', struc_annotation$annot, '"'),
@@ -784,12 +808,18 @@ draw_cartoon <- function(structure, mono_size = 0.2, show_linkage = TRUE, orient
       linewidth = 0.5
     )+
     ggplot2::geom_polygon(
+      data = polygon_coor, # Masking the segment with white color
+      ggplot2::aes(x = .data$point_x, y = .data$point_y, group = .data$group),
+      fill="white",color='black',linewidth = 0.5
+    )+
+    ggplot2::geom_polygon(
       data = polygon_coor,
       ggplot2::aes(x = .data$point_x, y = .data$point_y, group = .data$group),
-      fill=filled_color, color='black',linewidth = 0.5
+      fill = filled_color,color = 'black',linewidth = 0.5, alpha = polygon_coor$alpha
     )+
     ggplot2::coord_fixed(ratio = 1, clip = "off") +
-    ggplot2::theme_void()
+    ggplot2::theme_void()+
+    ggplot2::theme(legend.position = "none")
   if (show_linkage){
     gly_graph <- gly_graph+
       ggplot2::geom_text(
@@ -853,6 +883,15 @@ save_cartoon <- function(cartoon, file, dpi = 300){
       unit = "pt"
     )
   )
+}
+
+.ensure_highlight_para <- function(x, gly_vertices) {
+  if (!is.numeric(x) && !is.null(x)) {
+    cli::cli_abort("highlight parameter {.emph {x}} must be numeric")
+  } else if (!all(x %in% seq(1,gly_vertices))) {
+    cli::cli_abort("highlight parameter {.emph {x}} was out of range {.emph 1~{gly_vertices}}")
+  }
+  x
 }
 
 .strip_glydraw_class <- function(x) {
