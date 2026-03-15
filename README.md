@@ -7,8 +7,6 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![CRAN
-status](https://www.r-pkg.org/badges/version/glydraw)](https://CRAN.R-project.org/package=glydraw)
 [![R-universe
 version](https://glycoverse.r-universe.dev/glydraw/badges/version)](https://glycoverse.r-universe.dev/glydraw)
 [![R-CMD-check](https://github.com/glycoverse/glydraw/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/glycoverse/glydraw/actions/workflows/R-CMD-check.yaml)
