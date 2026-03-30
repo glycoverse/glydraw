@@ -574,7 +574,13 @@ gly_annotation <- function(structure,coor){
       y = numeric(0)
     ))
   }
-  struc_annot_coor <- data.frame(matrix(nrow = 0, ncol = 4))
+  struc_annot_coor <- data.frame(
+    vertice = numeric(),
+    annot   = character(),
+    x       = numeric(),
+    y       = numeric(),
+    stringsAsFactors = FALSE
+  )
   for (ver in seq_len(structure_length - 1)){
     par_ver <- dplyr::nth(as.vector(igraph::shortest_paths(structure,length(structure),ver)$vpath[[1]]),-2)
     # Read annotation information and relative position
@@ -611,7 +617,7 @@ reducing_end_annotation <- function(structure, coor) {
   if (length(anomer) == 0 || is.na(anomer) || anomer == "") {
     return(list(
       annotation = data.frame(
-        vertice = character(0),
+        vertice = numeric(0),
         annot = character(0),
         x = numeric(0),
         y = numeric(0)
@@ -632,7 +638,7 @@ reducing_end_annotation <- function(structure, coor) {
   } else {
     return(list(
       annotation = data.frame(
-        vertice = character(0),
+        vertice = numeric(0),
         annot = character(0),
         x = numeric(0),
         y = numeric(0)
@@ -661,7 +667,7 @@ reducing_end_annotation <- function(structure, coor) {
   annot_coor <- root_coor + as.vector(annot_loc)
   list(
     annotation = data.frame(
-      vertice = as.character(root),
+      vertice = as.numeric(root),
       annot = label,
       x = as.numeric(annot_coor["x"]),
       y = as.numeric(annot_coor["y"])
