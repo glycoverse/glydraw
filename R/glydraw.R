@@ -568,14 +568,14 @@ gly_annotation <- function(structure,coor){
   structure_length <- length(structure)
   if (igraph::ecount(structure) == 0) {
     return(data.frame(
-      vertice = integer(0),
+      vertice = character(0),
       annot = character(0),
       x = numeric(0),
       y = numeric(0)
     ))
   }
   struc_annot_coor <- data.frame(
-    vertice = numeric(),
+    vertice = character(),
     annot   = character(),
     x       = numeric(),
     y       = numeric(),
@@ -617,7 +617,7 @@ reducing_end_annotation <- function(structure, coor) {
   if (length(anomer) == 0 || is.na(anomer) || anomer == "") {
     return(list(
       annotation = data.frame(
-        vertice = numeric(0),
+        vertice = character(0),
         annot = character(0),
         x = numeric(0),
         y = numeric(0)
@@ -638,7 +638,7 @@ reducing_end_annotation <- function(structure, coor) {
   } else {
     return(list(
       annotation = data.frame(
-        vertice = numeric(0),
+        vertice = character(0),
         annot = character(0),
         x = numeric(0),
         y = numeric(0)
@@ -667,7 +667,7 @@ reducing_end_annotation <- function(structure, coor) {
   annot_coor <- root_coor + as.vector(annot_loc)
   list(
     annotation = data.frame(
-      vertice = as.numeric(root),
+      vertice = as.character(root),
       annot = label,
       x = as.numeric(annot_coor["x"]),
       y = as.numeric(annot_coor["y"])
