@@ -766,11 +766,12 @@ draw_cartoon <- function(structure, show_linkage = TRUE, orient = c("H","V"), hi
     dplyr::mutate(
       annot_label = dplyr::case_when(
         annot == "?" ~ '~"?"',
-        annot == "??" ~ '~"??"',
-
-        grepl("^\\?\\d+", annot) ~
-          paste0('~"', struc_annotation$annot, '"'),
-
+        annot == "??" ~ '~"?"',
+        # case like '?3' would convert to '?'
+        grepl("^\\?\\d+", annot) ~ '~"?"',
+        # case like 'a?' would convert to '?'
+        grepl("^\\w+\\?", annot) ~ '~"?"',
+        # normal annotation would maintain the same
         TRUE ~ struc_annotation$annot
       )
     )
