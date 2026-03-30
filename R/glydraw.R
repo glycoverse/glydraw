@@ -647,33 +647,17 @@ reducing_end_annotation <- function(structure, coor) {
   }
   root <- length(structure)
   root_coor <- c(x = as.numeric(coor[root, 1]), y = as.numeric(coor[root, 2]))
-  neigh_idx <- as.integer(igraph::neighbors(structure, root))
-  if (length(neigh_idx) == 0) {
-    direction <- c(x = 1, y = 0)
-  } else {
-    neigh_coor <- coor[neigh_idx, , drop = FALSE]
-    mean_vec <- c(
-      x = mean(as.numeric(neigh_coor[, 1])),
-      y = mean(as.numeric(neigh_coor[, 2]))
-    ) - root_coor
-    vec_norm <- sqrt(sum(mean_vec^2))
-    if (is.na(vec_norm) || vec_norm == 0) {
-      direction <- c(x = 1, y = 0)
-    } else {
-      direction <- -mean_vec / vec_norm
-    }
-  }
-  line_length <- 0.4
+  line_length <- 0.6
   label_offset <- 0.2
-  line_end <- root_coor + line_length * direction
+  line_end <- root_coor + c(line_length, 0)
   rotate_angle <- 1/10 * pi
   rotate_matrix <- matrix(
     c(cos(rotate_angle), sin(rotate_angle), -sin(rotate_angle), cos(rotate_angle)),
     ncol = 2,
     byrow = TRUE
   )
-  label_vec <- (line_length + label_offset) * direction
-  annot_loc <- 0.7 * rotate_matrix %*% matrix(label_vec, ncol = 1)
+  label_vec <- c(line_length + label_offset, 0)
+  annot_loc <- 0.6 * rotate_matrix %*% matrix(label_vec, ncol = 1)
   annot_coor <- root_coor + as.vector(annot_loc)
   list(
     annotation = data.frame(
