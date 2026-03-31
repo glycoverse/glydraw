@@ -596,8 +596,8 @@ gly_annotation <- function(structure,coor){
     struc_annot_coor <- rbind(struc_annot_coor, par_annotation)
   }
   colnames(struc_annot_coor) <- c('vertice','annot','x','y')
-  struc_annot_coor$annot[struc_annot_coor$annot == 'b1'] <- "beta"
-  struc_annot_coor$annot[struc_annot_coor$annot %in% c('a1','a2')] <- "alpha"
+  struc_annot_coor$annot[tolower(substr(struc_annot_coor$annot, 1, 1)) == "b"] <- "beta"
+  struc_annot_coor$annot[tolower(substr(struc_annot_coor$annot, 1, 1)) == "a"] <- "alpha"
   struc_annot_coor$x <- as.numeric(struc_annot_coor$x)
   struc_annot_coor$y <- as.numeric(struc_annot_coor$y)
   return(struc_annot_coor)
@@ -636,20 +636,7 @@ reducing_end_annotation <- function(structure, coor) {
   } else if (label == "b") {
     label <- "beta"
   } else {
-    return(list(
-      annotation = data.frame(
-        vertice = character(0),
-        annot = character(0),
-        x = numeric(0),
-        y = numeric(0)
-      ),
-      segment = data.frame(
-        start_x = numeric(0),
-        start_y = numeric(0),
-        end_x = numeric(0),
-        end_y = numeric(0)
-      )
-    ))
+    label <- '~"?"'
   }
   root <- length(structure)
   root_coor <- c(x = as.numeric(coor[root, 1]), y = as.numeric(coor[root, 2]))
@@ -775,8 +762,6 @@ draw_cartoon <- function(structure, show_linkage = TRUE, orient = c("H","V"), hi
         annot == "??" ~ '~"?"',
         # case like '?3' would convert to '?'
         grepl("^\\?\\d+", annot) ~ '~"?"',
-        # case like 'a?' would convert to '?'
-        grepl("^\\w+\\?", annot) ~ '~"?"',
         # normal annotation would maintain the same
         TRUE ~ struc_annotation$annot
       )
