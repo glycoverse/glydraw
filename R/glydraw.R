@@ -835,7 +835,9 @@ draw_cartoon <- function(structure, show_linkage = TRUE, orient = c("H","V"), hi
 #' }
 save_cartoon <- function(cartoon, file, dpi = 300){
   checkmate::assert_class(cartoon, "glydraw_cartoon")
-  ggview::save_ggplot(file = file, plot = cartoon, units = 'px', dpi = dpi)
+  file_ext <- tools::file_ext(file)
+  bg_color <- ifelse(file_ext == "jpeg" | file_ext == "jpg", "white", "transparent")
+  ggview::save_ggplot(file = file, plot = cartoon, units = 'px', dpi = dpi, bg = bg_color)
 }
 
 .decide_size <- function(cartoon, border_px = 0) {
