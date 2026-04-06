@@ -23,4 +23,5 @@ Imports:
     glyparse,
     cli,
     ggview,
-    checkmate
+    checkmate,
+    scales
