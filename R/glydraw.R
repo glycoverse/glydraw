@@ -758,7 +758,7 @@ draw_cartoon <- function(structure, show_linkage = TRUE, orient = c("H","V"), hi
   if(is.null(highlight)){
     struc_annotation$transparency <- 1
   } else {
-    (struc_annotation$transparency <- struc_annotation$vertice %in% highlight)*0.7+0.3
+    struc_annotation$transparency <- (struc_annotation$vertice %in% highlight)*0.7+0.3
     }
 
   # Escape '?' to prevent conflict with parse = TRUE
@@ -789,7 +789,8 @@ draw_cartoon <- function(structure, show_linkage = TRUE, orient = c("H","V"), hi
     ggplot2::geom_segment(
       data = connect_df,
       ggplot2::aes(x = .data$start_x, y = .data$start_y,
-                   xend = .data$end_x, yend = .data$end_y, alpha = .data$transparency),
+                   xend = .data$end_x, yend = .data$end_y),
+      alpha = connect_df$transparency,
       linewidth = 0.5
     )+
     ggplot2::geom_polygon(
@@ -799,8 +800,8 @@ draw_cartoon <- function(structure, show_linkage = TRUE, orient = c("H","V"), hi
     )+
     ggplot2::geom_polygon(
       data = polygon_coor,
-      ggplot2::aes(x = .data$point_x, y = .data$point_y, group = .data$group,
-                   alpha = .data$alpha),
+      ggplot2::aes(x = .data$point_x, y = .data$point_y, group = .data$group),
+      alpha = polygon_coor$alpha,
       fill = filled_color,
       color = scales::alpha("black", polygon_coor$alpha),
       linewidth = 0.5
@@ -812,8 +813,8 @@ draw_cartoon <- function(structure, show_linkage = TRUE, orient = c("H","V"), hi
     gly_graph <- gly_graph+
       ggplot2::geom_text(
         data = struc_annotation,
-        ggplot2::aes(x = .data$x, y = .data$y, label = .data$annot_label,
-                     alpha = .data$transparency),
+        ggplot2::aes(x = .data$x, y = .data$y, label = .data$annot_label),
+        alpha = struc_annotation$transparency,
         parse = TRUE,
         size = 6,
         hjust = 0.5,
