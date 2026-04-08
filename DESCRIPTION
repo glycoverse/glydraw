@@ -24,4 +24,6 @@ Imports:
     cli,
     ggview,
     checkmate,
-    scales
+    scales,
+    fs,
+    glyexp

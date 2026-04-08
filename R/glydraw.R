@@ -186,8 +186,127 @@ save_cartoon <- function(cartoon, file, dpi = 300) {
   )
 }
 
+#' Export all glycan structures to figures
+#'
+#' This function calls [draw_cartoon()] on each glycan structure in `x`,
+#' then calls [save_cartoon()] to save a figure for each of them.
+#' IUPAC-condensed nonmenclatures are used as file names.
+#'
+#' @param x A [glyexp::experiment()], a [glyrepr::glycan_structure()] vector,
+#'   or a character vector of any glycan structure text nomenclatures
+#'   supported by [glyparse::auto_parse()].
+#' @param dirname Directory name to save the cartoons.
+#' @param file_ext File extention supported by [ggplot2::ggsave()]. Defaults to "png".
+#' @param dpi Dots per inch. Defaults to 300.
+#' @inheritParams draw_cartoon
+#'
+#' @return The function returns the list of cartoons implicitly.
+#'
+#' @examples
+#' \dontrun{
+#' library(glyexp)
+#' export_cartoons(real_experiment, "path/to/save")
+#' }
+#' @export
+export_cartoons <- function(
+  x,
+  dirname,
+  file_ext = "png",
+  dpi = 300,
+  show_linkage = TRUE,
+  orient = c("H", "V")
+) {
+  UseMethod("export_cartoons")
+}
+
+#' @export
+export_cartoons.glyexp_experiment <- function(
+  x,
+  dirname,
+  file_ext = "png",
+  dpi = 300,
+  show_linkage = TRUE,
+  orient = c("H", "V")
+) {
+  if (glyexp::get_exp_type(x) != "glycoproteomics") {
+    cli::cli_abort(c(
+      "{.arg x} can only be an experiment with {.val glycoproteomics} type.",
+      "x" = "Got: {.val {glyexp::get_exp_type(x)}}"
+    ))
+  }
+  if (!"glycan_structure" %in% colnames(glyexp::get_var_info(x))) {
+    cli::cli_abort("There must a {.field glycan_structure} column in {.field var_info}.")
+  }
+  glycans <- unique(glyexp::get_var_info(x)$glycan_structure)
+  .export_cartoons(
+    glycans,
+    dirname,
+    file_ext = file_ext,
+    dpi = dpi,
+    show_linkage = show_linkage,
+    orient = orient
+  )
+}
+
+#' @export
+export_cartoons.character <- function(
+  x,
+  dirname,
+  file_ext = "png",
+  dpi = 300,
+  show_linkage = TRUE,
+  orient = c("H", "V")
+) {
+  glycans <- unique(.ensure_structure(x))
+  .export_cartoons(
+    glycans,
+    dirname,
+    file_ext = file_ext,
+    dpi = dpi,
+    show_linkage = show_linkage,
+    orient = orient
+  )
+}
+
+#' @export
+export_cartoons.glyrepr_structure <- function(
+  x,
+  dirname,
+  file_ext = "png",
+  dpi = 300,
+  show_linkage = TRUE,
+  orient = c("H", "V")
+) {
+  glycans <- unique(x)
+  .export_cartoons(
+    glycans,
+    dirname,
+    file_ext = file_ext,
+    dpi = dpi,
+    show_linkage = show_linkage,
+    orient = orient
+  )
+}
+
+.export_cartoons <- function(
+  glycans,
+  dirname,
+  file_ext,
+  dpi,
+  show_linkage,
+  orient
+) {
+  cli::cli_alert_info("Exporting {.val {length(glycans)}} glycan cartoons.")
+  checkmate::assert_directory_exists(dirname)
+  glycan_list <- purrr::map(seq_along(glycans), ~ glycans[[.x]])
+  cartoons <- purrr::map(glycan_list, draw_cartoon, show_linkage = show_linkage, orient = orient)
+  filenames <- fs::path(dirname, as.character(glycans), ext = file_ext)
+  purrr::walk2(cartoons, filenames, save_cartoon, dpi = dpi)
+  invisible(cartoons)
+}
+
 # glycan mapping
-glycan_color = c(
+glycan_color <- c(
   'glyWhite' = '#FFFFFF',
   'glyBlue' = '#0385AE',
   'glyGreen' = '#058F60',
@@ -1132,7 +1251,7 @@ create_polygon_coor <- function(gly_list, point_size) {
   x
 }
 
-.ensure_one_structure <- function(x) {
+.ensure_structure <- function(x) {
   if (glyrepr::is_glycan_structure(x)) {
     x <- x
   } else if (is.character(x)) {
@@ -1143,7 +1262,11 @@ create_polygon_coor <- function(gly_list, point_size) {
       "x" = "Got: {.cls {class(x)}}."
     ))
   }
+  x
+}
 
+.ensure_one_structure <- function(x) {
+  x <- .ensure_structure(x)
   if (length(x) > 1) {
     cli::cli_abort(c(
       "Must provide exactly one glycan structure.",
