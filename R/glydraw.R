@@ -25,7 +25,8 @@ draw_cartoon <- function(
   highlight = NULL
 ) {
   if (!is.null(highlight) && !glyrepr::is_glycan_structure(structure)) {
-    cli::cli_abort("{.arg highlight} can only be set when {.arg structure} is a {.fn glyrepr::glycan_structure}.")
+    cli::cli_warn("{.arg highlight} can only be set when {.arg structure} is a {.fn glyrepr::glycan_structure}.")
+    highlight <- NULL
   }
   structure <- .ensure_one_structure(structure)
   structure <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
