@@ -32,6 +32,25 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="glydraw-development-version">glydraw (development version)<a class="anchor" aria-label="anchor" href="#glydraw-development-version"></a></h2>
+<div class="section level3">
+<h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
+<ul><li>Remove the <code>mono_size</code> parameter of <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code>. (9b05e6c)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<ul><li>Add a <code>highlight</code> parameter to <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code>. (7e57a54, 3745ec8, c1057ba)</li>
+<li>Add <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> to save multiple glycan structure cartoons to files. (e1ac3c3)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="minor-improvements-and-bug-fixes-development-version">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-development-version"></a></h3>
+<ul><li>Fix the bug that reducing end annotation was not shown with unknown anomer information. (#12)</li>
+<li>Fix the bug that glycans with only one monosaccharide could not be plotted. (#11)</li>
+<li>Fix the bug that “?” in linkages was not correctly handled. (#9)</li>
+<li>Fix the incorrect reducing end annotation direction in some situations. (#8)</li>
+<li>Fix the bug that glycan structures with multiple branches had incorrect layouts. (2ac4e9f)</li>
+<li>Fix the bug that “png” is not supported in <code><a href="../reference/save_cartoon.html">save_cartoon()</a></code>. (fed89b9)</li>
+<li>Fix the bug that structures with generic “NeuAc” and “NeuGc” cannot be plotted. (3b78303)</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.1" id="glydraw-031">glydraw 0.3.1<a class="anchor" aria-label="anchor" href="#glydraw-031"></a></h2>
