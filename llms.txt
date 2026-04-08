@@ -66,12 +66,27 @@ cartoon <- draw_cartoon("Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-")
 save_cartoon(cartoon, "N-core.png", dpi = 300)
 ```
 
+You can also use
+[`export_cartoons()`](https://glycoverse.github.io/glydraw/reference/export_cartoons.md)
+to save mutiple SNFGs to a directory, directly from a
+`glexp::experiment()` object:
+
+``` r
+library(glyexp)
+
+# Make a tidy experiment object
+exp <- real_experiment |> slice_head_var(n = 5)
+export_cartoons(exp, "path/to/save")
+```
+
 # Package index
 
 ## All functions
 
 - [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md)
   : Draw a Symbol Nomenclature For Glycan (SNFG)
+- [`export_cartoons()`](https://glycoverse.github.io/glydraw/reference/export_cartoons.md)
+  : Export all glycan structures to figures
 - [`save_cartoon()`](https://glycoverse.github.io/glydraw/reference/save_cartoon.md)
   : Save fixed-size glycan cartoon image to local device.
 
