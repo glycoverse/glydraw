@@ -773,7 +773,7 @@ gly_annotation <- function(structure, coor) {
       chil_annotation,
       as.vector(gly_annot_coor$chil) + coor[ver, ]
     )
-    par_annotation <- c(par_ver, strsplit(linkage_str, '-')[[1]][2])
+    par_annotation <- c(ver, strsplit(linkage_str, '-')[[1]][2])
     par_annotation <- c(
       par_annotation,
       as.vector(gly_annot_coor$par) + coor[par_ver, ]
