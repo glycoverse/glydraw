@@ -2,6 +2,8 @@
 
 ## glydraw (development version)
 
+## glydraw 0.4.0
+
 ### Breaking changes
 
 - Remove the `mono_size` parameter of
