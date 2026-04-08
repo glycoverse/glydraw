@@ -14,45 +14,55 @@
 #' \dontrun{
 #' draw_cartoon("Gal(b1-3)GalNAc(a1-")
 #' }
-draw_cartoon <- function(structure, show_linkage = TRUE, orient = c("H","V"), highlight = NULL){
+draw_cartoon <- function(
+  structure,
+  show_linkage = TRUE,
+  orient = c("H", "V"),
+  highlight = NULL
+) {
   structure <- .ensure_one_structure(structure)
   structure <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
   highlight <- .ensure_highlight_para(highlight, length(structure))
   orient <- rlang::arg_match(orient)
   # Coordinate of Glycans
-  if (orient == 'H'){
+  if (orient == 'H') {
     coor <- coor_cal(structure)
-  } else{
+  } else {
     coor <- coor_cal(structure)
     temp <- coor
-    coor[,1] <- temp[,2]
-    coor[,2] <- -temp[,1]
+    coor[, 1] <- temp[, 2]
+    coor[, 2] <- -temp[, 1]
   }
 
-  gly_list <- data.frame(coor,'glycoform' = glycoform_info(structure))
+  gly_list <- data.frame(coor, 'glycoform' = glycoform_info(structure))
 
   # Process highlight points, highlight vertices 1.0, others 0.3
-  if (!is.null(highlight)){
+  if (!is.null(highlight)) {
     ver_transparency <- replace(rep(0.3, length(structure)), highlight, 1.0)
     gly_list$transparency <- ver_transparency
-  }else {
+  } else {
     gly_list$transparency <- 1.0
   }
   # Rename colnames of gly_list
-  colnames(gly_list) <- c('center_x','center_y','glycoform','transparency')
+  colnames(gly_list) <- c('center_x', 'center_y', 'glycoform', 'transparency')
   # Draw Glycan Shape, where gly_list contains center_x, center_y, glycoform 3 columns
   polygon_coor <- create_polygon_coor(gly_list, 0.2)
   filled_color <- glycan_color[as.character(polygon_coor$color)]
 
-  struc_annotation <- gly_annotation(structure,coor)
+  struc_annotation <- gly_annotation(structure, coor)
   reducing_info <- reducing_end_annotation(structure, coor)
-  struc_annotation <- dplyr::bind_rows(struc_annotation, reducing_info$annotation)
+  struc_annotation <- dplyr::bind_rows(
+    struc_annotation,
+    reducing_info$annotation
+  )
 
-  if(is.null(highlight)){
+  if (is.null(highlight)) {
     struc_annotation$transparency <- 1
   } else {
-    struc_annotation$transparency <- (struc_annotation$vertice %in% highlight)*0.7+0.3
-    }
+    struc_annotation$transparency <- (struc_annotation$vertice %in% highlight) *
+      0.7 +
+      0.3
+  }
 
   # Escape '?' to prevent conflict with parse = TRUE
   struc_annotation <- struc_annotation |>
@@ -72,25 +82,31 @@ draw_cartoon <- function(structure, show_linkage = TRUE, orient = c("H","V"), hi
   connect_df <- data.frame(
     start_x = gly_connect$start_x,
     start_y = gly_connect$start_y,
-    end_x   = gly_connect$end_x,
-    end_y   = gly_connect$end_y
+    end_x = gly_connect$end_x,
+    end_y = gly_connect$end_y
   )
   connect_df <- dplyr::bind_rows(connect_df, reducing_info$segment)
   connect_df$transparency <- gly_list$transparency
 
-  gly_graph <- ggplot2::ggplot()+
+  gly_graph <- ggplot2::ggplot() +
     ggplot2::geom_segment(
       data = connect_df,
-      ggplot2::aes(x = .data$start_x, y = .data$start_y,
-                   xend = .data$end_x, yend = .data$end_y),
+      ggplot2::aes(
+        x = .data$start_x,
+        y = .data$start_y,
+        xend = .data$end_x,
+        yend = .data$end_y
+      ),
       alpha = connect_df$transparency,
       linewidth = 0.5
-    )+
+    ) +
     ggplot2::geom_polygon(
       data = polygon_coor, # Masking the segment with white color
       ggplot2::aes(x = .data$point_x, y = .data$point_y, group = .data$group),
-      fill="white",color='white',linewidth = 0.5
-    )+
+      fill = "white",
+      color = 'white',
+      linewidth = 0.5
+    ) +
     ggplot2::geom_polygon(
       data = polygon_coor,
       ggplot2::aes(x = .data$point_x, y = .data$point_y, group = .data$group),
@@ -98,12 +114,12 @@ draw_cartoon <- function(structure, show_linkage = TRUE, orient = c("H","V"), hi
       fill = filled_color,
       color = scales::alpha("black", polygon_coor$alpha),
       linewidth = 0.5
-    )+
+    ) +
     ggplot2::coord_fixed(ratio = 1, clip = "off") +
-    ggplot2::theme_void()+
+    ggplot2::theme_void() +
     ggplot2::theme(legend.position = "none")
-  if (show_linkage){
-    gly_graph <- gly_graph+
+  if (show_linkage) {
+    gly_graph <- gly_graph +
       ggplot2::geom_text(
         data = struc_annotation,
         ggplot2::aes(x = .data$x, y = .data$y, label = .data$annot_label),
@@ -117,7 +133,12 @@ draw_cartoon <- function(structure, show_linkage = TRUE, orient = c("H","V"), hi
   gly_graph <- .apply_border(gly_graph, 50 / 300 * 72)
   size <- .decide_size(gly_graph, border_px = 50)
   gly_graph <- gly_graph +
-    ggview::canvas(width = size$width, height = size$height, units = "px", dpi = 300)
+    ggview::canvas(
+      width = size$width,
+      height = size$height,
+      units = "px",
+      dpi = 300
+    )
   structure(gly_graph, class = c("glydraw_cartoon", class(gly_graph)))
 }
 
@@ -140,117 +161,202 @@ draw_cartoon <- function(structure, show_linkage = TRUE, orient = c("H","V"), hi
 #' cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
 #' save_cartoon(cartoon, "p1.png", dpi = 300)
 #' }
-save_cartoon <- function(cartoon, file, dpi = 300){
+save_cartoon <- function(cartoon, file, dpi = 300) {
   checkmate::assert_class(cartoon, "glydraw_cartoon")
   file_ext <- tools::file_ext(file)
-  bg_color <- ifelse(file_ext == "jpeg" | file_ext == "jpg", "white", "transparent")
-  ggview::save_ggplot(file = file, plot = cartoon, units = 'px', dpi = dpi, bg = bg_color)
+  bg_color <- ifelse(
+    file_ext == "jpeg" | file_ext == "jpg",
+    "white",
+    "transparent"
+  )
+  ggview::save_ggplot(
+    file = file,
+    plot = cartoon,
+    units = 'px',
+    dpi = dpi,
+    bg = bg_color
+  )
 }
 
 # glycan mapping
 glycan_color = c(
-  'glyWhite'='#FFFFFF',
-  'glyBlue'='#0385AE', 'glyGreen'='#058F60',
-  'glyYellow'='#FCC326','glyOrange'='#EF6130',
-  'glyPink'='#F39EA0', 'glyPurple'='#A15989',
-  'glyLightBlue'='#91D3E3', 'glyBrown'='#9F6D55',
-  'glyRed'='#C23537'
+  'glyWhite' = '#FFFFFF',
+  'glyBlue' = '#0385AE',
+  'glyGreen' = '#058F60',
+  'glyYellow' = '#FCC326',
+  'glyOrange' = '#EF6130',
+  'glyPink' = '#F39EA0',
+  'glyPurple' = '#A15989',
+  'glyLightBlue' = '#91D3E3',
+  'glyBrown' = '#9F6D55',
+  'glyRed' = '#C23537'
 )
 
 glycan_dict <- list(
-  'Hex'=c('Hex','glyWhite'),
-  'Glc'=c('Hex','glyBlue'),'Man'=c('Hex','glyGreen'),
-  'Gal'=c('Hex','glyYellow'),'Gul'=c('Hex','glyOrange'),
-  'Alt'=c('Hex','glyPink'),'All'=c('Hex','glyPurple'),
-  'Tal'=c('Hex','glyLightBlue'),'Ido'=c('Hex','glyBrown'),
+  'Hex' = c('Hex', 'glyWhite'),
+  'Glc' = c('Hex', 'glyBlue'),
+  'Man' = c('Hex', 'glyGreen'),
+  'Gal' = c('Hex', 'glyYellow'),
+  'Gul' = c('Hex', 'glyOrange'),
+  'Alt' = c('Hex', 'glyPink'),
+  'All' = c('Hex', 'glyPurple'),
+  'Tal' = c('Hex', 'glyLightBlue'),
+  'Ido' = c('Hex', 'glyBrown'),
 
-  'HexNAc'=c('HexNAc','glyWhite'),
-  'GlcNAc'=c('HexNAc','glyBlue'),'ManNAc'=c('HexNAc','glyGreen'),
-  'GalNAc'=c('HexNAc','glyYellow'),'GulNAc'=c('HexNAc','glyOrange'),
-  'AltNAc'=c('HexNAc','glyPink'),'AllNAc'=c('HexNAc','glyPurple'),
-  'TalNAc'=c('HexNAc','glyLightBlue'),'IdoNAc'=c('HexNAc','glyBrown'),
+  'HexNAc' = c('HexNAc', 'glyWhite'),
+  'GlcNAc' = c('HexNAc', 'glyBlue'),
+  'ManNAc' = c('HexNAc', 'glyGreen'),
+  'GalNAc' = c('HexNAc', 'glyYellow'),
+  'GulNAc' = c('HexNAc', 'glyOrange'),
+  'AltNAc' = c('HexNAc', 'glyPink'),
+  'AllNAc' = c('HexNAc', 'glyPurple'),
+  'TalNAc' = c('HexNAc', 'glyLightBlue'),
+  'IdoNAc' = c('HexNAc', 'glyBrown'),
 
-  'HexN'=c('HexN','glyWhite','glyWhite'),
-  'GlcN'=c('HexN','glyBlue','glyWhite'),'ManN'=c('HexN','glyGreen','glyWhite'),
-  'GalN'=c('HexN','glyYellow','glyWhite'),'GulN'=c('HexN','glyOrange','glyWhite'),
-  'AltN'=c('HexN','glyPink','glyWhite'),'AllN'=c('HexN','glyPurple','glyWhite'),
-  'TalN'=c('HexN','glyLightBlue','glyWhite'),'IdoN'=c('HexN','glyBrown','glyWhite'),
+  'HexN' = c('HexN', 'glyWhite', 'glyWhite'),
+  'GlcN' = c('HexN', 'glyBlue', 'glyWhite'),
+  'ManN' = c('HexN', 'glyGreen', 'glyWhite'),
+  'GalN' = c('HexN', 'glyYellow', 'glyWhite'),
+  'GulN' = c('HexN', 'glyOrange', 'glyWhite'),
+  'AltN' = c('HexN', 'glyPink', 'glyWhite'),
+  'AllN' = c('HexN', 'glyPurple', 'glyWhite'),
+  'TalN' = c('HexN', 'glyLightBlue', 'glyWhite'),
+  'IdoN' = c('HexN', 'glyBrown', 'glyWhite'),
 
-  'HexA'=c('HexA','glyWhite','glyWhite'),
-  'GlcA'=c('HexA','glyBlue','glyWhite'),'ManA'=c('HexA','glyGreen','glyWhite'),
-  'GalA'=c('HexA','glyYellow','glyWhite'),'GulA'=c('HexA','glyOrange','glyWhite'),
-  'AltA'=c('HexA','glyPink','glyWhite'),'AllA'=c('HexA','glyPurple','glyWhite'),
-  'TalA'=c('HexA','glyLightBlue','glyWhite'),'IdoA'=c('HexA','glyBrown','glyWhite'),
+  'HexA' = c('HexA', 'glyWhite', 'glyWhite'),
+  'GlcA' = c('HexA', 'glyBlue', 'glyWhite'),
+  'ManA' = c('HexA', 'glyGreen', 'glyWhite'),
+  'GalA' = c('HexA', 'glyYellow', 'glyWhite'),
+  'GulA' = c('HexA', 'glyOrange', 'glyWhite'),
+  'AltA' = c('HexA', 'glyPink', 'glyWhite'),
+  'AllA' = c('HexA', 'glyPurple', 'glyWhite'),
+  'TalA' = c('HexA', 'glyLightBlue', 'glyWhite'),
+  'IdoA' = c('HexA', 'glyBrown', 'glyWhite'),
 
-  'dHex'=c('dHex','glyWhite'),
-  'Qui'=c('dHex','glyBlue'),'Rha'=c('dHex','glyGreen'),
-  '6dGul'=c('dHex','glyOrange'),'6dAlt'=c('dHex','glyPink'),
-  '6dTal'=c('dHex','glyLightBlue'),'Fuc'=c('dHex','glyRed'),
-  'FucUp'=c('dHexUp','glyRed'),
+  'dHex' = c('dHex', 'glyWhite'),
+  'Qui' = c('dHex', 'glyBlue'),
+  'Rha' = c('dHex', 'glyGreen'),
+  '6dGul' = c('dHex', 'glyOrange'),
+  '6dAlt' = c('dHex', 'glyPink'),
+  '6dTal' = c('dHex', 'glyLightBlue'),
+  'Fuc' = c('dHex', 'glyRed'),
+  'FucUp' = c('dHexUp', 'glyRed'),
 
-  'dHexNAc'=c('dHexNAc','glyWhite','glyWhite'),
-  'QuiNAc'=c('dHexNAc','glyBlue','glyWhite'),'RhaNAc'=c('dHexNAc','glyGreen','glyWhite'),
-  '6dAltNAc'=c('dHexNAc','glyPink','glyWhite'),'6dTalNAc'=c('dHexNAc','glyLightBlue','glyWhite'),
-  'FucNAc'=c('dHexNAc','glyRed','glyWhite'),
+  'dHexNAc' = c('dHexNAc', 'glyWhite', 'glyWhite'),
+  'QuiNAc' = c('dHexNAc', 'glyBlue', 'glyWhite'),
+  'RhaNAc' = c('dHexNAc', 'glyGreen', 'glyWhite'),
+  '6dAltNAc' = c('dHexNAc', 'glyPink', 'glyWhite'),
+  '6dTalNAc' = c('dHexNAc', 'glyLightBlue', 'glyWhite'),
+  'FucNAc' = c('dHexNAc', 'glyRed', 'glyWhite'),
 
-  'Pen'=c('Pen','glyWhite'),
-  'Ara'=c('Pen','glyGreen'),'Lyx'=c('Pne','glyYellow'),
-  'Xyl'=c('Pen','glyOrange'),'Rib'=c('Pen','glyPink'),
+  'Pen' = c('Pen', 'glyWhite'),
+  'Ara' = c('Pen', 'glyGreen'),
+  'Lyx' = c('Pne', 'glyYellow'),
+  'Xyl' = c('Pen', 'glyOrange'),
+  'Rib' = c('Pen', 'glyPink'),
 
-  'dNon'=c('dNon','glyWhite'),
-  'Kdn'=c('dNon','glyGreen'),'Neu5Ac'=c('dNon','glyPurple'),
-  'Neu5Gc'=c('dNon','glyLightBlue'),'Neu'=c('dNon','glyBrown'),
-  'Sia'=c('dNon','glyRed'),
+  'dNon' = c('dNon', 'glyWhite'),
+  'Kdn' = c('dNon', 'glyGreen'),
+  'Neu5Ac' = c('dNon', 'glyPurple'),
+  'Neu5Gc' = c('dNon', 'glyLightBlue'),
+  'Neu' = c('dNon', 'glyBrown'),
+  'Sia' = c('dNon', 'glyRed'),
 
-  'ddNon'=c('ddNon','glyWhite'),
-  'Pse'=c('ddNon','glyGreen'),'Leg'=c('ddNon','glyYellow'),
-  'Aci'=c('ddNon','glyPink'),'4eLeg'=c('ddNon','glyLightBlue'),
+  'ddNon' = c('ddNon', 'glyWhite'),
+  'Pse' = c('ddNon', 'glyGreen'),
+  'Leg' = c('ddNon', 'glyYellow'),
+  'Aci' = c('ddNon', 'glyPink'),
+  '4eLeg' = c('ddNon', 'glyLightBlue'),
 
-  'UnKnown'=c('UnKnown','glyWhite'),
-  'Bac'=c('UnKnown','glyBlue'),'LDmanHep'=c('UnKnown','glyGreen'),
-  'Kdo'=c('UnKnown','glyYellow'),'Dha'=c('UnKnown','glyOrange'),
-  'DDmanHep'=c('UnKnown','glyPink'),'MurNAc'=c('UnKnown','glyPurple'),
-  'MurNGc'=c('UnKnown','glyLightBlue'),'Mur'=c('UnKnown','glyBrown'),
+  'UnKnown' = c('UnKnown', 'glyWhite'),
+  'Bac' = c('UnKnown', 'glyBlue'),
+  'LDmanHep' = c('UnKnown', 'glyGreen'),
+  'Kdo' = c('UnKnown', 'glyYellow'),
+  'Dha' = c('UnKnown', 'glyOrange'),
+  'DDmanHep' = c('UnKnown', 'glyPink'),
+  'MurNAc' = c('UnKnown', 'glyPurple'),
+  'MurNGc' = c('UnKnown', 'glyLightBlue'),
+  'Mur' = c('UnKnown', 'glyBrown'),
 
-  'Assigned'=c('Assigned','glyWhite'),
-  'Api'=c('Assigned','glyBlue'),'Fru'=c('Assigned','glyGreen'),
-  'Tag'=c('Assigned','glyYellow'),'Sor'=c('Assigned','glyOrange'),
-  'Psi'=c('Assigned','glyPink')
+  'Assigned' = c('Assigned', 'glyWhite'),
+  'Api' = c('Assigned', 'glyBlue'),
+  'Fru' = c('Assigned', 'glyGreen'),
+  'Tag' = c('Assigned', 'glyYellow'),
+  'Sor' = c('Assigned', 'glyOrange'),
+  'Psi' = c('Assigned', 'glyPink')
 )
 
 glycan_shape <- list(
-  'Hex' = data.frame(x=cos(seq(0,2*pi,length.out = 50)), # The center is the Core of shape
-                     y=sin(seq(0,2*pi,length.out = 50))),
-  'HexNAc' = data.frame(x=c(-1,-1,1,1,-1),
-                        y=c(-1,1,1,-1,-1)),
-  'HexN' = data.frame(x=c(-1,1,1,-1),
-                      y=c(1,1,-1,1),
-                      xx=c(-1,1,-1,-1),
-                      yy=c(1,-1,-1,1)),
-  'HexA' = data.frame(x=c(-1,0,1,-1),
-                      y=c(0,1,0,0),
-                      xx=c(1,0,-1,1),
-                      yy=c(0,-1,0,0)),
-  'dHex' = data.frame(x=c(-1,0,1,-1),
-                      y=c(-0.33*sqrt(3),0.67*sqrt(3),-0.33*sqrt(3),-0.33*sqrt(3))), # The center is the Midpoint of the Base
-  'dHexUp' = data.frame(x=c(-1,0,1,-1),
-                        y=c(0.33*sqrt(3),-0.67*sqrt(3),0.33*sqrt(3),0.33*sqrt(3))),
-  'dHexNAc' = data.frame(x=c(0,1,0,0),
-                         y=c(0.67*sqrt(3),-0.33*sqrt(3),-0.33*sqrt(3),0.67*sqrt(3)),
-                         xx=c(0,-1,0,0),
-                         yy=c(0.67*sqrt(3),-0.33*sqrt(3),-0.33*sqrt(3),0.67*sqrt(3))),
-  'ddHex' = data.frame(x=c(-1,1,1,-1),
-                       y=c(0.5,0.5,-0.5,-0.5)),
-  'Pen' = data.frame(x=c(0,0.2345,0.9516,0.3798,0.5872,0,-0.5872,-0.3798,-0.9516,-0.2345,0),
-                     y=c(0.905,0.2289,0.2132,-0.219,-0.905,-0.4961,-0.905,-0.219,0.2132,0.2289,0.905)),
-  'dNon' = data.frame(x=c(0,1,0,-1,0),
-                      y=c(1,0,-1,0,1)),
-  'ddNon' = data.frame(x=c(0,1.2,0,-1.2,0),
-                       y=c(0.8,0,-0.8,0,0.8)),
-  'UnKnown' = data.frame(x=c(0.6,1,0.6,-0.6,-1,-0.6,0.6),
-                         y=c(0.6,0,-0.6,-0.6,0,0.6,0.6)),
-  'Assigned' = data.frame(x=c(0,0.9516,0.5872,-0.5872,-0.9516,0),
-                          y=c(0.905,0.2132,-0.905,-0.905,0.2132,0.905))
+  'Hex' = data.frame(
+    x = cos(seq(0, 2 * pi, length.out = 50)), # The center is the Core of shape
+    y = sin(seq(0, 2 * pi, length.out = 50))
+  ),
+  'HexNAc' = data.frame(x = c(-1, -1, 1, 1, -1), y = c(-1, 1, 1, -1, -1)),
+  'HexN' = data.frame(
+    x = c(-1, 1, 1, -1),
+    y = c(1, 1, -1, 1),
+    xx = c(-1, 1, -1, -1),
+    yy = c(1, -1, -1, 1)
+  ),
+  'HexA' = data.frame(
+    x = c(-1, 0, 1, -1),
+    y = c(0, 1, 0, 0),
+    xx = c(1, 0, -1, 1),
+    yy = c(0, -1, 0, 0)
+  ),
+  'dHex' = data.frame(
+    x = c(-1, 0, 1, -1),
+    y = c(-0.33 * sqrt(3), 0.67 * sqrt(3), -0.33 * sqrt(3), -0.33 * sqrt(3))
+  ), # The center is the Midpoint of the Base
+  'dHexUp' = data.frame(
+    x = c(-1, 0, 1, -1),
+    y = c(0.33 * sqrt(3), -0.67 * sqrt(3), 0.33 * sqrt(3), 0.33 * sqrt(3))
+  ),
+  'dHexNAc' = data.frame(
+    x = c(0, 1, 0, 0),
+    y = c(0.67 * sqrt(3), -0.33 * sqrt(3), -0.33 * sqrt(3), 0.67 * sqrt(3)),
+    xx = c(0, -1, 0, 0),
+    yy = c(0.67 * sqrt(3), -0.33 * sqrt(3), -0.33 * sqrt(3), 0.67 * sqrt(3))
+  ),
+  'ddHex' = data.frame(x = c(-1, 1, 1, -1), y = c(0.5, 0.5, -0.5, -0.5)),
+  'Pen' = data.frame(
+    x = c(
+      0,
+      0.2345,
+      0.9516,
+      0.3798,
+      0.5872,
+      0,
+      -0.5872,
+      -0.3798,
+      -0.9516,
+      -0.2345,
+      0
+    ),
+    y = c(
+      0.905,
+      0.2289,
+      0.2132,
+      -0.219,
+      -0.905,
+      -0.4961,
+      -0.905,
+      -0.219,
+      0.2132,
+      0.2289,
+      0.905
+    )
+  ),
+  'dNon' = data.frame(x = c(0, 1, 0, -1, 0), y = c(1, 0, -1, 0, 1)),
+  'ddNon' = data.frame(x = c(0, 1.2, 0, -1.2, 0), y = c(0.8, 0, -0.8, 0, 0.8)),
+  'UnKnown' = data.frame(
+    x = c(0.6, 1, 0.6, -0.6, -1, -0.6, 0.6),
+    y = c(0.6, 0, -0.6, -0.6, 0, 0.6, 0.6)
+  ),
+  'Assigned' = data.frame(
+    x = c(0, 0.9516, 0.5872, -0.5872, -0.9516, 0),
+    y = c(0.905, 0.2132, -0.905, -0.905, 0.2132, 0.905)
+  )
 )
 
 #' Title Initialize Vertices Coordinate
@@ -259,22 +365,22 @@ glycan_shape <- list(
 #'
 #' @returns Initialized Coordinate which Y=0, X are correct
 #' @noRd
-coor_initialization <- function(structure){
+coor_initialization <- function(structure) {
   ver_num <- length(structure)
   coor <- matrix(
-    ini_xy <- rep(0,2*ver_num),
+    ini_xy <- rep(0, 2 * ver_num),
     ncol = 2
   )
-  colnames(coor) <- c('x','y')
+  colnames(coor) <- c('x', 'y')
   # Gain x coordinate, where initial position of the structure is length(structure)
-  init_X <- igraph::distances(structure)[length(structure),]*(-1)
-  coor[,'x'] <- init_X
-  for (i in seq(1,length(structure))){
-    if (igraph::V(structure)[[i]]$mono == 'Fuc'){
-      coor[i,'x'] <- coor[i,'x']+1
+  init_X <- igraph::distances(structure)[length(structure), ] * (-1)
+  coor[, 'x'] <- init_X
+  for (i in seq(1, length(structure))) {
+    if (igraph::V(structure)[[i]]$mono == 'Fuc') {
+      coor[i, 'x'] <- coor[i, 'x'] + 1
     }
   }
-  return (coor)
+  return(coor)
 }
 
 #' Title Find Sequence Number of Sub-module
@@ -286,8 +392,8 @@ coor_initialization <- function(structure){
 #'
 #' @examples chil_coor(structure, 3)
 #' @noRd
-chil_coor <- function(structure,ver){
-  vers <- igraph::bfs(structure, ver, mode='out',unreachable = FALSE)$order
+chil_coor <- function(structure, ver) {
+  vers <- igraph::bfs(structure, ver, mode = 'out', unreachable = FALSE)$order
   return(vers)
 }
 
@@ -302,9 +408,9 @@ chil_coor <- function(structure,ver){
 #'
 #' @examples offset_chil_coor(structure, 3, coor, 0.5)
 #' @noRd
-offset_chil_coor <- function(structure,ver,coor,offset){
-  vers <- chil_coor(structure,ver)
-  coor[vers,'y'] <- coor[vers,'y']+offset
+offset_chil_coor <- function(structure, ver, coor, offset) {
+  vers <- chil_coor(structure, ver)
+  coor[vers, 'y'] <- coor[vers, 'y'] + offset
   return(coor)
 }
 
@@ -317,18 +423,24 @@ offset_chil_coor <- function(structure,ver,coor,offset){
 #'
 #' @examples out_degree(structure, 1)
 #' @noRd
-out_degree <- function(structure,ver){
-  path_vertex <- igraph::shortest_paths(structure,length(structure),ver)$vpath[[1]]
+out_degree <- function(structure, ver) {
+  path_vertex <- igraph::shortest_paths(
+    structure,
+    length(structure),
+    ver
+  )$vpath[[1]]
   num <- 0
   pos <- c()
-  for (i in path_vertex){
-    if (length(igraph::neighbors(structure,i)) >= 2 &&
-        !('Fuc' %in% igraph::neighbors(structure,i)$mono)){
-      num <- num+1
-      pos <- c(pos,i)
+  for (i in path_vertex) {
+    if (
+      length(igraph::neighbors(structure, i)) >= 2 &&
+        !('Fuc' %in% igraph::neighbors(structure, i)$mono)
+    ) {
+      num <- num + 1
+      pos <- c(pos, i)
     }
   }
-  return(c(num,pos))
+  return(c(num, pos))
 }
 
 #' Title Judge whether the Vertex is in the Middle Position of Sub-module
@@ -342,13 +454,13 @@ out_degree <- function(structure,ver){
 #'
 #' @examples mid_pos(structure, coor, 1, 3)
 #' @noRd
-mid_pos <- function(structure,coor,ver,par_ver){
+mid_pos <- function(structure, coor, ver, par_ver) {
   pos_mid <- FALSE
-  vers <- chil_coor(structure,par_ver)
-  col_vers <- vers[which(coor[vers,'x']==coor[ver,'x'])]
-  ver_y <- coor[ver,'y']
-  col_y <- sort(coor[col_vers,'y'])
-  if (ver_y != min(col_y) && ver_y != max(col_y)){
+  vers <- chil_coor(structure, par_ver)
+  col_vers <- vers[which(coor[vers, 'x'] == coor[ver, 'x'])]
+  ver_y <- coor[ver, 'y']
+  col_y <- sort(coor[col_vers, 'y'])
+  if (ver_y != min(col_y) && ver_y != max(col_y)) {
     pos_mid <- TRUE
   }
   return(pos_mid)
@@ -365,11 +477,11 @@ mid_pos <- function(structure,coor,ver,par_ver){
 #'
 #' @examples fuc_mid_pos(structure, coor, 1, 3)
 #' @noRd
-fuc_mid_pos <- function(structure,coor,ver,par_ver){
-  vers <- chil_coor(structure,par_ver)
-  col_vers <- vers[which(coor[vers,'x']==coor[ver,'x'])]
-  ver_y <- coor[ver,'y']
-  col_y <- sort(coor[col_vers,'y'])
+fuc_mid_pos <- function(structure, coor, ver, par_ver) {
+  vers <- chil_coor(structure, par_ver)
+  col_vers <- vers[which(coor[vers, 'x'] == coor[ver, 'x'])]
+  ver_y <- coor[ver, 'y']
+  col_y <- sort(coor[col_vers, 'y'])
   ver_index <- which(col_y == ver_y)
   lag_diff <- abs(col_y - dplyr::lag(col_y)) < 1
   lead_diff <- abs(col_y - dplyr::lead(col_y)) < 1
@@ -388,19 +500,26 @@ fuc_mid_pos <- function(structure,coor,ver,par_ver){
 #'
 #' @examples fuc_out_degree(structure, 6, coor)
 #' @noRd
-fuc_out_degree <- function(structure,ver,coor){
-  path_vertex <- igraph::shortest_paths(structure,length(structure),ver)$vpath[[1]]
+fuc_out_degree <- function(structure, ver, coor) {
+  path_vertex <- igraph::shortest_paths(
+    structure,
+    length(structure),
+    ver
+  )$vpath[[1]]
   num <- 0
   pos <- c()
-  for (i in path_vertex){
-    if (length(igraph::neighbors(structure,i)) %in% c(2,3) &&
-        !('Fuc' %in% igraph::neighbors(structure,i)$mono) &&
-        fuc_mid_pos(structure,coor,ver,i)){
-      num <- num+1
-      pos <- c(pos,i)
+  for (i in path_vertex) {
+    if (
+      length(igraph::neighbors(structure, i)) %in%
+        c(2, 3) &&
+        !('Fuc' %in% igraph::neighbors(structure, i)$mono) &&
+        fuc_mid_pos(structure, coor, ver, i)
+    ) {
+      num <- num + 1
+      pos <- c(pos, i)
     }
   }
-  return(c(num,pos))
+  return(c(num, pos))
 }
 
 #' Title Process the y-Coordinate of 'Fucose' Vertex
@@ -412,11 +531,11 @@ fuc_out_degree <- function(structure,ver,coor){
 #'
 #' @examples fuc_offset(structure, 1)
 #' @noRd
-fuc_offset <- function(structure,fuc_pos){
+fuc_offset <- function(structure, fuc_pos) {
   linkage_str <- igraph::E(structure)[fuc_pos]$linkage
-  linkage_pos <- strsplit(linkage_str,'-')[[1]][2]
+  linkage_pos <- strsplit(linkage_str, '-')[[1]][2]
   offset <- 0.99
-  if (linkage_pos %in% c('2','3')){
+  if (linkage_pos %in% c('2', '3')) {
     offset <- -0.99
   }
   return(offset)
@@ -430,10 +549,10 @@ fuc_offset <- function(structure,fuc_pos){
 #' @returns The sorting neighbor positions
 #'
 #' @noRd
-.neigh_pos_order <- function(structure, ver){
-  neigh_pos <- igraph::neighbors(structure,ver) # Get neighbor vertices
-  fuc_pos <- neigh_pos[which(neigh_pos$mono=='Fuc')]
-  if (length(fuc_pos) != 0){
+.neigh_pos_order <- function(structure, ver) {
+  neigh_pos <- igraph::neighbors(structure, ver) # Get neighbor vertices
+  fuc_pos <- neigh_pos[which(neigh_pos$mono == 'Fuc')]
+  if (length(fuc_pos) != 0) {
     neigh_pos <- neigh_pos[!neigh_pos %in% c(fuc_pos)] # Exclude Fucose in neighbor vertices
   }
   linkage_chars <- sub('.*-', '', igraph::E(structure)$linkage[neigh_pos])
@@ -459,19 +578,38 @@ fuc_offset <- function(structure,fuc_pos){
 #'
 #' @examples process_fucose_branches(coor, structure, 2, temp_coor)
 #' @noRd
-process_fucose_branches <- function(coor,structure,fuc_pos,temp_coor){
-  num <- fuc_out_degree(structure,fuc_pos,temp_coor)[1]
-  for (i in seq(1,num)){
-    par_pos <- fuc_out_degree(structure,fuc_pos,temp_coor)[i+1]
+process_fucose_branches <- function(coor, structure, fuc_pos, temp_coor) {
+  num <- fuc_out_degree(structure, fuc_pos, temp_coor)[1]
+  for (i in seq(1, num)) {
+    par_pos <- fuc_out_degree(structure, fuc_pos, temp_coor)[i + 1]
     arrange_neigh_pos <- .neigh_pos_order(structure, par_pos)
 
-    if (length(arrange_neigh_pos) == 2){
-      coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,1/(2**(num-i+1)))
-      coor <- offset_chil_coor(structure,arrange_neigh_pos[2],coor,-1/(2**(num-i+1)))
-    }
-    else if (length(arrange_neigh_pos) == 3){
-      coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,1/(2**(num-i+1)))
-      coor <- offset_chil_coor(structure,arrange_neigh_pos[3],coor,-1/(2**(num-i+1)))
+    if (length(arrange_neigh_pos) == 2) {
+      coor <- offset_chil_coor(
+        structure,
+        arrange_neigh_pos[1],
+        coor,
+        1 / (2**(num - i + 1))
+      )
+      coor <- offset_chil_coor(
+        structure,
+        arrange_neigh_pos[2],
+        coor,
+        -1 / (2**(num - i + 1))
+      )
+    } else if (length(arrange_neigh_pos) == 3) {
+      coor <- offset_chil_coor(
+        structure,
+        arrange_neigh_pos[1],
+        coor,
+        1 / (2**(num - i + 1))
+      )
+      coor <- offset_chil_coor(
+        structure,
+        arrange_neigh_pos[3],
+        coor,
+        -1 / (2**(num - i + 1))
+      )
     }
   }
   return(coor)
@@ -487,33 +625,57 @@ process_fucose_branches <- function(coor,structure,fuc_pos,temp_coor){
 #'
 #' @examples process_multiple_branches(coor, structure, 3)
 #' @noRd
-process_multiple_branches <- function(coor,structure,ver){
-  num <- out_degree(structure,ver)[1] # Numbers of vertices which out-degree > 1 (e.g. branch vertices)
-  for(j in seq(1,num-1)){ # Traverse all branch vertices except for self
-    pos <- out_degree(structure,ver)[j+1]
-    pos_max <- out_degree(structure,ver)[num] # Position of branch vertices with second largest index
+process_multiple_branches <- function(coor, structure, ver) {
+  num <- out_degree(structure, ver)[1] # Numbers of vertices which out-degree > 1 (e.g. branch vertices)
+  for (j in seq(1, num - 1)) {
+    # Traverse all branch vertices except for self
+    pos <- out_degree(structure, ver)[j + 1]
+    pos_max <- out_degree(structure, ver)[num] # Position of branch vertices with second largest index
     arrange_neigh_pos <- .neigh_pos_order(structure, pos)
     # Judge whether child vertex is in the middle
-    ver_neigh_pos <- igraph::neighbors(structure,ver)
+    ver_neigh_pos <- igraph::neighbors(structure, ver)
     num_neigh <- length(ver_neigh_pos)
-    chil_in_middle <- mid_pos(structure,coor,min(ver_neigh_pos),pos) | mid_pos(structure,coor,max(ver_neigh_pos),pos)
-    if (length(arrange_neigh_pos)==2){
+    chil_in_middle <- mid_pos(structure, coor, min(ver_neigh_pos), pos) |
+      mid_pos(structure, coor, max(ver_neigh_pos), pos)
+    if (length(arrange_neigh_pos) == 2) {
       # Different number of ver's neighbor leads to different offset rule.
       # (3-num_neigh) means when the number of ver's neighbor=3, value=0; 2->1.
-      coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,
-                               1/(2**(num-j+(3-num_neigh)))+0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
-      coor <- offset_chil_coor(structure,arrange_neigh_pos[2],coor,
-                               -1/(2**(num-j+(3-num_neigh)))-0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max))
-    }
-    else if(length(arrange_neigh_pos)==3 && chil_in_middle){
+      coor <- offset_chil_coor(
+        structure,
+        arrange_neigh_pos[1],
+        coor,
+        1 /
+          (2**(num - j + (3 - num_neigh))) +
+          0.25 * mid_pos(structure, coor, ver, pos) * (pos != pos_max)
+      )
+      coor <- offset_chil_coor(
+        structure,
+        arrange_neigh_pos[2],
+        coor,
+        -1 /
+          (2**(num - j + (3 - num_neigh))) -
+          0.25 * mid_pos(structure, coor, ver, pos) * (pos != pos_max)
+      )
+    } else if (length(arrange_neigh_pos) == 3 && chil_in_middle) {
       # For neighbors=3 vertex, the offset should not be consistent.
       # Only offset the neighbor vertex included in the path along the specified vertex to start vertex.
-      path_vertex <- igraph::shortest_paths(structure,length(structure),ver)$vpath[[1]]
+      path_vertex <- igraph::shortest_paths(
+        structure,
+        length(structure),
+        ver
+      )$vpath[[1]]
       offset_index <- which(arrange_neigh_pos %in% path_vertex) # Index of the neighbor to be offset.
       # (2-offset_index) means when offset_index=1, value=1; 2->0; 3->-1, adjusting offset direction.
       # (2-num_neigh) means when the number of ver's neighbor=3, value=-1; 2->0.
-      coor <- offset_chil_coor(structure, arrange_neigh_pos[offset_index], coor,
-                             (2-offset_index)*(1/(2**(num-j+(2-num_neigh)))+0.25*mid_pos(structure,coor,ver,pos)*(pos!=pos_max)))
+      coor <- offset_chil_coor(
+        structure,
+        arrange_neigh_pos[offset_index],
+        coor,
+        (2 - offset_index) *
+          (1 /
+            (2**(num - j + (2 - num_neigh))) +
+            0.25 * mid_pos(structure, coor, ver, pos) * (pos != pos_max))
+      )
     }
   }
   return(coor)
@@ -529,16 +691,16 @@ process_multiple_branches <- function(coor,structure,ver){
 #'
 #' @examples process_two_neighbors(coor, structure, 5)
 #' @noRd
-process_two_neighbors <- function(coor,structure,ver){
+process_two_neighbors <- function(coor, structure, ver) {
   arrange_neigh_pos <- .neigh_pos_order(structure, ver)
-  if (out_degree(structure,ver)[1] == 1){
-    coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,0.5)
-    coor <- offset_chil_coor(structure,arrange_neigh_pos[2],coor,-0.5)
-  }
-  else if(out_degree(structure,ver)[1] >= 2){ # More than 1 branch along the path
-    coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,0.5)
-    coor <- offset_chil_coor(structure,arrange_neigh_pos[2],coor,-0.5)
-    coor <- process_multiple_branches(coor,structure,ver)
+  if (out_degree(structure, ver)[1] == 1) {
+    coor <- offset_chil_coor(structure, arrange_neigh_pos[1], coor, 0.5)
+    coor <- offset_chil_coor(structure, arrange_neigh_pos[2], coor, -0.5)
+  } else if (out_degree(structure, ver)[1] >= 2) {
+    # More than 1 branch along the path
+    coor <- offset_chil_coor(structure, arrange_neigh_pos[1], coor, 0.5)
+    coor <- offset_chil_coor(structure, arrange_neigh_pos[2], coor, -0.5)
+    coor <- process_multiple_branches(coor, structure, ver)
   }
   return(coor)
 }
@@ -553,16 +715,16 @@ process_two_neighbors <- function(coor,structure,ver){
 #'
 #' @examples process_three_neighbors(coor, structure, 6)
 #' @noRd
-process_three_neighbors <- function(coor,structure,ver){
+process_three_neighbors <- function(coor, structure, ver) {
   arrange_neigh_pos <- .neigh_pos_order(structure, ver)
-  if (out_degree(structure,ver)[1] == 1){
-    coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,1)
-    coor <- offset_chil_coor(structure,arrange_neigh_pos[3],coor,-1)
-  }
-  else if(out_degree(structure,ver)[1] >= 2){ # More than 1 branch along the path
-    coor <- offset_chil_coor(structure,arrange_neigh_pos[1],coor,1)
-    coor <- offset_chil_coor(structure,arrange_neigh_pos[3],coor,-1)
-    coor <- process_multiple_branches(coor,structure,ver)
+  if (out_degree(structure, ver)[1] == 1) {
+    coor <- offset_chil_coor(structure, arrange_neigh_pos[1], coor, 1)
+    coor <- offset_chil_coor(structure, arrange_neigh_pos[3], coor, -1)
+  } else if (out_degree(structure, ver)[1] >= 2) {
+    # More than 1 branch along the path
+    coor <- offset_chil_coor(structure, arrange_neigh_pos[1], coor, 1)
+    coor <- offset_chil_coor(structure, arrange_neigh_pos[3], coor, -1)
+    coor <- process_multiple_branches(coor, structure, ver)
   }
   return(coor)
 }
@@ -577,17 +739,17 @@ process_three_neighbors <- function(coor,structure,ver){
 #'
 #' @examples process_contain_fucose_neighbors(coor, structure, 7)
 #' @noRd
-process_contain_fucose_neighbors <- function(coor,structure,ver){
+process_contain_fucose_neighbors <- function(coor, structure, ver) {
   arrange_other_neigh_pos <- .neigh_pos_order(structure, ver)
   # Process other vertices coordinate
-  if (out_degree(structure,ver)[1] == 1){
-    coor <- offset_chil_coor(structure,arrange_other_neigh_pos[1],coor,0.5)
-    coor <- offset_chil_coor(structure,arrange_other_neigh_pos[2],coor,-0.5)
-  }
-  else if(out_degree(structure,ver)[1] >= 2){ # More than 1 branch along the path
-    coor <- offset_chil_coor(structure,arrange_other_neigh_pos[1],coor,0.5)
-    coor <- offset_chil_coor(structure,arrange_other_neigh_pos[2],coor,-0.5)
-    coor <- process_multiple_branches(coor,structure,ver)
+  if (out_degree(structure, ver)[1] == 1) {
+    coor <- offset_chil_coor(structure, arrange_other_neigh_pos[1], coor, 0.5)
+    coor <- offset_chil_coor(structure, arrange_other_neigh_pos[2], coor, -0.5)
+  } else if (out_degree(structure, ver)[1] >= 2) {
+    # More than 1 branch along the path
+    coor <- offset_chil_coor(structure, arrange_other_neigh_pos[1], coor, 0.5)
+    coor <- offset_chil_coor(structure, arrange_other_neigh_pos[2], coor, -0.5)
+    coor <- process_multiple_branches(coor, structure, ver)
   }
   return(coor)
 }
@@ -600,37 +762,43 @@ process_contain_fucose_neighbors <- function(coor,structure,ver){
 #'
 #' @examples coor_cal(structure)
 #' @noRd
-coor_cal <- function(structure){
+coor_cal <- function(structure) {
   coor <- coor_initialization(structure)
-  structure_length <- seq(length(structure),1)
+  structure_length <- seq(length(structure), 1)
   for (i in structure_length) {
-    gly_neighbors <- igraph::neighbors(structure,i)
-    if (length(gly_neighbors) == 2 &&
-        !('Fuc' %in% gly_neighbors$mono)){
-      coor <- process_two_neighbors(coor,structure,i)
+    gly_neighbors <- igraph::neighbors(structure, i)
+    if (
+      length(gly_neighbors) == 2 &&
+        !('Fuc' %in% gly_neighbors$mono)
+    ) {
+      coor <- process_two_neighbors(coor, structure, i)
     }
-    if (length(gly_neighbors) == 3 &&
-        !('Fuc' %in% gly_neighbors$mono)){
-      coor <- process_three_neighbors(coor,structure,i)
+    if (
+      length(gly_neighbors) == 3 &&
+        !('Fuc' %in% gly_neighbors$mono)
+    ) {
+      coor <- process_three_neighbors(coor, structure, i)
     }
-    if (length(gly_neighbors) == 3 &&
-        'Fuc' %in% gly_neighbors$mono){
-      coor <- process_contain_fucose_neighbors(coor,structure,i)
+    if (
+      length(gly_neighbors) == 3 &&
+        'Fuc' %in% gly_neighbors$mono
+    ) {
+      coor <- process_contain_fucose_neighbors(coor, structure, i)
     }
   }
   fuc_list <- c()
-  for (i in structure_length){
-    if ('Fuc' %in% igraph::neighbors(structure,i)$mono){
-      neigh_pos <- igraph::neighbors(structure,i)
-      fuc_pos <- neigh_pos[which(neigh_pos$mono=='Fuc')]
-      fuc_list <- c(fuc_list,fuc_pos)
-      coor[fuc_pos,'y'] <- coor[fuc_pos,'y']+fuc_offset(structure,fuc_pos)
+  for (i in structure_length) {
+    if ('Fuc' %in% igraph::neighbors(structure, i)$mono) {
+      neigh_pos <- igraph::neighbors(structure, i)
+      fuc_pos <- neigh_pos[which(neigh_pos$mono == 'Fuc')]
+      fuc_list <- c(fuc_list, fuc_pos)
+      coor[fuc_pos, 'y'] <- coor[fuc_pos, 'y'] + fuc_offset(structure, fuc_pos)
     }
   }
   temp_coor <- coor
-  for (i in fuc_list){
-    if (fuc_out_degree(structure,i,temp_coor)[1] >=1){
-      coor <- process_fucose_branches(coor,structure,i,temp_coor)
+  for (i in fuc_list) {
+    if (fuc_out_degree(structure, i, temp_coor)[1] >= 1) {
+      coor <- process_fucose_branches(coor, structure, i, temp_coor)
     }
   }
   return(coor)
@@ -645,10 +813,15 @@ coor_cal <- function(structure){
 #'
 #' @examples connect_info(structure, coor)
 #' @noRd
-connect_info <- function(structure,coor){
+connect_info <- function(structure, coor) {
   edges <- igraph::as_edgelist(structure, names = FALSE)
   if (nrow(edges) == 0) {
-    return(list(start_x = numeric(0), start_y = numeric(0), end_x = numeric(0), end_y = numeric(0)))
+    return(list(
+      start_x = numeric(0),
+      start_y = numeric(0),
+      end_x = numeric(0),
+      end_y = numeric(0)
+    ))
   }
 
   list(
@@ -667,10 +840,10 @@ connect_info <- function(structure,coor){
 #'
 #' @examples glycoform_info(structure)
 #' @noRd
-glycoform_info <- function(structure){
+glycoform_info <- function(structure) {
   glycoform <- igraph::V(structure)$mono
-  for (i in c(which(glycoform == 'Fuc'))){
-    if (fuc_offset(structure,i)=='0.99'){
+  for (i in c(which(glycoform == 'Fuc'))) {
+    if (fuc_offset(structure, i) == '0.99') {
       glycoform[i] <- 'FucUp'
     }
   }
@@ -688,16 +861,40 @@ glycoform_info <- function(structure){
 #'
 #' @examples annotation_coordinate(chil_glyx, chil_glyy, par_glyx, par_glyy)
 #' @noRd
-annotation_coordinate <- function(chil_glyx, chil_glyy, par_glyx, par_glyy){
-  chil_direction <- matrix(c(par_glyx-chil_glyx, par_glyy-chil_glyy),ncol = 1, byrow = FALSE)
-  par_direction <- matrix(c(chil_glyx-par_glyx, chil_glyy-par_glyy),ncol = 1, byrow = FALSE)
-  chil_location <- 0.4*chil_direction/norm(chil_direction, type = '2')
-  par_location <- 0.4*par_direction/norm(par_direction, type = '2')
-  rotate_angle <- 1/10 * pi
-  chil_rotate_matrix <- matrix(c(cos(rotate_angle),sin(rotate_angle),
-                                 -sin(rotate_angle),cos(rotate_angle)), ncol = 2, byrow = TRUE)
-  par_rotate_matrix <- matrix(c(cos(rotate_angle),-sin(rotate_angle),
-                                sin(rotate_angle),cos(rotate_angle)), ncol = 2, byrow = TRUE)
+annotation_coordinate <- function(chil_glyx, chil_glyy, par_glyx, par_glyy) {
+  chil_direction <- matrix(
+    c(par_glyx - chil_glyx, par_glyy - chil_glyy),
+    ncol = 1,
+    byrow = FALSE
+  )
+  par_direction <- matrix(
+    c(chil_glyx - par_glyx, chil_glyy - par_glyy),
+    ncol = 1,
+    byrow = FALSE
+  )
+  chil_location <- 0.4 * chil_direction / norm(chil_direction, type = '2')
+  par_location <- 0.4 * par_direction / norm(par_direction, type = '2')
+  rotate_angle <- 1 / 10 * pi
+  chil_rotate_matrix <- matrix(
+    c(
+      cos(rotate_angle),
+      sin(rotate_angle),
+      -sin(rotate_angle),
+      cos(rotate_angle)
+    ),
+    ncol = 2,
+    byrow = TRUE
+  )
+  par_rotate_matrix <- matrix(
+    c(
+      cos(rotate_angle),
+      -sin(rotate_angle),
+      sin(rotate_angle),
+      cos(rotate_angle)
+    ),
+    ncol = 2,
+    byrow = TRUE
+  )
   chil_annot_loc <- chil_rotate_matrix %*% chil_location
   par_annot_loc <- par_rotate_matrix %*% par_location
   annot_loc <- list("chil" = chil_annot_loc, "par" = par_annot_loc)
@@ -713,7 +910,7 @@ annotation_coordinate <- function(chil_glyx, chil_glyy, par_glyx, par_glyy){
 #'
 #' @examples gly_annotation(structure,coor)
 #' @noRd
-gly_annotation <- function(structure,coor){
+gly_annotation <- function(structure, coor) {
   structure_length <- length(structure)
   if (igraph::ecount(structure) == 0) {
     return(data.frame(
@@ -725,28 +922,50 @@ gly_annotation <- function(structure,coor){
   }
   struc_annot_coor <- data.frame(
     vertice = character(),
-    annot   = character(),
-    x       = numeric(),
-    y       = numeric(),
+    annot = character(),
+    x = numeric(),
+    y = numeric(),
     stringsAsFactors = FALSE
   )
-  for (ver in seq_len(structure_length - 1)){
-    par_ver <- dplyr::nth(as.vector(igraph::shortest_paths(structure,length(structure),ver)$vpath[[1]]),-2)
+  for (ver in seq_len(structure_length - 1)) {
+    par_ver <- dplyr::nth(
+      as.vector(igraph::shortest_paths(
+        structure,
+        length(structure),
+        ver
+      )$vpath[[1]]),
+      -2
+    )
     # Read annotation information and relative position
     linkage_str <- igraph::E(structure)[ver]$linkage
-    gly_annot_coor <- annotation_coordinate(coor[ver,1],coor[ver,2],coor[par_ver,1],coor[par_ver,2])
+    gly_annot_coor <- annotation_coordinate(
+      coor[ver, 1],
+      coor[ver, 2],
+      coor[par_ver, 1],
+      coor[par_ver, 2]
+    )
     # Calculate annotation coordinate >> c(annotate_information, x, y)
-    chil_annotation <- c(ver, strsplit(linkage_str,'-')[[1]][1])
-    chil_annotation <- c(chil_annotation, as.vector(gly_annot_coor$chil)+coor[ver,])
-    par_annotation <- c(par_ver,strsplit(linkage_str,'-')[[1]][2])
-    par_annotation <- c(par_annotation, as.vector(gly_annot_coor$par)+coor[par_ver,])
+    chil_annotation <- c(ver, strsplit(linkage_str, '-')[[1]][1])
+    chil_annotation <- c(
+      chil_annotation,
+      as.vector(gly_annot_coor$chil) + coor[ver, ]
+    )
+    par_annotation <- c(par_ver, strsplit(linkage_str, '-')[[1]][2])
+    par_annotation <- c(
+      par_annotation,
+      as.vector(gly_annot_coor$par) + coor[par_ver, ]
+    )
     # Bind to data.frame
     struc_annot_coor <- rbind(struc_annot_coor, chil_annotation)
     struc_annot_coor <- rbind(struc_annot_coor, par_annotation)
   }
-  colnames(struc_annot_coor) <- c('vertice','annot','x','y')
-  struc_annot_coor$annot[tolower(substr(struc_annot_coor$annot, 1, 1)) == "b"] <- "beta"
-  struc_annot_coor$annot[tolower(substr(struc_annot_coor$annot, 1, 1)) == "a"] <- "alpha"
+  colnames(struc_annot_coor) <- c('vertice', 'annot', 'x', 'y')
+  struc_annot_coor$annot[
+    tolower(substr(struc_annot_coor$annot, 1, 1)) == "b"
+  ] <- "beta"
+  struc_annot_coor$annot[
+    tolower(substr(struc_annot_coor$annot, 1, 1)) == "a"
+  ] <- "alpha"
   struc_annot_coor$x <- as.numeric(struc_annot_coor$x)
   struc_annot_coor$y <- as.numeric(struc_annot_coor$y)
   return(struc_annot_coor)
@@ -792,9 +1011,14 @@ reducing_end_annotation <- function(structure, coor) {
   line_length <- 0.6
   label_offset <- 0.2
   line_end <- root_coor + c(line_length, 0)
-  rotate_angle <- 1/10 * pi
+  rotate_angle <- 1 / 10 * pi
   rotate_matrix <- matrix(
-    c(cos(rotate_angle), sin(rotate_angle), -sin(rotate_angle), cos(rotate_angle)),
+    c(
+      cos(rotate_angle),
+      sin(rotate_angle),
+      -sin(rotate_angle),
+      cos(rotate_angle)
+    ),
     ncol = 2,
     byrow = TRUE
   )
@@ -855,8 +1079,12 @@ create_polygon_coor <- function(gly_list, point_size) {
 }
 
 .decide_size <- function(cartoon, border_px = 0) {
-  panel_width <- 3 * 118 * diff(ggplot2::get_panel_scales(cartoon)$x$range$range)
-  panel_height <- 3 * 118 * diff(ggplot2::get_panel_scales(cartoon)$y$range$range)
+  panel_width <- 3 *
+    118 *
+    diff(ggplot2::get_panel_scales(cartoon)$x$range$range)
+  panel_height <- 3 *
+    118 *
+    diff(ggplot2::get_panel_scales(cartoon)$y$range$range)
   width <- panel_width + 2 * border_px
   height <- panel_height + 2 * border_px
   return(list(width = width, height = height))
@@ -866,22 +1094,25 @@ create_polygon_coor <- function(gly_list, point_size) {
   if (is.null(border_pt) || border_pt <= 0) {
     return(plot)
   }
-  plot + ggplot2::theme(
-    plot.margin = ggplot2::margin(
-      t = border_pt,
-      r = border_pt,
-      b = border_pt,
-      l = border_pt,
-      unit = "pt"
+  plot +
+    ggplot2::theme(
+      plot.margin = ggplot2::margin(
+        t = border_pt,
+        r = border_pt,
+        b = border_pt,
+        l = border_pt,
+        unit = "pt"
+      )
     )
-  )
 }
 
 .ensure_highlight_para <- function(x, gly_vertices) {
   if (!is.numeric(x) && !is.null(x)) {
     cli::cli_abort("highlight parameter {.emph {x}} must be numeric")
-  } else if (!all(x %in% seq(1,gly_vertices))) {
-    cli::cli_abort("highlight parameter {.emph {x}} was out of range {.emph 1~{gly_vertices}}")
+  } else if (!all(x %in% seq(1, gly_vertices))) {
+    cli::cli_abort(
+      "highlight parameter {.emph {x}} was out of range {.emph 1~{gly_vertices}}"
+    )
   }
   x
 }
