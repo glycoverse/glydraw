@@ -1,5 +1,24 @@
 # glydraw (development version)
 
+## Breaking changes
+
+* Remove the `mono_size` parameter of `draw_cartoon()`. (9b05e6c)
+
+## New features
+
+* Add a `highlight` parameter to `draw_cartoon()`. (7e57a54, 3745ec8, c1057ba)
+* Add `export_cartoons()` to save multiple glycan structure cartoons to files. (e1ac3c3)
+
+## Minor improvements and bug fixes
+
+* Fix the bug that reducing end annotation was not shown with unknown anomer information. (#12)
+* Fix the bug that glycans with only one monosaccharide could not be plotted. (#11)
+* Fix the bug that "?" in linkages was not correctly handled. (#9)
+* Fix the incorrect reducing end annotation direction in some situations. (#8)
+* Fix the bug that glycan structures with multiple branches had incorrect layouts. (2ac4e9f)
+* Fix the bug that "png" is not supported in `save_cartoon()`. (fed89b9)
+* Fix the bug that structures with generic "NeuAc" and "NeuGc" cannot be plotted. (3b78303)
+
 # glydraw 0.3.1
 
 ## Minor improvements and bug fixes
