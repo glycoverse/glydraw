@@ -96,6 +96,13 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cartoon</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="st">"Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/save_cartoon.html">save_cartoon</a></span><span class="op">(</span><span class="va">cartoon</span>, <span class="st">"N-core.png"</span>, dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span></code></pre></div>
+<p>You can also use <code><a href="reference/export_cartoons.html">export_cartoons()</a></code> to save mutiple SNFGs to a directory, directly from a <code>glexp::experiment()</code> object:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glycoverse.github.io/glyexp/" class="external-link">glyexp</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Make a tidy experiment object</span></span>
+<span><span class="va">exp</span> <span class="op">&lt;-</span> <span class="va">real_experiment</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://glycoverse.github.io/glyexp/reference/slice_obs.html" class="external-link">slice_head_var</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/export_cartoons.html">export_cartoons</a></span><span class="op">(</span><span class="va">exp</span>, <span class="st">"path/to/save"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">
