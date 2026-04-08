@@ -13,14 +13,19 @@ draw_cartoon(
 }
 \arguments{
 \item{structure}{A \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}} scalar,
-or a string or any glycan structure text nomenclatures.}
+or a string of any glycan structure text nomenclatures supported by \code{\link[glyparse:auto_parse]{glyparse::auto_parse()}}.}
 
 \item{show_linkage}{Show linkage annotation or not. Default is TRUE.}
 
 \item{orient}{The orientation of glycan structure. "H" for horizontal, "V" for vertical.
 Default is "H"}
 
-\item{highlight}{highlight specified monosaccharides.}
+\item{highlight}{An integer vector specifying the node indices to highlight.
+This argument is applicable only when \code{structure} is a \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}}.
+Note that for a \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}}, the node indices correspond exactly
+to the monosaccharides in its printed IUPAC nomenclature.
+For example, given \code{glyrepr::as_glycan_structure("Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-")},
+setting \code{highlight = c(1, 3)} will highlight the "Gal" and "GalNAc" nodes.}
 }
 \value{
 a ggplot2 object

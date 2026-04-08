@@ -1,29 +1,37 @@
 #' Draw a Symbol Nomenclature For Glycan (SNFG)
 #'
 #' @param structure A [glyrepr::glycan_structure()] scalar,
-#'   or a string or any glycan structure text nomenclatures.
+#'   or a string of any glycan structure text nomenclatures supported by [glyparse::auto_parse()].
 #' @param show_linkage Show linkage annotation or not. Default is TRUE.
 #' @param orient The orientation of glycan structure. "H" for horizontal, "V" for vertical.
 #'   Default is "H"
-#' @param highlight highlight specified monosaccharides.
+#' @param highlight An integer vector specifying the node indices to highlight.
+#'   This argument is applicable only when `structure` is a [glyrepr::glycan_structure()].
+#'   Note that for a [glyrepr::glycan_structure()], the node indices correspond exactly
+#'   to the monosaccharides in its printed IUPAC nomenclature.
+#'   For example, given `glyrepr::as_glycan_structure("Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-")`,
+#'   setting `highlight = c(1, 3)` will highlight the "Gal" and "GalNAc" nodes.
 #'
 #' @returns a ggplot2 object
-#' @export
-#'
 #' @examples
 #' \dontrun{
 #' draw_cartoon("Gal(b1-3)GalNAc(a1-")
 #' }
+#' @export
 draw_cartoon <- function(
   structure,
   show_linkage = TRUE,
   orient = c("H", "V"),
   highlight = NULL
 ) {
+  if (!is.null(highlight) && !glyrepr::is_glycan_structure(structure)) {
+    cli::cli_abort("{.arg highlight} can only be set when {.arg structure} is a {.fn glyrepr::glycan_structure}.")
+  }
   structure <- .ensure_one_structure(structure)
   structure <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
   highlight <- .ensure_highlight_para(highlight, length(structure))
   orient <- rlang::arg_match(orient)
+
   # Coordinate of Glycans
   if (orient == 'H') {
     coor <- coor_cal(structure)
@@ -155,12 +163,12 @@ draw_cartoon <- function(
 #' @param file File name of glycan cartoon.
 #' @param dpi Dots per inch, default = 300.
 #'
-#' @export
 #' @examples
 #' \dontrun{
 #' cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
 #' save_cartoon(cartoon, "p1.png", dpi = 300)
 #' }
+#' @export
 save_cartoon <- function(cartoon, file, dpi = 300) {
   checkmate::assert_class(cartoon, "glydraw_cartoon")
   file_ext <- tools::file_ext(file)
