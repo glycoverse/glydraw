@@ -267,6 +267,8 @@ glycan_dict <- list(
   'Kdn' = c('dNon', 'glyGreen'),
   'Neu5Ac' = c('dNon', 'glyPurple'),
   'Neu5Gc' = c('dNon', 'glyLightBlue'),
+  'NeuAc' = c('dNon', 'glyWhite'),
+  'NeuGc' = c('dNon', 'glyWhite'),
   'Neu' = c('dNon', 'glyBrown'),
   'Sia' = c('dNon', 'glyRed'),
 
