@@ -19,7 +19,9 @@ draw_cartoon(
 
   A
   [`glyrepr::glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/glycan_structure.html)
-  scalar, or a string or any glycan structure text nomenclatures.
+  scalar, or a string of any glycan structure text nomenclatures
+  supported by
+  [`glyparse::auto_parse()`](https://glycoverse.github.io/glyparse/reference/auto_parse.html).
 
 - show_linkage:
 
@@ -32,7 +34,16 @@ draw_cartoon(
 
 - highlight:
 
-  highlight specified monosaccharides.
+  An integer vector specifying the node indices to highlight. This
+  argument is applicable only when `structure` is a
+  [`glyrepr::glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/glycan_structure.html).
+  Note that for a
+  [`glyrepr::glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/glycan_structure.html),
+  the node indices correspond exactly to the monosaccharides in its
+  printed IUPAC nomenclature. For example, given
+  `glyrepr::as_glycan_structure("Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-")`,
+  setting `highlight = c(1, 3)` will highlight the "Gal" and "GalNAc"
+  nodes.
 
 ## Value
 
