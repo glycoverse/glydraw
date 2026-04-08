@@ -300,7 +300,19 @@ export_cartoons.glyrepr_structure <- function(
   checkmate::assert_directory_exists(dirname)
   glycan_list <- purrr::map(seq_along(glycans), ~ glycans[[.x]])
   cartoons <- purrr::map(glycan_list, draw_cartoon, show_linkage = show_linkage, orient = orient)
-  filenames <- fs::path(dirname, as.character(glycans), ext = file_ext)
+  filenames <- fs::path(dirname, .sanitize_export_filenames(glycans), ext = file_ext)
   purrr::walk2(cartoons, filenames, save_cartoon, dpi = dpi)
   invisible(cartoons)
+}
+
+.sanitize_export_filenames <- function(glycans) {
+  safe_names <- fs::path_sanitize(as.character(glycans), replacement = "_")
+  safe_names <- ifelse(
+    nchar(safe_names) == 0,
+    "glycan",
+    safe_names
+  )
+  # Keep filenames below typical file-system limits after adding extension/suffixes.
+  safe_names <- substr(safe_names, 1, 180)
+  make.unique(safe_names, sep = "_")
 }
