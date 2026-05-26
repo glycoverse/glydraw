@@ -4,8 +4,10 @@ This function calls
 [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
 on each glycan structure in `x`, then calls
 [`save_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/save_cartoon.md)
-to save a figure for each of them. IUPAC-condensed nonmenclatures are
-used as file names.
+to save a figure for each of them. IUPAC-condensed nomenclatures are
+used as file names. If `x` is a named character vector or named
+[`glyrepr::glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/glycan_structure.html)
+vector, the vector names are used as file names.
 
 ## Usage
 
@@ -34,11 +36,12 @@ export_cartoons(
 
 - dirname:
 
-  Directory name to save the cartoons.
+  Directory name to save the cartoons. If it does not exist, it is
+  created.
 
 - file_ext:
 
-  File extention supported by
+  File extension supported by
   [`ggplot2::ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html).
   Defaults to "png".
 
