@@ -26,6 +26,25 @@ test_that("draw_cartoon works with linkage hidden", {
   expect_s3_class(plot_no_linkage, "glydraw_cartoon")
 })
 
+test_that("draw_cartoon works with reducing-end O-Fuc glycans", {
+  glycans <- c(
+    "Fuc(a1-",
+    "GlcNAc(b1-3)Fuc(a1-"
+  )
+
+  cartoons <- purrr::map(glycans, draw_cartoon)
+
+  purrr::walk(cartoons, expect_s3_class, "glydraw_cartoon")
+})
+
+test_that("reducing-end Fuc keeps the regular Fuc orientation", {
+  structure <- .ensure_one_structure("GlcNAc(b1-3)Fuc(a1-")
+  graph <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
+
+  expect_equal(glycoform_info(graph), c("GlcNAc", "Fuc"))
+  expect_equal(unname(coor_cal(graph)[2, "x"]), 0)
+})
+
 test_that("save_cartoon saves file correctly", {
   structure <- "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
   cartoon <- draw_cartoon(structure)
@@ -167,7 +186,9 @@ test_that("export_cartoons works with jpeg extension", {
   on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
   fs::dir_create(temp_dir)
 
-  suppressMessages(result <- export_cartoons(glycans, temp_dir, file_ext = "jpg", dpi = 72))
+  suppressMessages(
+    result <- export_cartoons(glycans, temp_dir, file_ext = "jpg", dpi = 72)
+  )
   files <- fs::dir_ls(temp_dir, glob = "*.jpg")
   expect_length(files, 1)
 })

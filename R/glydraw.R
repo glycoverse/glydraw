@@ -25,7 +25,9 @@ draw_cartoon <- function(
   highlight = NULL
 ) {
   if (!is.null(highlight) && !glyrepr::is_glycan_structure(structure)) {
-    cli::cli_warn("{.arg highlight} can only be set when {.arg structure} is a {.fn glyrepr::glycan_structure}.")
+    cli::cli_warn(
+      "{.arg highlight} can only be set when {.arg structure} is a {.fn glyrepr::glycan_structure}."
+    )
     highlight <- NULL
   }
   structure <- .ensure_one_structure(structure)
@@ -236,7 +238,9 @@ export_cartoons.glyexp_experiment <- function(
     ))
   }
   if (!"glycan_structure" %in% colnames(glyexp::get_var_info(x))) {
-    cli::cli_abort("There must a {.field glycan_structure} column in {.field var_info}.")
+    cli::cli_abort(
+      "There must a {.field glycan_structure} column in {.field var_info}."
+    )
   }
   glycans <- unique(glyexp::get_var_info(x)$glycan_structure)
   .export_cartoons(
@@ -300,8 +304,17 @@ export_cartoons.glyrepr_structure <- function(
   cli::cli_alert_info("Exporting {.val {length(glycans)}} glycan cartoons.")
   checkmate::assert_directory_exists(dirname)
   glycan_list <- purrr::map(seq_along(glycans), ~ glycans[[.x]])
-  cartoons <- purrr::map(glycan_list, draw_cartoon, show_linkage = show_linkage, orient = orient)
-  filenames <- fs::path(dirname, .sanitize_export_filenames(glycans), ext = file_ext)
+  cartoons <- purrr::map(
+    glycan_list,
+    draw_cartoon,
+    show_linkage = show_linkage,
+    orient = orient
+  )
+  filenames <- fs::path(
+    dirname,
+    .sanitize_export_filenames(glycans),
+    ext = file_ext
+  )
   purrr::walk2(cartoons, filenames, save_cartoon, dpi = dpi)
   invisible(cartoons)
 }

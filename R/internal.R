@@ -1,4 +1,3 @@
-
 # glycan mapping
 glycan_color <- c(
   'glyWhite' = '#FFFFFF',
@@ -199,11 +198,24 @@ coor_initialization <- function(structure) {
   init_X <- igraph::distances(structure)[length(structure), ] * (-1)
   coor[, 'x'] <- init_X
   for (i in seq(1, length(structure))) {
-    if (igraph::V(structure)[[i]]$mono == 'Fuc') {
+    if (
+      igraph::V(structure)[[i]]$mono == 'Fuc' && !.is_reducing_end(structure, i)
+    ) {
       coor[i, 'x'] <- coor[i, 'x'] + 1
     }
   }
   return(coor)
+}
+
+#' Check whether a vertex is the reducing end.
+#'
+#' @param structure an igraph object.
+#' @param ver an integer vertex index.
+#'
+#' @returns A logical scalar.
+#' @noRd
+.is_reducing_end <- function(structure, ver) {
+  ver == length(structure)
 }
 
 #' Title Find Sequence Number of Sub-module
@@ -666,7 +678,7 @@ connect_info <- function(structure, coor) {
 glycoform_info <- function(structure) {
   glycoform <- igraph::V(structure)$mono
   for (i in c(which(glycoform == 'Fuc'))) {
-    if (fuc_offset(structure, i) == '0.99') {
+    if (!.is_reducing_end(structure, i) && fuc_offset(structure, i) == '0.99') {
       glycoform[i] <- 'FucUp'
     }
   }
