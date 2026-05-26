@@ -26,6 +26,32 @@ test_that("draw_cartoon works with linkage hidden", {
   expect_s3_class(plot_no_linkage, "glydraw_cartoon")
 })
 
+test_that("draw_cartoon places substituent annotations by orientation", {
+  structure <- "GalNAc6S(b1-3)GalNAc(a1-"
+
+  h_plot <- draw_cartoon(structure, orient = "H")
+  h_text <- ggplot2::ggplot_build(h_plot)$data[[4]]
+  h_sub <- h_text[grepl("6S", h_text$label), ]
+
+  expect_equal(nrow(h_sub), 1)
+  if (nrow(h_sub) == 1) {
+    expect_equal(h_sub$size, unique(h_text$size))
+    expect_equal(h_sub$x, -1, tolerance = 1e-6)
+    expect_gt(h_sub$y, 0)
+  }
+
+  v_plot <- draw_cartoon(structure, orient = "V")
+  v_text <- ggplot2::ggplot_build(v_plot)$data[[4]]
+  v_sub <- v_text[grepl("6S", v_text$label), ]
+
+  expect_equal(nrow(v_sub), 1)
+  if (nrow(v_sub) == 1) {
+    expect_equal(v_sub$size, unique(v_text$size))
+    expect_gt(v_sub$x, 0)
+    expect_equal(v_sub$y, 1, tolerance = 1e-6)
+  }
+})
+
 test_that("draw_cartoon works with reducing-end O-Fuc glycans", {
   glycans <- c(
     "Fuc(a1-",

@@ -806,6 +806,73 @@ gly_annotation <- function(structure, coor) {
   return(struc_annot_coor)
 }
 
+#' Map the coordinate of substituent annotation text
+#'
+#' @param structure an igraph object
+#' @param coor a matrix
+#' @param orient glycan drawing orientation
+#'
+#' @returns dataframe of substituent annotation and coordinate
+#' @noRd
+substituent_annotation <- function(structure, coor, orient) {
+  sub <- igraph::V(structure)$sub
+  if (length(sub) == 0) {
+    return(data.frame(
+      vertice = character(0),
+      annot = character(0),
+      x = numeric(0),
+      y = numeric(0)
+    ))
+  }
+
+  sub[is.na(sub)] <- ""
+  sub_pos <- which(sub != "")
+  if (length(sub_pos) == 0) {
+    return(data.frame(
+      vertice = character(0),
+      annot = character(0),
+      x = numeric(0),
+      y = numeric(0)
+    ))
+  }
+
+  offset <- if (orient == "H") {
+    c(x = 0, y = 0.4)
+  } else {
+    c(x = 0.4, y = 0)
+  }
+
+  data.frame(
+    vertice = as.character(sub_pos),
+    annot = sub[sub_pos],
+    x = as.numeric(coor[sub_pos, "x"] + offset["x"]),
+    y = as.numeric(coor[sub_pos, "y"] + offset["y"]),
+    stringsAsFactors = FALSE
+  )
+}
+
+#' Check whether an annotation can be parsed as plotmath
+#'
+#' @param annot annotation text
+#'
+#' @returns a logical vector
+#' @noRd
+is_parseable_annotation <- function(annot) {
+  purrr::map_lgl(annot, function(x) {
+    !inherits(try(parse(text = x), silent = TRUE), "try-error")
+  })
+}
+
+#' Quote annotation text for plotmath parsing
+#'
+#' @param annot annotation text
+#'
+#' @returns a quoted character vector
+#' @noRd
+quote_annotation <- function(annot) {
+  paste0('"', gsub('"', '\\"', annot, fixed = TRUE), '"')
+}
+
 #' Title Map the coordinate of reducing end annotation and segment
 #'
 #' @param structure an igraph object

@@ -60,7 +60,10 @@ draw_cartoon <- function(
   polygon_coor <- create_polygon_coor(gly_list, 0.2)
   filled_color <- glycan_color[as.character(polygon_coor$color)]
 
-  struc_annotation <- gly_annotation(structure, coor)
+  struc_annotation <- dplyr::bind_rows(
+    gly_annotation(structure, coor),
+    substituent_annotation(structure, coor, orient)
+  )
   reducing_info <- reducing_end_annotation(structure, coor)
   struc_annotation <- dplyr::bind_rows(
     struc_annotation,
@@ -79,12 +82,13 @@ draw_cartoon <- function(
   struc_annotation <- struc_annotation |>
     dplyr::mutate(
       annot_label = dplyr::case_when(
-        annot == "?" ~ '~"?"',
-        annot == "??" ~ '~"?"',
+        .data$annot == "?" ~ '~"?"',
+        .data$annot == "??" ~ '~"?"',
         # case like '?3' would convert to '?'
-        grepl("^\\?\\d+", annot) ~ '~"?"',
+        grepl("^\\?\\d+", .data$annot) ~ '~"?"',
+        !is_parseable_annotation(.data$annot) ~ quote_annotation(.data$annot),
         # normal annotation would maintain the same
-        TRUE ~ struc_annotation$annot
+        TRUE ~ .data$annot
       )
     )
 
