@@ -126,6 +126,25 @@ test_that("export_cartoons uses character vector names as filenames", {
   expect_setequal(fs::path_file(files), c("core.png", "antenna.png"))
 })
 
+test_that("export_cartoons falls back to structure filenames for empty names", {
+  glycans <- c(
+    core = "Man(a1-3)Man(b1-4)GlcNAc(b1-",
+    "Gal(b1-4)GlcNAc(b1-"
+  )
+  temp_dir <- tempfile()
+  on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
+  fs::dir_create(temp_dir)
+
+  suppressMessages(result <- export_cartoons(glycans, temp_dir, dpi = 72))
+
+  expect_length(result, 2)
+  files <- fs::dir_ls(temp_dir, glob = "*.png")
+  expect_setequal(
+    fs::path_file(files),
+    c("core.png", "Gal(b1-4)GlcNAc(b1-.png")
+  )
+})
+
 test_that("export_cartoons removes duplicates for character input", {
   glycans <- c(
     "Man(a1-3)Man(b1-4)GlcNAc(b1-",
@@ -241,7 +260,7 @@ test_that("export_cartoons errors when glycan_structure column is missing", {
 
 test_that("export_cartoons creates non-existent directory", {
   glycans <- "Man(a1-3)Man(b1-4)GlcNAc(b1-"
-  non_existent_dir <- file.path(tempdir(), "non_existent_dir_12345")
+  non_existent_dir <- tempfile(pattern = "non_existent_dir_")
   on.exit(unlink(non_existent_dir, recursive = TRUE), add = TRUE)
 
   suppressMessages(
