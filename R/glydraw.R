@@ -202,7 +202,8 @@ save_cartoon <- function(cartoon, file, dpi = 300) {
 #' @param x A [glyexp::experiment()], a [glyrepr::glycan_structure()] vector,
 #'   or a character vector of any glycan structure text nomenclatures
 #'   supported by [glyparse::auto_parse()].
-#' @param dirname Directory name to save the cartoons.
+#' @param dirname Directory name to save the cartoons. If it does not exist,
+#'   it is created.
 #' @param file_ext File extention supported by [ggplot2::ggsave()]. Defaults to "png".
 #' @param dpi Dots per inch. Defaults to 300.
 #' @inheritParams draw_cartoon
@@ -306,7 +307,7 @@ export_cartoons.glyrepr_structure <- function(
   orient
 ) {
   cli::cli_alert_info("Exporting {.val {length(glycans)}} glycan cartoons.")
-  checkmate::assert_directory_exists(dirname)
+  fs::dir_create(dirname)
   glycan_list <- purrr::map(seq_along(glycans), ~ glycans[[.x]])
   cartoons <- purrr::map(
     glycan_list,

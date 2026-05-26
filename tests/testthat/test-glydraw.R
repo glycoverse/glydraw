@@ -206,14 +206,19 @@ test_that("export_cartoons errors when glycan_structure column is missing", {
   )
 })
 
-test_that("export_cartoons errors for non-existent directory", {
+test_that("export_cartoons creates non-existent directory", {
   glycans <- "Man(a1-3)Man(b1-4)GlcNAc(b1-"
   non_existent_dir <- file.path(tempdir(), "non_existent_dir_12345")
+  on.exit(unlink(non_existent_dir, recursive = TRUE), add = TRUE)
 
-  expect_error(
-    export_cartoons(glycans, non_existent_dir),
-    "Assertion on 'dirname' failed"
+  suppressMessages(
+    result <- export_cartoons(glycans, non_existent_dir, dpi = 72)
   )
+
+  expect_length(result, 1)
+  expect_true(fs::dir_exists(non_existent_dir))
+  files <- fs::dir_ls(non_existent_dir, glob = "*.png")
+  expect_length(files, 1)
 })
 
 test_that("export_cartoons works with jpeg extension", {
