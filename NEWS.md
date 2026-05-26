@@ -1,4 +1,11 @@
-# glydraw (development version)
+# glydraw 0.4.1
+
+## Minor improvements and bug fixes
+
+* Fix substituent annotations in glycan cartoons. (#16)
+* Fix reducing-end Fuc orientation in O-Fuc glycans. (#15)
+* Make `export_cartoons()` create the output directory when needed. (#17)
+* Make `export_cartoons()` use vector names as output filenames when available. (#17)
 
 # glydraw 0.4.0
 
