@@ -21,6 +21,7 @@ You can install the latest release of glydraw from
 (**recommended**):
 
 ``` r
+
 # install.packages("pak")
 pak::repo_add(glycoverse = "https://glycoverse.r-universe.dev")
 pak::pkg_install("glydraw")
@@ -29,12 +30,14 @@ pak::pkg_install("glydraw")
 Or from [GitHub](https://github.com/glycoverse/glydraw):
 
 ``` r
+
 pak::pkg_install("glycoverse/glydraw@*release")
 ```
 
 Or install the development version (NOT recommended):
 
 ``` r
+
 pak::pkg_install("glycoverse/glydraw")
 ```
 
@@ -50,6 +53,7 @@ Call
 to plot a SNFG:
 
 ``` r
+
 library(glydraw)
 
 draw_cartoon("Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-")
@@ -62,6 +66,7 @@ And call
 to save it to a file:
 
 ``` r
+
 cartoon <- draw_cartoon("Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-")
 save_cartoon(cartoon, "N-core.png", dpi = 300)
 ```
@@ -72,6 +77,7 @@ to save mutiple SNFGs to a directory, directly from a
 `glexp::experiment()` object:
 
 ``` r
+
 library(glyexp)
 
 # Make a tidy experiment object
