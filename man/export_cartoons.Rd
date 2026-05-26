@@ -36,7 +36,9 @@ The function returns the list of cartoons implicitly.
 \description{
 This function calls \code{\link[=draw_cartoon]{draw_cartoon()}} on each glycan structure in \code{x},
 then calls \code{\link[=save_cartoon]{save_cartoon()}} to save a figure for each of them.
-IUPAC-condensed nonmenclatures are used as file names.
+IUPAC-condensed nonmenclatures are used as file names. If \code{x} is a named
+character vector or named \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}} vector, the vector
+names are used as file names.
 }
 \examples{
 \dontrun{

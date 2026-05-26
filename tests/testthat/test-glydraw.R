@@ -110,6 +110,22 @@ test_that("export_cartoons works with character vector input", {
   expect_length(files, 2)
 })
 
+test_that("export_cartoons uses character vector names as filenames", {
+  glycans <- c(
+    core = "Man(a1-3)Man(b1-4)GlcNAc(b1-",
+    antenna = "Gal(b1-4)GlcNAc(b1-"
+  )
+  temp_dir <- tempfile()
+  on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
+  fs::dir_create(temp_dir)
+
+  suppressMessages(result <- export_cartoons(glycans, temp_dir, dpi = 72))
+
+  expect_length(result, 2)
+  files <- fs::dir_ls(temp_dir, glob = "*.png")
+  expect_setequal(fs::path_file(files), c("core.png", "antenna.png"))
+})
+
 test_that("export_cartoons removes duplicates for character input", {
   glycans <- c(
     "Man(a1-3)Man(b1-4)GlcNAc(b1-",
@@ -143,6 +159,23 @@ test_that("export_cartoons works with glyrepr_structure input", {
   expect_length(result, 2)
   files <- fs::dir_ls(temp_dir, glob = "*.png")
   expect_length(files, 2)
+})
+
+test_that("export_cartoons uses glyrepr_structure names as filenames", {
+  skip_if_not_installed("glyrepr")
+  structures <- glyrepr::as_glycan_structure(c(
+    core = "Man(a1-3)Man(b1-4)GlcNAc(b1-",
+    antenna = "Gal(b1-4)GlcNAc(b1-"
+  ))
+  temp_dir <- tempfile()
+  on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
+  fs::dir_create(temp_dir)
+
+  suppressMessages(result <- export_cartoons(structures, temp_dir, dpi = 72))
+
+  expect_length(result, 2)
+  files <- fs::dir_ls(temp_dir, glob = "*.png")
+  expect_setequal(fs::path_file(files), c("core.png", "antenna.png"))
 })
 
 test_that("export_cartoons removes duplicates for glyrepr_structure input", {
