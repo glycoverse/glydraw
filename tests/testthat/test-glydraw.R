@@ -52,6 +52,16 @@ test_that("draw_cartoon places substituent annotations by orientation", {
   }
 })
 
+test_that("draw_cartoon ignores unknown substituent linkage in annotation", {
+  structure <- "GalNAc?S(b1-3)GalNAc(a1-"
+
+  plot <- draw_cartoon(structure)
+  labels <- ggplot2::ggplot_build(plot)$data[[4]]$label
+
+  expect_true(any(labels == "S"))
+  expect_false(any(grepl("?", labels, fixed = TRUE)))
+})
+
 test_that("draw_cartoon works with reducing-end O-Fuc glycans", {
   glycans <- c(
     "Fuc(a1-",

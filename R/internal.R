@@ -844,7 +844,7 @@ substituent_annotation <- function(structure, coor, orient) {
 
   data.frame(
     vertice = as.character(sub_pos),
-    annot = sub[sub_pos],
+    annot = sub("^\\?+", "", sub[sub_pos]),
     x = as.numeric(coor[sub_pos, "x"] + offset["x"]),
     y = as.numeric(coor[sub_pos, "y"] + offset["y"]),
     stringsAsFactors = FALSE
