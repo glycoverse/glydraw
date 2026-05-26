@@ -197,7 +197,9 @@ save_cartoon <- function(cartoon, file, dpi = 300) {
 #'
 #' This function calls [draw_cartoon()] on each glycan structure in `x`,
 #' then calls [save_cartoon()] to save a figure for each of them.
-#' IUPAC-condensed nonmenclatures are used as file names.
+#' IUPAC-condensed nonmenclatures are used as file names. If `x` is a named
+#' character vector or named [glyrepr::glycan_structure()] vector, the vector
+#' names are used as file names.
 #'
 #' @param x A [glyexp::experiment()], a [glyrepr::glycan_structure()] vector,
 #'   or a character vector of any glycan structure text nomenclatures
@@ -317,11 +319,24 @@ export_cartoons.glyrepr_structure <- function(
   )
   filenames <- fs::path(
     dirname,
-    .sanitize_export_filenames(glycans),
+    .sanitize_export_filenames(.export_filename_labels(glycans)),
     ext = file_ext
   )
   purrr::walk2(cartoons, filenames, save_cartoon, dpi = dpi)
   invisible(cartoons)
+}
+
+#' Select filename labels for exported cartoons
+#'
+#' @param glycans A vector of glycan structures.
+#' @return A vector of labels for output filenames.
+#' @noRd
+.export_filename_labels <- function(glycans) {
+  if (is.null(names(glycans))) {
+    glycans
+  } else {
+    names(glycans)
+  }
 }
 
 .sanitize_export_filenames <- function(glycans) {
