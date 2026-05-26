@@ -18,7 +18,8 @@ export_cartoons(
 or a character vector of any glycan structure text nomenclatures
 supported by \code{\link[glyparse:auto_parse]{glyparse::auto_parse()}}.}
 
-\item{dirname}{Directory name to save the cartoons.}
+\item{dirname}{Directory name to save the cartoons. If it does not exist,
+it is created.}
 
 \item{file_ext}{File extention supported by \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}}. Defaults to "png".}
 
