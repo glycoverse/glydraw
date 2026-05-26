@@ -197,7 +197,7 @@ save_cartoon <- function(cartoon, file, dpi = 300) {
 #'
 #' This function calls [draw_cartoon()] on each glycan structure in `x`,
 #' then calls [save_cartoon()] to save a figure for each of them.
-#' IUPAC-condensed nonmenclatures are used as file names. If `x` is a named
+#' IUPAC-condensed nomenclatures are used as file names. If `x` is a named
 #' character vector or named [glyrepr::glycan_structure()] vector, the vector
 #' names are used as file names.
 #'
@@ -206,7 +206,7 @@ save_cartoon <- function(cartoon, file, dpi = 300) {
 #'   supported by [glyparse::auto_parse()].
 #' @param dirname Directory name to save the cartoons. If it does not exist,
 #'   it is created.
-#' @param file_ext File extention supported by [ggplot2::ggsave()]. Defaults to "png".
+#' @param file_ext File extension supported by [ggplot2::ggsave()]. Defaults to "png".
 #' @param dpi Dots per inch. Defaults to 300.
 #' @inheritParams draw_cartoon
 #'
@@ -335,7 +335,11 @@ export_cartoons.glyrepr_structure <- function(
   if (is.null(names(glycans))) {
     glycans
   } else {
-    names(glycans)
+    labels <- as.character(glycans)
+    glycan_names <- names(glycans)
+    has_name <- !is.na(glycan_names) & nzchar(glycan_names)
+    labels[has_name] <- glycan_names[has_name]
+    labels
   }
 }
 

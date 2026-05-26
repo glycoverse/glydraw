@@ -21,7 +21,7 @@ supported by \code{\link[glyparse:auto_parse]{glyparse::auto_parse()}}.}
 \item{dirname}{Directory name to save the cartoons. If it does not exist,
 it is created.}
 
-\item{file_ext}{File extention supported by \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}}. Defaults to "png".}
+\item{file_ext}{File extension supported by \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}}. Defaults to "png".}
 
 \item{dpi}{Dots per inch. Defaults to 300.}
 
@@ -36,7 +36,7 @@ The function returns the list of cartoons implicitly.
 \description{
 This function calls \code{\link[=draw_cartoon]{draw_cartoon()}} on each glycan structure in \code{x},
 then calls \code{\link[=save_cartoon]{save_cartoon()}} to save a figure for each of them.
-IUPAC-condensed nonmenclatures are used as file names. If \code{x} is a named
+IUPAC-condensed nomenclatures are used as file names. If \code{x} is a named
 character vector or named \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}} vector, the vector
 names are used as file names.
 }
