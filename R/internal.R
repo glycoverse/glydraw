@@ -752,7 +752,11 @@ gly_annotation <- function(structure, coor) {
       vertice = character(0),
       annot = character(0),
       x = numeric(0),
-      y = numeric(0)
+      y = numeric(0),
+      segment_start_x = numeric(0),
+      segment_start_y = numeric(0),
+      segment_end_x = numeric(0),
+      segment_end_y = numeric(0)
     ))
   }
   struc_annot_coor <- data.frame(
@@ -760,6 +764,10 @@ gly_annotation <- function(structure, coor) {
     annot = character(),
     x = numeric(),
     y = numeric(),
+    segment_start_x = numeric(),
+    segment_start_y = numeric(),
+    segment_end_x = numeric(),
+    segment_end_y = numeric(),
     stringsAsFactors = FALSE
   )
   for (ver in seq_len(structure_length - 1)) {
@@ -783,18 +791,31 @@ gly_annotation <- function(structure, coor) {
     chil_annotation <- c(ver, strsplit(linkage_str, '-')[[1]][1])
     chil_annotation <- c(
       chil_annotation,
-      as.vector(gly_annot_coor$chil) + coor[ver, ]
+      as.vector(gly_annot_coor$chil) + coor[ver, ],
+      coor[ver, ],
+      coor[par_ver, ]
     )
     par_annotation <- c(ver, strsplit(linkage_str, '-')[[1]][2])
     par_annotation <- c(
       par_annotation,
-      as.vector(gly_annot_coor$par) + coor[par_ver, ]
+      as.vector(gly_annot_coor$par) + coor[par_ver, ],
+      coor[ver, ],
+      coor[par_ver, ]
     )
     # Bind to data.frame
     struc_annot_coor <- rbind(struc_annot_coor, chil_annotation)
     struc_annot_coor <- rbind(struc_annot_coor, par_annotation)
   }
-  colnames(struc_annot_coor) <- c('vertice', 'annot', 'x', 'y')
+  colnames(struc_annot_coor) <- c(
+    'vertice',
+    'annot',
+    'x',
+    'y',
+    'segment_start_x',
+    'segment_start_y',
+    'segment_end_x',
+    'segment_end_y'
+  )
   struc_annot_coor$annot[
     tolower(substr(struc_annot_coor$annot, 1, 1)) == "b"
   ] <- "beta"
@@ -803,7 +824,274 @@ gly_annotation <- function(structure, coor) {
   ] <- "alpha"
   struc_annot_coor$x <- as.numeric(struc_annot_coor$x)
   struc_annot_coor$y <- as.numeric(struc_annot_coor$y)
+  struc_annot_coor$segment_start_x <- as.numeric(
+    struc_annot_coor$segment_start_x
+  )
+  struc_annot_coor$segment_start_y <- as.numeric(
+    struc_annot_coor$segment_start_y
+  )
+  struc_annot_coor$segment_end_x <- as.numeric(struc_annot_coor$segment_end_x)
+  struc_annot_coor$segment_end_y <- as.numeric(struc_annot_coor$segment_end_y)
   return(struc_annot_coor)
+}
+
+#' Reflect a point across a line segment
+#'
+#' @param point a numeric vector with x and y values
+#' @param segment_start a numeric vector with x and y values
+#' @param segment_end a numeric vector with x and y values
+#'
+#' @returns reflected point coordinates
+#' @noRd
+reflect_point_across_segment <- function(point, segment_start, segment_end) {
+  segment <- segment_end - segment_start
+  segment_length <- sum(segment^2)
+  if (!is.finite(segment_length) || segment_length <= .Machine$double.eps) {
+    return(point)
+  }
+
+  projection <- segment_start +
+    segment * sum((point - segment_start) * segment) / segment_length
+  point + 2 * (projection - point)
+}
+
+#' Find the shortest distance among annotation coordinates
+#'
+#' @param coords a numeric matrix with x and y columns
+#'
+#' @returns minimum pairwise distance
+#' @noRd
+min_annotation_distance <- function(coords) {
+  finite <- stats::complete.cases(coords)
+  if (sum(finite) < 2) {
+    return(Inf)
+  }
+
+  min(stats::dist(coords[finite, , drop = FALSE]))
+}
+
+#' Check whether two annotation coordinates are sufficiently separated
+#'
+#' @param coords a numeric matrix with x and y columns
+#' @param i row index of first annotation
+#' @param j row index of second annotation
+#' @param min_distance minimum distance between annotation centers
+#'
+#' @returns logical scalar
+#' @noRd
+are_annotations_separated <- function(coords, i, j, min_distance) {
+  delta <- coords[i, ] - coords[j, ]
+  distance <- sqrt(sum(delta^2))
+  distance >= min_distance
+}
+
+#' Compute the reflection of annotation coordinates across their segments
+#'
+#' @param coords a numeric matrix with x and y columns
+#' @param segment a numeric matrix with segment start/end columns
+#'
+#' @returns numeric matrix of reflected coordinates
+#' @noRd
+reflect_annotation_coords <- function(coords, segment) {
+  can_reflect <- stats::complete.cases(segment)
+  reflected_coords <- coords
+  for (i in which(can_reflect)) {
+    reflected_coords[i, ] <- reflect_point_across_segment(
+      point = coords[i, ],
+      segment_start = segment[i, c("segment_start_x", "segment_start_y")],
+      segment_end = segment[i, c("segment_end_x", "segment_end_y")]
+    )
+  }
+  reflected_coords
+}
+
+#' Build annotation groups that share a reflection segment
+#'
+#' @param annotation a data frame returned by annotation mapping helpers
+#' @param segment a numeric matrix with segment start/end columns
+#' @param segment_lengths numeric vector of segment lengths
+#'
+#' @returns list with keys, rows, and lengths for each group
+#' @noRd
+build_annotation_groups <- function(annotation, segment, segment_lengths) {
+  can_reflect <- stats::complete.cases(segment)
+  group_keys <- rep(NA_character_, nrow(annotation))
+  group_keys[can_reflect] <- paste(
+    annotation$vertice[can_reflect],
+    segment[can_reflect, "segment_start_x"],
+    segment[can_reflect, "segment_start_y"],
+    segment[can_reflect, "segment_end_x"],
+    segment[can_reflect, "segment_end_y"],
+    sep = "\r"
+  )
+  group_rows <- split(which(can_reflect), group_keys[can_reflect])
+  group_lengths <- purrr::map_dbl(group_rows, ~ max(segment_lengths[.x]))
+
+  list(
+    keys = group_keys,
+    rows = group_rows,
+    lengths = group_lengths
+  )
+}
+
+#' Choose the best annotation group to reflect for resolving an overlap
+#'
+#' @param i row index of first annotation
+#' @param j row index of second annotation
+#' @param coords current annotation coordinates
+#' @param reflected_coords candidate reflected coordinates
+#' @param groups list returned by build_annotation_groups
+#' @param reflected_groups logical vector tracking reflected groups
+#'
+#' @returns character group key, or NULL if no candidate exists
+#' @noRd
+choose_reflection_group <- function(
+  i,
+  j,
+  coords,
+  reflected_coords,
+  groups,
+  reflected_groups
+) {
+  candidate_groups <- unique(groups$keys[c(i, j)])
+  candidate_groups <- candidate_groups[
+    !is.na(candidate_groups) & !reflected_groups[candidate_groups]
+  ]
+  if (length(candidate_groups) == 0) {
+    return(NULL)
+  }
+
+  candidate_scores <- purrr::map_dbl(
+    candidate_groups,
+    function(candidate) {
+      candidate_coords <- coords
+      rows <- groups$rows[[candidate]]
+      candidate_coords[rows, ] <- reflected_coords[rows, ]
+      min_annotation_distance(candidate_coords)
+    }
+  )
+
+  best_score <- max(candidate_scores)
+  best_candidates <- candidate_groups[
+    abs(candidate_scores - best_score) <= sqrt(.Machine$double.eps)
+  ]
+  best_candidates[which.max(groups$lengths[best_candidates])]
+}
+
+#' Iteratively resolve overlaps by reflecting annotation groups
+#'
+#' @param coords current annotation coordinates
+#' @param reflected_coords candidate reflected coordinates
+#' @param finite_index integer vector of rows with finite coordinates
+#' @param groups list returned by build_annotation_groups
+#' @param min_distance minimum distance between annotation centers
+#' @param max_iter maximum number of overlap resolution passes
+#'
+#' @returns numeric matrix of resolved coordinates
+#' @noRd
+resolve_overlaps <- function(
+  coords,
+  reflected_coords,
+  finite_index,
+  groups,
+  min_distance,
+  max_iter
+) {
+  reflected_groups <- rep(FALSE, length(groups$rows))
+  names(reflected_groups) <- names(groups$rows)
+
+  for (iter in seq_len(max_iter)) {
+    shifted <- FALSE
+    for (i_pos in seq_len(length(finite_index) - 1)) {
+      i <- finite_index[i_pos]
+      for (j in finite_index[(i_pos + 1):length(finite_index)]) {
+        if (are_annotations_separated(coords, i, j, min_distance)) {
+          next
+        }
+
+        best <- choose_reflection_group(
+          i,
+          j,
+          coords,
+          reflected_coords,
+          groups,
+          reflected_groups
+        )
+        if (is.null(best)) {
+          next
+        }
+
+        rows <- groups$rows[[best]]
+        coords[rows, ] <- reflected_coords[rows, ]
+        reflected_groups[best] <- TRUE
+        shifted <- TRUE
+      }
+    }
+
+    if (!shifted) {
+      break
+    }
+  }
+
+  coords
+}
+
+#' Separate annotations that are too close to each other
+#'
+#' @param annotation a data frame returned by annotation mapping helpers
+#' @param min_distance minimum distance between annotation centers
+#' @param max_iter maximum number of overlap resolution passes
+#'
+#' @returns annotation data frame with adjusted coordinates
+#' @noRd
+resolve_annotation_overlap <- function(
+  annotation,
+  min_distance = 0.2,
+  max_iter = 20
+) {
+  if (nrow(annotation) < 2) {
+    return(annotation)
+  }
+
+  coords <- as.matrix(annotation[, c("x", "y")])
+  finite <- is.finite(coords[, "x"]) & is.finite(coords[, "y"])
+  finite_index <- which(finite)
+  if (length(finite_index) < 2) {
+    return(annotation)
+  }
+
+  segment_cols <- c(
+    "segment_start_x",
+    "segment_start_y",
+    "segment_end_x",
+    "segment_end_y"
+  )
+  if (!all(segment_cols %in% names(annotation))) {
+    annotation$x <- as.numeric(coords[, "x"])
+    annotation$y <- as.numeric(coords[, "y"])
+    return(annotation)
+  }
+
+  segment <- as.matrix(annotation[, segment_cols])
+  segment_lengths <- sqrt(
+    (segment[, "segment_end_x"] - segment[, "segment_start_x"])^2 +
+      (segment[, "segment_end_y"] - segment[, "segment_start_y"])^2
+  )
+
+  reflected_coords <- reflect_annotation_coords(coords, segment)
+  groups <- build_annotation_groups(annotation, segment, segment_lengths)
+  coords <- resolve_overlaps(
+    coords,
+    reflected_coords,
+    finite_index,
+    groups,
+    min_distance,
+    max_iter
+  )
+
+  annotation$x <- as.numeric(coords[, "x"])
+  annotation$y <- as.numeric(coords[, "y"])
+  annotation
 }
 
 #' Map the coordinate of substituent annotation text
