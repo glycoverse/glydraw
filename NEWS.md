@@ -2,6 +2,7 @@
 
 ## Minor improvements and bug fixes
 
+* Orient reducing end annotation line vertically when `orient = "V"`. (#24)
 * Fix overlapping linkage annotations for some glycans. (#21)
 * Fix overlapping a1-3 and a1-6 core Fucose residues. (#23)
 
