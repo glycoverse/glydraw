@@ -64,7 +64,7 @@ draw_cartoon <- function(
     gly_annotation(structure, coor),
     substituent_annotation(structure, coor, orient)
   )
-  reducing_info <- reducing_end_annotation(structure, coor)
+  reducing_info <- reducing_end_annotation(structure, coor, orient)
   struc_annotation <- dplyr::bind_rows(
     struc_annotation,
     reducing_info$annotation

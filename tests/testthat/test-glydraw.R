@@ -19,6 +19,26 @@ test_that("draw_cartoon works with vertical orientation", {
   expect_s3_class(v_plot, "ggplot")
 })
 
+test_that("draw_cartoon orients reducing end annotation line by orientation", {
+  structure <- "Gal(b1-3)GalNAc(a1-"
+
+  h_plot <- draw_cartoon(structure, orient = "H")
+  h_segments <- ggplot2::ggplot_build(h_plot)$data[[1]]
+  h_reducing <- tail(h_segments, 1)
+  expect_equal(h_reducing$x, 0, tolerance = 1e-6)
+  expect_equal(h_reducing$y, 0, tolerance = 1e-6)
+  expect_equal(h_reducing$xend, 0.6, tolerance = 1e-6)
+  expect_equal(h_reducing$yend, 0, tolerance = 1e-6)
+
+  v_plot <- draw_cartoon(structure, orient = "V")
+  v_segments <- ggplot2::ggplot_build(v_plot)$data[[1]]
+  v_reducing <- tail(v_segments, 1)
+  expect_equal(v_reducing$x, 0, tolerance = 1e-6)
+  expect_equal(v_reducing$y, 0, tolerance = 1e-6)
+  expect_equal(v_reducing$xend, 0, tolerance = 1e-6)
+  expect_equal(v_reducing$yend, -0.6, tolerance = 1e-6)
+})
+
 test_that("draw_cartoon works with linkage hidden", {
   structure <- "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
 

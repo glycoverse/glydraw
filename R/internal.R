@@ -1163,12 +1163,14 @@ quote_annotation <- function(annot) {
 #'
 #' @param structure an igraph object
 #' @param coor a matrix
+#' @param orient glycan drawing orientation, "H" or "V"
 #'
 #' @returns list of reducing end annotation and segment
 #'
-#' @examples reducing_end_annotation(structure, coor)
+#' @examples reducing_end_annotation(structure, coor, orient)
 #' @noRd
-reducing_end_annotation <- function(structure, coor) {
+reducing_end_annotation <- function(structure, coor, orient = c("H", "V")) {
+  orient <- rlang::arg_match(orient)
   anomer <- igraph::graph_attr(structure, "anomer")
   if (length(anomer) == 0 || is.na(anomer) || anomer == "") {
     return(list(
@@ -1198,7 +1200,12 @@ reducing_end_annotation <- function(structure, coor) {
   root_coor <- c(x = as.numeric(coor[root, 1]), y = as.numeric(coor[root, 2]))
   line_length <- 0.6
   label_offset <- 0.2
-  line_end <- root_coor + c(line_length, 0)
+  line_vec <- if (orient == "H") {
+    c(x = line_length, y = 0)
+  } else {
+    c(x = 0, y = -line_length)
+  }
+  line_end <- root_coor + line_vec
   rotate_angle <- 1 / 10 * pi
   rotate_matrix <- matrix(
     c(
@@ -1210,7 +1217,11 @@ reducing_end_annotation <- function(structure, coor) {
     ncol = 2,
     byrow = TRUE
   )
-  label_vec <- c(line_length + label_offset, 0)
+  label_vec <- if (orient == "H") {
+    c(x = line_length + label_offset, y = 0)
+  } else {
+    c(x = 0, y = -(line_length + label_offset))
+  }
   annot_loc <- 0.6 * rotate_matrix %*% matrix(label_vec, ncol = 1)
   annot_coor <- root_coor + as.vector(annot_loc)
   list(
