@@ -357,22 +357,20 @@ fuc_out_degree <- function(structure, ver, coor) {
   return(c(num, pos))
 }
 
-#' Title Process the y-Coordinate of 'Fucose' Vertex
+#' Title Process the y-Coordinate of 'Fucose' Vertices
 #'
 #' @param structure an igraph object
-#' @param fuc_pos an integer
+#' @param fuc_pos An integer vector of 'Fucose' vertex indices.
 #'
-#' @returns the Offset of Specified 'Fucose' Vertex
+#' @returns A numeric vector of vertical offsets for the specified vertices.
 #'
-#' @examples fuc_offset(structure, 1)
+#' @examples fuc_offset(structure, c(1, 2))
 #' @noRd
 fuc_offset <- function(structure, fuc_pos) {
   linkage_str <- igraph::E(structure)[fuc_pos]$linkage
-  linkage_pos <- strsplit(linkage_str, '-')[[1]][2]
-  offset <- 0.99
-  if (linkage_pos %in% c('2', '3')) {
-    offset <- -0.99
-  }
+  linkage_pos <- purrr::map_chr(strsplit(linkage_str, '-'), 2)
+  offset <- rep(0.99, length(linkage_pos))
+  offset[linkage_pos %in% c('2', '3')] <- -0.99
   return(offset)
 }
 
