@@ -3,7 +3,7 @@
 ## Minor improvements and bug fixes
 
 * Fix overlapping linkage annotations for some glycans. (#21)
-* Fix overlapping a1-3 and a1-6 core Fucose residues. (#20)
+* Fix overlapping a1-3 and a1-6 core Fucose residues. (#23)
 
 # glydraw 0.4.1
 
