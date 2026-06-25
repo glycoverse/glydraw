@@ -62,6 +62,29 @@ test_that("draw_cartoon ignores unknown substituent linkage in annotation", {
   expect_false(any(grepl("?", labels, fixed = TRUE)))
 })
 
+test_that("draw_cartoon separates crowded branch linkage annotations", {
+  structure <- "Fuc(a1-2)Gal(b1-3)GlcNAc(b1-3)[Neu5Ac(a2-3)Gal(b1-4)[Fuc(a1-3)]GlcNAc(b1-6)]GalNAc(?1-"
+
+  plot <- draw_cartoon(structure)
+  annotation <- ggplot2::ggplot_build(plot)$data[[4]]
+  linkage_annotation <- annotation[annotation$label != '~"?"', ]
+  pair_distance <- stats::dist(linkage_annotation[, c("x", "y")])
+  branch_beta <- annotation[
+    annotation$label == "beta" & annotation$x > -1 & annotation$y > 0.5,
+  ]
+  branch_six <- annotation[annotation$label == "6", ]
+
+  expect_gt(min(pair_distance), 0.18)
+  expect_equal(nrow(branch_beta), 1)
+  if (nrow(branch_beta) == 1) {
+    expect_gt(branch_beta$y, 0.75)
+  }
+  expect_equal(nrow(branch_six), 1)
+  if (nrow(branch_six) == 1) {
+    expect_gt(branch_six$y, 0.3)
+  }
+})
+
 test_that("draw_cartoon works with reducing-end O-Fuc glycans", {
   glycans <- c(
     "Fuc(a1-",

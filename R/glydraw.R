@@ -69,6 +69,7 @@ draw_cartoon <- function(
     struc_annotation,
     reducing_info$annotation
   )
+  struc_annotation <- resolve_annotation_overlap(struc_annotation)
 
   if (is.null(highlight)) {
     struc_annotation$transparency <- 1
