@@ -104,6 +104,18 @@ test_that("reducing-end Fuc keeps the regular Fuc orientation", {
   expect_equal(unname(coor_cal(graph)[2, "x"]), 0)
 })
 
+test_that("draw_cartoon places a1-6 core Fuc up and a1-3 core Fuc down", {
+  structure <- "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-4)GlcNAc(b1-"
+
+  plot <- draw_cartoon(structure)
+  segments <- ggplot2::ggplot_build(plot)$data[[1]]
+  fuc_segments <- segments[segments$x == segments$xend, ]
+
+  expect_equal(nrow(fuc_segments), 2)
+  expect_gt(max(fuc_segments$yend), 0.5)
+  expect_lt(min(fuc_segments$yend), -0.5)
+})
+
 test_that("save_cartoon saves file correctly", {
   structure <- "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
   cartoon <- draw_cartoon(structure)
