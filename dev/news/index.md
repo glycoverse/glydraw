@@ -2,6 +2,10 @@
 
 ## glydraw (development version)
 
+### Minor improvements and bug fixes
+
+- Fix overlapping linkage annotations for some glycans. (#21)
+
 ## glydraw 0.4.1
 
 ### Minor improvements and bug fixes
