@@ -11,6 +11,29 @@ test_that("draw_cartoon works with valid branched glycan structure", {
   )
 })
 
+test_that("draw_cartoon uses ggplot2 fixed panel sizing", {
+  structure <- "Gal(b1-3)GalNAc(a1-"
+
+  plot <- draw_cartoon(structure)
+
+  expect_s3_class(plot, "glydraw_cartoon")
+  expect_false(inherits(plot, "ggview"))
+  expect_s3_class(plot$theme$panel.widths, "unit")
+  expect_s3_class(plot$theme$panel.heights, "unit")
+  expect_named(attr(plot, "glydraw_size_px"), c("width", "height"))
+})
+
+test_that("save_cartoon writes fixed-size image without ggview", {
+  structure <- "Gal(b1-3)GalNAc(a1-"
+  plot <- draw_cartoon(structure)
+  file <- tempfile(fileext = ".png")
+
+  save_cartoon(plot, file)
+
+  expect_true(file.exists(file))
+  expect_gt(file.info(file)$size, 0)
+})
+
 test_that("draw_cartoon works with vertical orientation", {
   structure <- "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
 

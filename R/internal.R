@@ -1410,6 +1410,23 @@ create_polygon_coor <- function(gly_list, point_size) {
     )
 }
 
+#' Apply fixed ggplot2 panel size
+#'
+#' @param plot A ggplot2 object.
+#' @param panel_size_px A named list or vector with `width` and `height` panel
+#'   size in pixels.
+#' @param dpi Dots per inch used to convert pixels to physical panel units.
+#'
+#' @return A ggplot2 object with fixed panel width and height.
+#' @noRd
+.apply_fixed_panel_size <- function(plot, panel_size_px, dpi) {
+  plot +
+    ggplot2::theme(
+      panel.widths = grid::unit(panel_size_px[["width"]] / dpi, "in"),
+      panel.heights = grid::unit(panel_size_px[["height"]] / dpi, "in")
+    )
+}
+
 .ensure_highlight_para <- function(x, gly_vertices) {
   if (!is.numeric(x) && !is.null(x)) {
     cli::cli_abort("highlight parameter {.emph {x}} must be numeric")
