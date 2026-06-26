@@ -157,6 +157,31 @@ draw_cartoon <- function(
   structure(gly_graph, class = c("glydraw_cartoon", class(gly_graph)))
 }
 
+#' Print glycan cartoon
+#'
+#' @param x A ggplot2 object returned by [draw_cartoon()].
+#' @param newpage Draw the plot on a new page.
+#' @param vp A grid viewport object or viewport name.
+#' @param ... Additional arguments passed to ggplot2's print method.
+#'
+#' @return The original glycan cartoon, invisibly.
+#' @export
+print.glydraw_cartoon <- function(
+  x,
+  newpage = is.null(vp),
+  vp = NULL,
+  ...
+) {
+  raster <- .render_cartoon_raster(x)
+  .draw_cartoon_raster(
+    raster,
+    size_px = attr(x, "glydraw_size_px"),
+    newpage = newpage,
+    vp = vp
+  )
+  invisible(x)
+}
+
 #' Save fixed-size glycan cartoon image to local device.
 #'
 #' In theory, you can just use `ggplot2::ggsave()` to save the cartoons plotted by [draw_cartoon()].

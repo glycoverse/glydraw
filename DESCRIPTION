@@ -23,6 +23,7 @@ Imports:
     ggplot2 (>= 4.0.0),
     igraph,
     purrr,
+    png,
     glyparse,
     cli,
     checkmate,
