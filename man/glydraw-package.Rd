@@ -18,7 +18,12 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Xisong Feng \email{1225774778@qq.com} (\href{https://orcid.org/0009-0000-4057-1295}{ORCID})
+\strong{Maintainer}: Bin Fu \email{23110220018@m.fudan.edu.cn} (\href{https://orcid.org/0000-0001-8567-2997}{ORCID}) [copyright holder]
+
+Authors:
+\itemize{
+  \item Xisong Feng \email{1225774778@qq.com} (\href{https://orcid.org/0009-0000-4057-1295}{ORCID})
+}
 
 }
 \keyword{internal}
