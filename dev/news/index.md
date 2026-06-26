@@ -9,6 +9,8 @@
 - Orient reducing end annotation line vertically when `orient = "V"`.
   (#24)
 - Refine branch spacing for some glycans. (#26)
+- Use native ggplot2 theme to manage cartoon size, so `ggview` is no
+  longer dependent. (#27)
 
 ## glydraw 0.4.1
 
