@@ -418,6 +418,57 @@ fuc_offset <- function(structure, fuc_pos) {
   return(offset)
 }
 
+#' Check whether an ancestor branch needs extra spacing.
+#'
+#' @param structure an igraph object
+#' @param ver the descendant branch vertex being processed
+#' @param ancestor an ancestor branch vertex
+#' @param neighbor_pos child vertices of `ancestor`
+#'
+#' @returns A logical scalar.
+#' @noRd
+has_deep_sibling_branch <- function(
+  structure,
+  ver,
+  ancestor,
+  neighbor_pos
+) {
+  path <- igraph::shortest_paths(
+    structure,
+    ancestor,
+    ver,
+    mode = "out"
+  )$vpath[[1]]
+  path <- as.integer(path)
+  if (length(path) < 2) {
+    return(TRUE)
+  }
+
+  path_child <- path[2]
+  sibling_pos <- setdiff(as.integer(neighbor_pos), path_child)
+  if (length(sibling_pos) == 0) {
+    return(TRUE)
+  }
+
+  branch_child_pos <- as.integer(igraph::neighbors(
+    structure,
+    ver,
+    mode = "out"
+  ))
+  if (length(branch_child_pos) == 0) {
+    return(FALSE)
+  }
+
+  depth <- igraph::distances(structure)[length(structure), ]
+  path_depth <- max(depth[branch_child_pos])
+  sibling_depth <- purrr::map_dbl(
+    sibling_pos,
+    ~ max(depth[chil_coor(structure, .x)])
+  )
+
+  any(sibling_depth >= path_depth)
+}
+
 #' Sorting the linkage locations of neighbor vertices
 #'
 #' @param structure an igraph object
@@ -517,22 +568,24 @@ process_multiple_branches <- function(coor, structure, ver) {
     if (length(arrange_neigh_pos) == 2) {
       # Different number of ver's neighbor leads to different offset rule.
       # (3-num_neigh) means when the number of ver's neighbor=3, value=0; 2->1.
-      coor <- offset_chil_coor(
-        structure,
-        arrange_neigh_pos[1],
-        coor,
-        1 /
-          (2**(num - j + (3 - num_neigh))) +
-          0.25 * mid_pos(structure, coor, ver, pos) * (pos != pos_max)
-      )
-      coor <- offset_chil_coor(
-        structure,
-        arrange_neigh_pos[2],
-        coor,
-        -1 /
-          (2**(num - j + (3 - num_neigh))) -
-          0.25 * mid_pos(structure, coor, ver, pos) * (pos != pos_max)
-      )
+      if (has_deep_sibling_branch(structure, ver, pos, arrange_neigh_pos)) {
+        coor <- offset_chil_coor(
+          structure,
+          arrange_neigh_pos[1],
+          coor,
+          1 /
+            (2**(num - j + (3 - num_neigh))) +
+            0.25 * mid_pos(structure, coor, ver, pos) * (pos != pos_max)
+        )
+        coor <- offset_chil_coor(
+          structure,
+          arrange_neigh_pos[2],
+          coor,
+          -1 /
+            (2**(num - j + (3 - num_neigh))) -
+            0.25 * mid_pos(structure, coor, ver, pos) * (pos != pos_max)
+        )
+      }
     } else if (length(arrange_neigh_pos) == 3 && chil_in_middle) {
       # For neighbors=3 vertex, the offset should not be consistent.
       # Only offset the neighbor vertex included in the path along the specified vertex to start vertex.
