@@ -146,16 +146,40 @@ draw_cartoon <- function(
         vjust = 0.5
       )
   }
-  gly_graph <- .apply_border(gly_graph, 50 / 300 * 72)
-  size <- .decide_size(gly_graph, border_px = 50)
-  gly_graph <- gly_graph +
-    ggview::canvas(
-      width = size$width,
-      height = size$height,
-      units = "px",
-      dpi = 300
-    )
+  dpi <- 300
+  border_px <- 50
+  gly_graph <- .apply_border(gly_graph, border_px / dpi * 72)
+  panel_size <- .decide_size(gly_graph, border_px = 0)
+  size <- .decide_size(gly_graph, border_px = border_px)
+  gly_graph <- .apply_fixed_panel_size(gly_graph, panel_size, dpi = dpi)
+  attr(gly_graph, "glydraw_panel_size_px") <- unlist(panel_size)
+  attr(gly_graph, "glydraw_size_px") <- unlist(size)
   structure(gly_graph, class = c("glydraw_cartoon", class(gly_graph)))
+}
+
+#' Print glycan cartoon
+#'
+#' @param x A ggplot2 object returned by [draw_cartoon()].
+#' @param newpage Draw the plot on a new page.
+#' @param vp A grid viewport object or viewport name.
+#' @param ... Additional arguments passed to ggplot2's print method.
+#'
+#' @return The original glycan cartoon, invisibly.
+#' @export
+print.glydraw_cartoon <- function(
+  x,
+  newpage = is.null(vp),
+  vp = NULL,
+  ...
+) {
+  raster <- .render_cartoon_raster(x)
+  .draw_cartoon_raster(
+    raster,
+    size_px = attr(x, "glydraw_size_px"),
+    newpage = newpage,
+    vp = vp
+  )
+  invisible(x)
 }
 
 #' Save fixed-size glycan cartoon image to local device.
@@ -185,10 +209,27 @@ save_cartoon <- function(cartoon, file, dpi = 300) {
     "white",
     "transparent"
   )
-  ggview::save_ggplot(
-    file = file,
+  size <- attr(cartoon, "glydraw_size_px")
+  panel_size <- attr(cartoon, "glydraw_panel_size_px")
+  checkmate::assert_numeric(size, names = "strict", any.missing = FALSE)
+  checkmate::assert_names(names(size), identical.to = c("width", "height"))
+  checkmate::assert_numeric(panel_size, names = "strict", any.missing = FALSE)
+  checkmate::assert_names(
+    names(panel_size),
+    identical.to = c("width", "height")
+  )
+  border_px <- (size - panel_size) / 2
+  cartoon <- cartoon |>
+    .apply_border(border_px[["width"]] / dpi * 72) |>
+    .apply_fixed_panel_size(panel_size, dpi = dpi) |>
+    .strip_glydraw_class()
+
+  ggplot2::ggsave(
+    filename = file,
     plot = cartoon,
-    units = 'px',
+    width = size[["width"]],
+    height = size[["height"]],
+    units = "px",
     dpi = dpi,
     bg = bg_color
   )

@@ -11,6 +11,58 @@ test_that("draw_cartoon works with valid branched glycan structure", {
   )
 })
 
+test_that("draw_cartoon uses ggplot2 fixed panel sizing", {
+  structure <- "Gal(b1-3)GalNAc(a1-"
+
+  plot <- draw_cartoon(structure)
+
+  expect_s3_class(plot, "glydraw_cartoon")
+  expect_false(inherits(plot, "ggview"))
+  expect_s3_class(plot$theme$panel.widths, "unit")
+  expect_s3_class(plot$theme$panel.heights, "unit")
+  expect_named(attr(plot, "glydraw_size_px"), c("width", "height"))
+})
+
+test_that("print.glydraw_cartoon rasterizes fixed-size cartoon for display", {
+  structure <- paste0(
+    "Gal(b1-4)GlcNAc(b1-2)[Gal(b1-4)GlcNAc(b1-4)]Man(a1-3)",
+    "[Gal(b1-4)GlcNAc(b1-2)[Gal(b1-4)GlcNAc(b1-4)]",
+    "[Gal(b1-4)GlcNAc(b1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)",
+    "[Fuc(a1-6)]GlcNAc(b1-"
+  )
+  plot <- draw_cartoon(structure)
+  rplots <- "Rplots.pdf"
+  unlink(rplots)
+  on.exit(unlink(rplots), add = TRUE)
+  original_width <- as.numeric(plot$theme$panel.widths)
+  size <- attr(plot, "glydraw_size_px")
+  raster <- .render_cartoon_raster(plot)
+  file <- tempfile(fileext = ".png")
+
+  expect_s3_class(raster, "nativeRaster")
+  expect_equal(ncol(raster), size[["width"]], tolerance = 1)
+  expect_equal(nrow(raster), size[["height"]], tolerance = 1)
+
+  grDevices::png(file, width = 4, height = 3, units = "in", res = 300)
+  on.exit(grDevices::dev.off())
+  printed_plot <- print(plot)
+
+  expect_identical(printed_plot, plot)
+  expect_equal(as.numeric(plot$theme$panel.widths), original_width)
+  expect_false(file.exists(rplots))
+})
+
+test_that("save_cartoon writes fixed-size image without ggview", {
+  structure <- "Gal(b1-3)GalNAc(a1-"
+  plot <- draw_cartoon(structure)
+  file <- tempfile(fileext = ".png")
+
+  save_cartoon(plot, file)
+
+  expect_true(file.exists(file))
+  expect_gt(file.info(file)$size, 0)
+})
+
 test_that("draw_cartoon works with vertical orientation", {
   structure <- "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
 
