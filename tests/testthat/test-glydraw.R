@@ -136,6 +136,26 @@ test_that("draw_cartoon places a1-6 core Fuc up and a1-3 core Fuc down", {
   expect_lt(min(fuc_segments$yend), -0.5)
 })
 
+test_that("draw_cartoon keeps elongated Fuc branches together", {
+  structure <- .ensure_one_structure(
+    paste0(
+      "WURCS=2.0/6,7,6/",
+      "[a2122h-1a_1-5_2*NCC/3=O][a1221m-1a_1-5]",
+      "[a2122h-1b_1-5_2*NCC/3=O][a2112h-1b_1-5]",
+      "[a1122h-1b_1-5][a1122h-1a_1-5]/",
+      "1-2-3-2-4-5-6/",
+      "a3-b1_a4-c1_c3-d1_c4-f1_d4-e1_f3-g1"
+    )
+  )
+  graph <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
+  coor <- coor_cal(graph)
+
+  expect_equal(igraph::V(graph)$mono[c(1, 2, 3)], c("Gal", "Fuc", "Man"))
+  expect_equal(unname(coor[1, "x"]), unname(coor[2, "x"]))
+  expect_lt(unname(coor[1, "y"]), unname(coor[2, "y"]))
+  expect_false(identical(unname(coor[1, ]), unname(coor[3, ])))
+})
+
 test_that("save_cartoon saves file correctly", {
   structure <- "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
   cartoon <- draw_cartoon(structure)
