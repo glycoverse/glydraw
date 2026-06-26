@@ -31,11 +31,10 @@ test_that("print.glydraw_cartoon rasterizes fixed-size cartoon for display", {
     "[Fuc(a1-6)]GlcNAc(b1-"
   )
   plot <- draw_cartoon(structure)
-  original_width <- grid::convertWidth(
-    plot$theme$panel.widths,
-    "in",
-    valueOnly = TRUE
-  )
+  rplots <- "Rplots.pdf"
+  unlink(rplots)
+  on.exit(unlink(rplots), add = TRUE)
+  original_width <- as.numeric(plot$theme$panel.widths)
   size <- attr(plot, "glydraw_size_px")
   raster <- .render_cartoon_raster(plot)
   file <- tempfile(fileext = ".png")
@@ -49,10 +48,8 @@ test_that("print.glydraw_cartoon rasterizes fixed-size cartoon for display", {
   printed_plot <- print(plot)
 
   expect_identical(printed_plot, plot)
-  expect_equal(
-    grid::convertWidth(plot$theme$panel.widths, "in", valueOnly = TRUE),
-    original_width
-  )
+  expect_equal(as.numeric(plot$theme$panel.widths), original_width)
+  expect_false(file.exists(rplots))
 })
 
 test_that("save_cartoon writes fixed-size image without ggview", {
