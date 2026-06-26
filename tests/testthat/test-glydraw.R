@@ -156,6 +156,71 @@ test_that("draw_cartoon keeps elongated Fuc branches together", {
   expect_false(identical(unname(coor[1, ]), unname(coor[3, ])))
 })
 
+test_that("draw_cartoon avoids widening nested branches next to leaf siblings", {
+  short_structure <- .ensure_one_structure(
+    "Man(a1-3)[Man(a1-6)]Man(a1-6)[Man(a1-3)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
+  )
+  short_graph <- glyrepr::get_structure_graphs(
+    short_structure,
+    return_list = FALSE
+  )
+  short_coor <- coor_cal(short_graph)
+
+  terminal_distance <- abs(short_coor[1, "y"] - short_coor[2, "y"])
+  branch_distance <- abs(short_coor[3, "y"] - short_coor[4, "y"])
+  expect_equal(branch_distance, terminal_distance)
+
+  elongated_structure <- .ensure_one_structure(
+    "Man(a1-3)[Man(a1-6)]Man(a1-6)[Man(a1-2)Man(a1-3)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
+  )
+  elongated_graph <- glyrepr::get_structure_graphs(
+    elongated_structure,
+    return_list = FALSE
+  )
+  elongated_coor <- coor_cal(elongated_graph)
+  outer_man <- which(
+    igraph::V(elongated_graph)$mono == "Man" &
+      elongated_coor[, "x"] == min(elongated_coor[, "x"])
+  )
+  outer_y <- sort(elongated_coor[outer_man, "y"])
+
+  expect_equal(diff(outer_y), rep(1, 2))
+})
+
+test_that("draw_cartoon keeps elongated and leaf sibling branches evenly spaced", {
+  structure <- .ensure_one_structure(
+    "Neu5Ac(a2-3)Gal(b1-3)[Gal(b1-3)GlcNAc(b1-3)[Gal(b1-4)GlcNAc(b1-6)]Gal(b1-4)GlcNAc(b1-6)]GalNAc(a1-"
+  )
+  graph <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
+  coor <- coor_cal(graph)
+  same_depth <- which(coor[, "x"] == -2)
+  neu5ac <- same_depth[igraph::V(graph)$mono[same_depth] == "Neu5Ac"]
+  rightmost_gal <- same_depth[igraph::V(graph)$mono[same_depth] == "Gal"]
+
+  expect_equal(length(neu5ac), 1)
+  expect_equal(length(rightmost_gal), 1)
+  expect_equal(
+    unname(abs(coor[neu5ac, "y"] - coor[rightmost_gal, "y"])),
+    1
+  )
+})
+
+test_that("draw_cartoon keeps same-depth Man sibling branches evenly spaced", {
+  structure <- .ensure_one_structure(
+    "Man(a1-2)Man(a1-3)[Man(a1-3)[Man(a1-2)Man(a1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
+  )
+  graph <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
+  coor <- coor_cal(graph)
+  same_depth_man <- which(
+    igraph::V(graph)$mono == "Man" &
+      coor[, "x"] == -4
+  )
+  same_depth_y <- sort(coor[same_depth_man, "y"])
+
+  expect_equal(length(same_depth_man), 3)
+  expect_equal(diff(same_depth_y), rep(1, 2))
+})
+
 test_that("save_cartoon saves file correctly", {
   structure <- "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
   cartoon <- draw_cartoon(structure)
