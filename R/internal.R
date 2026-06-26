@@ -201,7 +201,7 @@ coor_initialization <- function(structure) {
     if (
       igraph::V(structure)[[i]]$mono == 'Fuc' && !.is_reducing_end(structure, i)
     ) {
-      coor[i, 'x'] <- coor[i, 'x'] + 1
+      coor <- offset_chil_axis(structure, i, coor, "x", 1)
     }
   }
   return(coor)
@@ -244,9 +244,53 @@ chil_coor <- function(structure, ver) {
 #' @examples offset_chil_coor(structure, 3, coor, 0.5)
 #' @noRd
 offset_chil_coor <- function(structure, ver, coor, offset) {
+  offset_chil_axis(structure, ver, coor, "y", offset)
+}
+
+#' Offset one coordinate axis for a vertex subtree.
+#'
+#' @param structure an igraph object
+#' @param ver an integer vertex index
+#' @param coor a coordinate matrix
+#' @param axis coordinate axis to offset
+#' @param offset a numeric offset
+#'
+#' @returns offset coordinate matrix
+#' @noRd
+offset_chil_axis <- function(structure, ver, coor, axis, offset) {
   vers <- chil_coor(structure, ver)
-  coor[vers, 'y'] <- coor[vers, 'y'] + offset
+  coor[vers, axis] <- coor[vers, axis] + offset
   return(coor)
+}
+
+#' Rotate a Fuc subtree into the Fuc branch direction.
+#'
+#' @param structure an igraph object
+#' @param fuc_pos an integer Fuc vertex index
+#' @param coor a coordinate matrix
+#' @param branch_offset a numeric vertical offset for the Fuc branch
+#'
+#' @returns coordinate matrix with the Fuc descendants rotated
+#' @noRd
+orient_fucose_subtree <- function(structure, fuc_pos, coor, branch_offset) {
+  direction <- sign(branch_offset)
+  if (!is.finite(direction) || direction == 0) {
+    return(coor)
+  }
+
+  descendants <- setdiff(as.integer(chil_coor(structure, fuc_pos)), fuc_pos)
+  if (length(descendants) == 0) {
+    return(coor)
+  }
+
+  fuc_x <- coor[fuc_pos, 'x']
+  fuc_y <- coor[fuc_pos, 'y']
+  relative_x <- coor[descendants, 'x'] - fuc_x
+  relative_y <- coor[descendants, 'y'] - fuc_y
+
+  coor[descendants, 'x'] <- fuc_x + relative_y
+  coor[descendants, 'y'] <- fuc_y - relative_x * direction
+  coor
 }
 
 #' Title Calculate the Amount and Sequence Number of Vertices that Out-degree >= 2 along the Path
@@ -625,7 +669,15 @@ coor_cal <- function(structure) {
       neigh_pos <- igraph::neighbors(structure, i)
       fuc_pos <- neigh_pos[which(neigh_pos$mono == 'Fuc')]
       fuc_list <- c(fuc_list, fuc_pos)
-      coor[fuc_pos, 'y'] <- coor[fuc_pos, 'y'] + fuc_offset(structure, fuc_pos)
+      coor <- purrr::reduce2(
+        as.integer(fuc_pos),
+        fuc_offset(structure, fuc_pos),
+        function(coor_acc, fuc_vertex, offset) {
+          coor_acc <- offset_chil_coor(structure, fuc_vertex, coor_acc, offset)
+          orient_fucose_subtree(structure, fuc_vertex, coor_acc, offset)
+        },
+        .init = coor
+      )
     }
   }
   temp_coor <- coor
