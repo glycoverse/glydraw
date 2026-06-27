@@ -293,114 +293,6 @@ orient_fucose_subtree <- function(structure, fuc_pos, coor, branch_offset) {
   coor
 }
 
-#' Title Calculate the Amount and Sequence Number of Vertices that Out-degree >= 2 along the Path
-#'
-#' @param structure an igraph integer
-#' @param ver the Sequence Number of Vertices
-#'
-#' @returns the number of vertices which neighbors >=2 on the path between vertex and begin vertex
-#'
-#' @examples out_degree(structure, 1)
-#' @noRd
-out_degree <- function(structure, ver) {
-  path_vertex <- igraph::shortest_paths(
-    structure,
-    length(structure),
-    ver
-  )$vpath[[1]]
-  num <- 0
-  pos <- c()
-  for (i in path_vertex) {
-    if (
-      length(igraph::neighbors(structure, i)) >= 2 &&
-        !('Fuc' %in% igraph::neighbors(structure, i)$mono)
-    ) {
-      num <- num + 1
-      pos <- c(pos, i)
-    }
-  }
-  return(c(num, pos))
-}
-
-#' Title Judge whether the Vertex is in the Middle Position of Sub-module
-#'
-#' @param structure an igraph object
-#' @param coor a matrix
-#' @param ver an integer
-#' @param par_ver an integer
-#'
-#' @returns bool
-#'
-#' @examples mid_pos(structure, coor, 1, 3)
-#' @noRd
-mid_pos <- function(structure, coor, ver, par_ver) {
-  pos_mid <- FALSE
-  vers <- chil_coor(structure, par_ver)
-  col_vers <- vers[which(coor[vers, 'x'] == coor[ver, 'x'])]
-  ver_y <- coor[ver, 'y']
-  col_y <- sort(coor[col_vers, 'y'])
-  if (ver_y != min(col_y) && ver_y != max(col_y)) {
-    pos_mid <- TRUE
-  }
-  return(pos_mid)
-}
-
-#' Title Judge whether the 'Fucose' Vertex is in the Middle Position of Sub-module
-#'
-#' @param structure an igraph object
-#' @param coor a matrix
-#' @param ver an integer
-#' @param par_ver an integer
-#'
-#' @returns bool
-#'
-#' @examples fuc_mid_pos(structure, coor, 1, 3)
-#' @noRd
-fuc_mid_pos <- function(structure, coor, ver, par_ver) {
-  vers <- chil_coor(structure, par_ver)
-  col_vers <- vers[which(coor[vers, 'x'] == coor[ver, 'x'])]
-  ver_y <- coor[ver, 'y']
-  col_y <- sort(coor[col_vers, 'y'])
-  ver_index <- which(col_y == ver_y)
-  lag_diff <- abs(col_y - dplyr::lag(col_y)) < 1
-  lead_diff <- abs(col_y - dplyr::lead(col_y)) < 1
-  result <- lag_diff & lead_diff
-  result[is.na(result)] <- FALSE
-  return(result[ver_index])
-}
-
-#' Title Calculate the Amount and Sequence Number of Vertices that Out-degree >= 2 from Specified 'Fucose' vertex along the Path
-#'
-#' @param structure an igraph object
-#' @param ver an integer
-#' @param coor a matrix
-#'
-#' @returns the Amount and Sequence Number of vertices that Out-degree >= 2
-#'
-#' @examples fuc_out_degree(structure, 6, coor)
-#' @noRd
-fuc_out_degree <- function(structure, ver, coor) {
-  path_vertex <- igraph::shortest_paths(
-    structure,
-    length(structure),
-    ver
-  )$vpath[[1]]
-  num <- 0
-  pos <- c()
-  for (i in path_vertex) {
-    if (
-      length(igraph::neighbors(structure, i)) %in%
-        c(2, 3) &&
-        !('Fuc' %in% igraph::neighbors(structure, i)$mono) &&
-        fuc_mid_pos(structure, coor, ver, i)
-    ) {
-      num <- num + 1
-      pos <- c(pos, i)
-    }
-  }
-  return(c(num, pos))
-}
-
 #' Title Process the y-Coordinate of 'Fucose' Vertices
 #'
 #' @param structure an igraph object
@@ -413,8 +305,8 @@ fuc_out_degree <- function(structure, ver, coor) {
 fuc_offset <- function(structure, fuc_pos) {
   linkage_str <- igraph::E(structure)[fuc_pos]$linkage
   linkage_pos <- purrr::map_chr(strsplit(linkage_str, '-'), 2)
-  offset <- rep(0.99, length(linkage_pos))
-  offset[linkage_pos %in% c('2', '3')] <- -0.99
+  offset <- rep(1, length(linkage_pos))
+  offset[linkage_pos %in% c('2', '3')] <- -1
   return(offset)
 }
 
@@ -444,120 +336,6 @@ fuc_offset <- function(structure, fuc_pos) {
   }
 }
 
-#' Title Process the Vertices which Out-degree >=2 along the Path
-#'
-#' @param coor a matrix
-#' @param structure an igraph object
-#' @param fuc_pos an integer
-#' @param temp_coor a matrix
-#'
-#' @returns Processed Coordinate
-#'
-#' @examples process_fucose_branches(coor, structure, 2, temp_coor)
-#' @noRd
-process_fucose_branches <- function(coor, structure, fuc_pos, temp_coor) {
-  num <- fuc_out_degree(structure, fuc_pos, temp_coor)[1]
-  for (i in seq(1, num)) {
-    par_pos <- fuc_out_degree(structure, fuc_pos, temp_coor)[i + 1]
-    arrange_neigh_pos <- .neigh_pos_order(structure, par_pos)
-
-    if (length(arrange_neigh_pos) == 2) {
-      coor <- offset_chil_coor(
-        structure,
-        arrange_neigh_pos[1],
-        coor,
-        1 / (2**(num - i + 1))
-      )
-      coor <- offset_chil_coor(
-        structure,
-        arrange_neigh_pos[2],
-        coor,
-        -1 / (2**(num - i + 1))
-      )
-    } else if (length(arrange_neigh_pos) == 3) {
-      coor <- offset_chil_coor(
-        structure,
-        arrange_neigh_pos[1],
-        coor,
-        1 / (2**(num - i + 1))
-      )
-      coor <- offset_chil_coor(
-        structure,
-        arrange_neigh_pos[3],
-        coor,
-        -1 / (2**(num - i + 1))
-      )
-    }
-  }
-  return(coor)
-}
-
-#' Title Process the Vertices which Out-degree >=2 and more than 2 Father Vertices that Out-degree >= 2 along the Path
-#'
-#' @param coor a matrix
-#' @param structure an igraph object
-#' @param ver an integer
-#'
-#' @returns Processed coordinate
-#'
-#' @examples process_multiple_branches(coor, structure, 3)
-#' @noRd
-process_multiple_branches <- function(coor, structure, ver) {
-  num <- out_degree(structure, ver)[1] # Numbers of vertices which out-degree > 1 (e.g. branch vertices)
-  for (j in seq(1, num - 1)) {
-    # Traverse all branch vertices except for self
-    pos <- out_degree(structure, ver)[j + 1]
-    pos_max <- out_degree(structure, ver)[num] # Position of branch vertices with second largest index
-    arrange_neigh_pos <- .neigh_pos_order(structure, pos)
-    # Judge whether child vertex is in the middle
-    ver_neigh_pos <- igraph::neighbors(structure, ver)
-    num_neigh <- length(ver_neigh_pos)
-    chil_in_middle <- mid_pos(structure, coor, min(ver_neigh_pos), pos) |
-      mid_pos(structure, coor, max(ver_neigh_pos), pos)
-    if (length(arrange_neigh_pos) == 2) {
-      # Different number of ver's neighbor leads to different offset rule.
-      # (3-num_neigh) means when the number of ver's neighbor=3, value=0; 2->1.
-      coor <- offset_chil_coor(
-        structure,
-        arrange_neigh_pos[1],
-        coor,
-        1 /
-          (2**(num - j + (3 - num_neigh))) +
-          0.25 * mid_pos(structure, coor, ver, pos) * (pos != pos_max)
-      )
-      coor <- offset_chil_coor(
-        structure,
-        arrange_neigh_pos[2],
-        coor,
-        -1 /
-          (2**(num - j + (3 - num_neigh))) -
-          0.25 * mid_pos(structure, coor, ver, pos) * (pos != pos_max)
-      )
-    } else if (length(arrange_neigh_pos) == 3 && chil_in_middle) {
-      # For neighbors=3 vertex, the offset should not be consistent.
-      # Only offset the neighbor vertex included in the path along the specified vertex to start vertex.
-      path_vertex <- igraph::shortest_paths(
-        structure,
-        length(structure),
-        ver
-      )$vpath[[1]]
-      offset_index <- which(arrange_neigh_pos %in% path_vertex) # Index of the neighbor to be offset.
-      # (2-offset_index) means when offset_index=1, value=1; 2->0; 3->-1, adjusting offset direction.
-      # (2-num_neigh) means when the number of ver's neighbor=3, value=-1; 2->0.
-      coor <- offset_chil_coor(
-        structure,
-        arrange_neigh_pos[offset_index],
-        coor,
-        (2 - offset_index) *
-          (1 /
-            (2**(num - j + (2 - num_neigh))) +
-            0.25 * mid_pos(structure, coor, ver, pos) * (pos != pos_max))
-      )
-    }
-  }
-  return(coor)
-}
-
 #' Title Process the Vertices which Out-degree =2 along the Path
 #'
 #' @param coor a matrix
@@ -570,15 +348,8 @@ process_multiple_branches <- function(coor, structure, ver) {
 #' @noRd
 process_two_neighbors <- function(coor, structure, ver) {
   arrange_neigh_pos <- .neigh_pos_order(structure, ver)
-  if (out_degree(structure, ver)[1] == 1) {
-    coor <- offset_chil_coor(structure, arrange_neigh_pos[1], coor, 0.5)
-    coor <- offset_chil_coor(structure, arrange_neigh_pos[2], coor, -0.5)
-  } else if (out_degree(structure, ver)[1] >= 2) {
-    # More than 1 branch along the path
-    coor <- offset_chil_coor(structure, arrange_neigh_pos[1], coor, 0.5)
-    coor <- offset_chil_coor(structure, arrange_neigh_pos[2], coor, -0.5)
-    coor <- process_multiple_branches(coor, structure, ver)
-  }
+  coor <- offset_chil_coor(structure, arrange_neigh_pos[1], coor, 0.5)
+  coor <- offset_chil_coor(structure, arrange_neigh_pos[2], coor, -0.5)
   return(coor)
 }
 
@@ -594,15 +365,8 @@ process_two_neighbors <- function(coor, structure, ver) {
 #' @noRd
 process_three_neighbors <- function(coor, structure, ver) {
   arrange_neigh_pos <- .neigh_pos_order(structure, ver)
-  if (out_degree(structure, ver)[1] == 1) {
-    coor <- offset_chil_coor(structure, arrange_neigh_pos[1], coor, 1)
-    coor <- offset_chil_coor(structure, arrange_neigh_pos[3], coor, -1)
-  } else if (out_degree(structure, ver)[1] >= 2) {
-    # More than 1 branch along the path
-    coor <- offset_chil_coor(structure, arrange_neigh_pos[1], coor, 1)
-    coor <- offset_chil_coor(structure, arrange_neigh_pos[3], coor, -1)
-    coor <- process_multiple_branches(coor, structure, ver)
-  }
+  coor <- offset_chil_coor(structure, arrange_neigh_pos[1], coor, 1)
+  coor <- offset_chil_coor(structure, arrange_neigh_pos[3], coor, -1)
   return(coor)
 }
 
@@ -618,16 +382,8 @@ process_three_neighbors <- function(coor, structure, ver) {
 #' @noRd
 process_contain_fucose_neighbors <- function(coor, structure, ver) {
   arrange_other_neigh_pos <- .neigh_pos_order(structure, ver)
-  # Process other vertices coordinate
-  if (out_degree(structure, ver)[1] == 1) {
-    coor <- offset_chil_coor(structure, arrange_other_neigh_pos[1], coor, 0.5)
-    coor <- offset_chil_coor(structure, arrange_other_neigh_pos[2], coor, -0.5)
-  } else if (out_degree(structure, ver)[1] >= 2) {
-    # More than 1 branch along the path
-    coor <- offset_chil_coor(structure, arrange_other_neigh_pos[1], coor, 0.5)
-    coor <- offset_chil_coor(structure, arrange_other_neigh_pos[2], coor, -0.5)
-    coor <- process_multiple_branches(coor, structure, ver)
-  }
+  coor <- offset_chil_coor(structure, arrange_other_neigh_pos[1], coor, 0.5)
+  coor <- offset_chil_coor(structure, arrange_other_neigh_pos[2], coor, -0.5)
   return(coor)
 }
 
@@ -893,12 +649,10 @@ coor_cal <- function(structure) {
       coor <- process_contain_fucose_neighbors(coor, structure, i)
     }
   }
-  fuc_list <- c()
   for (i in structure_length) {
     if ('Fuc' %in% igraph::neighbors(structure, i)$mono) {
       neigh_pos <- igraph::neighbors(structure, i)
       fuc_pos <- neigh_pos[which(neigh_pos$mono == 'Fuc')]
-      fuc_list <- c(fuc_list, fuc_pos)
       coor <- purrr::reduce2(
         as.integer(fuc_pos),
         fuc_offset(structure, fuc_pos),
@@ -908,12 +662,6 @@ coor_cal <- function(structure) {
         },
         .init = coor
       )
-    }
-  }
-  temp_coor <- coor
-  for (i in fuc_list) {
-    if (fuc_out_degree(structure, i, temp_coor)[1] >= 1) {
-      coor <- process_fucose_branches(coor, structure, i, temp_coor)
     }
   }
   coor <- compact_coor(structure, coor)
@@ -959,7 +707,7 @@ connect_info <- function(structure, coor) {
 glycoform_info <- function(structure) {
   glycoform <- igraph::V(structure)$mono
   for (i in c(which(glycoform == 'Fuc'))) {
-    if (!.is_reducing_end(structure, i) && fuc_offset(structure, i) == '0.99') {
+    if (!.is_reducing_end(structure, i) && fuc_offset(structure, i) > 0) {
       glycoform[i] <- 'FucUp'
     }
   }
