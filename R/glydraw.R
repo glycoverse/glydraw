@@ -5,6 +5,9 @@
 #' @param show_linkage Show linkage annotation or not. Default is TRUE.
 #' @param orient The orientation of glycan structure. "H" for horizontal, "V" for vertical.
 #'   Default is "H"
+#' @param red_end Reducing-end annotation. The default `""` keeps the current
+#'   reducing-end line. Use `"~"` to add a wavy reducing end, or any other
+#'   string to draw that string at the reducing end.
 #' @param highlight An integer vector specifying the node indices to highlight.
 #'   This argument is applicable only when `structure` is a [glyrepr::glycan_structure()].
 #'   Note that for a [glyrepr::glycan_structure()], the node indices correspond exactly
@@ -22,8 +25,10 @@ draw_cartoon <- function(
   structure,
   show_linkage = TRUE,
   orient = c("H", "V"),
+  red_end = "",
   highlight = NULL
 ) {
+  checkmate::assert_string(red_end, na.ok = FALSE)
   if (!is.null(highlight) && !glyrepr::is_glycan_structure(structure)) {
     cli::cli_warn(
       "{.arg highlight} can only be set when {.arg structure} is a {.fn glyrepr::glycan_structure}."
@@ -64,7 +69,7 @@ draw_cartoon <- function(
     gly_annotation(structure, coor),
     substituent_annotation(structure, coor, orient)
   )
-  reducing_info <- reducing_end_annotation(structure, coor, orient)
+  reducing_info <- reducing_end_annotation(structure, coor, orient, red_end)
   struc_annotation <- dplyr::bind_rows(
     struc_annotation,
     reducing_info$annotation
@@ -144,6 +149,14 @@ draw_cartoon <- function(
         size = 6,
         hjust = 0.5,
         vjust = 0.5
+      )
+  }
+  if (nrow(reducing_info$wave) > 0) {
+    gly_graph <- gly_graph +
+      ggplot2::geom_path(
+        data = reducing_info$wave,
+        ggplot2::aes(x = .data$x, y = .data$y),
+        linewidth = 0.8
       )
   }
   dpi <- 300
@@ -266,7 +279,8 @@ export_cartoons <- function(
   file_ext = "png",
   dpi = 300,
   show_linkage = TRUE,
-  orient = c("H", "V")
+  orient = c("H", "V"),
+  red_end = ""
 ) {
   UseMethod("export_cartoons")
 }
@@ -278,7 +292,8 @@ export_cartoons.glyexp_experiment <- function(
   file_ext = "png",
   dpi = 300,
   show_linkage = TRUE,
-  orient = c("H", "V")
+  orient = c("H", "V"),
+  red_end = ""
 ) {
   if (glyexp::get_exp_type(x) != "glycoproteomics") {
     cli::cli_abort(c(
@@ -298,7 +313,8 @@ export_cartoons.glyexp_experiment <- function(
     file_ext = file_ext,
     dpi = dpi,
     show_linkage = show_linkage,
-    orient = orient
+    orient = orient,
+    red_end = red_end
   )
 }
 
@@ -309,7 +325,8 @@ export_cartoons.character <- function(
   file_ext = "png",
   dpi = 300,
   show_linkage = TRUE,
-  orient = c("H", "V")
+  orient = c("H", "V"),
+  red_end = ""
 ) {
   glycans <- unique(.ensure_structure(x))
   .export_cartoons(
@@ -318,7 +335,8 @@ export_cartoons.character <- function(
     file_ext = file_ext,
     dpi = dpi,
     show_linkage = show_linkage,
-    orient = orient
+    orient = orient,
+    red_end = red_end
   )
 }
 
@@ -329,7 +347,8 @@ export_cartoons.glyrepr_structure <- function(
   file_ext = "png",
   dpi = 300,
   show_linkage = TRUE,
-  orient = c("H", "V")
+  orient = c("H", "V"),
+  red_end = ""
 ) {
   glycans <- unique(x)
   .export_cartoons(
@@ -338,7 +357,8 @@ export_cartoons.glyrepr_structure <- function(
     file_ext = file_ext,
     dpi = dpi,
     show_linkage = show_linkage,
-    orient = orient
+    orient = orient,
+    red_end = red_end
   )
 }
 
@@ -348,7 +368,8 @@ export_cartoons.glyrepr_structure <- function(
   file_ext,
   dpi,
   show_linkage,
-  orient
+  orient,
+  red_end
 ) {
   cli::cli_alert_info("Exporting {.val {length(glycans)}} glycan cartoons.")
   fs::dir_create(dirname)
@@ -357,7 +378,8 @@ export_cartoons.glyrepr_structure <- function(
     glycan_list,
     draw_cartoon,
     show_linkage = show_linkage,
-    orient = orient
+    orient = orient,
+    red_end = red_end
   )
   filenames <- fs::path(
     dirname,

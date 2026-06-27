@@ -91,6 +91,37 @@ test_that("draw_cartoon orients reducing end annotation line by orientation", {
   expect_equal(v_reducing$yend, -0.6, tolerance = 1e-6)
 })
 
+test_that("draw_cartoon uses custom reducing-end text", {
+  structure <- "Gal(b1-3)GalNAc(a1-"
+
+  plot <- draw_cartoon(structure, red_end = "Ser/Thr")
+  text <- ggplot2::ggplot_build(plot)$data[[4]]
+  red_end <- text[text$label == '"Ser/Thr"', ]
+
+  expect_equal(nrow(red_end), 1)
+  expect_gt(red_end$x, 0.6)
+  expect_equal(red_end$y, 0, tolerance = 1e-6)
+})
+
+test_that("draw_cartoon adds a reducing-end wave for tilde", {
+  structure <- "Gal(b1-3)GalNAc(a1-"
+
+  plot <- draw_cartoon(structure, red_end = "~")
+  plot_build <- ggplot2::ggplot_build(plot)
+  wave <- plot_build$data[[5]]
+  text <- plot_build$data[[4]]
+
+  expect_true(all(c("x", "y") %in% names(wave)))
+  expect_gt(nrow(wave), 4)
+  expect_gt(max(wave$x), 0.6)
+  expect_lt(min(wave$x), max(wave$x))
+  expect_lt(min(wave$y), 0)
+  expect_gt(max(wave$y), 0)
+  expect_lt(diff(range(wave$y)), 0.35)
+  expect_lt(diff(range(wave$x)), 0.12)
+  expect_false(any(text$label == '"~"'))
+})
+
 test_that("draw_cartoon works with linkage hidden", {
   structure <- "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
 
