@@ -5,7 +5,7 @@
 * Fix overlapping linkage annotations for some glycans. (#21)
 * Fix overlapping a1-3 and a1-6 core Fucose residues. (#23)
 * Orient reducing end annotation line vertically when `orient = "V"`. (#24)
-* Refine branch spacing for some glycans. (#26)
+* Redesign the node coordination layout algorithm to fix inaccurate branch spacing for some glycans. (#26, #28)
 * Use native ggplot2 theme to manage cartoon size, so `ggview` is no longer dependent. (#27)
 
 # glydraw 0.4.1
