@@ -1313,7 +1313,7 @@ reducing_end_annotation <- function(
   root <- length(structure)
   root_coor <- c(x = as.numeric(coor[root, 1]), y = as.numeric(coor[root, 2]))
   line_length <- 0.6
-  label_offset <- 0.2
+  label_offset <- 0.1
   line_vec <- if (orient == "H") {
     c(x = line_length, y = 0)
   } else {
@@ -1387,7 +1387,7 @@ reducing_end_text_annotation <- function(red_end, line_end, line_vec, root) {
     ))
   }
   line_unit <- line_vec / sqrt(sum(line_vec^2))
-  text_offset <- 0.1
+  text_offset <- 0.02
   text_coor <- line_end + line_unit * text_offset
   data.frame(
     vertice = as.character(root),
@@ -1435,7 +1435,7 @@ reducing_end_wave <- function(red_end, line_end, line_vec) {
   line_unit <- line_vec / sqrt(sum(line_vec^2))
   wave_unit <- c(x = -line_unit["y"], y = line_unit["x"])
   wave_t <- seq(0, 1, length.out = 25)
-  wave_length <- 0.3
+  wave_length <- 0.45
   wave_amplitude <- 0.03
   wave_coor <- purrr::map_dfr(wave_t, function(t) {
     line_end +

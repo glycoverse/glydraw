@@ -120,7 +120,7 @@ test_that("draw_cartoon adds a reducing-end wave for tilde", {
   expect_lt(min(wave$x), max(wave$x))
   expect_lt(min(wave$y), 0)
   expect_gt(max(wave$y), 0)
-  expect_lt(diff(range(wave$y)), 0.35)
+  expect_lt(diff(range(wave$y)), 0.5)
   expect_lt(diff(range(wave$x)), 0.12)
   expect_false(any(text$label == '"~"'))
 })
