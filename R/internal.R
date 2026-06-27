@@ -1,15 +1,15 @@
 # glycan mapping
 glycan_color <- c(
   'glyWhite' = '#FFFFFF',
-  'glyBlue' = '#0385AE',
-  'glyGreen' = '#058F60',
-  'glyYellow' = '#FCC326',
-  'glyOrange' = '#EF6130',
-  'glyPink' = '#F39EA0',
-  'glyPurple' = '#A15989',
-  'glyLightBlue' = '#91D3E3',
-  'glyBrown' = '#9F6D55',
-  'glyRed' = '#C23537'
+  'glyBlue' = '#0072BC',
+  'glyGreen' = '#00A651',
+  'glyYellow' = '#FFD400',
+  'glyOrange' = '#F47920',
+  'glyPink' = '#F69EA1',
+  'glyPurple' = '#A54399',
+  'glyLightBlue' = '#8FCCE9',
+  'glyBrown' = '#A17A4D',
+  'glyRed' = '#ED1C24'
 )
 
 glycan_dict <- list(
