@@ -59,7 +59,7 @@ library(glydraw)
 draw_cartoon("Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-")
 ```
 
-![](reference/figures/README-unnamed-chunk-2-1.png)
+![](reference/figures/N-core.png)
 
 And call
 [`save_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/save_cartoon.md)
