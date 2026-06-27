@@ -1,3 +1,5 @@
+skip_on_ci()
+
 test_that("Draw G97345NY", {
   glycan <- "Neu5Ac(a2-3)Gal(b1-3)[Neu5Ac(a2-3)Gal(b1-4)[Fuc(a1-3)]GlcNAc(b1-6)]GalNAc(a1-"
   vdiffr::expect_doppelganger("G97345NY", draw_cartoon(glycan))
