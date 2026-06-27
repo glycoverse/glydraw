@@ -720,12 +720,21 @@ glycoform_info <- function(structure) {
 #' @param chil_glyy a float
 #' @param par_glyx a float
 #' @param par_glyy a float
+#' @param chil_offset annotation distance from the child residue center
+#' @param par_offset annotation distance from the parent residue center
 #'
 #' @returns coordinate list of annotations
 #'
 #' @examples annotation_coordinate(chil_glyx, chil_glyy, par_glyx, par_glyy)
 #' @noRd
-annotation_coordinate <- function(chil_glyx, chil_glyy, par_glyx, par_glyy) {
+annotation_coordinate <- function(
+  chil_glyx,
+  chil_glyy,
+  par_glyx,
+  par_glyy,
+  chil_offset = 0.4,
+  par_offset = 0.4
+) {
   chil_direction <- matrix(
     c(par_glyx - chil_glyx, par_glyy - chil_glyy),
     ncol = 1,
@@ -736,8 +745,10 @@ annotation_coordinate <- function(chil_glyx, chil_glyy, par_glyx, par_glyy) {
     ncol = 1,
     byrow = FALSE
   )
-  chil_location <- 0.4 * chil_direction / norm(chil_direction, type = '2')
-  par_location <- 0.4 * par_direction / norm(par_direction, type = '2')
+  chil_location <- chil_offset *
+    chil_direction /
+    norm(chil_direction, type = '2')
+  par_location <- par_offset * par_direction / norm(par_direction, type = '2')
   rotate_angle <- 1 / 10 * pi
   chil_rotate_matrix <- matrix(
     c(
@@ -763,6 +774,45 @@ annotation_coordinate <- function(chil_glyx, chil_glyy, par_glyx, par_glyy) {
   par_annot_loc <- par_rotate_matrix %*% par_location
   annot_loc <- list("chil" = chil_annot_loc, "par" = par_annot_loc)
   return(annot_loc)
+}
+
+#' Calculate linkage annotation distance from a residue center
+#'
+#' @param structure an igraph object
+#' @param anchor_ver an integer vertex index for the annotated residue
+#' @param anchor_x x coordinate of the annotated residue
+#' @param anchor_y y coordinate of the annotated residue
+#' @param other_x x coordinate of the linked residue
+#' @param other_y y coordinate of the linked residue
+#' @param role whether the annotation is on the child or parent residue
+#'
+#' @returns numeric annotation offset distance
+#' @noRd
+annotation_offset <- function(
+  structure,
+  anchor_ver,
+  anchor_x,
+  anchor_y,
+  other_x,
+  other_y,
+  role = c("child", "parent")
+) {
+  role <- rlang::arg_match(role)
+  base_offset <- 0.4
+  diagonal_hexnac_offset <- 0.45
+  mono <- igraph::V(structure)[[anchor_ver]]$mono
+  glycoform <- glycan_dict[[mono]][[1]]
+  needs_extra_offset <- if (role == "child") {
+    other_x > anchor_x && anchor_y > other_y
+  } else {
+    other_x < anchor_x && other_y < anchor_y
+  }
+
+  if (identical(glycoform, "HexNAc") && needs_extra_offset) {
+    return(diagonal_hexnac_offset)
+  }
+
+  base_offset
 }
 
 #' Title Map the glycan coordinate and annotation text
@@ -814,7 +864,25 @@ gly_annotation <- function(structure, coor) {
       coor[ver, 1],
       coor[ver, 2],
       coor[par_ver, 1],
-      coor[par_ver, 2]
+      coor[par_ver, 2],
+      chil_offset = annotation_offset(
+        structure,
+        ver,
+        coor[ver, 1],
+        coor[ver, 2],
+        coor[par_ver, 1],
+        coor[par_ver, 2],
+        role = "child"
+      ),
+      par_offset = annotation_offset(
+        structure,
+        par_ver,
+        coor[par_ver, 1],
+        coor[par_ver, 2],
+        coor[ver, 1],
+        coor[ver, 2],
+        role = "parent"
+      )
     )
     # Calculate annotation coordinate >> c(annotate_information, x, y)
     chil_annotation <- c(ver, strsplit(linkage_str, '-')[[1]][1])
