@@ -68,7 +68,7 @@ library(glydraw)
 draw_cartoon("Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-")
 ```
 
-<img src="man/figures/README-unnamed-chunk-2-1.png" alt="" width="100%" />
+<img src="man/figures/N-core.png" width="400" />
 
 And call `save_cartoon()` to save it to a file:
 
