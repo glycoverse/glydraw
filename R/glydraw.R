@@ -114,14 +114,14 @@ draw_cartoon <- function(
         yend = .data$end_y
       ),
       alpha = connect_df$transparency,
-      linewidth = 0.5
+      linewidth = 0.8
     ) +
     ggplot2::geom_polygon(
       data = polygon_coor, # Masking the segment with white color
       ggplot2::aes(x = .data$point_x, y = .data$point_y, group = .data$group),
       fill = "white",
       color = 'white',
-      linewidth = 0.5
+      linewidth = 0.8
     ) +
     ggplot2::geom_polygon(
       data = polygon_coor,
@@ -129,7 +129,7 @@ draw_cartoon <- function(
       alpha = polygon_coor$alpha,
       fill = filled_color,
       color = scales::alpha("black", polygon_coor$alpha),
-      linewidth = 0.5
+      linewidth = 0.8
     ) +
     ggplot2::coord_fixed(ratio = 1, clip = "off") +
     ggplot2::theme_void() +
