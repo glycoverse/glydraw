@@ -2,6 +2,12 @@
 
 ## glydraw (development version)
 
+### Minor improvements and bug fixes
+
+- Use SNFG standard colors. (8573759)
+- Minor aesthetic ajustments to line width and node size. (427e8d0,
+  4466f88)
+
 ## glydraw 0.5.0
 
 ### New features
