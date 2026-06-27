@@ -2,18 +2,20 @@
 
 ## Authors
 
-- **Xisong Feng**. Author, maintainer.
-  [](https://orcid.org/0009-0000-4057-1295)
+- **Bin Fu**. Author, maintainer, copyright holder.
+  [](https://orcid.org/0000-0001-8567-2997)
+
+- **Xisong Feng**. Author. [](https://orcid.org/0009-0000-4057-1295)
 
 ## Citation
 
-Feng X (2026). *glydraw: Draw beautiful SNFG cartoons*. R package
-version 0.4.1, <https://glycoverse.github.io/glydraw/>.
+Fu B, Feng X (2026). *glydraw: Draw beautiful SNFG cartoons*. R package
+version 0.5.0, <https://glycoverse.github.io/glydraw/>.
 
     @Manual{,
       title = {glydraw: Draw beautiful SNFG cartoons},
-      author = {Xisong Feng},
+      author = {Bin Fu and Xisong Feng},
       year = {2026},
-      note = {R package version 0.4.1},
+      note = {R package version 0.5.0},
       url = {https://glycoverse.github.io/glydraw/},
     }
