@@ -418,57 +418,6 @@ fuc_offset <- function(structure, fuc_pos) {
   return(offset)
 }
 
-#' Check whether an ancestor branch needs extra spacing.
-#'
-#' @param structure an igraph object
-#' @param ver the descendant branch vertex being processed
-#' @param ancestor an ancestor branch vertex
-#' @param neighbor_pos child vertices of `ancestor`
-#'
-#' @returns A logical scalar.
-#' @noRd
-has_deep_sibling_branch <- function(
-  structure,
-  ver,
-  ancestor,
-  neighbor_pos
-) {
-  path <- igraph::shortest_paths(
-    structure,
-    ancestor,
-    ver,
-    mode = "out"
-  )$vpath[[1]]
-  path <- as.integer(path)
-  if (length(path) < 2) {
-    return(TRUE)
-  }
-
-  path_child <- path[2]
-  sibling_pos <- setdiff(as.integer(neighbor_pos), path_child)
-  if (length(sibling_pos) == 0) {
-    return(TRUE)
-  }
-
-  branch_child_pos <- as.integer(igraph::neighbors(
-    structure,
-    ver,
-    mode = "out"
-  ))
-  if (length(branch_child_pos) == 0) {
-    return(FALSE)
-  }
-
-  depth <- igraph::distances(structure)[length(structure), ]
-  path_depth <- max(depth[branch_child_pos])
-  sibling_depth <- purrr::map_dbl(
-    sibling_pos,
-    ~ max(depth[chil_coor(structure, .x)])
-  )
-
-  any(sibling_depth >= path_depth)
-}
-
 #' Sorting the linkage locations of neighbor vertices
 #'
 #' @param structure an igraph object
@@ -568,24 +517,22 @@ process_multiple_branches <- function(coor, structure, ver) {
     if (length(arrange_neigh_pos) == 2) {
       # Different number of ver's neighbor leads to different offset rule.
       # (3-num_neigh) means when the number of ver's neighbor=3, value=0; 2->1.
-      if (has_deep_sibling_branch(structure, ver, pos, arrange_neigh_pos)) {
-        coor <- offset_chil_coor(
-          structure,
-          arrange_neigh_pos[1],
-          coor,
-          1 /
-            (2**(num - j + (3 - num_neigh))) +
-            0.25 * mid_pos(structure, coor, ver, pos) * (pos != pos_max)
-        )
-        coor <- offset_chil_coor(
-          structure,
-          arrange_neigh_pos[2],
-          coor,
-          -1 /
-            (2**(num - j + (3 - num_neigh))) -
-            0.25 * mid_pos(structure, coor, ver, pos) * (pos != pos_max)
-        )
-      }
+      coor <- offset_chil_coor(
+        structure,
+        arrange_neigh_pos[1],
+        coor,
+        1 /
+          (2**(num - j + (3 - num_neigh))) +
+          0.25 * mid_pos(structure, coor, ver, pos) * (pos != pos_max)
+      )
+      coor <- offset_chil_coor(
+        structure,
+        arrange_neigh_pos[2],
+        coor,
+        -1 /
+          (2**(num - j + (3 - num_neigh))) -
+          0.25 * mid_pos(structure, coor, ver, pos) * (pos != pos_max)
+      )
     } else if (length(arrange_neigh_pos) == 3 && chil_in_middle) {
       # For neighbors=3 vertex, the offset should not be consistent.
       # Only offset the neighbor vertex included in the path along the specified vertex to start vertex.
@@ -684,6 +631,236 @@ process_contain_fucose_neighbors <- function(coor, structure, ver) {
   return(coor)
 }
 
+#' Calculate the vertical gap needed between two subtree profiles.
+#'
+#' @param lower_profile a subtree profile data frame
+#' @param upper_profile a subtree profile data frame
+#' @param min_gap minimum vertical gap in a shared column
+#'
+#' @returns minimum shift needed to place `upper_profile` above `lower_profile`
+#' @noRd
+profile_gap <- function(lower_profile, upper_profile, min_gap = 1) {
+  lower_split <- split(lower_profile$y, lower_profile$x)
+  upper_split <- split(upper_profile$y, upper_profile$x)
+  shared_x <- intersect(names(lower_split), names(upper_split))
+  if (length(shared_x) == 0) {
+    return(0)
+  }
+
+  max(purrr::map_dbl(
+    shared_x,
+    \(x) max(lower_split[[x]]) + min_gap - min(upper_split[[x]])
+  ))
+}
+
+#' Shift a compact subtree layout vertically.
+#'
+#' @param layout a compact subtree layout
+#' @param offset vertical offset
+#'
+#' @returns shifted compact subtree layout
+#' @noRd
+shift_compact_layout <- function(layout, offset) {
+  layout$y <- layout$y + offset
+  layout$profile$y <- layout$profile$y + offset
+  layout
+}
+
+#' Pack child subtree layouts as tightly as possible.
+#'
+#' @param layouts ordered child subtree layouts
+#' @param min_gap minimum vertical gap in a shared column
+#'
+#' @returns numeric vector of vertical shifts
+#' @noRd
+pack_child_layouts <- function(layouts, min_gap = 1) {
+  layout_num <- length(layouts)
+  if (layout_num == 0) {
+    return(numeric(0))
+  }
+
+  shifts <- rep(0, layout_num)
+  for (i in seq_len(layout_num)) {
+    if (i == 1) {
+      next
+    }
+
+    shifts[i] <- max(purrr::map_dbl(
+      seq_len(i - 1),
+      \(j) {
+        shifts[j] +
+          profile_gap(
+            layouts[[j]]$profile,
+            layouts[[i]]$profile,
+            min_gap
+          )
+      }
+    ))
+  }
+
+  shifts - mean(range(shifts))
+}
+
+#' Infer whether a child subtree should sit below or above its parent.
+#'
+#' @param rough_offset rough child root offset from the parent
+#' @param shift compacted child root shift from the parent
+#' @param index child index in bottom-to-top order
+#' @param child_num number of children
+#'
+#' @returns -1 for below the parent, 1 for above the parent
+#' @noRd
+child_compaction_direction <- function(
+  rough_offset,
+  shift,
+  index,
+  child_num
+) {
+  direction <- sign(rough_offset)
+  if (!is.finite(direction) || direction == 0) {
+    direction <- sign(shift)
+  }
+  if (!is.finite(direction) || direction == 0) {
+    direction <- ifelse(index <= child_num / 2, -1, 1)
+  }
+  direction
+}
+
+#' Keep child subtrees away from their parent in a shared column.
+#'
+#' @param layouts ordered child subtree layouts
+#' @param shifts child layout shifts
+#' @param rough_offsets rough child root offsets from the parent
+#' @param parent_x parent x coordinate
+#' @param min_gap minimum vertical gap in a shared column
+#'
+#' @returns adjusted child layout shifts
+#' @noRd
+enforce_parent_profile_gap <- function(
+  layouts,
+  shifts,
+  rough_offsets,
+  parent_x,
+  min_gap = 1
+) {
+  layout_num <- length(layouts)
+  if (layout_num == 0) {
+    return(shifts)
+  }
+
+  for (iter in seq_len(layout_num + 1)) {
+    shifted <- purrr::map2(layouts, shifts, shift_compact_layout)
+    changed <- FALSE
+
+    for (i in seq_len(layout_num)) {
+      profile <- shifted[[i]]$profile
+      parent_column_y <- profile$y[profile$x == parent_x]
+      if (length(parent_column_y) == 0) {
+        next
+      }
+
+      direction <- child_compaction_direction(
+        rough_offsets[i],
+        shifts[i],
+        i,
+        layout_num
+      )
+      if (direction < 0) {
+        violation <- max(parent_column_y) + min_gap
+        if (violation > sqrt(.Machine$double.eps)) {
+          shifts[seq_len(i)] <- shifts[seq_len(i)] - violation
+          changed <- TRUE
+        }
+      } else {
+        violation <- min_gap - min(parent_column_y)
+        if (violation > sqrt(.Machine$double.eps)) {
+          shifts[seq(i, layout_num)] <- shifts[seq(i, layout_num)] + violation
+          changed <- TRUE
+        }
+      }
+    }
+
+    if (!changed) {
+      break
+    }
+  }
+
+  shifts
+}
+
+#' Compact a subtree layout while preserving the current branch order.
+#'
+#' @param structure an igraph object
+#' @param ver subtree root vertex
+#' @param coor current coordinate matrix
+#' @param min_gap minimum vertical gap in a shared column
+#'
+#' @returns a compact subtree layout
+#' @noRd
+compact_subtree_layout <- function(structure, ver, coor, min_gap = 1) {
+  child_pos <- as.integer(igraph::neighbors(structure, ver, mode = "out"))
+  vertex_profile <- data.frame(
+    vertex = ver,
+    x = as.numeric(coor[ver, "x"]),
+    y = 0
+  )
+  if (length(child_pos) == 0) {
+    return(list(
+      y = stats::setNames(0, as.character(ver)),
+      profile = vertex_profile
+    ))
+  }
+
+  rough_offsets <- as.numeric(coor[child_pos, "y"] - coor[ver, "y"])
+  child_order <- order(rough_offsets, child_pos)
+  child_pos <- child_pos[child_order]
+  rough_offsets <- rough_offsets[child_order]
+  layouts <- purrr::map(
+    child_pos,
+    \(child) compact_subtree_layout(structure, child, coor, min_gap)
+  )
+  shifts <- pack_child_layouts(layouts, min_gap)
+  shifts <- enforce_parent_profile_gap(
+    layouts,
+    shifts,
+    rough_offsets,
+    parent_x = as.numeric(coor[ver, "x"]),
+    min_gap = min_gap
+  )
+  shifted_layouts <- purrr::map2(layouts, shifts, shift_compact_layout)
+
+  list(
+    y = c(
+      stats::setNames(0, as.character(ver)),
+      unlist(purrr::map(shifted_layouts, "y"))
+    ),
+    profile = dplyr::bind_rows(
+      vertex_profile,
+      purrr::map(shifted_layouts, "profile")
+    )
+  )
+}
+
+#' Compact a complete coordinate matrix after rough layout.
+#'
+#' @param structure an igraph object
+#' @param coor current coordinate matrix
+#' @param min_gap minimum vertical gap in a shared column
+#'
+#' @returns compacted coordinate matrix
+#' @noRd
+compact_coor <- function(structure, coor, min_gap = 1) {
+  layout <- compact_subtree_layout(
+    structure,
+    length(structure),
+    coor,
+    min_gap = min_gap
+  )
+  vertex_pos <- as.integer(names(layout$y))
+  coor[vertex_pos, "y"] <- as.numeric(layout$y)
+  coor
+}
+
 #' Title Process the Coordinate of all Vertices
 #'
 #' @param structure an igraph object
@@ -739,6 +916,7 @@ coor_cal <- function(structure) {
       coor <- process_fucose_branches(coor, structure, i, temp_coor)
     }
   }
+  coor <- compact_coor(structure, coor)
   return(coor)
 }
 
