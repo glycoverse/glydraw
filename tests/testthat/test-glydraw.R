@@ -97,10 +97,13 @@ test_that("draw_cartoon uses custom reducing-end text", {
   plot <- draw_cartoon(structure, red_end = "Ser/Thr")
   text <- ggplot2::ggplot_build(plot)$data[[4]]
   red_end <- text[text$label == '"Ser/Thr"', ]
+  x_range <- ggplot2::get_panel_scales(plot)$x$range$range
 
   expect_equal(nrow(red_end), 1)
   expect_gt(red_end$x, 0.6)
   expect_equal(red_end$y, 0, tolerance = 1e-6)
+  expect_equal(red_end$hjust, 0)
+  expect_gt(max(x_range), red_end$x + 0.5)
 })
 
 test_that("draw_cartoon adds a reducing-end wave for tilde", {

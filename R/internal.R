@@ -1283,7 +1283,8 @@ reducing_end_annotation <- function(
         vertice = character(0),
         annot = character(0),
         x = numeric(0),
-        y = numeric(0)
+        y = numeric(0),
+        hjust = numeric(0)
       ),
       segment = data.frame(
         start_x = numeric(0),
@@ -1292,6 +1293,10 @@ reducing_end_annotation <- function(
         end_y = numeric(0)
       ),
       wave = data.frame(
+        x = numeric(0),
+        y = numeric(0)
+      ),
+      bounds = data.frame(
         x = numeric(0),
         y = numeric(0)
       )
@@ -1339,13 +1344,15 @@ reducing_end_annotation <- function(
     line_vec,
     root
   )
+  red_end_bounds <- reducing_end_text_bounds(red_end, line_end, line_vec)
   list(
     annotation = dplyr::bind_rows(
       data.frame(
         vertice = as.character(root),
         annot = label,
         x = as.numeric(annot_coor["x"]),
-        y = as.numeric(annot_coor["y"])
+        y = as.numeric(annot_coor["y"]),
+        hjust = 0.5
       ),
       red_end_annotation
     ),
@@ -1355,7 +1362,8 @@ reducing_end_annotation <- function(
       end_x = as.numeric(line_end["x"]),
       end_y = as.numeric(line_end["y"])
     ),
-    wave = reducing_end_wave(red_end, line_end, line_vec)
+    wave = reducing_end_wave(red_end, line_end, line_vec),
+    bounds = red_end_bounds
   )
 }
 
@@ -1374,7 +1382,8 @@ reducing_end_text_annotation <- function(red_end, line_end, line_vec, root) {
       vertice = character(0),
       annot = character(0),
       x = numeric(0),
-      y = numeric(0)
+      y = numeric(0),
+      hjust = numeric(0)
     ))
   }
   line_unit <- line_vec / sqrt(sum(line_vec^2))
@@ -1384,7 +1393,30 @@ reducing_end_text_annotation <- function(red_end, line_end, line_vec, root) {
     vertice = as.character(root),
     annot = quote_annotation(red_end),
     x = as.numeric(text_coor["x"]),
-    y = as.numeric(text_coor["y"])
+    y = as.numeric(text_coor["y"]),
+    hjust = 0
+  )
+}
+
+#' Map reducing-end text scale bounds
+#'
+#' @param red_end reducing-end annotation
+#' @param line_end reducing-end line endpoint
+#' @param line_vec reducing-end line vector
+#'
+#' @returns a data frame
+#' @noRd
+reducing_end_text_bounds <- function(red_end, line_end, line_vec) {
+  if (red_end %in% c("", "~")) {
+    return(data.frame(x = numeric(0), y = numeric(0)))
+  }
+  line_unit <- line_vec / sqrt(sum(line_vec^2))
+  text_offset <- 0.1
+  text_width <- max(nchar(red_end), 1) * 0.12
+  text_bound <- line_end + line_unit * (text_offset + text_width)
+  data.frame(
+    x = as.numeric(text_bound["x"]),
+    y = as.numeric(text_bound["y"])
   )
 }
 
@@ -1403,7 +1435,7 @@ reducing_end_wave <- function(red_end, line_end, line_vec) {
   line_unit <- line_vec / sqrt(sum(line_vec^2))
   wave_unit <- c(x = -line_unit["y"], y = line_unit["x"])
   wave_t <- seq(0, 1, length.out = 25)
-  wave_length <- 0.45
+  wave_length <- 0.3
   wave_amplitude <- 0.03
   wave_coor <- purrr::map_dfr(wave_t, function(t) {
     line_end +

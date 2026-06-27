@@ -87,6 +87,7 @@ draw_cartoon <- function(
   # Escape '?' to prevent conflict with parse = TRUE
   struc_annotation <- struc_annotation |>
     dplyr::mutate(
+      hjust = dplyr::if_else(is.na(.data$hjust), 0.5, .data$hjust),
       annot_label = dplyr::case_when(
         .data$annot == "?" ~ '~"?"',
         .data$annot == "??" ~ '~"?"',
@@ -143,11 +144,15 @@ draw_cartoon <- function(
     gly_graph <- gly_graph +
       ggplot2::geom_text(
         data = struc_annotation,
-        ggplot2::aes(x = .data$x, y = .data$y, label = .data$annot_label),
+        ggplot2::aes(
+          x = .data$x,
+          y = .data$y,
+          label = .data$annot_label,
+          hjust = .data$hjust
+        ),
         alpha = struc_annotation$transparency,
         parse = TRUE,
         size = 6,
-        hjust = 0.5,
         vjust = 0.5
       )
   }
@@ -157,6 +162,13 @@ draw_cartoon <- function(
         data = reducing_info$wave,
         ggplot2::aes(x = .data$x, y = .data$y),
         linewidth = 0.8
+      )
+  }
+  if (nrow(reducing_info$bounds) > 0) {
+    gly_graph <- gly_graph +
+      ggplot2::geom_blank(
+        data = reducing_info$bounds,
+        ggplot2::aes(x = .data$x, y = .data$y)
       )
   }
   dpi <- 300
