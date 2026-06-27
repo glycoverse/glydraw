@@ -188,6 +188,18 @@ test_that("draw_cartoon places a1-6 core Fuc up and a1-3 core Fuc down", {
   expect_lt(min(fuc_segments$yend), -0.5)
 })
 
+test_that("coor_cal keeps same-column residues at least one unit apart", {
+  structure <- .ensure_one_structure(
+    "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-4)GlcNAc(b1-"
+  )
+  graph <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
+  coor <- coor_cal(graph)
+  same_column <- which(coor[, "x"] == -1)
+  same_column_y <- sort(coor[same_column, "y"])
+
+  expect_equal(diff(same_column_y), rep(1, length(same_column_y) - 1))
+})
+
 test_that("draw_cartoon keeps elongated Fuc branches together", {
   structure <- .ensure_one_structure(
     paste0(
