@@ -57,7 +57,7 @@ draw_cartoon <- function(
   # Rename colnames of gly_list
   colnames(gly_list) <- c('center_x', 'center_y', 'glycoform', 'transparency')
   # Draw Glycan Shape, where gly_list contains center_x, center_y, glycoform 3 columns
-  polygon_coor <- create_polygon_coor(gly_list, 0.2)
+  polygon_coor <- create_polygon_coor(gly_list, 0.215)
   filled_color <- glycan_color[as.character(polygon_coor$color)]
 
   struc_annotation <- dplyr::bind_rows(
