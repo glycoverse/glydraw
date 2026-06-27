@@ -87,7 +87,13 @@ draw_cartoon <- function(
   # Escape '?' to prevent conflict with parse = TRUE
   struc_annotation <- struc_annotation |>
     dplyr::mutate(
+      is_red_end_text = dplyr::if_else(
+        is.na(.data$is_red_end_text),
+        FALSE,
+        .data$is_red_end_text
+      ),
       hjust = dplyr::if_else(is.na(.data$hjust), 0.5, .data$hjust),
+      vjust = dplyr::if_else(is.na(.data$vjust), 0.5, .data$vjust),
       annot_label = dplyr::case_when(
         .data$annot == "?" ~ '~"?"',
         .data$annot == "??" ~ '~"?"',
@@ -98,6 +104,10 @@ draw_cartoon <- function(
         TRUE ~ .data$annot
       )
     )
+  red_end_text_annotation <- dplyr::filter(
+    struc_annotation,
+    .data$is_red_end_text
+  )
 
   # connect information
   gly_connect <- connect_info(structure, coor)
@@ -148,12 +158,28 @@ draw_cartoon <- function(
           x = .data$x,
           y = .data$y,
           label = .data$annot_label,
-          hjust = .data$hjust
+          hjust = .data$hjust,
+          vjust = .data$vjust
         ),
         alpha = struc_annotation$transparency,
         parse = TRUE,
         size = 6,
-        vjust = 0.5
+      )
+  }
+  if (!show_linkage && nrow(red_end_text_annotation) > 0) {
+    gly_graph <- gly_graph +
+      ggplot2::geom_text(
+        data = red_end_text_annotation,
+        ggplot2::aes(
+          x = .data$x,
+          y = .data$y,
+          label = .data$annot_label,
+          hjust = .data$hjust,
+          vjust = .data$vjust
+        ),
+        alpha = red_end_text_annotation$transparency,
+        parse = TRUE,
+        size = 6,
       )
   }
   if (nrow(reducing_info$wave) > 0) {

@@ -1284,7 +1284,9 @@ reducing_end_annotation <- function(
         annot = character(0),
         x = numeric(0),
         y = numeric(0),
-        hjust = numeric(0)
+        hjust = numeric(0),
+        vjust = numeric(0),
+        is_red_end_text = logical(0)
       ),
       segment = data.frame(
         start_x = numeric(0),
@@ -1342,9 +1344,15 @@ reducing_end_annotation <- function(
     red_end,
     line_end,
     line_vec,
+    orient,
     root
   )
-  red_end_bounds <- reducing_end_text_bounds(red_end, line_end, line_vec)
+  red_end_bounds <- reducing_end_text_bounds(
+    red_end,
+    line_end,
+    line_vec,
+    orient
+  )
   list(
     annotation = dplyr::bind_rows(
       data.frame(
@@ -1352,7 +1360,9 @@ reducing_end_annotation <- function(
         annot = label,
         x = as.numeric(annot_coor["x"]),
         y = as.numeric(annot_coor["y"]),
-        hjust = 0.5
+        hjust = 0.5,
+        vjust = 0.5,
+        is_red_end_text = FALSE
       ),
       red_end_annotation
     ),
@@ -1372,29 +1382,42 @@ reducing_end_annotation <- function(
 #' @param red_end reducing-end annotation
 #' @param line_end reducing-end line endpoint
 #' @param line_vec reducing-end line vector
+#' @param orient glycan drawing orientation, "H" or "V"
 #' @param root reducing-end vertex index
 #'
 #' @returns a data frame
 #' @noRd
-reducing_end_text_annotation <- function(red_end, line_end, line_vec, root) {
+reducing_end_text_annotation <- function(
+  red_end,
+  line_end,
+  line_vec,
+  orient,
+  root
+) {
   if (red_end %in% c("", "~")) {
     return(data.frame(
       vertice = character(0),
       annot = character(0),
       x = numeric(0),
       y = numeric(0),
-      hjust = numeric(0)
+      hjust = numeric(0),
+      vjust = numeric(0),
+      is_red_end_text = logical(0)
     ))
   }
   line_unit <- line_vec / sqrt(sum(line_vec^2))
   text_offset <- 0.02
   text_coor <- line_end + line_unit * text_offset
+  hjust <- if (orient == "H") 0 else 0.5
+  vjust <- if (orient == "H") 0.5 else 1
   data.frame(
     vertice = as.character(root),
     annot = quote_annotation(red_end),
     x = as.numeric(text_coor["x"]),
     y = as.numeric(text_coor["y"]),
-    hjust = 0
+    hjust = hjust,
+    vjust = vjust,
+    is_red_end_text = TRUE
   )
 }
 
@@ -1403,20 +1426,29 @@ reducing_end_text_annotation <- function(red_end, line_end, line_vec, root) {
 #' @param red_end reducing-end annotation
 #' @param line_end reducing-end line endpoint
 #' @param line_vec reducing-end line vector
+#' @param orient glycan drawing orientation, "H" or "V"
 #'
 #' @returns a data frame
 #' @noRd
-reducing_end_text_bounds <- function(red_end, line_end, line_vec) {
+reducing_end_text_bounds <- function(red_end, line_end, line_vec, orient) {
   if (red_end %in% c("", "~")) {
     return(data.frame(x = numeric(0), y = numeric(0)))
   }
   line_unit <- line_vec / sqrt(sum(line_vec^2))
   text_offset <- 0.1
   text_width <- max(nchar(red_end), 1) * 0.12
-  text_bound <- line_end + line_unit * (text_offset + text_width)
+  if (orient == "H") {
+    text_bound <- line_end + line_unit * (text_offset + text_width)
+    return(data.frame(
+      x = as.numeric(text_bound["x"]),
+      y = as.numeric(text_bound["y"])
+    ))
+  }
+  text_coor <- line_end + line_unit * 0.02
+  text_height <- 0.36
   data.frame(
-    x = as.numeric(text_bound["x"]),
-    y = as.numeric(text_bound["y"])
+    x = as.numeric(text_coor["x"] + c(-1, 1) * text_width / 2),
+    y = as.numeric(text_coor["y"] + c(0, -text_height))
   )
 }
 

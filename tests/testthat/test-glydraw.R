@@ -106,6 +106,37 @@ test_that("draw_cartoon uses custom reducing-end text", {
   expect_gt(max(x_range), red_end$x + 0.5)
 })
 
+test_that("draw_cartoon keeps custom reducing-end text with linkage hidden", {
+  structure <- "Gal(b1-3)GalNAc(a1-"
+
+  plot <- draw_cartoon(structure, show_linkage = FALSE, red_end = "Ser/Thr")
+  text_layers <- purrr::keep(
+    ggplot2::ggplot_build(plot)$data,
+    ~ "label" %in% names(.x)
+  )
+  text <- dplyr::bind_rows(text_layers)
+
+  expect_true(any(text$label == '"Ser/Thr"'))
+  expect_false(any(text$label == "beta"))
+  expect_false(any(text$label == "3"))
+})
+
+test_that("draw_cartoon centers vertical reducing-end text", {
+  structure <- "Gal(b1-3)GalNAc(a1-"
+
+  plot <- draw_cartoon(structure, orient = "V", red_end = "Ser/Thr")
+  text <- ggplot2::ggplot_build(plot)$data[[4]]
+  red_end <- text[text$label == '"Ser/Thr"', ]
+  x_range <- ggplot2::get_panel_scales(plot)$x$range$range
+
+  expect_equal(nrow(red_end), 1)
+  expect_equal(red_end$hjust, 0.5)
+  expect_equal(red_end$vjust, 1)
+  expect_lt(min(x_range), red_end$x - 0.3)
+  expect_gt(max(x_range), red_end$x + 0.3)
+  expect_lt(min(ggplot2::get_panel_scales(plot)$y$range$range), red_end$y - 0.3)
+})
+
 test_that("draw_cartoon adds a reducing-end wave for tilde", {
   structure <- "Gal(b1-3)GalNAc(a1-"
 
