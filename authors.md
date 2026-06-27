@@ -10,12 +10,12 @@
 ## Citation
 
 Fu B, Feng X (2026). *glydraw: Draw beautiful SNFG cartoons*. R package
-version 0.5.0, <https://glycoverse.github.io/glydraw/>.
+version 0.5.1, <https://glycoverse.github.io/glydraw/>.
 
     @Manual{,
       title = {glydraw: Draw beautiful SNFG cartoons},
       author = {Bin Fu and Xisong Feng},
       year = {2026},
-      note = {R package version 0.5.0},
+      note = {R package version 0.5.1},
       url = {https://glycoverse.github.io/glydraw/},
     }
