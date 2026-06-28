@@ -2,8 +2,15 @@
 
 ## Breaking changes
 
-* `export_cartoons()` no longer supports `glyexp::experiment()` input, and
-  `glyexp` is no longer a package dependency.
+* `export_cartoons()` no longer supports `glyexp::experiment()` input, and `glyexp` is no longer a package dependency. (#33)
+
+## New features
+
+* Add the `red_end` parameter to `draw_cartoon()` and `export_cartoons()` for custom reducing-end text or a wavy reducing-end annotation. (#31)
+
+## Minor improvements and bug fixes
+
+* Adjust linkage annotation offsets for diagonal HexNAc links. (#29)
 
 # glydraw 0.5.1
 
