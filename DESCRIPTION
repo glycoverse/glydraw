@@ -29,5 +29,4 @@ Imports:
     cli,
     checkmate,
     scales,
-    fs,
-    glyexp
+    fs

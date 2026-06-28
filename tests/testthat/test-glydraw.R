@@ -484,46 +484,20 @@ test_that("export_cartoons removes duplicates for glyrepr_structure input", {
   expect_length(files, 2)
 })
 
-test_that("export_cartoons works with glyexp_experiment input", {
-  skip_if_not_installed("glyexp")
-  skip_if_not_installed("glyrepr")
-  exp <- glyexp::real_experiment |> glyexp::slice_head_var(n = 5)
+test_that("export_cartoons does not support glyexp experiment input", {
+  exp <- structure(list(), class = "glyexp_experiment")
   temp_dir <- tempfile()
   on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
   fs::dir_create(temp_dir)
 
-  suppressMessages(result <- export_cartoons(exp, temp_dir, dpi = 72))
-
-  expect_type(result, "list")
-  files <- fs::dir_ls(temp_dir, glob = "*.png")
-  expect_gt(length(files), 0)
-})
-
-test_that("export_cartoons errors for non-glycoproteomics experiment", {
-  skip_if_not_installed("glyexp")
-  exp <- glyexp::real_experiment |> glyexp::slice_head_var(n = 5)
-  exp$meta_data$exp_type <- "proteomics"
-  temp_dir <- tempfile()
-  on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
-  fs::dir_create(temp_dir)
-
+  expect_null(getS3method(
+    "export_cartoons",
+    "glyexp_experiment",
+    optional = TRUE
+  ))
   expect_error(
     export_cartoons(exp, temp_dir),
-    "can only be an experiment with"
-  )
-})
-
-test_that("export_cartoons errors when glycan_structure column is missing", {
-  skip_if_not_installed("glyexp")
-  exp <- glyexp::real_experiment |> glyexp::slice_head_var(n = 5)
-  exp$var_info$glycan_structure <- NULL
-  temp_dir <- tempfile()
-  on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
-  fs::dir_create(temp_dir)
-
-  expect_error(
-    export_cartoons(exp, temp_dir),
-    "glycan_structure"
+    "no applicable method"
   )
 })
 

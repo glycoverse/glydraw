@@ -146,9 +146,9 @@ save_cartoon <- function(cartoon, file, dpi = 300) {
 #' character vector or named [glyrepr::glycan_structure()] vector, the vector
 #' names are used as file names.
 #'
-#' @param x A [glyexp::experiment()], a [glyrepr::glycan_structure()] vector,
-#'   or a character vector of any glycan structure text nomenclatures
-#'   supported by [glyparse::auto_parse()].
+#' @param x A [glyrepr::glycan_structure()] vector, or a character vector of
+#'   any glycan structure text nomenclatures supported by
+#'   [glyparse::auto_parse()].
 #' @param dirname Directory name to save the cartoons. If it does not exist,
 #'   it is created.
 #' @param file_ext File extension supported by [ggplot2::ggsave()]. Defaults to "png".
@@ -158,10 +158,13 @@ save_cartoon <- function(cartoon, file, dpi = 300) {
 #' @return The function returns the list of cartoons implicitly.
 #'
 #' @examples
-#' \dontrun{
-#' library(glyexp)
-#' export_cartoons(real_experiment, "path/to/save")
-#' }
+#' export_cartoons(
+#'   c(
+#'     "Man(a1-3)Man(b1-4)GlcNAc(b1-",
+#'     "Gal(b1-4)GlcNAc(b1-"
+#'   ),
+#'   "path/to/save"
+#' )
 #' @export
 export_cartoons <- function(
   x,
@@ -173,39 +176,6 @@ export_cartoons <- function(
   red_end = ""
 ) {
   UseMethod("export_cartoons")
-}
-
-#' @export
-export_cartoons.glyexp_experiment <- function(
-  x,
-  dirname,
-  file_ext = "png",
-  dpi = 300,
-  show_linkage = TRUE,
-  orient = c("H", "V"),
-  red_end = ""
-) {
-  if (glyexp::get_exp_type(x) != "glycoproteomics") {
-    cli::cli_abort(c(
-      "{.arg x} can only be an experiment with {.val glycoproteomics} type.",
-      "x" = "Got: {.val {glyexp::get_exp_type(x)}}"
-    ))
-  }
-  if (!"glycan_structure" %in% colnames(glyexp::get_var_info(x))) {
-    cli::cli_abort(
-      "There must a {.field glycan_structure} column in {.field var_info}."
-    )
-  }
-  glycans <- unique(glyexp::get_var_info(x)$glycan_structure)
-  .export_cartoon_list(
-    glycans,
-    dirname,
-    file_ext = file_ext,
-    dpi = dpi,
-    show_linkage = show_linkage,
-    orient = orient,
-    red_end = red_end
-  )
 }
 
 #' @export

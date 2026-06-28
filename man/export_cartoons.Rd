@@ -15,9 +15,9 @@ export_cartoons(
 )
 }
 \arguments{
-\item{x}{A \code{\link[glyexp:experiment]{glyexp::experiment()}}, a \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}} vector,
-or a character vector of any glycan structure text nomenclatures
-supported by \code{\link[glyparse:auto_parse]{glyparse::auto_parse()}}.}
+\item{x}{A \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}} vector, or a character vector of
+any glycan structure text nomenclatures supported by
+\code{\link[glyparse:auto_parse]{glyparse::auto_parse()}}.}
 
 \item{dirname}{Directory name to save the cartoons. If it does not exist,
 it is created.}
@@ -46,8 +46,11 @@ character vector or named \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_
 names are used as file names.
 }
 \examples{
-\dontrun{
-library(glyexp)
-export_cartoons(real_experiment, "path/to/save")
-}
+export_cartoons(
+  c(
+    "Man(a1-3)Man(b1-4)GlcNAc(b1-",
+    "Gal(b1-4)GlcNAc(b1-"
+  ),
+  "path/to/save"
+)
 }
