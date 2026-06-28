@@ -7,7 +7,19 @@
 - [`export_cartoons()`](https://glycoverse.github.io/glydraw/dev/reference/export_cartoons.md)
   no longer supports
   [`glyexp::experiment()`](https://glycoverse.github.io/glyexp/reference/experiment.html)
-  input, and `glyexp` is no longer a package dependency.
+  input, and `glyexp` is no longer a package dependency. (#33)
+
+### New features
+
+- Add the `red_end` parameter to
+  [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
+  and
+  [`export_cartoons()`](https://glycoverse.github.io/glydraw/dev/reference/export_cartoons.md)
+  for custom reducing-end text or a wavy reducing-end annotation. (#31)
+
+### Minor improvements and bug fixes
+
+- Adjust linkage annotation offsets for diagonal HexNAc links. (#29)
 
 ## glydraw 0.5.1
 
