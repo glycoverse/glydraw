@@ -1,10 +1,15 @@
-#' Render a glycan cartoon to a fixed-size raster image
+# Internal raster rendering helpers used by print methods and fixed-size display
+# of glydraw cartoons.
+
+#' Render a glycan cartoon to a fixed-size raster
 #'
-#' @param cartoon A glydraw cartoon.
-#' @param dpi Dots per inch used by the cartoon size metadata.
-#' @param bg Background color passed to [ggplot2::ggsave()].
+#' @param cartoon A `glydraw_cartoon` ggplot object with attribute
+#'   `glydraw_size_px`, a named numeric vector containing `width` and `height`.
+#' @param dpi Numeric dots per inch used by the cartoon size metadata.
+#' @param bg Background color passed to `ggplot2::ggsave()`.
 #'
-#' @return A native raster matrix.
+#' @return A `nativeRaster` matrix read from a temporary PNG file. Matrix
+#'   dimensions match `glydraw_size_px` within device rounding.
 #' @noRd
 .render_cartoon_raster <- function(cartoon, dpi = 300, bg = "transparent") {
   size <- attr(cartoon, "glydraw_size_px")
@@ -16,7 +21,7 @@
 
   ggplot2::ggsave(
     filename = file,
-    plot = .strip_glydraw_class(cartoon),
+    plot = .strip_cartoon_class(cartoon),
     width = size[["width"]],
     height = size[["height"]],
     units = "px",
@@ -26,15 +31,16 @@
   png::readPNG(file, native = TRUE)
 }
 
-#' Draw a fixed-size cartoon raster to the current graphics device
+#' Draw a fixed-size cartoon raster on the current graphics device
 #'
-#' @param raster A native raster matrix.
+#' @param raster A `nativeRaster` matrix.
 #' @param size_px A named numeric vector with `width` and `height` in pixels.
-#' @param dpi Dots per inch used by the cartoon size metadata.
-#' @param newpage Draw on a new grid page.
-#' @param vp A grid viewport object or viewport name.
+#' @param dpi Numeric dots per inch used to convert pixels to inches.
+#' @param newpage Logical scalar; `TRUE` starts a new grid page before drawing.
+#' @param vp `NULL`, a grid viewport object, or a viewport name string.
 #'
-#' @return The raster object, invisibly.
+#' @return The input `raster`, invisibly. The raster is drawn scaled down if the
+#'   current viewport is smaller than the cartoon's physical size.
 #' @noRd
 .draw_cartoon_raster <- function(
   raster,
@@ -59,7 +65,7 @@
     on.exit(grid::upViewport(), add = TRUE)
   }
 
-  viewport_size <- .current_viewport_size_in()
+  viewport_size <- .current_viewport_size_inches()
   cartoon_size <- size_px / dpi
   scale <- min(
     1,
@@ -79,11 +85,13 @@
   invisible(raster)
 }
 
-#' Get the current grid viewport size
+#' Get the current grid viewport size in inches
 #'
-#' @return A named numeric vector with `width` and `height` in inches.
+#' @return A named numeric vector with `width` and `height` in inches. Falls
+#'   back to `grDevices::dev.size("in")` when grid viewport conversion is not
+#'   finite or positive.
 #' @noRd
-.current_viewport_size_in <- function() {
+.current_viewport_size_inches <- function() {
   size <- c(
     width = grid::convertWidth(grid::unit(1, "npc"), "in", valueOnly = TRUE),
     height = grid::convertHeight(grid::unit(1, "npc"), "in", valueOnly = TRUE)

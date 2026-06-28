@@ -1,17 +1,22 @@
-#' Adjust the coordinate of glycan annotation text
+# Internal helpers for deriving text annotations, label positions, overlap
+# resolution, substituent labels, and reducing-end annotation geometry.
+
+#' Calculate label positions for one glycosidic linkage
 #'
-#' @param chil_glyx a float
-#' @param chil_glyy a float
-#' @param par_glyx a float
-#' @param par_glyy a float
-#' @param chil_offset annotation distance from the child residue center
-#' @param par_offset annotation distance from the parent residue center
+#' @param chil_glyx,chil_glyy Numeric `x` and `y` coordinates of the child
+#'   residue.
+#' @param par_glyx,par_glyy Numeric `x` and `y` coordinates of the parent
+#'   residue.
+#' @param chil_offset Numeric distance from the child residue center to the
+#'   child-side linkage label.
+#' @param par_offset Numeric distance from the parent residue center to the
+#'   parent-side linkage label.
 #'
-#' @returns coordinate list of annotations
-#'
-#' @examples .annotation_coordinate(chil_glyx, chil_glyy, par_glyx, par_glyy)
+#' @returns A list with two numeric 2-row matrices, `chil` and `par`. Each
+#'   matrix is an `(x, y)` offset vector to add to the child or parent residue
+#'   coordinate.
 #' @noRd
-.annotation_coordinate <- function(
+.linkage_label_positions <- function(
   chil_glyx,
   chil_glyy,
   par_glyx,
@@ -60,19 +65,21 @@
   return(annot_loc)
 }
 
-#' Calculate linkage annotation distance from a residue center
+#' Choose the label offset for one side of a linkage
 #'
-#' @param structure an igraph object
-#' @param anchor_ver an integer vertex index for the annotated residue
-#' @param anchor_x x coordinate of the annotated residue
-#' @param anchor_y y coordinate of the annotated residue
-#' @param other_x x coordinate of the linked residue
-#' @param other_y y coordinate of the linked residue
-#' @param role whether the annotation is on the child or parent residue
+#' @param structure An igraph glycan graph whose vertices include `mono`.
+#' @param anchor_ver A single integer vertex index for the residue receiving
+#'   the label.
+#' @param anchor_x,anchor_y Numeric coordinates of the residue receiving the
+#'   label.
+#' @param other_x,other_y Numeric coordinates of the residue on the other side
+#'   of the linkage.
+#' @param role Either `"child"` or `"parent"`, naming which side of the linkage
+#'   the label belongs to.
 #'
-#' @returns numeric annotation offset distance
+#' @returns A numeric scalar offset distance from the anchor residue center.
 #' @noRd
-.annotation_offset <- function(
+.linkage_label_offset <- function(
   structure,
   anchor_ver,
   anchor_x,
@@ -99,16 +106,18 @@
   base_offset
 }
 
-#' Map the glycan coordinate and annotation text
+#' Build linkage annotation rows for every glycosidic edge
 #'
-#' @param structure an igraph object
-#' @param coor a matrix
+#' @param structure An igraph glycan graph whose edges include `linkage`.
+#' @param coor A numeric coordinate matrix with columns `x` and `y`, one row
+#'   per graph vertex.
 #'
-#' @returns dataframe of glycan annotation and coordinate
-#'
-#' @examples .gly_annotation(structure,coor)
+#' @returns A data frame with one or two rows per edge and columns `vertice`,
+#'   `annot`, `x`, `y`, `segment_start_x`, `segment_start_y`, `segment_end_x`,
+#'   and `segment_end_y`. `annot` contains normalized labels such as `alpha`,
+#'   `beta`, or linkage position text.
 #' @noRd
-.gly_annotation <- function(structure, coor) {
+.linkage_annotation_data <- function(structure, coor) {
   structure_length <- length(structure)
   if (igraph::ecount(structure) == 0) {
     return(data.frame(
@@ -144,12 +153,12 @@
     )
     # Read annotation information and relative position
     linkage_str <- igraph::E(structure)[ver]$linkage
-    gly_annot_coor <- .annotation_coordinate(
+    gly_annot_coor <- .linkage_label_positions(
       coor[ver, 1],
       coor[ver, 2],
       coor[par_ver, 1],
       coor[par_ver, 2],
-      chil_offset = .annotation_offset(
+      chil_offset = .linkage_label_offset(
         structure,
         ver,
         coor[ver, 1],
@@ -158,7 +167,7 @@
         coor[par_ver, 2],
         role = "child"
       ),
-      par_offset = .annotation_offset(
+      par_offset = .linkage_label_offset(
         structure,
         par_ver,
         coor[par_ver, 1],
@@ -216,15 +225,18 @@
   return(struc_annot_coor)
 }
 
-#' Reflect a point across a line segment
+#' Reflect one point across a line segment
 #'
-#' @param point a numeric vector with x and y values
-#' @param segment_start a numeric vector with x and y values
-#' @param segment_end a numeric vector with x and y values
+#' @param point A numeric vector with `x` and `y` values.
+#' @param segment_start A numeric vector with `x` and `y` values for the start
+#'   of the segment.
+#' @param segment_end A numeric vector with `x` and `y` values for the end of
+#'   the segment.
 #'
-#' @returns reflected point coordinates
+#' @returns A numeric vector with the reflected `x` and `y` coordinates. If the
+#'   segment length is zero, returns `point` unchanged.
 #' @noRd
-.reflect_point_across_segment <- function(point, segment_start, segment_end) {
+.reflect_point_over_segment <- function(point, segment_start, segment_end) {
   segment <- segment_end - segment_start
   segment_length <- sum(segment^2)
   if (!is.finite(segment_length) || segment_length <= .Machine$double.eps) {
@@ -238,11 +250,12 @@
 
 #' Find the shortest distance among annotation coordinates
 #'
-#' @param coords a numeric matrix with x and y columns
+#' @param coords A numeric matrix with columns `x` and `y`.
 #'
-#' @returns minimum pairwise distance
+#' @returns A numeric scalar minimum pairwise Euclidean distance among complete
+#'   rows. Returns `Inf` when fewer than two complete rows are available.
 #' @noRd
-.min_annotation_distance <- function(coords) {
+.minimum_annotation_distance <- function(coords) {
   finite <- stats::complete.cases(coords)
   if (sum(finite) < 2) {
     return(Inf)
@@ -251,33 +264,35 @@
   min(stats::dist(coords[finite, , drop = FALSE]))
 }
 
-#' Check whether two annotation coordinates are sufficiently separated
+#' Check whether two annotation rows are sufficiently separated
 #'
-#' @param coords a numeric matrix with x and y columns
-#' @param i row index of first annotation
-#' @param j row index of second annotation
-#' @param min_distance minimum distance between annotation centers
+#' @param coords A numeric matrix with columns `x` and `y`.
+#' @param i,j Integer row indices in `coords`.
+#' @param min_distance Numeric minimum distance between annotation centers.
 #'
-#' @returns logical scalar
+#' @returns A logical scalar: `TRUE` when rows `i` and `j` are at least
+#'   `min_distance` apart.
 #' @noRd
-.are_annotations_separated <- function(coords, i, j, min_distance) {
+.annotations_are_separated <- function(coords, i, j, min_distance) {
   delta <- coords[i, ] - coords[j, ]
   distance <- sqrt(sum(delta^2))
   distance >= min_distance
 }
 
-#' Compute the reflection of annotation coordinates across their segments
+#' Reflect annotation coordinates across their linkage segments
 #'
-#' @param coords a numeric matrix with x and y columns
-#' @param segment a numeric matrix with segment start/end columns
+#' @param coords A numeric matrix with columns `x` and `y`.
+#' @param segment A numeric matrix with columns `segment_start_x`,
+#'   `segment_start_y`, `segment_end_x`, and `segment_end_y`.
 #'
-#' @returns numeric matrix of reflected coordinates
+#' @returns A numeric matrix with the same dimensions as `coords`. Rows with
+#'   complete segment coordinates are reflected; other rows are unchanged.
 #' @noRd
-.reflect_annotation_coords <- function(coords, segment) {
+.reflected_annotation_coordinates <- function(coords, segment) {
   can_reflect <- stats::complete.cases(segment)
   reflected_coords <- coords
   for (i in which(can_reflect)) {
-    reflected_coords[i, ] <- .reflect_point_across_segment(
+    reflected_coords[i, ] <- .reflect_point_over_segment(
       point = coords[i, ],
       segment_start = segment[i, c("segment_start_x", "segment_start_y")],
       segment_end = segment[i, c("segment_end_x", "segment_end_y")]
@@ -286,15 +301,22 @@
   reflected_coords
 }
 
-#' Build annotation groups that share a reflection segment
+#' Group annotations that should reflect together
 #'
-#' @param annotation a data frame returned by annotation mapping helpers
-#' @param segment a numeric matrix with segment start/end columns
-#' @param segment_lengths numeric vector of segment lengths
+#' @param annotation A data frame with `vertice` and segment coordinate columns.
+#' @param segment A numeric matrix with segment start/end columns.
+#' @param segment_lengths A numeric vector of segment lengths, one per
+#'   annotation row.
 #'
-#' @returns list with keys, rows, and lengths for each group
+#' @returns A list with `keys`, a character vector mapping rows to group ids;
+#'   `rows`, a list of integer row indices by group; and `lengths`, a numeric
+#'   vector of maximum segment length by group.
 #' @noRd
-.build_annotation_groups <- function(annotation, segment, segment_lengths) {
+.annotation_reflection_groups <- function(
+  annotation,
+  segment,
+  segment_lengths
+) {
   can_reflect <- stats::complete.cases(segment)
   group_keys <- rep(NA_character_, nrow(annotation))
   group_keys[can_reflect] <- paste(
@@ -315,18 +337,21 @@
   )
 }
 
-#' Choose the best annotation group to reflect for resolving an overlap
+#' Choose which annotation group to reflect for one overlap
 #'
-#' @param i row index of first annotation
-#' @param j row index of second annotation
-#' @param coords current annotation coordinates
-#' @param reflected_coords candidate reflected coordinates
-#' @param groups list returned by .build_annotation_groups
-#' @param reflected_groups logical vector tracking reflected groups
+#' @param i,j Integer row indices for two overlapping annotation rows.
+#' @param coords A numeric matrix with current `x` and `y` annotation
+#'   coordinates.
+#' @param reflected_coords A numeric matrix with candidate reflected
+#'   coordinates, same dimensions as `coords`.
+#' @param groups A list returned by `.annotation_reflection_groups()`.
+#' @param reflected_groups A named logical vector marking groups that have
+#'   already been reflected.
 #'
-#' @returns character group key, or NULL if no candidate exists
+#' @returns A single character group key, or `NULL` if neither row belongs to an
+#'   unreflected candidate group.
 #' @noRd
-.choose_reflection_group <- function(
+.choose_annotation_group_to_reflect <- function(
   i,
   j,
   coords,
@@ -348,7 +373,7 @@
       candidate_coords <- coords
       rows <- groups$rows[[candidate]]
       candidate_coords[rows, ] <- reflected_coords[rows, ]
-      .min_annotation_distance(candidate_coords)
+      .minimum_annotation_distance(candidate_coords)
     }
   )
 
@@ -359,18 +384,22 @@
   best_candidates[which.max(groups$lengths[best_candidates])]
 }
 
-#' Iteratively resolve overlaps by reflecting annotation groups
+#' Resolve annotation overlaps by reflecting whole label groups
 #'
-#' @param coords current annotation coordinates
-#' @param reflected_coords candidate reflected coordinates
-#' @param finite_index integer vector of rows with finite coordinates
-#' @param groups list returned by .build_annotation_groups
-#' @param min_distance minimum distance between annotation centers
-#' @param max_iter maximum number of overlap resolution passes
+#' @param coords A numeric matrix with current `x` and `y` annotation
+#'   coordinates.
+#' @param reflected_coords A numeric matrix with candidate reflected
+#'   coordinates, same dimensions as `coords`.
+#' @param finite_index An integer vector of row indices in `coords` that have
+#'   finite coordinates.
+#' @param groups A list returned by `.annotation_reflection_groups()`.
+#' @param min_distance Numeric minimum distance between annotation centers.
+#' @param max_iter Integer maximum number of overlap resolution passes.
 #'
-#' @returns numeric matrix of resolved coordinates
+#' @returns A numeric matrix with the same dimensions as `coords`, after any
+#'   selected row groups have been replaced with reflected coordinates.
 #' @noRd
-.resolve_overlaps <- function(
+.resolve_annotation_group_overlaps <- function(
   coords,
   reflected_coords,
   finite_index,
@@ -386,11 +415,11 @@
     for (i_pos in seq_len(length(finite_index) - 1)) {
       i <- finite_index[i_pos]
       for (j in finite_index[(i_pos + 1):length(finite_index)]) {
-        if (.are_annotations_separated(coords, i, j, min_distance)) {
+        if (.annotations_are_separated(coords, i, j, min_distance)) {
           next
         }
 
-        best <- .choose_reflection_group(
+        best <- .choose_annotation_group_to_reflect(
           i,
           j,
           coords,
@@ -417,15 +446,18 @@
   coords
 }
 
-#' Separate annotations that are too close to each other
+#' Separate overlapping annotation labels
 #'
-#' @param annotation a data frame returned by annotation mapping helpers
-#' @param min_distance minimum distance between annotation centers
-#' @param max_iter maximum number of overlap resolution passes
+#' @param annotation A data frame with at least `x` and `y` columns. If present,
+#'   segment columns `segment_start_x`, `segment_start_y`, `segment_end_x`, and
+#'   `segment_end_y` are used to reflect labels across their linkage segments.
+#' @param min_distance Numeric minimum distance between annotation centers.
+#' @param max_iter Integer maximum number of overlap resolution passes.
 #'
-#' @returns annotation data frame with adjusted coordinates
+#' @returns The same data frame columns as `annotation`, with adjusted numeric
+#'   `x` and `y` columns when overlaps can be resolved.
 #' @noRd
-.resolve_annotation_overlap <- function(
+.separate_overlapping_annotations <- function(
   annotation,
   min_distance = 0.2,
   max_iter = 20
@@ -459,9 +491,9 @@
       (segment[, "segment_end_y"] - segment[, "segment_start_y"])^2
   )
 
-  reflected_coords <- .reflect_annotation_coords(coords, segment)
-  groups <- .build_annotation_groups(annotation, segment, segment_lengths)
-  coords <- .resolve_overlaps(
+  reflected_coords <- .reflected_annotation_coordinates(coords, segment)
+  groups <- .annotation_reflection_groups(annotation, segment, segment_lengths)
+  coords <- .resolve_annotation_group_overlaps(
     coords,
     reflected_coords,
     finite_index,
@@ -475,15 +507,18 @@
   annotation
 }
 
-#' Map the coordinate of substituent annotation text
+#' Build substituent annotation rows
 #'
-#' @param structure an igraph object
-#' @param coor a matrix
-#' @param orient glycan drawing orientation
+#' @param structure An igraph glycan graph whose vertices may include `sub`.
+#' @param coor A numeric coordinate matrix with columns `x` and `y`, one row
+#'   per graph vertex.
+#' @param orient Drawing orientation, either `"H"` or `"V"`.
 #'
-#' @returns dataframe of substituent annotation and coordinate
+#' @returns A data frame with columns `vertice`, `annot`, `x`, and `y`.
+#'   Unknown linkage prefixes such as `?` are removed from `annot`. Returns an
+#'   empty data frame with the same columns when no substituents are present.
 #' @noRd
-.substituent_annotation <- function(structure, coor, orient) {
+.substituent_annotation_data <- function(structure, coor, orient) {
   sub <- igraph::V(structure)$sub
   if (length(sub) == 0) {
     return(data.frame(
@@ -520,40 +555,46 @@
   )
 }
 
-#' Check whether an annotation can be parsed as plotmath
+#' Check whether text is already valid plotmath
 #'
-#' @param annot annotation text
+#' @param annot A character vector of annotation labels.
 #'
-#' @returns a logical vector
+#' @returns A logical vector the same length as `annot`; `TRUE` means
+#'   `parse(text = annot)` succeeds.
 #' @noRd
-.is_parseable_annotation <- function(annot) {
+.can_parse_plotmath <- function(annot) {
   purrr::map_lgl(annot, function(x) {
     !inherits(try(parse(text = x), silent = TRUE), "try-error")
   })
 }
 
-#' Quote annotation text for plotmath parsing
+#' Quote plain text for plotmath parsing
 #'
-#' @param annot annotation text
+#' @param annot A character vector of annotation labels.
 #'
-#' @returns a quoted character vector
+#' @returns A character vector the same length as `annot`, with each value
+#'   wrapped in double quotes and embedded quotes escaped.
 #' @noRd
-.quote_annotation <- function(annot) {
+.quote_plotmath_text <- function(annot) {
   paste0('"', gsub('"', '\\"', annot, fixed = TRUE), '"')
 }
 
-#' Map the coordinate of reducing end annotation and segment
+#' Build reducing-end segment, label, wave, and bounds data
 #'
-#' @param structure an igraph object
-#' @param coor a matrix
-#' @param orient glycan drawing orientation, "H" or "V"
-#' @param red_end reducing-end annotation
+#' @param structure An igraph glycan graph. The graph attribute `anomer`
+#'   supplies the reducing-end alpha/beta/unknown label.
+#' @param coor A numeric coordinate matrix with columns `x` and `y`, one row
+#'   per graph vertex.
+#' @param orient Drawing orientation, either `"H"` or `"V"`.
+#' @param red_end A string. `""` draws only the current reducing-end line,
+#'   `"~"` draws a wavy end, and any other string draws custom text.
 #'
-#' @returns list of reducing end annotation and segment
-#'
-#' @examples .reducing_end_annotation(structure, coor, orient, red_end)
+#' @returns A list with data frames `annotation`, `segment`, `wave`, and
+#'   `bounds`. `annotation` contains text rows; `segment` contains one line
+#'   segment row; `wave` contains path coordinates for `"~"`; `bounds` contains
+#'   invisible points used to reserve space for custom text.
 #' @noRd
-.reducing_end_annotation <- function(
+.reducing_end_annotation_data <- function(
   structure,
   coor,
   orient = c("H", "V"),
@@ -624,7 +665,7 @@
   }
   annot_loc <- 0.6 * rotate_matrix %*% matrix(label_vec, ncol = 1)
   annot_coor <- root_coor + as.vector(annot_loc)
-  red_end_annotation <- .reducing_end_text_annotation(
+  red_end_annotation <- .reducing_end_text_data(
     red_end,
     line_end,
     line_vec,
@@ -656,22 +697,26 @@
       end_x = as.numeric(line_end["x"]),
       end_y = as.numeric(line_end["y"])
     ),
-    wave = .reducing_end_wave(red_end, line_end, line_vec),
+    wave = .reducing_end_wave_data(red_end, line_end, line_vec),
     bounds = red_end_bounds
   )
 }
 
-#' Map reducing-end text coordinates
+#' Build custom reducing-end text rows
 #'
-#' @param red_end reducing-end annotation
-#' @param line_end reducing-end line endpoint
-#' @param line_vec reducing-end line vector
-#' @param orient glycan drawing orientation, "H" or "V"
-#' @param root reducing-end vertex index
+#' @param red_end A string reducing-end annotation.
+#' @param line_end A named numeric vector `c(x, y)` for the reducing-end line
+#'   endpoint.
+#' @param line_vec A named numeric vector `c(x, y)` for the reducing-end line
+#'   direction.
+#' @param orient Drawing orientation, either `"H"` or `"V"`.
+#' @param root Integer reducing-end vertex index.
 #'
-#' @returns a data frame
+#' @returns A data frame with columns `vertice`, `annot`, `x`, `y`, `hjust`,
+#'   `vjust`, and `is_red_end_text`. Returns an empty data frame with those
+#'   columns for `""` and `"~"`.
 #' @noRd
-.reducing_end_text_annotation <- function(
+.reducing_end_text_data <- function(
   red_end,
   line_end,
   line_vec,
@@ -696,7 +741,7 @@
   vjust <- if (orient == "H") 0.5 else 1
   data.frame(
     vertice = as.character(root),
-    annot = .quote_annotation(red_end),
+    annot = .quote_plotmath_text(red_end),
     x = as.numeric(text_coor["x"]),
     y = as.numeric(text_coor["y"]),
     hjust = hjust,
@@ -705,14 +750,18 @@
   )
 }
 
-#' Map reducing-end text scale bounds
+#' Build invisible bounds for custom reducing-end text
 #'
-#' @param red_end reducing-end annotation
-#' @param line_end reducing-end line endpoint
-#' @param line_vec reducing-end line vector
-#' @param orient glycan drawing orientation, "H" or "V"
+#' @param red_end A string reducing-end annotation.
+#' @param line_end A named numeric vector `c(x, y)` for the reducing-end line
+#'   endpoint.
+#' @param line_vec A named numeric vector `c(x, y)` for the reducing-end line
+#'   direction.
+#' @param orient Drawing orientation, either `"H"` or `"V"`.
 #'
-#' @returns a data frame
+#' @returns A data frame with numeric columns `x` and `y`. Horizontal text
+#'   returns one bound point; vertical text returns two bound points; `""` and
+#'   `"~"` return zero rows.
 #' @noRd
 .reducing_end_text_bounds <- function(red_end, line_end, line_vec, orient) {
   if (red_end %in% c("", "~")) {
@@ -736,15 +785,18 @@
   )
 }
 
-#' Map reducing-end wave coordinates
+#' Build reducing-end wave path coordinates
 #'
-#' @param red_end reducing-end annotation
-#' @param line_end reducing-end line endpoint
-#' @param line_vec reducing-end line vector
+#' @param red_end A string reducing-end annotation.
+#' @param line_end A named numeric vector `c(x, y)` for the reducing-end line
+#'   endpoint.
+#' @param line_vec A named numeric vector `c(x, y)` for the reducing-end line
+#'   direction.
 #'
-#' @returns a data frame
+#' @returns A data frame with numeric columns `x` and `y` containing wave path
+#'   points when `red_end` is `"~"`; otherwise returns zero rows.
 #' @noRd
-.reducing_end_wave <- function(red_end, line_end, line_vec) {
+.reducing_end_wave_data <- function(red_end, line_end, line_vec) {
   if (!identical(red_end, "~")) {
     return(data.frame(x = numeric(0), y = numeric(0)))
   }
