@@ -10,7 +10,8 @@ export_cartoons(
   file_ext = "png",
   dpi = 300,
   show_linkage = TRUE,
-  orient = c("H", "V")
+  orient = c("H", "V"),
+  red_end = ""
 )
 }
 \arguments{
@@ -29,6 +30,10 @@ it is created.}
 
 \item{orient}{The orientation of glycan structure. "H" for horizontal, "V" for vertical.
 Default is "H"}
+
+\item{red_end}{Reducing-end annotation. The default \code{""} keeps the current
+reducing-end line. Use \code{"~"} to add a wavy reducing end, or any other
+string to draw that string at the reducing end.}
 }
 \value{
 The function returns the list of cartoons implicitly.

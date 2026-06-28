@@ -1263,12 +1263,18 @@ quote_annotation <- function(annot) {
 #' @param structure an igraph object
 #' @param coor a matrix
 #' @param orient glycan drawing orientation, "H" or "V"
+#' @param red_end reducing-end annotation
 #'
 #' @returns list of reducing end annotation and segment
 #'
-#' @examples reducing_end_annotation(structure, coor, orient)
+#' @examples reducing_end_annotation(structure, coor, orient, red_end)
 #' @noRd
-reducing_end_annotation <- function(structure, coor, orient = c("H", "V")) {
+reducing_end_annotation <- function(
+  structure,
+  coor,
+  orient = c("H", "V"),
+  red_end = ""
+) {
   orient <- rlang::arg_match(orient)
   anomer <- igraph::graph_attr(structure, "anomer")
   if (length(anomer) == 0 || is.na(anomer) || anomer == "") {
@@ -1277,13 +1283,24 @@ reducing_end_annotation <- function(structure, coor, orient = c("H", "V")) {
         vertice = character(0),
         annot = character(0),
         x = numeric(0),
-        y = numeric(0)
+        y = numeric(0),
+        hjust = numeric(0),
+        vjust = numeric(0),
+        is_red_end_text = logical(0)
       ),
       segment = data.frame(
         start_x = numeric(0),
         start_y = numeric(0),
         end_x = numeric(0),
         end_y = numeric(0)
+      ),
+      wave = data.frame(
+        x = numeric(0),
+        y = numeric(0)
+      ),
+      bounds = data.frame(
+        x = numeric(0),
+        y = numeric(0)
       )
     ))
   }
@@ -1298,7 +1315,7 @@ reducing_end_annotation <- function(structure, coor, orient = c("H", "V")) {
   root <- length(structure)
   root_coor <- c(x = as.numeric(coor[root, 1]), y = as.numeric(coor[root, 2]))
   line_length <- 0.6
-  label_offset <- 0.2
+  label_offset <- 0.1
   line_vec <- if (orient == "H") {
     c(x = line_length, y = 0)
   } else {
@@ -1323,19 +1340,143 @@ reducing_end_annotation <- function(structure, coor, orient = c("H", "V")) {
   }
   annot_loc <- 0.6 * rotate_matrix %*% matrix(label_vec, ncol = 1)
   annot_coor <- root_coor + as.vector(annot_loc)
+  red_end_annotation <- reducing_end_text_annotation(
+    red_end,
+    line_end,
+    line_vec,
+    orient,
+    root
+  )
+  red_end_bounds <- reducing_end_text_bounds(
+    red_end,
+    line_end,
+    line_vec,
+    orient
+  )
   list(
-    annotation = data.frame(
-      vertice = as.character(root),
-      annot = label,
-      x = as.numeric(annot_coor["x"]),
-      y = as.numeric(annot_coor["y"])
+    annotation = dplyr::bind_rows(
+      data.frame(
+        vertice = as.character(root),
+        annot = label,
+        x = as.numeric(annot_coor["x"]),
+        y = as.numeric(annot_coor["y"]),
+        hjust = 0.5,
+        vjust = 0.5,
+        is_red_end_text = FALSE
+      ),
+      red_end_annotation
     ),
     segment = data.frame(
       start_x = as.numeric(root_coor["x"]),
       start_y = as.numeric(root_coor["y"]),
       end_x = as.numeric(line_end["x"]),
       end_y = as.numeric(line_end["y"])
-    )
+    ),
+    wave = reducing_end_wave(red_end, line_end, line_vec),
+    bounds = red_end_bounds
+  )
+}
+
+#' Map reducing-end text coordinates
+#'
+#' @param red_end reducing-end annotation
+#' @param line_end reducing-end line endpoint
+#' @param line_vec reducing-end line vector
+#' @param orient glycan drawing orientation, "H" or "V"
+#' @param root reducing-end vertex index
+#'
+#' @returns a data frame
+#' @noRd
+reducing_end_text_annotation <- function(
+  red_end,
+  line_end,
+  line_vec,
+  orient,
+  root
+) {
+  if (red_end %in% c("", "~")) {
+    return(data.frame(
+      vertice = character(0),
+      annot = character(0),
+      x = numeric(0),
+      y = numeric(0),
+      hjust = numeric(0),
+      vjust = numeric(0),
+      is_red_end_text = logical(0)
+    ))
+  }
+  line_unit <- line_vec / sqrt(sum(line_vec^2))
+  text_offset <- 0.02
+  text_coor <- line_end + line_unit * text_offset
+  hjust <- if (orient == "H") 0 else 0.5
+  vjust <- if (orient == "H") 0.5 else 1
+  data.frame(
+    vertice = as.character(root),
+    annot = quote_annotation(red_end),
+    x = as.numeric(text_coor["x"]),
+    y = as.numeric(text_coor["y"]),
+    hjust = hjust,
+    vjust = vjust,
+    is_red_end_text = TRUE
+  )
+}
+
+#' Map reducing-end text scale bounds
+#'
+#' @param red_end reducing-end annotation
+#' @param line_end reducing-end line endpoint
+#' @param line_vec reducing-end line vector
+#' @param orient glycan drawing orientation, "H" or "V"
+#'
+#' @returns a data frame
+#' @noRd
+reducing_end_text_bounds <- function(red_end, line_end, line_vec, orient) {
+  if (red_end %in% c("", "~")) {
+    return(data.frame(x = numeric(0), y = numeric(0)))
+  }
+  line_unit <- line_vec / sqrt(sum(line_vec^2))
+  text_offset <- 0.1
+  text_width <- max(nchar(red_end), 1) * 0.12
+  if (orient == "H") {
+    text_bound <- line_end + line_unit * (text_offset + text_width)
+    return(data.frame(
+      x = as.numeric(text_bound["x"]),
+      y = as.numeric(text_bound["y"])
+    ))
+  }
+  text_coor <- line_end + line_unit * 0.02
+  text_height <- 0.36
+  data.frame(
+    x = as.numeric(text_coor["x"] + c(-1, 1) * text_width / 2),
+    y = as.numeric(text_coor["y"] + c(0, -text_height))
+  )
+}
+
+#' Map reducing-end wave coordinates
+#'
+#' @param red_end reducing-end annotation
+#' @param line_end reducing-end line endpoint
+#' @param line_vec reducing-end line vector
+#'
+#' @returns a data frame
+#' @noRd
+reducing_end_wave <- function(red_end, line_end, line_vec) {
+  if (!identical(red_end, "~")) {
+    return(data.frame(x = numeric(0), y = numeric(0)))
+  }
+  line_unit <- line_vec / sqrt(sum(line_vec^2))
+  wave_unit <- c(x = -line_unit["y"], y = line_unit["x"])
+  wave_t <- seq(0, 1, length.out = 25)
+  wave_length <- 0.45
+  wave_amplitude <- 0.03
+  wave_coor <- purrr::map_dfr(wave_t, function(t) {
+    line_end +
+      wave_unit * ((t - 0.5) * wave_length) +
+      line_unit * (sin(2 * pi * t) * wave_amplitude)
+  })
+  data.frame(
+    x = as.numeric(wave_coor$x),
+    y = as.numeric(wave_coor$y)
   )
 }
 

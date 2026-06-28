@@ -8,6 +8,7 @@ draw_cartoon(
   structure,
   show_linkage = TRUE,
   orient = c("H", "V"),
+  red_end = "",
   highlight = NULL
 )
 }
@@ -19,6 +20,10 @@ or a string of any glycan structure text nomenclatures supported by \code{\link[
 
 \item{orient}{The orientation of glycan structure. "H" for horizontal, "V" for vertical.
 Default is "H"}
+
+\item{red_end}{Reducing-end annotation. The default \code{""} keeps the current
+reducing-end line. Use \code{"~"} to add a wavy reducing end, or any other
+string to draw that string at the reducing end.}
 
 \item{highlight}{An integer vector specifying the node indices to highlight.
 This argument is applicable only when \code{structure} is a \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}}.
