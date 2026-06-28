@@ -1,5 +1,10 @@
 # glydraw (development version)
 
+## Breaking changes
+
+* `export_cartoons()` no longer supports `glyexp::experiment()` input, and
+  `glyexp` is no longer a package dependency.
+
 # glydraw 0.5.1
 
 ## Minor improvements and bug fixes

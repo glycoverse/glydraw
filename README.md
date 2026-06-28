@@ -77,13 +77,13 @@ cartoon <- draw_cartoon("Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-")
 save_cartoon(cartoon, "N-core.png", dpi = 300)
 ```
 
-You can also use `export_cartoons()` to save mutiple SNFGs to a
-directory, directly from a `glexp::experiment()` object:
+You can also use `export_cartoons()` to save multiple SNFGs from
+character vectors to a directory:
 
 ``` r
-library(glyexp)
-
-# Make a tidy experiment object
-exp <- real_experiment |> slice_head_var(n = 5)
-export_cartoons(exp, "path/to/save")
+glycans <- c(
+  core = "Man(a1-3)Man(b1-4)GlcNAc(b1-",
+  antenna = "Gal(b1-4)GlcNAc(b1-"
+)
+export_cartoons(glycans, "path/to/save")
 ```
