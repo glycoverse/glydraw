@@ -28,8 +28,6 @@ export_cartoons(
 - x:
 
   A
-  [`glyexp::experiment()`](https://glycoverse.github.io/glyexp/reference/experiment.html),
-  a
   [`glyrepr::glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/glycan_structure.html)
   vector, or a character vector of any glycan structure text
   nomenclatures supported by
@@ -72,8 +70,12 @@ The function returns the list of cartoons implicitly.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-library(glyexp)
-export_cartoons(real_experiment, "path/to/save")
-} # }
+export_cartoons(
+  c(
+    "Man(a1-3)Man(b1-4)GlcNAc(b1-",
+    "Gal(b1-4)GlcNAc(b1-"
+  ),
+  "path/to/save"
+)
+#> ℹ Exporting 2 glycan cartoons.
 ```

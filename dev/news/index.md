@@ -2,6 +2,13 @@
 
 ## glydraw (development version)
 
+### Breaking changes
+
+- [`export_cartoons()`](https://glycoverse.github.io/glydraw/dev/reference/export_cartoons.md)
+  no longer supports
+  [`glyexp::experiment()`](https://glycoverse.github.io/glyexp/reference/experiment.html)
+  input, and `glyexp` is no longer a package dependency.
+
 ## glydraw 0.5.1
 
 ### Minor improvements and bug fixes
