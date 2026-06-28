@@ -118,20 +118,26 @@
 #'   `beta`, or linkage position text.
 #' @noRd
 .linkage_annotation_data <- function(structure, coor) {
-  structure_length <- length(structure)
   if (igraph::ecount(structure) == 0) {
-    return(data.frame(
-      vertice = character(0),
-      annot = character(0),
-      x = numeric(0),
-      y = numeric(0),
-      segment_start_x = numeric(0),
-      segment_start_y = numeric(0),
-      segment_end_x = numeric(0),
-      segment_end_y = numeric(0)
-    ))
+    return(.empty_linkage_annotation_data())
   }
-  struc_annot_coor <- data.frame(
+
+  annotation <- purrr::map_dfr(
+    seq_len(length(structure) - 1),
+    \(ver) .linkage_annotation_rows(structure, coor, ver)
+  )
+  annotation$annot <- .normalize_linkage_labels(annotation$annot)
+  annotation
+}
+
+#' Build an empty linkage annotation table
+#'
+#' @returns A data frame with linkage annotation columns and zero rows. Columns
+#'   are `vertice`, `annot`, `x`, `y`, `segment_start_x`, `segment_start_y`,
+#'   `segment_end_x`, and `segment_end_y`.
+#' @noRd
+.empty_linkage_annotation_data <- function() {
+  data.frame(
     vertice = character(),
     annot = character(),
     x = numeric(),
@@ -142,87 +148,148 @@
     segment_end_y = numeric(),
     stringsAsFactors = FALSE
   )
-  for (ver in seq_len(structure_length - 1)) {
-    par_ver <- dplyr::nth(
-      as.vector(igraph::shortest_paths(
-        structure,
-        length(structure),
-        ver
-      )$vpath[[1]]),
-      -2
-    )
-    # Read annotation information and relative position
-    linkage_str <- igraph::E(structure)[ver]$linkage
-    gly_annot_coor <- .linkage_label_positions(
-      coor[ver, 1],
-      coor[ver, 2],
-      coor[par_ver, 1],
-      coor[par_ver, 2],
-      chil_offset = .linkage_label_offset(
-        structure,
-        ver,
-        coor[ver, 1],
-        coor[ver, 2],
-        coor[par_ver, 1],
-        coor[par_ver, 2],
-        role = "child"
-      ),
-      par_offset = .linkage_label_offset(
-        structure,
-        par_ver,
-        coor[par_ver, 1],
-        coor[par_ver, 2],
-        coor[ver, 1],
-        coor[ver, 2],
-        role = "parent"
-      )
-    )
-    # Calculate annotation coordinate >> c(annotate_information, x, y)
-    chil_annotation <- c(ver, strsplit(linkage_str, '-')[[1]][1])
-    chil_annotation <- c(
-      chil_annotation,
-      as.vector(gly_annot_coor$chil) + coor[ver, ],
-      coor[ver, ],
-      coor[par_ver, ]
-    )
-    par_annotation <- c(ver, strsplit(linkage_str, '-')[[1]][2])
-    par_annotation <- c(
-      par_annotation,
-      as.vector(gly_annot_coor$par) + coor[par_ver, ],
-      coor[ver, ],
-      coor[par_ver, ]
-    )
-    # Bind to data.frame
-    struc_annot_coor <- rbind(struc_annot_coor, chil_annotation)
-    struc_annot_coor <- rbind(struc_annot_coor, par_annotation)
-  }
-  colnames(struc_annot_coor) <- c(
-    'vertice',
-    'annot',
-    'x',
-    'y',
-    'segment_start_x',
-    'segment_start_y',
-    'segment_end_x',
-    'segment_end_y'
+}
+
+#' Build the two linkage annotation rows for one child residue
+#'
+#' @param structure An igraph glycan graph whose edges include `linkage`.
+#' @param coor A numeric coordinate matrix with columns `x` and `y`, one row
+#'   per graph vertex.
+#' @param ver A single integer child vertex index.
+#'
+#' @returns A two-row data frame with linkage annotation columns. The first row
+#'   is the child-side anomer label and the second row is the parent-side
+#'   linkage-position label.
+#' @noRd
+.linkage_annotation_rows <- function(structure, coor, ver) {
+  par_ver <- .parent_vertex_for_annotation(structure, ver)
+  labels <- strsplit(igraph::E(structure)[ver]$linkage, '-')[[1]]
+  offsets <- .linkage_label_offsets(structure, coor, ver, par_ver)
+  label_positions <- .linkage_label_positions(
+    coor[ver, "x"],
+    coor[ver, "y"],
+    coor[par_ver, "x"],
+    coor[par_ver, "y"],
+    chil_offset = offsets[["child"]],
+    par_offset = offsets[["parent"]]
   )
-  struc_annot_coor$annot[
-    tolower(substr(struc_annot_coor$annot, 1, 1)) == "b"
-  ] <- "beta"
-  struc_annot_coor$annot[
-    tolower(substr(struc_annot_coor$annot, 1, 1)) == "a"
-  ] <- "alpha"
-  struc_annot_coor$x <- as.numeric(struc_annot_coor$x)
-  struc_annot_coor$y <- as.numeric(struc_annot_coor$y)
-  struc_annot_coor$segment_start_x <- as.numeric(
-    struc_annot_coor$segment_start_x
+
+  dplyr::bind_rows(
+    .linkage_annotation_row(
+      ver = ver,
+      annot = labels[1],
+      annot_coor = as.vector(label_positions$chil) + coor[ver, ],
+      segment_start = coor[ver, ],
+      segment_end = coor[par_ver, ]
+    ),
+    .linkage_annotation_row(
+      ver = ver,
+      annot = labels[2],
+      annot_coor = as.vector(label_positions$par) + coor[par_ver, ],
+      segment_start = coor[ver, ],
+      segment_end = coor[par_ver, ]
+    )
   )
-  struc_annot_coor$segment_start_y <- as.numeric(
-    struc_annot_coor$segment_start_y
+}
+
+#' Find the parent vertex used for linkage annotations
+#'
+#' @param structure An igraph glycan graph.
+#' @param ver A single integer child vertex index.
+#'
+#' @returns A single integer parent vertex index. The value is the penultimate
+#'   vertex on the shortest path from the reducing end to `ver`.
+#' @noRd
+.parent_vertex_for_annotation <- function(structure, ver) {
+  dplyr::nth(
+    as.vector(igraph::shortest_paths(
+      structure,
+      length(structure),
+      ver
+    )$vpath[[1]]),
+    -2
   )
-  struc_annot_coor$segment_end_x <- as.numeric(struc_annot_coor$segment_end_x)
-  struc_annot_coor$segment_end_y <- as.numeric(struc_annot_coor$segment_end_y)
-  return(struc_annot_coor)
+}
+
+#' Calculate child-side and parent-side linkage label offsets
+#'
+#' @param structure An igraph glycan graph whose vertices include `mono`.
+#' @param coor A numeric coordinate matrix with columns `x` and `y`, one row
+#'   per graph vertex.
+#' @param child_ver A single integer child vertex index.
+#' @param parent_ver A single integer parent vertex index.
+#'
+#' @returns A named numeric vector with values `child` and `parent`, giving the
+#'   distance from each residue center to its label.
+#' @noRd
+.linkage_label_offsets <- function(structure, coor, child_ver, parent_ver) {
+  c(
+    child = .linkage_label_offset(
+      structure,
+      child_ver,
+      coor[child_ver, "x"],
+      coor[child_ver, "y"],
+      coor[parent_ver, "x"],
+      coor[parent_ver, "y"],
+      role = "child"
+    ),
+    parent = .linkage_label_offset(
+      structure,
+      parent_ver,
+      coor[parent_ver, "x"],
+      coor[parent_ver, "y"],
+      coor[child_ver, "x"],
+      coor[child_ver, "y"],
+      role = "parent"
+    )
+  )
+}
+
+#' Build one linkage annotation row
+#'
+#' @param ver A single integer child vertex index.
+#' @param annot A string linkage label for this row.
+#' @param annot_coor A numeric vector with `x` and `y` annotation coordinates.
+#' @param segment_start A numeric vector with `x` and `y` coordinates for the
+#'   child-side segment endpoint.
+#' @param segment_end A numeric vector with `x` and `y` coordinates for the
+#'   parent-side segment endpoint.
+#'
+#' @returns A one-row data frame with linkage annotation columns.
+#' @noRd
+.linkage_annotation_row <- function(
+  ver,
+  annot,
+  annot_coor,
+  segment_start,
+  segment_end
+) {
+  data.frame(
+    vertice = as.character(ver),
+    annot = annot,
+    x = as.numeric(annot_coor[["x"]]),
+    y = as.numeric(annot_coor[["y"]]),
+    segment_start_x = as.numeric(segment_start[["x"]]),
+    segment_start_y = as.numeric(segment_start[["y"]]),
+    segment_end_x = as.numeric(segment_end[["x"]]),
+    segment_end_y = as.numeric(segment_end[["y"]]),
+    stringsAsFactors = FALSE
+  )
+}
+
+#' Normalize linkage labels for plotmath
+#'
+#' @param labels A character vector of raw linkage labels.
+#'
+#' @returns A character vector the same length as `labels`. Labels beginning
+#'   with `a` become `alpha`, labels beginning with `b` become `beta`, and all
+#'   other labels are returned unchanged.
+#' @noRd
+.normalize_linkage_labels <- function(labels) {
+  normalized <- labels
+  normalized[tolower(substr(normalized, 1, 1)) == "b"] <- "beta"
+  normalized[tolower(substr(normalized, 1, 1)) == "a"] <- "alpha"
+  normalized
 }
 
 #' Reflect one point across a line segment
@@ -409,41 +476,149 @@
 ) {
   reflected_groups <- rep(FALSE, length(groups$rows))
   names(reflected_groups) <- names(groups$rows)
+  pairs <- .annotation_overlap_pairs(finite_index)
 
   for (iter in seq_len(max_iter)) {
-    shifted <- FALSE
-    for (i_pos in seq_len(length(finite_index) - 1)) {
-      i <- finite_index[i_pos]
-      for (j in finite_index[(i_pos + 1):length(finite_index)]) {
-        if (.annotations_are_separated(coords, i, j, min_distance)) {
-          next
-        }
+    result <- .resolve_annotation_overlap_pass(
+      coords,
+      reflected_coords,
+      groups,
+      reflected_groups,
+      pairs,
+      min_distance
+    )
+    coords <- result$coords
+    reflected_groups <- result$reflected_groups
 
-        best <- .choose_annotation_group_to_reflect(
-          i,
-          j,
-          coords,
-          reflected_coords,
-          groups,
-          reflected_groups
-        )
-        if (is.null(best)) {
-          next
-        }
-
-        rows <- groups$rows[[best]]
-        coords[rows, ] <- reflected_coords[rows, ]
-        reflected_groups[best] <- TRUE
-        shifted <- TRUE
-      }
-    }
-
-    if (!shifted) {
+    if (!result$shifted) {
       break
     }
   }
 
   coords
+}
+
+#' Build all finite annotation row pairs to compare
+#'
+#' @param finite_index An integer vector of annotation row indices with finite
+#'   `x` and `y` coordinates.
+#'
+#' @returns A data frame with integer columns `i` and `j`. Each row is a unique
+#'   pair from `finite_index`, with `i` preceding `j` in the input order.
+#' @noRd
+.annotation_overlap_pairs <- function(finite_index) {
+  if (length(finite_index) < 2) {
+    return(data.frame(i = integer(0), j = integer(0)))
+  }
+
+  purrr::map_dfr(
+    seq_len(length(finite_index) - 1),
+    function(i_pos) {
+      data.frame(
+        i = finite_index[i_pos],
+        j = finite_index[(i_pos + 1):length(finite_index)]
+      )
+    }
+  )
+}
+
+#' Run one annotation-overlap resolution pass
+#'
+#' @param coords A numeric matrix with current `x` and `y` annotation
+#'   coordinates.
+#' @param reflected_coords A numeric matrix with candidate reflected
+#'   coordinates, same dimensions as `coords`.
+#' @param groups A list returned by `.annotation_reflection_groups()`.
+#' @param reflected_groups A named logical vector marking groups that have
+#'   already been reflected.
+#' @param pairs A data frame returned by `.annotation_overlap_pairs()`.
+#' @param min_distance Numeric minimum distance between annotation centers.
+#'
+#' @returns A list with updated `coords`, updated `reflected_groups`, and
+#'   `shifted`, a logical scalar indicating whether any group was reflected.
+#' @noRd
+.resolve_annotation_overlap_pass <- function(
+  coords,
+  reflected_coords,
+  groups,
+  reflected_groups,
+  pairs,
+  min_distance
+) {
+  shifted <- FALSE
+  for (pair in seq_len(nrow(pairs))) {
+    i <- pairs$i[pair]
+    j <- pairs$j[pair]
+    if (.annotations_are_separated(coords, i, j, min_distance)) {
+      next
+    }
+
+    result <- .reflect_best_annotation_group(
+      i,
+      j,
+      coords,
+      reflected_coords,
+      groups,
+      reflected_groups
+    )
+    coords <- result$coords
+    reflected_groups <- result$reflected_groups
+    shifted <- shifted || result$shifted
+  }
+
+  list(
+    coords = coords,
+    reflected_groups = reflected_groups,
+    shifted = shifted
+  )
+}
+
+#' Reflect the best available annotation group for one overlap
+#'
+#' @param i,j Integer row indices for two overlapping annotation rows.
+#' @param coords A numeric matrix with current `x` and `y` annotation
+#'   coordinates.
+#' @param reflected_coords A numeric matrix with candidate reflected
+#'   coordinates, same dimensions as `coords`.
+#' @param groups A list returned by `.annotation_reflection_groups()`.
+#' @param reflected_groups A named logical vector marking groups that have
+#'   already been reflected.
+#'
+#' @returns A list with updated `coords`, updated `reflected_groups`, and
+#'   `shifted`, a logical scalar indicating whether a group was reflected.
+#' @noRd
+.reflect_best_annotation_group <- function(
+  i,
+  j,
+  coords,
+  reflected_coords,
+  groups,
+  reflected_groups
+) {
+  best <- .choose_annotation_group_to_reflect(
+    i,
+    j,
+    coords,
+    reflected_coords,
+    groups,
+    reflected_groups
+  )
+  if (is.null(best)) {
+    return(list(
+      coords = coords,
+      reflected_groups = reflected_groups,
+      shifted = FALSE
+    ))
+  }
+
+  rows <- groups$rows[[best]]
+  coords[rows, ] <- reflected_coords[rows, ]
+  reflected_groups[best] <- TRUE
+  list(
+    coords = coords,
+    reflected_groups = reflected_groups,
+    shifted = TRUE
+  )
 }
 
 #' Separate overlapping annotation labels
@@ -602,51 +777,166 @@
 ) {
   orient <- rlang::arg_match(orient)
   anomer <- igraph::graph_attr(structure, "anomer")
-  if (length(anomer) == 0 || is.na(anomer) || anomer == "") {
-    return(list(
-      annotation = data.frame(
-        vertice = character(0),
-        annot = character(0),
-        x = numeric(0),
-        y = numeric(0),
-        hjust = numeric(0),
-        vjust = numeric(0),
-        is_red_end_text = logical(0)
-      ),
-      segment = data.frame(
-        start_x = numeric(0),
-        start_y = numeric(0),
-        end_x = numeric(0),
-        end_y = numeric(0)
-      ),
-      wave = data.frame(
-        x = numeric(0),
-        y = numeric(0)
-      ),
-      bounds = data.frame(
-        x = numeric(0),
-        y = numeric(0)
-      )
-    ))
+  if (.has_no_reducing_end_anomer(anomer)) {
+    return(.empty_reducing_end_annotation_data())
   }
+
+  label <- .reducing_end_anomer_label(anomer)
+  root <- length(structure)
+  geometry <- .reducing_end_geometry(coor[root, ], orient)
+  red_end_annotation <- .reducing_end_text_data(
+    red_end,
+    geometry$line_end,
+    geometry$line_vec,
+    orient,
+    root
+  )
+  red_end_bounds <- .reducing_end_text_bounds(
+    red_end,
+    geometry$line_end,
+    geometry$line_vec,
+    orient
+  )
+  list(
+    annotation = dplyr::bind_rows(
+      .reducing_end_anomer_row(root, label, geometry$label_coor),
+      red_end_annotation
+    ),
+    segment = .reducing_end_segment_data(
+      geometry$root_coor,
+      geometry$line_end
+    ),
+    wave = .reducing_end_wave_data(
+      red_end,
+      geometry$line_end,
+      geometry$line_vec
+    ),
+    bounds = red_end_bounds
+  )
+}
+
+#' Check whether a graph has no reducing-end anomer label
+#'
+#' @param anomer The `anomer` graph attribute from an igraph glycan graph.
+#'
+#' @returns A logical scalar: `TRUE` when `anomer` is missing, `NA`, or an
+#'   empty string.
+#' @noRd
+.has_no_reducing_end_anomer <- function(anomer) {
+  length(anomer) == 0 || is.na(anomer) || anomer == ""
+}
+
+#' Build an empty reducing-end annotation result
+#'
+#' @returns A list with zero-row data frames `annotation`, `segment`, `wave`,
+#'   and `bounds`. The columns match the non-empty result from
+#'   `.reducing_end_annotation_data()`.
+#' @noRd
+.empty_reducing_end_annotation_data <- function() {
+  list(
+    annotation = data.frame(
+      vertice = character(0),
+      annot = character(0),
+      x = numeric(0),
+      y = numeric(0),
+      hjust = numeric(0),
+      vjust = numeric(0),
+      is_red_end_text = logical(0)
+    ),
+    segment = data.frame(
+      start_x = numeric(0),
+      start_y = numeric(0),
+      end_x = numeric(0),
+      end_y = numeric(0)
+    ),
+    wave = data.frame(
+      x = numeric(0),
+      y = numeric(0)
+    ),
+    bounds = data.frame(
+      x = numeric(0),
+      y = numeric(0)
+    )
+  )
+}
+
+#' Convert a reducing-end anomer attribute to a plot label
+#'
+#' @param anomer A non-empty string graph attribute such as `"a"`, `"b"`,
+#'   `"alpha"`, `"beta"`, or an unknown value.
+#'
+#' @returns A string. Values beginning with `a` return `alpha`, values
+#'   beginning with `b` return `beta`, and all other values return the plotmath
+#'   expression for an unknown label.
+#' @noRd
+.reducing_end_anomer_label <- function(anomer) {
   label <- tolower(substr(anomer, 1, 1))
   if (label == "a") {
-    label <- "alpha"
-  } else if (label == "b") {
-    label <- "beta"
-  } else {
-    label <- '~"?"'
+    return("alpha")
   }
-  root <- length(structure)
-  root_coor <- c(x = as.numeric(coor[root, 1]), y = as.numeric(coor[root, 2]))
-  line_length <- 0.6
-  label_offset <- 0.1
-  line_vec <- if (orient == "H") {
-    c(x = line_length, y = 0)
-  } else {
-    c(x = 0, y = -line_length)
+  if (label == "b") {
+    return("beta")
   }
-  line_end <- root_coor + line_vec
+  '~"?"'
+}
+
+#' Calculate reducing-end line and anomer-label coordinates
+#'
+#' @param root_coor A numeric vector with `x` and `y` coordinates for the
+#'   reducing-end residue.
+#' @param orient Drawing orientation, either `"H"` or `"V"`.
+#' @param line_length Numeric length of the reducing-end line segment.
+#' @param label_offset Numeric extra distance between the line length and the
+#'   anomer label anchor before rotation.
+#'
+#' @returns A list with named numeric vectors `root_coor`, `line_vec`,
+#'   `line_end`, and `label_coor`, each containing `x` and `y` values.
+#' @noRd
+.reducing_end_geometry <- function(
+  root_coor,
+  orient,
+  line_length = 0.6,
+  label_offset = 0.1
+) {
+  root_coor <- c(
+    x = as.numeric(root_coor[["x"]]),
+    y = as.numeric(root_coor[["y"]])
+  )
+  line_vec <- .reducing_end_line_vector(orient, line_length)
+  label_vec <- .reducing_end_line_vector(orient, line_length + label_offset)
+  label_coor <- root_coor + .rotated_reducing_end_label_vector(label_vec)
+
+  list(
+    root_coor = root_coor,
+    line_vec = line_vec,
+    line_end = root_coor + line_vec,
+    label_coor = label_coor
+  )
+}
+
+#' Build an orientation-specific reducing-end line vector
+#'
+#' @param orient Drawing orientation, either `"H"` or `"V"`.
+#' @param length Numeric vector length in plot coordinate units.
+#'
+#' @returns A named numeric vector `c(x, y)`. Horizontal orientation points
+#'   right; vertical orientation points downward.
+#' @noRd
+.reducing_end_line_vector <- function(orient, length) {
+  if (orient == "H") {
+    return(c(x = length, y = 0))
+  }
+  c(x = 0, y = -length)
+}
+
+#' Rotate the reducing-end anomer label away from the line
+#'
+#' @param label_vec A named numeric vector `c(x, y)` pointing from the reducing
+#'   end toward the unrotated label position.
+#'
+#' @returns A named numeric vector `c(x, y)` containing the rotated label offset.
+#' @noRd
+.rotated_reducing_end_label_vector <- function(label_vec) {
   rotate_angle <- 1 / 10 * pi
   rotate_matrix <- matrix(
     c(
@@ -658,47 +948,46 @@
     ncol = 2,
     byrow = TRUE
   )
-  label_vec <- if (orient == "H") {
-    c(x = line_length + label_offset, y = 0)
-  } else {
-    c(x = 0, y = -(line_length + label_offset))
-  }
-  annot_loc <- 0.6 * rotate_matrix %*% matrix(label_vec, ncol = 1)
-  annot_coor <- root_coor + as.vector(annot_loc)
-  red_end_annotation <- .reducing_end_text_data(
-    red_end,
-    line_end,
-    line_vec,
-    orient,
-    root
+  rotated <- 0.6 * rotate_matrix %*% matrix(label_vec, ncol = 1)
+  c(x = as.numeric(rotated[1, 1]), y = as.numeric(rotated[2, 1]))
+}
+
+#' Build the reducing-end anomer annotation row
+#'
+#' @param root A single integer reducing-end vertex index.
+#' @param label A string plotmath label for the reducing-end anomer.
+#' @param label_coor A named numeric vector `c(x, y)` for the label position.
+#'
+#' @returns A one-row data frame with columns `vertice`, `annot`, `x`, `y`,
+#'   `hjust`, `vjust`, and `is_red_end_text`.
+#' @noRd
+.reducing_end_anomer_row <- function(root, label, label_coor) {
+  data.frame(
+    vertice = as.character(root),
+    annot = label,
+    x = as.numeric(label_coor[["x"]]),
+    y = as.numeric(label_coor[["y"]]),
+    hjust = 0.5,
+    vjust = 0.5,
+    is_red_end_text = FALSE
   )
-  red_end_bounds <- .reducing_end_text_bounds(
-    red_end,
-    line_end,
-    line_vec,
-    orient
-  )
-  list(
-    annotation = dplyr::bind_rows(
-      data.frame(
-        vertice = as.character(root),
-        annot = label,
-        x = as.numeric(annot_coor["x"]),
-        y = as.numeric(annot_coor["y"]),
-        hjust = 0.5,
-        vjust = 0.5,
-        is_red_end_text = FALSE
-      ),
-      red_end_annotation
-    ),
-    segment = data.frame(
-      start_x = as.numeric(root_coor["x"]),
-      start_y = as.numeric(root_coor["y"]),
-      end_x = as.numeric(line_end["x"]),
-      end_y = as.numeric(line_end["y"])
-    ),
-    wave = .reducing_end_wave_data(red_end, line_end, line_vec),
-    bounds = red_end_bounds
+}
+
+#' Build the reducing-end line segment row
+#'
+#' @param root_coor A named numeric vector `c(x, y)` for the reducing-end
+#'   residue coordinate.
+#' @param line_end A named numeric vector `c(x, y)` for the line endpoint.
+#'
+#' @returns A one-row data frame with columns `start_x`, `start_y`, `end_x`,
+#'   and `end_y`.
+#' @noRd
+.reducing_end_segment_data <- function(root_coor, line_end) {
+  data.frame(
+    start_x = as.numeric(root_coor[["x"]]),
+    start_y = as.numeric(root_coor[["y"]]),
+    end_x = as.numeric(line_end[["x"]]),
+    end_y = as.numeric(line_end[["y"]])
   )
 }
 

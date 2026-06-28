@@ -354,43 +354,109 @@
   }
 
   for (iter in seq_len(layout_num + 1)) {
-    shifted <- purrr::map2(layouts, shifts, .shift_subtree_layout)
-    changed <- FALSE
+    result <- .separate_parent_column_once(
+      layouts,
+      shifts,
+      rough_offsets,
+      parent_x,
+      min_gap
+    )
+    shifts <- result$shifts
 
-    for (i in seq_len(layout_num)) {
-      profile <- shifted[[i]]$profile
-      parent_column_y <- profile$y[profile$x == parent_x]
-      if (length(parent_column_y) == 0) {
-        next
-      }
-
-      direction <- .child_subtree_side(
-        rough_offsets[i],
-        shifts[i],
-        i,
-        layout_num
-      )
-      if (direction < 0) {
-        violation <- max(parent_column_y) + min_gap
-        if (violation > sqrt(.Machine$double.eps)) {
-          shifts[seq_len(i)] <- shifts[seq_len(i)] - violation
-          changed <- TRUE
-        }
-      } else {
-        violation <- min_gap - min(parent_column_y)
-        if (violation > sqrt(.Machine$double.eps)) {
-          shifts[seq(i, layout_num)] <- shifts[seq(i, layout_num)] + violation
-          changed <- TRUE
-        }
-      }
-    }
-
-    if (!changed) {
+    if (!result$changed) {
       break
     }
   }
 
   shifts
+}
+
+#' Run one parent-column spacing pass for child subtrees
+#'
+#' @param layouts A list of child subtree layout lists in bottom-to-top branch
+#'   order.
+#' @param shifts A numeric vector of proposed vertical shifts, one per layout.
+#' @param rough_offsets A numeric vector of child root offsets from the parent
+#'   before compaction.
+#' @param parent_x Numeric `x` coordinate of the parent residue.
+#' @param min_gap A numeric minimum vertical gap in the parent `x` column.
+#'
+#' @returns A list with `shifts`, the adjusted numeric shift vector, and
+#'   `changed`, a logical scalar indicating whether any shift changed.
+#' @noRd
+.separate_parent_column_once <- function(
+  layouts,
+  shifts,
+  rough_offsets,
+  parent_x,
+  min_gap
+) {
+  shifted <- purrr::map2(layouts, shifts, .shift_subtree_layout)
+  changed <- FALSE
+  layout_num <- length(layouts)
+
+  for (i in seq_len(layout_num)) {
+    profile <- shifted[[i]]$profile
+    parent_column_y <- profile$y[profile$x == parent_x]
+    direction <- .child_subtree_side(
+      rough_offsets[i],
+      shifts[i],
+      i,
+      layout_num
+    )
+    adjustment <- .parent_column_shift_adjustment(
+      parent_column_y,
+      direction,
+      min_gap
+    )
+
+    if (adjustment < 0) {
+      shifts[seq_len(i)] <- shifts[seq_len(i)] + adjustment
+      changed <- TRUE
+    }
+    if (adjustment > 0) {
+      shifts[seq(i, layout_num)] <- shifts[seq(i, layout_num)] + adjustment
+      changed <- TRUE
+    }
+  }
+
+  list(shifts = shifts, changed = changed)
+}
+
+#' Calculate the signed shift needed away from the parent column
+#'
+#' @param parent_column_y A numeric vector of child-subtree y-coordinates that
+#'   occupy the parent `x` column after the current shifts.
+#' @param direction Numeric child side from `.child_subtree_side()`: negative
+#'   for below the parent, positive for above.
+#' @param min_gap A numeric minimum vertical gap from the parent coordinate.
+#'
+#' @returns A numeric scalar. Negative values mean lower child subtrees should
+#'   move downward, positive values mean upper child subtrees should move
+#'   upward, and zero means no movement is needed.
+#' @noRd
+.parent_column_shift_adjustment <- function(
+  parent_column_y,
+  direction,
+  min_gap
+) {
+  if (length(parent_column_y) == 0) {
+    return(0)
+  }
+
+  if (direction < 0) {
+    violation <- max(parent_column_y) + min_gap
+    if (violation > sqrt(.Machine$double.eps)) {
+      return(-violation)
+    }
+    return(0)
+  }
+
+  violation <- min_gap - min(parent_column_y)
+  if (violation > sqrt(.Machine$double.eps)) {
+    return(violation)
+  }
+  0
 }
 
 #' Recursively compact coordinates for one residue subtree
@@ -470,6 +536,106 @@
   coor
 }
 
+#' Get vertices from reducing end to non-reducing end
+#'
+#' @param structure An igraph glycan graph.
+#'
+#' @returns An integer vector of vertex indices in reverse graph order, starting
+#'   with the reducing-end vertex and ending with vertex 1.
+#' @noRd
+.reverse_vertex_order <- function(structure) {
+  seq(length(structure), 1)
+}
+
+#' Apply the rough branch-spreading pass to all vertices
+#'
+#' @param structure An igraph glycan graph whose vertices include `mono`.
+#' @param coor A numeric coordinate matrix with columns `x` and `y`.
+#'
+#' @returns The same coordinate matrix shape as `coor`, with two-child,
+#'   three-child, and Fuc-containing branch subtrees vertically spread before
+#'   final compaction.
+#' @noRd
+.spread_rough_child_subtrees <- function(structure, coor) {
+  for (ver in .reverse_vertex_order(structure)) {
+    coor <- .spread_child_subtrees_for_vertex(coor, structure, ver)
+  }
+  coor
+}
+
+#' Spread rough child subtree positions for one parent vertex
+#'
+#' @param coor A numeric coordinate matrix with columns `x` and `y`.
+#' @param structure An igraph glycan graph whose vertices include `mono`.
+#' @param ver A single integer parent vertex index.
+#'
+#' @returns The same coordinate matrix shape as `coor`. Branching vertices may
+#'   have child subtrees shifted up or down; non-branching vertices return
+#'   `coor` unchanged.
+#' @noRd
+.spread_child_subtrees_for_vertex <- function(coor, structure, ver) {
+  gly_neighbors <- igraph::neighbors(structure, ver)
+  has_fucose <- 'Fuc' %in% gly_neighbors$mono
+  neighbor_num <- length(gly_neighbors)
+
+  if (neighbor_num == 2 && !has_fucose) {
+    return(.spread_two_child_subtrees(coor, structure, ver))
+  }
+  if (neighbor_num == 3 && !has_fucose) {
+    return(.spread_three_child_subtrees(coor, structure, ver))
+  }
+  if (neighbor_num == 3 && has_fucose) {
+    return(.spread_non_fucose_children(coor, structure, ver))
+  }
+  coor
+}
+
+#' Apply Fuc branch offsets and orientation to all vertices
+#'
+#' @param structure An igraph glycan graph whose vertices include `mono` and
+#'   whose edges include `linkage`.
+#' @param coor A numeric coordinate matrix with columns `x` and `y`.
+#'
+#' @returns The same coordinate matrix shape as `coor`, with Fuc branches moved
+#'   to the linkage-specific side and any elongated Fuc descendants rotated with
+#'   the branch.
+#' @noRd
+.orient_fucose_branch_subtrees <- function(structure, coor) {
+  for (ver in .reverse_vertex_order(structure)) {
+    coor <- .orient_fucose_children_for_vertex(structure, coor, ver)
+  }
+  coor
+}
+
+#' Apply Fuc branch offsets and orientation for one parent vertex
+#'
+#' @param structure An igraph glycan graph whose vertices include `mono` and
+#'   whose edges include `linkage`.
+#' @param coor A numeric coordinate matrix with columns `x` and `y`.
+#' @param ver A single integer parent vertex index.
+#'
+#' @returns The same coordinate matrix shape as `coor`. If `ver` has Fuc
+#'   children, each Fuc subtree is shifted and elongated descendants are
+#'   oriented with the branch; otherwise `coor` is returned unchanged.
+#' @noRd
+.orient_fucose_children_for_vertex <- function(structure, coor, ver) {
+  neigh_pos <- igraph::neighbors(structure, ver)
+  fuc_pos <- neigh_pos[which(neigh_pos$mono == 'Fuc')]
+  if (length(fuc_pos) == 0) {
+    return(coor)
+  }
+
+  purrr::reduce2(
+    as.integer(fuc_pos),
+    .fucose_branch_y_offsets(structure, fuc_pos),
+    function(coor_acc, fuc_vertex, offset) {
+      coor_acc <- .shift_subtree_y(structure, fuc_vertex, coor_acc, offset)
+      .orient_fucose_branch_subtree(structure, fuc_vertex, coor_acc, offset)
+    },
+    .init = coor
+  )
+}
+
 #' Calculate final residue coordinates for a glycan graph
 #'
 #' @param structure An igraph glycan graph. Vertices must be in glyrepr order
@@ -481,43 +647,8 @@
 #' @noRd
 .calculate_residue_coordinates <- function(structure) {
   coor <- .initialize_residue_coordinates(structure)
-  structure_length <- seq(length(structure), 1)
-  for (i in structure_length) {
-    gly_neighbors <- igraph::neighbors(structure, i)
-    if (
-      length(gly_neighbors) == 2 &&
-        !('Fuc' %in% gly_neighbors$mono)
-    ) {
-      coor <- .spread_two_child_subtrees(coor, structure, i)
-    }
-    if (
-      length(gly_neighbors) == 3 &&
-        !('Fuc' %in% gly_neighbors$mono)
-    ) {
-      coor <- .spread_three_child_subtrees(coor, structure, i)
-    }
-    if (
-      length(gly_neighbors) == 3 &&
-        'Fuc' %in% gly_neighbors$mono
-    ) {
-      coor <- .spread_non_fucose_children(coor, structure, i)
-    }
-  }
-  for (i in structure_length) {
-    if ('Fuc' %in% igraph::neighbors(structure, i)$mono) {
-      neigh_pos <- igraph::neighbors(structure, i)
-      fuc_pos <- neigh_pos[which(neigh_pos$mono == 'Fuc')]
-      coor <- purrr::reduce2(
-        as.integer(fuc_pos),
-        .fucose_branch_y_offsets(structure, fuc_pos),
-        function(coor_acc, fuc_vertex, offset) {
-          coor_acc <- .shift_subtree_y(structure, fuc_vertex, coor_acc, offset)
-          .orient_fucose_branch_subtree(structure, fuc_vertex, coor_acc, offset)
-        },
-        .init = coor
-      )
-    }
-  }
+  coor <- .spread_rough_child_subtrees(structure, coor)
+  coor <- .orient_fucose_branch_subtrees(structure, coor)
   coor <- .compact_coordinates(structure, coor)
   return(coor)
 }
