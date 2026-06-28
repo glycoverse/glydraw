@@ -28,184 +28,36 @@ draw_cartoon <- function(
   red_end = "",
   highlight = NULL
 ) {
-  checkmate::assert_string(red_end, na.ok = FALSE)
-  if (!is.null(highlight) && !glyrepr::is_glycan_structure(structure)) {
-    cli::cli_warn(
-      "{.arg highlight} can only be set when {.arg structure} is a {.fn glyrepr::glycan_structure}."
-    )
-    highlight <- NULL
-  }
-  structure <- .ensure_one_structure(structure)
-  structure <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
-  highlight <- .ensure_highlight_para(highlight, length(structure))
-  orient <- rlang::arg_match(orient)
+  inputs <- .prepare_cartoon_input(structure, highlight, orient, red_end)
+  structure <- inputs$structure
+  coor <- inputs$coor
+  highlight <- inputs$highlight
+  orient <- inputs$orient
 
-  # Coordinate of Glycans
-  if (orient == 'H') {
-    coor <- coor_cal(structure)
-  } else {
-    coor <- coor_cal(structure)
-    temp <- coor
-    coor[, 1] <- temp[, 2]
-    coor[, 2] <- -temp[, 1]
-  }
-
-  gly_list <- data.frame(coor, 'glycoform' = glycoform_info(structure))
-
-  # Process highlight points, highlight vertices 1.0, others 0.3
-  if (!is.null(highlight)) {
-    ver_transparency <- replace(rep(0.3, length(structure)), highlight, 1.0)
-    gly_list$transparency <- ver_transparency
-  } else {
-    gly_list$transparency <- 1.0
-  }
-  # Rename colnames of gly_list
-  colnames(gly_list) <- c('center_x', 'center_y', 'glycoform', 'transparency')
-  # Draw Glycan Shape, where gly_list contains center_x, center_y, glycoform 3 columns
+  gly_list <- .cartoon_gly_list(structure, coor, highlight)
   polygon_coor <- create_polygon_coor(gly_list, 0.215)
   filled_color <- glycan_color[as.character(polygon_coor$color)]
-
-  struc_annotation <- dplyr::bind_rows(
-    gly_annotation(structure, coor),
-    substituent_annotation(structure, coor, orient)
+  annotation_data <- .cartoon_annotation_data(
+    structure,
+    coor,
+    orient,
+    red_end,
+    highlight
   )
-  reducing_info <- reducing_end_annotation(structure, coor, orient, red_end)
-  struc_annotation <- dplyr::bind_rows(
-    struc_annotation,
-    reducing_info$annotation
-  )
-  struc_annotation <- resolve_annotation_overlap(struc_annotation)
-
-  if (is.null(highlight)) {
-    struc_annotation$transparency <- 1
-  } else {
-    struc_annotation$transparency <- (struc_annotation$vertice %in% highlight) *
-      0.7 +
-      0.3
-  }
-
-  # Escape '?' to prevent conflict with parse = TRUE
-  struc_annotation <- struc_annotation |>
-    dplyr::mutate(
-      is_red_end_text = dplyr::if_else(
-        is.na(.data$is_red_end_text),
-        FALSE,
-        .data$is_red_end_text
-      ),
-      hjust = dplyr::if_else(is.na(.data$hjust), 0.5, .data$hjust),
-      vjust = dplyr::if_else(is.na(.data$vjust), 0.5, .data$vjust),
-      annot_label = dplyr::case_when(
-        .data$annot == "?" ~ '~"?"',
-        .data$annot == "??" ~ '~"?"',
-        # case like '?3' would convert to '?'
-        grepl("^\\?\\d+", .data$annot) ~ '~"?"',
-        !is_parseable_annotation(.data$annot) ~ quote_annotation(.data$annot),
-        # normal annotation would maintain the same
-        TRUE ~ .data$annot
-      )
-    )
-  red_end_text_annotation <- dplyr::filter(
-    struc_annotation,
-    .data$is_red_end_text
+  connect_df <- .cartoon_connection_data(
+    structure,
+    coor,
+    annotation_data$reducing_info$segment,
+    gly_list
   )
 
-  # connect information
-  gly_connect <- connect_info(structure, coor)
-  connect_df <- data.frame(
-    start_x = gly_connect$start_x,
-    start_y = gly_connect$start_y,
-    end_x = gly_connect$end_x,
-    end_y = gly_connect$end_y
+  .build_cartoon_plot(
+    connect_df,
+    polygon_coor,
+    filled_color,
+    annotation_data,
+    show_linkage
   )
-  connect_df <- dplyr::bind_rows(connect_df, reducing_info$segment)
-  connect_df$transparency <- gly_list$transparency
-
-  gly_graph <- ggplot2::ggplot() +
-    ggplot2::geom_segment(
-      data = connect_df,
-      ggplot2::aes(
-        x = .data$start_x,
-        y = .data$start_y,
-        xend = .data$end_x,
-        yend = .data$end_y
-      ),
-      alpha = connect_df$transparency,
-      linewidth = 0.8
-    ) +
-    ggplot2::geom_polygon(
-      data = polygon_coor, # Masking the segment with white color
-      ggplot2::aes(x = .data$point_x, y = .data$point_y, group = .data$group),
-      fill = "white",
-      color = 'white',
-      linewidth = 0.8
-    ) +
-    ggplot2::geom_polygon(
-      data = polygon_coor,
-      ggplot2::aes(x = .data$point_x, y = .data$point_y, group = .data$group),
-      alpha = polygon_coor$alpha,
-      fill = filled_color,
-      color = scales::alpha("black", polygon_coor$alpha),
-      linewidth = 0.8
-    ) +
-    ggplot2::coord_fixed(ratio = 1, clip = "off") +
-    ggplot2::theme_void() +
-    ggplot2::theme(legend.position = "none")
-  if (show_linkage) {
-    gly_graph <- gly_graph +
-      ggplot2::geom_text(
-        data = struc_annotation,
-        ggplot2::aes(
-          x = .data$x,
-          y = .data$y,
-          label = .data$annot_label,
-          hjust = .data$hjust,
-          vjust = .data$vjust
-        ),
-        alpha = struc_annotation$transparency,
-        parse = TRUE,
-        size = 6,
-      )
-  }
-  if (!show_linkage && nrow(red_end_text_annotation) > 0) {
-    gly_graph <- gly_graph +
-      ggplot2::geom_text(
-        data = red_end_text_annotation,
-        ggplot2::aes(
-          x = .data$x,
-          y = .data$y,
-          label = .data$annot_label,
-          hjust = .data$hjust,
-          vjust = .data$vjust
-        ),
-        alpha = red_end_text_annotation$transparency,
-        parse = TRUE,
-        size = 6,
-      )
-  }
-  if (nrow(reducing_info$wave) > 0) {
-    gly_graph <- gly_graph +
-      ggplot2::geom_path(
-        data = reducing_info$wave,
-        ggplot2::aes(x = .data$x, y = .data$y),
-        linewidth = 0.8
-      )
-  }
-  if (nrow(reducing_info$bounds) > 0) {
-    gly_graph <- gly_graph +
-      ggplot2::geom_blank(
-        data = reducing_info$bounds,
-        ggplot2::aes(x = .data$x, y = .data$y)
-      )
-  }
-  dpi <- 300
-  border_px <- 50
-  gly_graph <- .apply_border(gly_graph, border_px / dpi * 72)
-  panel_size <- .decide_size(gly_graph, border_px = 0)
-  size <- .decide_size(gly_graph, border_px = border_px)
-  gly_graph <- .apply_fixed_panel_size(gly_graph, panel_size, dpi = dpi)
-  attr(gly_graph, "glydraw_panel_size_px") <- unlist(panel_size)
-  attr(gly_graph, "glydraw_size_px") <- unlist(size)
-  structure(gly_graph, class = c("glydraw_cartoon", class(gly_graph)))
 }
 
 #' Print glycan cartoon
