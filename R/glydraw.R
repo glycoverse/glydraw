@@ -35,7 +35,7 @@ draw_cartoon <- function(
   orient <- inputs$orient
 
   gly_list <- .cartoon_gly_list(structure, coor, highlight)
-  polygon_coor <- create_polygon_coor(gly_list, 0.215)
+  polygon_coor <- .create_polygon_coor(gly_list, 0.215)
   filled_color <- glycan_color[as.character(polygon_coor$color)]
   annotation_data <- .cartoon_annotation_data(
     structure,
@@ -252,6 +252,18 @@ export_cartoons.glyrepr_structure <- function(
   )
 }
 
+#' Export cartoons for a vector of glycan structures
+#'
+#' @param glycans A vector of glycan structures.
+#' @param dirname Directory path for output files.
+#' @param file_ext Output file extension.
+#' @param dpi Dots per inch.
+#' @param show_linkage Show linkage annotation or not.
+#' @param orient Drawing orientation.
+#' @param red_end Reducing-end annotation.
+#'
+#' @return The list of exported cartoons, invisibly.
+#' @noRd
 .export_cartoons <- function(
   glycans,
   dirname,
@@ -297,6 +309,12 @@ export_cartoons.glyrepr_structure <- function(
   }
 }
 
+#' Sanitize glycan labels for export filenames
+#'
+#' @param glycans Glycan labels to use as filenames.
+#'
+#' @return A character vector of safe, unique filenames without extensions.
+#' @noRd
 .sanitize_export_filenames <- function(glycans) {
   safe_names <- fs::path_sanitize(as.character(glycans), replacement = "_")
   safe_names <- ifelse(

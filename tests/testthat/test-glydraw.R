@@ -237,8 +237,8 @@ test_that("reducing-end Fuc keeps the regular Fuc orientation", {
   structure <- .ensure_one_structure("GlcNAc(b1-3)Fuc(a1-")
   graph <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
 
-  expect_equal(glycoform_info(graph), c("GlcNAc", "Fuc"))
-  expect_equal(unname(coor_cal(graph)[2, "x"]), 0)
+  expect_equal(.glycoform_info(graph), c("GlcNAc", "Fuc"))
+  expect_equal(unname(.coor_cal(graph)[2, "x"]), 0)
 })
 
 test_that("draw_cartoon places a1-6 core Fuc up and a1-3 core Fuc down", {
@@ -253,12 +253,12 @@ test_that("draw_cartoon places a1-6 core Fuc up and a1-3 core Fuc down", {
   expect_lt(min(fuc_segments$yend), -0.5)
 })
 
-test_that("coor_cal keeps same-column residues at least one unit apart", {
+test_that(".coor_cal keeps same-column residues at least one unit apart", {
   structure <- .ensure_one_structure(
     "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-4)GlcNAc(b1-"
   )
   graph <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
-  coor <- coor_cal(graph)
+  coor <- .coor_cal(graph)
   same_column <- which(coor[, "x"] == -1)
   same_column_y <- sort(coor[same_column, "y"])
 
@@ -277,7 +277,7 @@ test_that("draw_cartoon keeps elongated Fuc branches together", {
     )
   )
   graph <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
-  coor <- coor_cal(graph)
+  coor <- .coor_cal(graph)
 
   expect_equal(igraph::V(graph)$mono[c(1, 2, 3)], c("Gal", "Fuc", "Man"))
   expect_equal(unname(coor[1, "x"]), unname(coor[2, "x"]))
@@ -293,7 +293,7 @@ test_that("draw_cartoon avoids widening nested branches next to leaf siblings", 
     short_structure,
     return_list = FALSE
   )
-  short_coor <- coor_cal(short_graph)
+  short_coor <- .coor_cal(short_graph)
 
   terminal_distance <- abs(short_coor[1, "y"] - short_coor[2, "y"])
   branch_distance <- abs(short_coor[3, "y"] - short_coor[4, "y"])
@@ -306,7 +306,7 @@ test_that("draw_cartoon avoids widening nested branches next to leaf siblings", 
     elongated_structure,
     return_list = FALSE
   )
-  elongated_coor <- coor_cal(elongated_graph)
+  elongated_coor <- .coor_cal(elongated_graph)
   outer_man <- which(
     igraph::V(elongated_graph)$mono == "Man" &
       elongated_coor[, "x"] == min(elongated_coor[, "x"])
@@ -321,7 +321,7 @@ test_that("draw_cartoon keeps elongated and leaf sibling branches evenly spaced"
     "Neu5Ac(a2-3)Gal(b1-3)[Gal(b1-3)GlcNAc(b1-3)[Gal(b1-4)GlcNAc(b1-6)]Gal(b1-4)GlcNAc(b1-6)]GalNAc(a1-"
   )
   graph <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
-  coor <- coor_cal(graph)
+  coor <- .coor_cal(graph)
   same_depth <- which(coor[, "x"] == -2)
   neu5ac <- same_depth[igraph::V(graph)$mono[same_depth] == "Neu5Ac"]
   rightmost_gal <- same_depth[igraph::V(graph)$mono[same_depth] == "Gal"]
@@ -339,7 +339,7 @@ test_that("draw_cartoon keeps same-depth Man sibling branches evenly spaced", {
     "Man(a1-2)Man(a1-3)[Man(a1-3)[Man(a1-2)Man(a1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
   )
   graph <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
-  coor <- coor_cal(graph)
+  coor <- .coor_cal(graph)
   same_depth_man <- which(
     igraph::V(graph)$mono == "Man" &
       coor[, "x"] == -4
