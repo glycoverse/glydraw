@@ -9,6 +9,7 @@ draw_cartoon(
   structure,
   show_linkage = TRUE,
   orient = c("H", "V"),
+  red_end = "",
   highlight = NULL
 )
 ```
@@ -31,6 +32,12 @@ draw_cartoon(
 
   The orientation of glycan structure. "H" for horizontal, "V" for
   vertical. Default is "H"
+
+- red_end:
+
+  Reducing-end annotation. The default `""` keeps the current
+  reducing-end line. Use `"~"` to add a wavy reducing end, or any other
+  string to draw that string at the reducing end.
 
 - highlight:
 
