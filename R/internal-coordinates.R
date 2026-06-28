@@ -1,4 +1,4 @@
-#' Title Initialize Vertices Coordinate
+#' Initialize Vertices Coordinate
 #'
 #' @param structure an igraph object
 #'
@@ -35,7 +35,7 @@
   ver == length(structure)
 }
 
-#' Title Find Sequence Number of Sub-module
+#' Find Sequence Number of Sub-module
 #'
 #' @param structure an igraph object
 #' @param ver an integer
@@ -49,7 +49,7 @@
   return(vers)
 }
 
-#' Title Offset y-Coordinate of Vertex Sub-module
+#' Offset y-Coordinate of Vertex Sub-module
 #'
 #' @param structure an igraph object
 #' @param ver an integer
@@ -110,7 +110,7 @@
   coor
 }
 
-#' Title Process the y-Coordinate of 'Fucose' Vertices
+#' Process the y-Coordinate of 'Fucose' Vertices
 #'
 #' @param structure an igraph object
 #' @param fuc_pos An integer vector of 'Fucose' vertex indices.
@@ -153,7 +153,7 @@
   }
 }
 
-#' Title Process the Vertices which Out-degree =2 along the Path
+#' Process the Vertices which Out-degree =2 along the Path
 #'
 #' @param coor a matrix
 #' @param structure an igraph object
@@ -170,7 +170,7 @@
   return(coor)
 }
 
-#' Title Process the Vertices which Out-degree =3 along the Path
+#' Process the Vertices which Out-degree =3 along the Path
 #'
 #' @param coor a matrix
 #' @param structure an igraph object
@@ -187,7 +187,7 @@
   return(coor)
 }
 
-#' Title Process the Vertices adjacent to 'Fucose'
+#' Process the Vertices adjacent to 'Fucose'
 #'
 #' @param coor a matrix
 #' @param structure an igraph object
@@ -434,7 +434,7 @@
   coor
 }
 
-#' Title Process the Coordinate of all Vertices
+#' Process the Coordinate of all Vertices
 #'
 #' @param structure an igraph object
 #'
@@ -485,7 +485,7 @@
   return(coor)
 }
 
-#' Title Analysis the Connection Information of all Vertices
+#' Analysis the Connection Information of all Vertices
 #'
 #' @param structure an igraph object
 #' @param coor a matrix
@@ -513,7 +513,7 @@
   )
 }
 
-#' Title Gain the glycoforms corresponding to the vertices
+#' Gain the glycoforms corresponding to the vertices
 #'
 #' @param structure an igraph object
 #'

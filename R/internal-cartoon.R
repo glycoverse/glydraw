@@ -1,4 +1,4 @@
-#' Title Match the coordinates of glycan shape
+#' Match the coordinates of glycan shape
 #'
 #' @param gly_list a list
 #'
