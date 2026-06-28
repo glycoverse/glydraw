@@ -28,30 +28,30 @@ draw_cartoon <- function(
   red_end = "",
   highlight = NULL
 ) {
-  inputs <- .prepare_cartoon_input(structure, highlight, orient, red_end)
+  inputs <- .prepare_cartoon_inputs(structure, highlight, orient, red_end)
   structure <- inputs$structure
   coor <- inputs$coor
   highlight <- inputs$highlight
   orient <- inputs$orient
 
-  gly_list <- .cartoon_gly_list(structure, coor, highlight)
-  polygon_coor <- .create_polygon_coor(gly_list, 0.215)
+  gly_list <- .cartoon_residue_data(structure, coor, highlight)
+  polygon_coor <- .residue_polygon_data(gly_list, 0.215)
   filled_color <- glycan_color[as.character(polygon_coor$color)]
-  annotation_data <- .cartoon_annotation_data(
+  annotation_data <- .cartoon_text_annotation_data(
     structure,
     coor,
     orient,
     red_end,
     highlight
   )
-  connect_df <- .cartoon_connection_data(
+  connect_df <- .cartoon_segment_data(
     structure,
     coor,
     annotation_data$reducing_info$segment,
     gly_list
   )
 
-  .build_cartoon_plot(
+  .assemble_cartoon_plot(
     connect_df,
     polygon_coor,
     filled_color,
@@ -123,9 +123,9 @@ save_cartoon <- function(cartoon, file, dpi = 300) {
   )
   border_px <- (size - panel_size) / 2
   cartoon <- cartoon |>
-    .apply_border(border_px[["width"]] / dpi * 72) |>
-    .apply_fixed_panel_size(panel_size, dpi = dpi) |>
-    .strip_glydraw_class()
+    .add_plot_border(border_px[["width"]] / dpi * 72) |>
+    .set_fixed_panel_size(panel_size, dpi = dpi) |>
+    .strip_cartoon_class()
 
   ggplot2::ggsave(
     filename = file,
@@ -197,7 +197,7 @@ export_cartoons.glyexp_experiment <- function(
     )
   }
   glycans <- unique(glyexp::get_var_info(x)$glycan_structure)
-  .export_cartoons(
+  .export_cartoon_list(
     glycans,
     dirname,
     file_ext = file_ext,
@@ -218,8 +218,8 @@ export_cartoons.character <- function(
   orient = c("H", "V"),
   red_end = ""
 ) {
-  glycans <- unique(.ensure_structure(x))
-  .export_cartoons(
+  glycans <- unique(.as_glycan_structure_input(x))
+  .export_cartoon_list(
     glycans,
     dirname,
     file_ext = file_ext,
@@ -241,7 +241,7 @@ export_cartoons.glyrepr_structure <- function(
   red_end = ""
 ) {
   glycans <- unique(x)
-  .export_cartoons(
+  .export_cartoon_list(
     glycans,
     dirname,
     file_ext = file_ext,
@@ -252,19 +252,20 @@ export_cartoons.glyrepr_structure <- function(
   )
 }
 
-#' Export cartoons for a vector of glycan structures
+#' Export a vector of glycan cartoons
 #'
-#' @param glycans A vector of glycan structures.
-#' @param dirname Directory path for output files.
-#' @param file_ext Output file extension.
-#' @param dpi Dots per inch.
-#' @param show_linkage Show linkage annotation or not.
-#' @param orient Drawing orientation.
-#' @param red_end Reducing-end annotation.
+#' @param glycans A vector of `glyrepr::glycan_structure()` values.
+#' @param dirname String path to the output directory.
+#' @param file_ext String output file extension without leading dot.
+#' @param dpi Numeric dots per inch passed to `save_cartoon()`.
+#' @param show_linkage Logical scalar passed to `draw_cartoon()`.
+#' @param orient Drawing orientation, either `"H"` or `"V"`.
+#' @param red_end String reducing-end annotation passed to `draw_cartoon()`.
 #'
-#' @return The list of exported cartoons, invisibly.
+#' @return A list of `glydraw_cartoon` objects, invisibly. Files are written to
+#'   `dirname` with sanitized labels and extension `file_ext`.
 #' @noRd
-.export_cartoons <- function(
+.export_cartoon_list <- function(
   glycans,
   dirname,
   file_ext,
@@ -294,8 +295,10 @@ export_cartoons.glyrepr_structure <- function(
 
 #' Select filename labels for exported cartoons
 #'
-#' @param glycans A vector of glycan structures.
-#' @return A vector of labels for output filenames.
+#' @param glycans A named or unnamed vector of glycan structures.
+#'
+#' @return A character vector the same length as `glycans`. Non-empty vector
+#'   names are used as labels; unnamed entries fall back to the structure text.
 #' @noRd
 .export_filename_labels <- function(glycans) {
   if (is.null(names(glycans))) {
@@ -311,9 +314,10 @@ export_cartoons.glyrepr_structure <- function(
 
 #' Sanitize glycan labels for export filenames
 #'
-#' @param glycans Glycan labels to use as filenames.
+#' @param glycans A character vector of proposed filename labels.
 #'
-#' @return A character vector of safe, unique filenames without extensions.
+#' @return A character vector the same length as `glycans`, sanitized for file
+#'   paths, truncated to 180 characters, and made unique without extensions.
 #' @noRd
 .sanitize_export_filenames <- function(glycans) {
   safe_names <- fs::path_sanitize(as.character(glycans), replacement = "_")

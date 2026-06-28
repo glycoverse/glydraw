@@ -1,3 +1,6 @@
+# Internal SNFG constants: residue-to-shape mappings, fill colors, and polygon
+# templates used by cartoon drawing helpers.
+
 # glycan mapping
 glycan_color <- c(
   'glyWhite' = '#FFFFFF',
