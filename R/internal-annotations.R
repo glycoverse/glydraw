@@ -1,4 +1,4 @@
-#' Title Adjust the coordinate of glycan annotation text
+#' Adjust the coordinate of glycan annotation text
 #'
 #' @param chil_glyx a float
 #' @param chil_glyy a float
@@ -99,7 +99,7 @@
   base_offset
 }
 
-#' Title Map the glycan coordinate and annotation text
+#' Map the glycan coordinate and annotation text
 #'
 #' @param structure an igraph object
 #' @param coor a matrix
@@ -542,7 +542,7 @@
   paste0('"', gsub('"', '\\"', annot, fixed = TRUE), '"')
 }
 
-#' Title Map the coordinate of reducing end annotation and segment
+#' Map the coordinate of reducing end annotation and segment
 #'
 #' @param structure an igraph object
 #' @param coor a matrix
