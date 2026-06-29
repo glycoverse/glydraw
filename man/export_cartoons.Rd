@@ -7,6 +7,7 @@
 export_cartoons(
   x,
   dirname,
+  ...,
   file_ext = "png",
   dpi = 300,
   scale = 1,
@@ -25,6 +26,8 @@ any glycan structure text nomenclatures supported by
 
 \item{dirname}{Directory name to save the cartoons. If it does not exist,
 it is created.}
+
+\item{...}{Ignored.}
 
 \item{file_ext}{File extension supported by \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}}. Defaults to "png".}
 

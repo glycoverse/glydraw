@@ -4,12 +4,14 @@
 \alias{save_cartoon}
 \title{Save fixed-size glycan cartoon image to local device.}
 \usage{
-save_cartoon(cartoon, file, dpi = 300, scale = 1)
+save_cartoon(cartoon, file, ..., dpi = 300, scale = 1)
 }
 \arguments{
 \item{cartoon}{A ggplot2 object returned by \code{\link[=draw_cartoon]{draw_cartoon()}}.}
 
 \item{file}{File name of glycan cartoon.}
+
+\item{...}{Ignored.}
 
 \item{dpi}{Deprecated and ignored. Use \code{scale} to change the output size.}
 

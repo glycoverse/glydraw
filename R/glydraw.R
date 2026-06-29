@@ -2,6 +2,7 @@
 #'
 #' @param structure A [glyrepr::glycan_structure()] scalar,
 #'   or a string of any glycan structure text nomenclatures supported by [glyparse::auto_parse()].
+#' @param ... Ignored.
 #' @param show_linkage Show linkage annotation or not. Default is TRUE.
 #' @param orient The orientation of glycan structure. "H" for horizontal, "V" for vertical.
 #'   Default is "H"
@@ -32,6 +33,7 @@
 #' @export
 draw_cartoon <- function(
   structure,
+  ...,
   show_linkage = TRUE,
   orient = c("H", "V"),
   red_end = "",
@@ -85,17 +87,17 @@ draw_cartoon <- function(
 #' Print glycan cartoon
 #'
 #' @param x A ggplot2 object returned by [draw_cartoon()].
+#' @param ... Ignored.
 #' @param newpage Draw the plot on a new page.
 #' @param vp A grid viewport object or viewport name.
-#' @param ... Additional arguments passed to ggplot2's print method.
 #'
 #' @return The original glycan cartoon, invisibly.
 #' @export
 print.glydraw_cartoon <- function(
   x,
+  ...,
   newpage = is.null(vp),
-  vp = NULL,
-  ...
+  vp = NULL
 ) {
   raster <- .render_cartoon_raster(x)
   .draw_cartoon_raster(
@@ -114,6 +116,7 @@ print.glydraw_cartoon <- function(
 #'
 #' @param cartoon A ggplot2 object returned by [draw_cartoon()].
 #' @param file File name of glycan cartoon.
+#' @param ... Ignored.
 #' @param dpi Deprecated and ignored. Use `scale` to change the output size.
 #' @param scale Numeric output-size multiplier. The default `1` saves the
 #'   cartoon at its natural fixed size; `2` saves the same cartoon with twice
@@ -143,7 +146,7 @@ print.glydraw_cartoon <- function(
 #' save_cartoon(cartoon, "p1.png", scale = 2)
 #' }
 #' @export
-save_cartoon <- function(cartoon, file, dpi = 300, scale = 1) {
+save_cartoon <- function(cartoon, file, ..., dpi = 300, scale = 1) {
   checkmate::assert_class(cartoon, "glydraw_cartoon")
   if (!missing(dpi)) {
     .warn_ignored_dpi()
@@ -191,6 +194,7 @@ save_cartoon <- function(cartoon, file, dpi = 300, scale = 1) {
 #'   [glyparse::auto_parse()].
 #' @param dirname Directory name to save the cartoons. If it does not exist,
 #'   it is created.
+#' @param ... Ignored.
 #' @param file_ext File extension supported by [ggplot2::ggsave()]. Defaults to "png".
 #' @param dpi Deprecated and ignored. Use `scale` to change the output size.
 #' @param scale Numeric output-size multiplier passed to [save_cartoon()].
@@ -218,6 +222,7 @@ save_cartoon <- function(cartoon, file, dpi = 300, scale = 1) {
 export_cartoons <- function(
   x,
   dirname,
+  ...,
   file_ext = "png",
   dpi = 300,
   scale = 1,
@@ -240,6 +245,7 @@ export_cartoons <- function(
 export_cartoons.character <- function(
   x,
   dirname,
+  ...,
   file_ext = "png",
   dpi = 300,
   scale = 1,
@@ -269,6 +275,7 @@ export_cartoons.character <- function(
 export_cartoons.glyrepr_structure <- function(
   x,
   dirname,
+  ...,
   file_ext = "png",
   dpi = 300,
   scale = 1,

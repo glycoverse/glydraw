@@ -4,16 +4,16 @@
 \alias{print.glydraw_cartoon}
 \title{Print glycan cartoon}
 \usage{
-\method{print}{glydraw_cartoon}(x, newpage = is.null(vp), vp = NULL, ...)
+\method{print}{glydraw_cartoon}(x, ..., newpage = is.null(vp), vp = NULL)
 }
 \arguments{
 \item{x}{A ggplot2 object returned by \code{\link[=draw_cartoon]{draw_cartoon()}}.}
 
+\item{...}{Ignored.}
+
 \item{newpage}{Draw the plot on a new page.}
 
 \item{vp}{A grid viewport object or viewport name.}
-
-\item{...}{Additional arguments passed to ggplot2's print method.}
 }
 \value{
 The original glycan cartoon, invisibly.
