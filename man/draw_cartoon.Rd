@@ -11,6 +11,7 @@ draw_cartoon(
   red_end = "",
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
+  node_size = 1,
   highlight = NULL
 )
 }
@@ -32,6 +33,12 @@ lines. Defaults to the current value, \code{0.8}.}
 
 \item{node_linewidth}{Numeric scalar controlling the linewidth of node
 borders. Defaults to the current value, \code{0.8}.}
+
+\item{node_size}{Numeric scalar used as a multiplier for the default node
+size. Defaults to \code{1}, which keeps the current size. Linkage annotations
+are moved farther from larger nodes, and are hidden with a warning when
+\code{node_size} is too large to leave enough annotation space. Values larger
+than \code{2} are rejected because residues overlap.}
 
 \item{highlight}{An integer vector specifying the node indices to highlight.
 This argument is applicable only when \code{structure} is a \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}}.

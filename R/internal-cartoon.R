@@ -1,6 +1,48 @@
 # Internal helpers for turning prepared glycan geometry into ggplot layers,
 # fixed-size cartoon metadata, residue polygons, segments, and text layers.
 
+.default_node_point_size <- 0.215
+.node_size_linkage_threshold <- 1.2
+.node_size_upper_boundary <- 2
+
+#' Validate node-size input
+#'
+#' @param node_size Numeric node-size multiplier.
+#'
+#' @returns `node_size`, invisibly.
+#' @noRd
+.validate_node_size <- function(node_size) {
+  checkmate::assert_number(node_size, lower = 0)
+  if (node_size > .node_size_upper_boundary) {
+    cli::cli_abort(
+      "{.arg node_size} must be no larger than {.val {(.node_size_upper_boundary)}} because larger values make residues overlap."
+    )
+  }
+
+  invisible(node_size)
+}
+
+#' Resolve whether text annotations can be shown for the requested node size
+#'
+#' @param show_linkage Logical scalar requested by the user.
+#' @param node_size Numeric node-size multiplier.
+#'
+#' @returns A logical scalar indicating whether the regular text annotation
+#'   layer should be drawn.
+#' @noRd
+.resolve_linkage_visibility <- function(show_linkage, node_size) {
+  checkmate::assert_flag(show_linkage)
+  if (!show_linkage || node_size <= .node_size_linkage_threshold) {
+    return(show_linkage)
+  }
+
+  cli::cli_warn(c(
+    "Linkage annotations are hidden because {.arg node_size} is larger than {.val {(.node_size_linkage_threshold)}}.",
+    "i" = "Set {.arg show_linkage = FALSE} to silence this warning, or use a smaller {.arg node_size}."
+  ))
+  FALSE
+}
+
 #' Convert residue centers to polygon vertices
 #'
 #' @param gly_list A data frame with columns `center_x`, `center_y`,
@@ -135,6 +177,8 @@
 #' @param red_end A string reducing-end annotation.
 #' @param highlight `NULL` or a numeric vector of 1-based vertex indices to
 #'   highlight.
+#' @param node_size Numeric scalar used as a multiplier for the default node
+#'   size.
 #'
 #' @returns A list with `annotation`, the complete text annotation data frame;
 #'   `red_end_text`, only custom reducing-end text rows; and `reducing_info`,
@@ -145,12 +189,18 @@
   coor,
   orient = c("H", "V"),
   red_end = "",
-  highlight = NULL
+  highlight = NULL,
+  node_size = 1
 ) {
   orient <- rlang::arg_match(orient)
   struc_annotation <- dplyr::bind_rows(
-    .linkage_annotation_data(structure, coor),
-    .substituent_annotation_data(structure, coor, orient)
+    .linkage_annotation_data(structure, coor, node_size = node_size),
+    .substituent_annotation_data(
+      structure,
+      coor,
+      orient,
+      node_size = node_size
+    )
   )
   reducing_info <- .reducing_end_annotation_data(
     structure,

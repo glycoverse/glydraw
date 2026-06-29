@@ -11,6 +11,8 @@
 #'   child-side linkage label.
 #' @param par_offset Numeric distance from the parent residue center to the
 #'   parent-side linkage label.
+#' @param node_size Numeric node-size multiplier used to push labels along the
+#'   linkage segment away from scaled residue polygons.
 #'
 #' @returns A list with two numeric 2-row matrices, `chil` and `par`. Each
 #'   matrix is an `(x, y)` offset vector to add to the child or parent residue
@@ -22,7 +24,8 @@
   par_glyx,
   par_glyy,
   chil_offset = 0.4,
-  par_offset = 0.4
+  par_offset = 0.4,
+  node_size = 1
 ) {
   chil_direction <- matrix(
     c(par_glyx - chil_glyx, par_glyy - chil_glyy),
@@ -61,8 +64,60 @@
   )
   chil_annot_loc <- chil_rotate_matrix %*% chil_location
   par_annot_loc <- par_rotate_matrix %*% par_location
+  extra_offset <- .annotation_extra_offset(node_size)
+  chil_annot_loc <- .push_label_position_along_segment(
+    label_offset = chil_annot_loc,
+    anchor = c(x = chil_glyx, y = chil_glyy),
+    other = c(x = par_glyx, y = par_glyy),
+    extra_offset = extra_offset
+  )
+  par_annot_loc <- .push_label_position_along_segment(
+    label_offset = par_annot_loc,
+    anchor = c(x = par_glyx, y = par_glyy),
+    other = c(x = chil_glyx, y = chil_glyy),
+    extra_offset = extra_offset
+  )
   annot_loc <- list("chil" = chil_annot_loc, "par" = par_annot_loc)
   return(annot_loc)
+}
+
+#' Calculate the extra annotation clearance for scaled nodes
+#'
+#' @param node_size Numeric node-size multiplier.
+#'
+#' @returns A non-negative numeric scalar.
+#' @noRd
+.annotation_extra_offset <- function(node_size) {
+  .default_node_point_size * pmax(node_size - 1, 0)
+}
+
+#' Push a linkage label offset along its linkage segment
+#'
+#' @param label_offset A two-row matrix giving the current label offset from
+#'   the anchor residue.
+#' @param anchor Numeric `x` and `y` coordinates of the anchor residue.
+#' @param other Numeric `x` and `y` coordinates of the linked residue.
+#' @param extra_offset Numeric distance to add along the segment.
+#'
+#' @returns A two-row matrix with the adjusted label offset.
+#' @noRd
+.push_label_position_along_segment <- function(
+  label_offset,
+  anchor,
+  other,
+  extra_offset
+) {
+  if (extra_offset <= 0) {
+    return(label_offset)
+  }
+
+  direction <- matrix(other - anchor, ncol = 1)
+  direction_norm <- norm(direction, type = "2")
+  if (direction_norm <= .Machine$double.eps) {
+    return(label_offset)
+  }
+
+  label_offset + extra_offset * direction / direction_norm
 }
 
 #' Choose the label offset for one side of a linkage
@@ -111,20 +166,22 @@
 #' @param structure An igraph glycan graph whose edges include `linkage`.
 #' @param coor A numeric coordinate matrix with columns `x` and `y`, one row
 #'   per graph vertex.
+#' @param node_size Numeric node-size multiplier used to keep labels outside
+#'   scaled residue polygons.
 #'
 #' @returns A data frame with one or two rows per edge and columns `vertice`,
 #'   `annot`, `x`, `y`, `segment_start_x`, `segment_start_y`, `segment_end_x`,
 #'   and `segment_end_y`. `annot` contains normalized labels such as `alpha`,
 #'   `beta`, or linkage position text.
 #' @noRd
-.linkage_annotation_data <- function(structure, coor) {
+.linkage_annotation_data <- function(structure, coor, node_size = 1) {
   if (igraph::ecount(structure) == 0) {
     return(.empty_linkage_annotation_data())
   }
 
   annotation <- purrr::map_dfr(
     seq_len(length(structure) - 1),
-    \(ver) .linkage_annotation_rows(structure, coor, ver)
+    \(ver) .linkage_annotation_rows(structure, coor, ver, node_size = node_size)
   )
   annotation$annot <- .normalize_linkage_labels(annotation$annot)
   annotation
@@ -156,22 +213,30 @@
 #' @param coor A numeric coordinate matrix with columns `x` and `y`, one row
 #'   per graph vertex.
 #' @param ver A single integer child vertex index.
+#' @param node_size Numeric node-size multiplier used to keep labels outside
+#'   scaled residue polygons.
 #'
 #' @returns A two-row data frame with linkage annotation columns. The first row
 #'   is the child-side anomer label and the second row is the parent-side
 #'   linkage-position label.
 #' @noRd
-.linkage_annotation_rows <- function(structure, coor, ver) {
+.linkage_annotation_rows <- function(structure, coor, ver, node_size = 1) {
   par_ver <- .parent_vertex_for_annotation(structure, ver)
   labels <- strsplit(igraph::E(structure)[ver]$linkage, '-')[[1]]
-  offsets <- .linkage_label_offsets(structure, coor, ver, par_ver)
+  offsets <- .linkage_label_offsets(
+    structure,
+    coor,
+    ver,
+    par_ver
+  )
   label_positions <- .linkage_label_positions(
     coor[ver, "x"],
     coor[ver, "y"],
     coor[par_ver, "x"],
     coor[par_ver, "y"],
     chil_offset = offsets[["child"]],
-    par_offset = offsets[["parent"]]
+    par_offset = offsets[["parent"]],
+    node_size = node_size
   )
 
   dplyr::bind_rows(
@@ -243,6 +308,18 @@
       role = "parent"
     )
   )
+}
+
+#' Scale one annotation offset for larger residue nodes
+#'
+#' @param offset Numeric default label offset.
+#' @param node_size Numeric node-size multiplier.
+#'
+#' @returns A numeric scalar offset. The value grows with the extra node radius
+#'   but remains below the midpoint between unit-spaced residue centers.
+#' @noRd
+.scaled_annotation_offset <- function(offset, node_size) {
+  pmin(offset + .annotation_extra_offset(node_size), 0.49)
 }
 
 #' Build one linkage annotation row
@@ -688,12 +765,19 @@
 #' @param coor A numeric coordinate matrix with columns `x` and `y`, one row
 #'   per graph vertex.
 #' @param orient Drawing orientation, either `"H"` or `"V"`.
+#' @param node_size Numeric node-size multiplier used to keep labels outside
+#'   scaled residue polygons.
 #'
 #' @returns A data frame with columns `vertice`, `annot`, `x`, and `y`.
 #'   Unknown linkage prefixes such as `?` are removed from `annot`. Returns an
 #'   empty data frame with the same columns when no substituents are present.
 #' @noRd
-.substituent_annotation_data <- function(structure, coor, orient) {
+.substituent_annotation_data <- function(
+  structure,
+  coor,
+  orient,
+  node_size = 1
+) {
   sub <- igraph::V(structure)$sub
   if (length(sub) == 0) {
     return(data.frame(
@@ -715,10 +799,11 @@
     ))
   }
 
+  offset_distance <- .scaled_annotation_offset(0.4, node_size)
   offset <- if (orient == "H") {
-    c(x = 0, y = 0.4)
+    c(x = 0, y = offset_distance)
   } else {
-    c(x = 0.4, y = 0)
+    c(x = offset_distance, y = 0)
   }
 
   data.frame(
