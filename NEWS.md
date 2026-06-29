@@ -16,6 +16,7 @@
 
 ## Minor improvements and bug fixes
 
+* Fix `draw_cartoon()` for structures with two core Fuc branches and one b1-4 GlcNAc branch, avoiding an igraph vertex-selection error and keeping the b1-4 GlcNAc aligned with the core GlcNAc. (#45)
 * Deprecate `dpi` for `save_cartoon()` and `export_cartoons()` because glydraw uses an internal fixed design scale. Supplying `dpi` now warns that the argument is ignored. (#35)
 * Keep substituent annotations visible when `show_linkage = FALSE`. (#41)
 * Fix diagonal HexNAc linkage annotation offsets when `orient = "V"`. (#43)
