@@ -15,6 +15,7 @@ draw_cartoon(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
+  colors = NULL,
   highlight = NULL
 )
 ```
@@ -73,6 +74,14 @@ draw_cartoon(
   moved farther from larger nodes, and are hidden with a warning when
   `node_size` is too large to leave enough annotation space. Values
   larger than `2` are rejected because residues overlap.
+
+- colors:
+
+  Optional named character vector of custom monosaccharide fill colors.
+  Names must be supported monosaccharide names, such as `"Gal"` or
+  `"GlcNAc"`. User-provided colors overwrite the default SNFG colors,
+  while unprovided monosaccharides keep their default colors. Defaults
+  to `NULL`.
 
 - highlight:
 

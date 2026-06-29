@@ -47,6 +47,7 @@
 <span>  edge_linewidth <span class="op">=</span> <span class="fl">0.8</span>,</span>
 <span>  node_linewidth <span class="op">=</span> <span class="fl">0.8</span>,</span>
 <span>  node_size <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  colors <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  highlight <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -103,6 +104,13 @@ size. Defaults to <code>1</code>, which keeps the current size. Linkage annotati
 are moved farther from larger nodes, and are hidden with a warning when
 <code>node_size</code> is too large to leave enough annotation space. Values larger
 than <code>2</code> are rejected because residues overlap.</p></dd>
+
+
+<dt id="arg-colors">colors<a class="anchor" aria-label="anchor" href="#arg-colors"></a></dt>
+<dd><p>Optional named character vector of custom monosaccharide fill
+colors. Names must be supported monosaccharide names, such as <code>"Gal"</code> or
+<code>"GlcNAc"</code>. User-provided colors overwrite the default SNFG colors, while
+unprovided monosaccharides keep their default colors. Defaults to <code>NULL</code>.</p></dd>
 
 
 <dt id="arg-highlight">highlight<a class="anchor" aria-label="anchor" href="#arg-highlight"></a></dt>

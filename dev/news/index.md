@@ -13,6 +13,11 @@
 
 ### New features
 
+- Add the `colors` parameter to
+  [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
+  and
+  [`export_cartoons()`](https://glycoverse.github.io/glydraw/dev/reference/export_cartoons.md)
+  for customizing monosaccharide fill colors. (#44)
 - Add the `fuc_orient` parameter to
   [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
   and
