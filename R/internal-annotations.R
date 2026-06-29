@@ -131,6 +131,7 @@
 #'   of the linkage.
 #' @param role Either `"child"` or `"parent"`, naming which side of the linkage
 #'   the label belongs to.
+#' @param orient Drawing orientation, either `"H"` or `"V"`.
 #'
 #' @returns A numeric scalar offset distance from the anchor residue center.
 #' @noRd
@@ -141,24 +142,62 @@
   anchor_y,
   other_x,
   other_y,
-  role = c("child", "parent")
+  role = c("child", "parent"),
+  orient = c("H", "V")
 ) {
   role <- rlang::arg_match(role)
+  orient <- rlang::arg_match(orient)
   base_offset <- 0.4
   diagonal_hexnac_offset <- 0.45
   mono <- igraph::V(structure)[[anchor_ver]]$mono
   glycoform <- glycan_dict[[mono]][[1]]
-  needs_extra_offset <- if (role == "child") {
-    other_x > anchor_x && anchor_y > other_y
-  } else {
-    other_x < anchor_x && other_y < anchor_y
-  }
+  needs_extra_offset <- .needs_diagonal_hexnac_offset(
+    anchor_x,
+    anchor_y,
+    other_x,
+    other_y,
+    role,
+    orient
+  )
 
   if (identical(glycoform, "HexNAc") && needs_extra_offset) {
     return(diagonal_hexnac_offset)
   }
 
   base_offset
+}
+
+#' Check whether a diagonal HexNAc label needs extra clearance
+#'
+#' @param anchor_x,anchor_y Numeric coordinates of the residue receiving the
+#'   label.
+#' @param other_x,other_y Numeric coordinates of the residue on the other side
+#'   of the linkage.
+#' @param role Either `"child"` or `"parent"`, naming which side of the linkage
+#'   the label belongs to.
+#' @param orient Drawing orientation, either `"H"` or `"V"`.
+#'
+#' @returns A logical scalar.
+#' @noRd
+.needs_diagonal_hexnac_offset <- function(
+  anchor_x,
+  anchor_y,
+  other_x,
+  other_y,
+  role,
+  orient
+) {
+  if (orient == "H") {
+    if (role == "child") {
+      return(other_x > anchor_x && other_y < anchor_y)
+    }
+    return(other_x < anchor_x && other_y < anchor_y)
+  }
+
+  if (role == "child") {
+    return(other_x < anchor_x && other_y < anchor_y)
+  }
+  other_x < anchor_x && other_y > anchor_y
 }
 
 #' Build linkage annotation rows for every glycosidic edge
@@ -168,20 +207,35 @@
 #'   per graph vertex.
 #' @param node_size Numeric node-size multiplier used to keep labels outside
 #'   scaled residue polygons.
+#' @param orient Drawing orientation, either `"H"` or `"V"`.
 #'
 #' @returns A data frame with one or two rows per edge and columns `vertice`,
 #'   `annot`, `x`, `y`, `segment_start_x`, `segment_start_y`, `segment_end_x`,
 #'   and `segment_end_y`. `annot` contains normalized labels such as `alpha`,
 #'   `beta`, or linkage position text.
 #' @noRd
-.linkage_annotation_data <- function(structure, coor, node_size = 1) {
+.linkage_annotation_data <- function(
+  structure,
+  coor,
+  node_size = 1,
+  orient = c("H", "V")
+) {
   if (igraph::ecount(structure) == 0) {
     return(.empty_linkage_annotation_data())
   }
+  orient <- rlang::arg_match(orient)
 
   annotation <- purrr::map_dfr(
     seq_len(length(structure) - 1),
-    \(ver) .linkage_annotation_rows(structure, coor, ver, node_size = node_size)
+    \(ver) {
+      .linkage_annotation_rows(
+        structure,
+        coor,
+        ver,
+        node_size = node_size,
+        orient = orient
+      )
+    }
   )
   annotation$annot <- .normalize_linkage_labels(annotation$annot)
   annotation
@@ -215,19 +269,28 @@
 #' @param ver A single integer child vertex index.
 #' @param node_size Numeric node-size multiplier used to keep labels outside
 #'   scaled residue polygons.
+#' @param orient Drawing orientation, either `"H"` or `"V"`.
 #'
 #' @returns A two-row data frame with linkage annotation columns. The first row
 #'   is the child-side anomer label and the second row is the parent-side
 #'   linkage-position label.
 #' @noRd
-.linkage_annotation_rows <- function(structure, coor, ver, node_size = 1) {
+.linkage_annotation_rows <- function(
+  structure,
+  coor,
+  ver,
+  node_size = 1,
+  orient = c("H", "V")
+) {
+  orient <- rlang::arg_match(orient)
   par_ver <- .parent_vertex_for_annotation(structure, ver)
   labels <- strsplit(igraph::E(structure)[ver]$linkage, '-')[[1]]
   offsets <- .linkage_label_offsets(
     structure,
     coor,
-    ver,
-    par_ver
+    child_ver = ver,
+    parent_ver = par_ver,
+    orient = orient
   )
   label_positions <- .linkage_label_positions(
     coor[ver, "x"],
@@ -283,11 +346,19 @@
 #'   per graph vertex.
 #' @param child_ver A single integer child vertex index.
 #' @param parent_ver A single integer parent vertex index.
+#' @param orient Drawing orientation, either `"H"` or `"V"`.
 #'
 #' @returns A named numeric vector with values `child` and `parent`, giving the
 #'   distance from each residue center to its label.
 #' @noRd
-.linkage_label_offsets <- function(structure, coor, child_ver, parent_ver) {
+.linkage_label_offsets <- function(
+  structure,
+  coor,
+  child_ver,
+  parent_ver,
+  orient = c("H", "V")
+) {
+  orient <- rlang::arg_match(orient)
   c(
     child = .linkage_label_offset(
       structure,
@@ -296,7 +367,8 @@
       coor[child_ver, "y"],
       coor[parent_ver, "x"],
       coor[parent_ver, "y"],
-      role = "child"
+      role = "child",
+      orient = orient
     ),
     parent = .linkage_label_offset(
       structure,
@@ -305,7 +377,8 @@
       coor[parent_ver, "y"],
       coor[child_ver, "x"],
       coor[child_ver, "y"],
-      role = "parent"
+      role = "parent",
+      orient = orient
     )
   )
 }

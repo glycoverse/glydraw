@@ -132,6 +132,101 @@ test_that("draw_cartoon moves linkage annotations along the line for larger node
   expect_lt(custom_three$x, default_three$x)
 })
 
+test_that("linkage annotation offsets follow orientation-specific HexNAc corners", {
+  structure <- igraph::make_empty_graph(n = 1)
+  igraph::V(structure)$mono <- "GlcNAc"
+
+  h_child_right_bottom_offset <- .linkage_label_offset(
+    structure,
+    anchor_ver = 1,
+    anchor_x = 0,
+    anchor_y = 0,
+    other_x = 1,
+    other_y = -1,
+    role = "child",
+    orient = "H"
+  )
+  h_parent_left_bottom_offset <- .linkage_label_offset(
+    structure,
+    anchor_ver = 1,
+    anchor_x = 0,
+    anchor_y = 0,
+    other_x = -1,
+    other_y = -1,
+    role = "parent",
+    orient = "H"
+  )
+  h_child_right_top_offset <- .linkage_label_offset(
+    structure,
+    anchor_ver = 1,
+    anchor_x = 0,
+    anchor_y = 0,
+    other_x = 1,
+    other_y = 1,
+    role = "child",
+    orient = "H"
+  )
+  h_parent_left_top_offset <- .linkage_label_offset(
+    structure,
+    anchor_ver = 1,
+    anchor_x = 0,
+    anchor_y = 0,
+    other_x = -1,
+    other_y = 1,
+    role = "parent",
+    orient = "H"
+  )
+  child_left_down_offset <- .linkage_label_offset(
+    structure,
+    anchor_ver = 1,
+    anchor_x = 0.5,
+    anchor_y = 1,
+    other_x = 0,
+    other_y = 0,
+    role = "child",
+    orient = "V"
+  )
+  parent_left_up_offset <- .linkage_label_offset(
+    structure,
+    anchor_ver = 1,
+    anchor_x = 0,
+    anchor_y = 0,
+    other_x = -0.5,
+    other_y = 1,
+    role = "parent",
+    orient = "V"
+  )
+  child_right_down_offset <- .linkage_label_offset(
+    structure,
+    anchor_ver = 1,
+    anchor_x = -0.5,
+    anchor_y = 1,
+    other_x = 0,
+    other_y = 0,
+    role = "child",
+    orient = "V"
+  )
+  parent_right_up_offset <- .linkage_label_offset(
+    structure,
+    anchor_ver = 1,
+    anchor_x = 0,
+    anchor_y = 0,
+    other_x = 0.5,
+    other_y = 1,
+    role = "parent",
+    orient = "V"
+  )
+
+  expect_equal(h_child_right_bottom_offset, 0.45)
+  expect_equal(h_parent_left_bottom_offset, 0.45)
+  expect_equal(h_child_right_top_offset, 0.4)
+  expect_equal(h_parent_left_top_offset, 0.4)
+  expect_equal(child_left_down_offset, 0.45)
+  expect_equal(parent_left_up_offset, 0.45)
+  expect_equal(child_right_down_offset, 0.4)
+  expect_equal(parent_right_up_offset, 0.4)
+})
+
 test_that("draw_cartoon warns and hides linkage annotations for oversized nodes", {
   structure <- "Gal(b1-3)GalNAc(a1-"
 
