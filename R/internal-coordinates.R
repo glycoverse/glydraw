@@ -371,6 +371,49 @@
   shifts
 }
 
+#' Restore a centered child subtree when it cannot collide with siblings
+#'
+#' @param layouts A list of child subtree layout lists in bottom-to-top branch
+#'   order.
+#' @param shifts A numeric vector of proposed vertical shifts, one per layout.
+#' @param rough_offsets A numeric vector of child root offsets from the parent
+#'   before compaction.
+#' @param parent_x Numeric `x` coordinate of the parent residue.
+#'
+#' @returns A numeric vector of adjusted shifts, the same length as `shifts`.
+#'   A single child with zero rough offset is restored to the parent horizon
+#'   only when its occupied `x` columns do not include the parent column and do
+#'   not overlap sibling child-subtree columns.
+#' @noRd
+.restore_isolated_centered_child <- function(
+  layouts,
+  shifts,
+  rough_offsets,
+  parent_x
+) {
+  centered_child <- which(abs(rough_offsets) <= sqrt(.Machine$double.eps))
+  if (length(centered_child) != 1) {
+    return(shifts)
+  }
+
+  child <- centered_child[[1]]
+  child_x <- unique(layouts[[child]]$profile$x)
+  if (parent_x %in% child_x) {
+    return(shifts)
+  }
+
+  sibling_x <- unique(unlist(purrr::map(
+    layouts[-child],
+    \(layout) layout$profile$x
+  )))
+  if (length(intersect(child_x, sibling_x)) != 0) {
+    return(shifts)
+  }
+
+  shifts[child] <- 0
+  shifts
+}
+
 #' Run one parent-column spacing pass for child subtrees
 #'
 #' @param layouts A list of child subtree layout lists in bottom-to-top branch
@@ -501,6 +544,12 @@
     parent_x = as.numeric(coor[ver, "x"]),
     min_gap = min_gap
   )
+  shifts <- .restore_isolated_centered_child(
+    layouts,
+    shifts,
+    rough_offsets,
+    parent_x = as.numeric(coor[ver, "x"])
+  )
   shifted_layouts <- purrr::map2(layouts, shifts, .shift_subtree_layout)
 
   list(
@@ -577,6 +626,7 @@
   gly_neighbors <- igraph::neighbors(structure, ver)
   has_fucose <- 'Fuc' %in% gly_neighbors$mono
   neighbor_num <- length(gly_neighbors)
+  non_fucose_num <- sum(gly_neighbors$mono != 'Fuc')
 
   if (neighbor_num == 2 && !has_fucose) {
     return(.spread_two_child_subtrees(coor, structure, ver))
@@ -584,7 +634,7 @@
   if (neighbor_num == 3 && !has_fucose) {
     return(.spread_three_child_subtrees(coor, structure, ver))
   }
-  if (neighbor_num == 3 && has_fucose) {
+  if (has_fucose && non_fucose_num == 2) {
     return(.spread_non_fucose_children(coor, structure, ver))
   }
   coor

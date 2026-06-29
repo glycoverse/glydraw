@@ -531,6 +531,22 @@ test_that("draw_cartoon places a1-6 core Fuc up and a1-3 core Fuc down", {
   expect_lt(min(fuc_segments$yend), -0.5)
 })
 
+test_that("draw_cartoon handles two Fuc branches plus one non-Fuc branch", {
+  structure <- .as_single_glycan_structure(
+    "Fuc(a1-3)[Fuc(a1-6)][GlcNAc(b1-4)]GlcNAc(b1-"
+  )
+  graph <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
+  coor <- .calculate_residue_coordinates(graph)
+
+  expect_s3_class(draw_cartoon(structure), "glydraw_cartoon")
+  expect_equal(
+    unname(coor[2, "y"]),
+    unname(coor[4, "y"])
+  )
+  expect_lt(unname(coor[1, "y"]), unname(coor[4, "y"]))
+  expect_gt(unname(coor[3, "y"]), unname(coor[4, "y"]))
+})
+
 test_that("draw_cartoon controls Fuc triangle orientation", {
   structure <- "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-4)GlcNAc(b1-"
 
