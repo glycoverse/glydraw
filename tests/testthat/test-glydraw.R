@@ -1,3 +1,29 @@
+fuc_triangle_polygons <- function(plot) {
+  nodes <- ggplot2::ggplot_build(plot)$data[[3]]
+  polygons <- split(nodes[, c("x", "y")], nodes$group)
+  purrr::keep(polygons, ~ nrow(.x) == 4)
+}
+
+has_triangle_apex <- function(polygon, center, direction) {
+  vertices <- unique(polygon)
+  switch(
+    direction,
+    up = any(
+      abs(vertices$x - center[["x"]]) < 1e-6 & vertices$y > center[["y"]]
+    ),
+    down = any(
+      abs(vertices$x - center[["x"]]) < 1e-6 & vertices$y < center[["y"]]
+    ),
+    right = any(
+      vertices$x > center[["x"]] & abs(vertices$y - center[["y"]]) < 1e-6
+    ),
+    left = any(
+      vertices$x < center[["x"]] & abs(vertices$y - center[["y"]]) < 1e-6
+    ),
+    stop("Unknown direction: ", direction)
+  )
+}
+
 test_that("draw_cartoon works with valid branched glycan structure", {
   structure <- "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
 
@@ -391,6 +417,39 @@ test_that("draw_cartoon places a1-6 core Fuc up and a1-3 core Fuc down", {
   expect_lt(min(fuc_segments$yend), -0.5)
 })
 
+test_that("draw_cartoon controls Fuc triangle orientation", {
+  structure <- "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-4)GlcNAc(b1-"
+
+  flex_plot <- draw_cartoon(structure, fuc_orient = "flex")
+  up_plot <- draw_cartoon(structure, fuc_orient = "up")
+  flex_fuc <- fuc_triangle_polygons(flex_plot)
+  up_fuc <- fuc_triangle_polygons(up_plot)
+
+  expect_true(has_triangle_apex(flex_fuc[[1]], c(x = -1, y = -1), "up"))
+  expect_true(has_triangle_apex(flex_fuc[[2]], c(x = -1, y = 1), "down"))
+  expect_true(has_triangle_apex(up_fuc[[1]], c(x = -1, y = -1), "up"))
+  expect_true(has_triangle_apex(up_fuc[[2]], c(x = -1, y = 1), "up"))
+})
+
+test_that("draw_cartoon points vertical Fuc triangles toward their linkage", {
+  structure <- "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-4)GlcNAc(b1-"
+
+  plot <- draw_cartoon(structure, orient = "V", fuc_orient = "flex")
+  fuc <- fuc_triangle_polygons(plot)
+
+  expect_true(has_triangle_apex(fuc[[1]], c(x = -1, y = 1), "right"))
+  expect_true(has_triangle_apex(fuc[[2]], c(x = 1, y = 1), "left"))
+})
+
+test_that("draw_cartoon keeps reducing-end Fuc triangles up", {
+  structure <- "GlcNAc(b1-3)Fuc(a1-"
+
+  plot <- draw_cartoon(structure, orient = "V", fuc_orient = "flex")
+  fuc <- fuc_triangle_polygons(plot)
+
+  expect_true(has_triangle_apex(fuc[[1]], c(x = 0, y = 0), "up"))
+})
+
 test_that(".calculate_residue_coordinates keeps same-column residues at least one unit apart", {
   structure <- .as_single_glycan_structure(
     "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-4)GlcNAc(b1-"
@@ -602,6 +661,21 @@ test_that("export_cartoons forwards custom node sizes", {
     1.2,
     tolerance = 1e-6
   )
+})
+
+test_that("export_cartoons forwards custom Fuc orientation", {
+  glycans <- "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-4)GlcNAc(b1-"
+  temp_dir <- tempfile()
+  on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
+  fs::dir_create(temp_dir)
+
+  suppressMessages(
+    result <- export_cartoons(glycans, temp_dir, fuc_orient = "up")
+  )
+  fuc <- fuc_triangle_polygons(result[[1]])
+
+  expect_true(has_triangle_apex(fuc[[1]], c(x = -1, y = -1), "up"))
+  expect_true(has_triangle_apex(fuc[[2]], c(x = -1, y = 1), "up"))
 })
 
 test_that("export_cartoons rejects node_size values that make residues overlap", {

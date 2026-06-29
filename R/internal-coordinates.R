@@ -684,20 +684,61 @@
 #' Get drawable residue shape names for graph vertices
 #'
 #' @param structure An igraph glycan graph whose vertices include `mono`.
+#' @param coor A numeric coordinate matrix with rendered columns `x` and `y`,
+#'   one row per graph vertex.
+#' @param fuc_orient Fuc triangle orientation, either `"flex"` or `"up"`.
 #'
 #' @returns A character vector with one value per vertex. Most values are copied
-#'   from `mono`; non-reducing Fuc residues on upward branches are returned as
-#'   `"FucUp"` so the triangle points in the branch direction.
+#'   from `mono`; in flexible Fuc orientation, non-reducing Fuc residues are
+#'   mapped to directional shape names so the triangle apex points toward the
+#'   rendered linkage direction.
 #' @noRd
-.residue_glycoforms <- function(structure) {
+.residue_glycoforms <- function(
+  structure,
+  coor = NULL,
+  fuc_orient = c("flex", "up")
+) {
+  fuc_orient <- rlang::arg_match(fuc_orient)
   glycoform <- igraph::V(structure)$mono
+  if (fuc_orient == "up") {
+    return(glycoform)
+  }
+  if (is.null(coor)) {
+    coor <- .calculate_residue_coordinates(structure)
+  }
+
   for (i in c(which(glycoform == 'Fuc'))) {
-    if (
-      !.is_reducing_end(structure, i) &&
-        .fucose_branch_y_offsets(structure, i) > 0
-    ) {
-      glycoform[i] <- 'FucUp'
+    if (!.is_reducing_end(structure, i)) {
+      glycoform[i] <- .fucose_directional_glycoform(structure, coor, i)
     }
   }
   return(glycoform)
+}
+
+#' Get directional Fuc shape name from rendered linkage direction
+#'
+#' @param structure An igraph glycan graph.
+#' @param coor A numeric coordinate matrix with rendered columns `x` and `y`.
+#' @param fuc_pos A single integer vertex index whose residue is Fuc.
+#'
+#' @returns A Fuc glycoform string: `"Fuc"` points up, `"FucUp"` points down,
+#'   `"FucRight"` points right, and `"FucLeft"` points left.
+#' @noRd
+.fucose_directional_glycoform <- function(structure, coor, fuc_pos) {
+  parent_pos <- as.integer(igraph::neighbors(structure, fuc_pos, mode = "in"))
+  if (length(parent_pos) == 0) {
+    return("Fuc")
+  }
+
+  linkage_vec <- coor[parent_pos[1], c("x", "y")] - coor[fuc_pos, c("x", "y")]
+  if (abs(linkage_vec[["x"]]) > abs(linkage_vec[["y"]])) {
+    if (linkage_vec[["x"]] > 0) {
+      return("FucRight")
+    }
+    return("FucLeft")
+  }
+  if (linkage_vec[["y"]] < 0) {
+    return("FucUp")
+  }
+  "Fuc"
 }

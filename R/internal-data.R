@@ -64,6 +64,8 @@ glycan_dict <- list(
   '6dTal' = c('dHex', 'glyLightBlue'),
   'Fuc' = c('dHex', 'glyRed'),
   'FucUp' = c('dHexUp', 'glyRed'),
+  'FucRight' = c('dHexRight', 'glyRed'),
+  'FucLeft' = c('dHexLeft', 'glyRed'),
 
   'dHexNAc' = c('dHexNAc', 'glyWhite', 'glyWhite'),
   'QuiNAc' = c('dHexNAc', 'glyBlue', 'glyWhite'),
@@ -136,6 +138,14 @@ glycan_shape <- list(
   'dHexUp' = data.frame(
     x = c(-1, 0, 1, -1),
     y = c(0.33 * sqrt(3), -0.67 * sqrt(3), 0.33 * sqrt(3), 0.33 * sqrt(3))
+  ),
+  'dHexRight' = data.frame(
+    x = c(-0.33 * sqrt(3), 0.67 * sqrt(3), -0.33 * sqrt(3), -0.33 * sqrt(3)),
+    y = c(1, 0, -1, 1)
+  ),
+  'dHexLeft' = data.frame(
+    x = c(0.33 * sqrt(3), -0.67 * sqrt(3), 0.33 * sqrt(3), 0.33 * sqrt(3)),
+    y = c(1, 0, -1, 1)
   ),
   'dHexNAc' = data.frame(
     x = c(0, 1, 0, 0),

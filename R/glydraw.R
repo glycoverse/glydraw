@@ -7,6 +7,10 @@
 #'   TRUE. Substituent annotations are always shown.
 #' @param orient The orientation of glycan structure. "H" for horizontal, "V" for vertical.
 #'   Default is "H"
+#' @param fuc_orient Fuc triangle orientation. `"flex"` points non-reducing Fuc
+#'   residues toward their rendered linkage direction, while `"up"` draws all
+#'   Fuc triangles pointing upward. Reducing-end Fuc residues always point
+#'   upward. Defaults to `"flex"`.
 #' @param red_end Reducing-end annotation. The default `""` keeps the current
 #'   reducing-end line. Use `"~"` to add a wavy reducing end, or any other
 #'   string to draw that string at the reducing end.
@@ -37,6 +41,7 @@ draw_cartoon <- function(
   ...,
   show_linkage = TRUE,
   orient = c("H", "V"),
+  fuc_orient = c("flex", "up"),
   red_end = "",
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
@@ -46,6 +51,7 @@ draw_cartoon <- function(
   checkmate::assert_number(edge_linewidth, lower = 0)
   checkmate::assert_number(node_linewidth, lower = 0)
   .validate_node_size(node_size)
+  fuc_orient <- rlang::arg_match(fuc_orient)
   inputs <- .prepare_cartoon_inputs(structure, highlight, orient, red_end)
   structure <- inputs$structure
   coor <- inputs$coor
@@ -53,7 +59,7 @@ draw_cartoon <- function(
   orient <- inputs$orient
   show_linkage <- .resolve_linkage_visibility(show_linkage, node_size)
 
-  gly_list <- .cartoon_residue_data(structure, coor, highlight)
+  gly_list <- .cartoon_residue_data(structure, coor, highlight, fuc_orient)
   polygon_coor <- .residue_polygon_data(
     gly_list,
     .default_node_point_size * node_size
@@ -229,12 +235,14 @@ export_cartoons <- function(
   scale = 1,
   show_linkage = TRUE,
   orient = c("H", "V"),
+  fuc_orient = c("flex", "up"),
   red_end = "",
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1
 ) {
   .validate_node_size(node_size)
+  fuc_orient <- rlang::arg_match(fuc_orient)
   if (!missing(dpi)) {
     .warn_ignored_dpi()
   }
@@ -252,6 +260,7 @@ export_cartoons.character <- function(
   scale = 1,
   show_linkage = TRUE,
   orient = c("H", "V"),
+  fuc_orient = c("flex", "up"),
   red_end = "",
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
@@ -265,6 +274,7 @@ export_cartoons.character <- function(
     scale = scale,
     show_linkage = show_linkage,
     orient = orient,
+    fuc_orient = fuc_orient,
     red_end = red_end,
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
@@ -282,6 +292,7 @@ export_cartoons.glyrepr_structure <- function(
   scale = 1,
   show_linkage = TRUE,
   orient = c("H", "V"),
+  fuc_orient = c("flex", "up"),
   red_end = "",
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
@@ -295,6 +306,7 @@ export_cartoons.glyrepr_structure <- function(
     scale = scale,
     show_linkage = show_linkage,
     orient = orient,
+    fuc_orient = fuc_orient,
     red_end = red_end,
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
@@ -310,6 +322,7 @@ export_cartoons.glyrepr_structure <- function(
 #' @param scale Numeric output-size multiplier passed to `save_cartoon()`.
 #' @param show_linkage Logical scalar passed to `draw_cartoon()`.
 #' @param orient Drawing orientation, either `"H"` or `"V"`.
+#' @param fuc_orient Fuc triangle orientation passed to `draw_cartoon()`.
 #' @param red_end String reducing-end annotation passed to `draw_cartoon()`.
 #' @param edge_linewidth Numeric linkage line width passed to
 #'   `draw_cartoon()`.
@@ -327,12 +340,14 @@ export_cartoons.glyrepr_structure <- function(
   scale,
   show_linkage,
   orient,
+  fuc_orient,
   red_end,
   edge_linewidth,
   node_linewidth,
   node_size
 ) {
   .validate_node_size(node_size)
+  fuc_orient <- rlang::arg_match(fuc_orient, c("flex", "up"))
   cli::cli_alert_info("Exporting {.val {length(glycans)}} glycan cartoons.")
   fs::dir_create(dirname)
   glycan_list <- purrr::map(seq_along(glycans), ~ glycans[[.x]])
@@ -341,6 +356,7 @@ export_cartoons.glyrepr_structure <- function(
     draw_cartoon,
     show_linkage = show_linkage,
     orient = orient,
+    fuc_orient = fuc_orient,
     red_end = red_end,
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
