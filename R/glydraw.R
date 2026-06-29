@@ -23,6 +23,10 @@
 #'   are moved farther from larger nodes, and are hidden with a warning when
 #'   `node_size` is too large to leave enough annotation space. Values larger
 #'   than `2` are rejected because residues overlap.
+#' @param colors Optional named character vector of custom monosaccharide fill
+#'   colors. Names must be supported monosaccharide names, such as `"Gal"` or
+#'   `"GlcNAc"`. User-provided colors overwrite the default SNFG colors, while
+#'   unprovided monosaccharides keep their default colors. Defaults to `NULL`.
 #' @param highlight An integer vector specifying the node indices to highlight.
 #'   This argument is applicable only when `structure` is a [glyrepr::glycan_structure()].
 #'   Note that for a [glyrepr::glycan_structure()], the node indices correspond exactly
@@ -46,11 +50,13 @@ draw_cartoon <- function(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
+  colors = NULL,
   highlight = NULL
 ) {
   checkmate::assert_number(edge_linewidth, lower = 0)
   checkmate::assert_number(node_linewidth, lower = 0)
   .validate_node_size(node_size)
+  colors <- .validate_custom_colors(colors)
   fuc_orient <- rlang::arg_match(fuc_orient)
   inputs <- .prepare_cartoon_inputs(structure, highlight, orient, red_end)
   structure <- inputs$structure
@@ -64,7 +70,7 @@ draw_cartoon <- function(
     gly_list,
     .default_node_point_size * node_size
   )
-  filled_color <- glycan_color[as.character(polygon_coor$color)]
+  filled_color <- .resolve_residue_fill_colors(polygon_coor, colors)
   annotation_data <- .cartoon_text_annotation_data(
     structure,
     coor,
@@ -239,9 +245,11 @@ export_cartoons <- function(
   red_end = "",
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
-  node_size = 1
+  node_size = 1,
+  colors = NULL
 ) {
   .validate_node_size(node_size)
+  colors <- .validate_custom_colors(colors)
   fuc_orient <- rlang::arg_match(fuc_orient)
   if (!missing(dpi)) {
     .warn_ignored_dpi()
@@ -264,7 +272,8 @@ export_cartoons.character <- function(
   red_end = "",
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
-  node_size = 1
+  node_size = 1,
+  colors = NULL
 ) {
   glycans <- unique(.as_glycan_structure_input(x))
   .export_cartoon_list(
@@ -278,7 +287,8 @@ export_cartoons.character <- function(
     red_end = red_end,
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
-    node_size = node_size
+    node_size = node_size,
+    colors = colors
   )
 }
 
@@ -296,7 +306,8 @@ export_cartoons.glyrepr_structure <- function(
   red_end = "",
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
-  node_size = 1
+  node_size = 1,
+  colors = NULL
 ) {
   glycans <- unique(x)
   .export_cartoon_list(
@@ -310,7 +321,8 @@ export_cartoons.glyrepr_structure <- function(
     red_end = red_end,
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
-    node_size = node_size
+    node_size = node_size,
+    colors = colors
   )
 }
 
@@ -329,6 +341,8 @@ export_cartoons.glyrepr_structure <- function(
 #' @param node_linewidth Numeric node border line width passed to
 #'   `draw_cartoon()`.
 #' @param node_size Numeric node size multiplier passed to `draw_cartoon()`.
+#' @param colors Optional custom monosaccharide colors passed to
+#'   `draw_cartoon()`.
 #'
 #' @return A list of `glydraw_cartoon` objects, invisibly. Files are written to
 #'   `dirname` with sanitized labels and extension `file_ext`.
@@ -344,9 +358,11 @@ export_cartoons.glyrepr_structure <- function(
   red_end,
   edge_linewidth,
   node_linewidth,
-  node_size
+  node_size,
+  colors
 ) {
   .validate_node_size(node_size)
+  colors <- .validate_custom_colors(colors)
   fuc_orient <- rlang::arg_match(fuc_orient, c("flex", "up"))
   cli::cli_alert_info("Exporting {.val {length(glycans)}} glycan cartoons.")
   fs::dir_create(dirname)
@@ -360,7 +376,8 @@ export_cartoons.glyrepr_structure <- function(
     red_end = red_end,
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
-    node_size = node_size
+    node_size = node_size,
+    colors = colors
   )
   filenames <- fs::path(
     dirname,

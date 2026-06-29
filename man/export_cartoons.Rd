@@ -17,7 +17,8 @@ export_cartoons(
   red_end = "",
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
-  node_size = 1
+  node_size = 1,
+  colors = NULL
 )
 }
 \arguments{
@@ -62,6 +63,11 @@ size. Defaults to \code{1}, which keeps the current size. Linkage annotations
 are moved farther from larger nodes, and are hidden with a warning when
 \code{node_size} is too large to leave enough annotation space. Values larger
 than \code{2} are rejected because residues overlap.}
+
+\item{colors}{Optional named character vector of custom monosaccharide fill
+colors. Names must be supported monosaccharide names, such as \code{"Gal"} or
+\code{"GlcNAc"}. User-provided colors overwrite the default SNFG colors, while
+unprovided monosaccharides keep their default colors. Defaults to \code{NULL}.}
 }
 \value{
 The function returns the list of cartoons implicitly.

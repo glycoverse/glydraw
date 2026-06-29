@@ -73,6 +73,25 @@ test_that("draw_cartoon controls edge and node linewidths", {
   expect_equal(unique(custom_layers[[5]]$linewidth), 1.2)
 })
 
+test_that("draw_cartoon applies custom monosaccharide colors over defaults", {
+  structure <- "Gal(b1-4)GlcNAc(b1-"
+
+  plot <- draw_cartoon(structure, colors = c(Gal = "#123456"))
+  node_fill <- unique(ggplot2::ggplot_build(plot)$data[[3]]$fill)
+
+  expect_contains(node_fill, "#123456")
+  expect_contains(node_fill, "#0072BC")
+})
+
+test_that("draw_cartoon rejects unsupported custom color names", {
+  structure <- "Gal(b1-4)GlcNAc(b1-"
+
+  expect_error(
+    draw_cartoon(structure, colors = c(NotAMono = "#123456")),
+    "supported monosaccharides"
+  )
+})
+
 test_that("draw_cartoon scales node polygons with node_size", {
   structure <- "Gal(b1-3)GalNAc(a1-"
 
@@ -719,6 +738,25 @@ test_that("export_cartoons forwards custom linewidths", {
 
   expect_equal(unique(layers[[1]]$linewidth), 1.1)
   expect_equal(unique(layers[[3]]$linewidth), 0.3)
+})
+
+test_that("export_cartoons forwards custom colors", {
+  glycans <- "Gal(b1-4)GlcNAc(b1-"
+  temp_dir <- tempfile()
+  on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
+  fs::dir_create(temp_dir)
+
+  suppressMessages(
+    result <- export_cartoons(
+      glycans,
+      temp_dir,
+      colors = c(Gal = "#123456")
+    )
+  )
+  node_fill <- unique(ggplot2::ggplot_build(result[[1]])$data[[3]]$fill)
+
+  expect_contains(node_fill, "#123456")
+  expect_contains(node_fill, "#0072BC")
 })
 
 test_that("export_cartoons forwards custom node sizes", {
