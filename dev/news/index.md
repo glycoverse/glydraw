@@ -11,6 +11,12 @@
 
 ### New features
 
+- Add the `scale` parameter to
+  [`save_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/save_cartoon.md)
+  and
+  [`export_cartoons()`](https://glycoverse.github.io/glydraw/dev/reference/export_cartoons.md)
+  for changing output pixel dimensions while preserving cartoon
+  appearance. (#35)
 - Add the `node_size` parameter to
   [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
   and
@@ -30,6 +36,12 @@
 
 ### Minor improvements and bug fixes
 
+- Deprecate `dpi` for
+  [`save_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/save_cartoon.md)
+  and
+  [`export_cartoons()`](https://glycoverse.github.io/glydraw/dev/reference/export_cartoons.md)
+  because glydraw uses an internal fixed design scale. Supplying `dpi`
+  now warns that the argument is ignored. (#35)
 - Adjust linkage annotation offsets for diagonal HexNAc links. (#29)
 
 ## glydraw 0.5.1

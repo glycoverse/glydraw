@@ -1,13 +1,6 @@
 # Export all glycan structures to figures
 
-This function calls
-[`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
-on each glycan structure in `x`, then calls
-[`save_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/save_cartoon.md)
-to save a figure for each of them. IUPAC-condensed nomenclatures are
-used as file names. If `x` is a named character vector or named
-[`glyrepr::glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/glycan_structure.html)
-vector, the vector names are used as file names.
+Draw and save one cartoon for each glycan structure in `x`.
 
 ## Usage
 
@@ -17,6 +10,7 @@ export_cartoons(
   dirname,
   file_ext = "png",
   dpi = 300,
+  scale = 1,
   show_linkage = TRUE,
   orient = c("H", "V"),
   red_end = "",
@@ -49,7 +43,12 @@ export_cartoons(
 
 - dpi:
 
-  Dots per inch. Defaults to 300.
+  Deprecated and ignored. Use `scale` to change the output size.
+
+- scale:
+
+  Numeric output-size multiplier passed to
+  [`save_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/save_cartoon.md).
 
 - show_linkage:
 
@@ -87,6 +86,32 @@ export_cartoons(
 ## Value
 
 The function returns the list of cartoons implicitly.
+
+## File names
+
+IUPAC-condensed nomenclatures are used as file names. If `x` is a named
+character vector or named
+[`glyrepr::glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/glycan_structure.html)
+vector, the vector names are used as file names.
+
+## Why not `width` and `height`?
+
+The familiar
+[`ggplot2::ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html)
+interface uses `width`, `height`, and `dpi` because ordinary ggplot2
+plots are drawn into a user-chosen device size. glydraw cartoons are
+different: the natural width and height are calculated from the glycan
+structure so residues, linkages, labels, and borders stay comparable
+across different glycans. If users supplied arbitrary `width` and
+`height`, glydraw would either distort that structure-derived layout or
+need to guess how to reconcile one requested size with the other.
+
+`dpi` is also not the right control here because changing it alters how
+point- and inch-based ggplot2 elements are rasterized relative to the
+fixed cartoon canvas. glydraw therefore keeps an internal fixed design
+scale and uses `scale` as a single multiplier for the final pixel
+dimensions. This preserves the cartoon's aspect ratio and relative
+appearance while still allowing larger or smaller output files.
 
 ## Examples
 
