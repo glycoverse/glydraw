@@ -44,6 +44,7 @@
 <span>  red_end <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  edge_linewidth <span class="op">=</span> <span class="fl">0.8</span>,</span>
 <span>  node_linewidth <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>  node_size <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  highlight <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -80,6 +81,14 @@ lines. Defaults to the current value, <code>0.8</code>.</p></dd>
 <dt id="arg-node-linewidth">node_linewidth<a class="anchor" aria-label="anchor" href="#arg-node-linewidth"></a></dt>
 <dd><p>Numeric scalar controlling the linewidth of node
 borders. Defaults to the current value, <code>0.8</code>.</p></dd>
+
+
+<dt id="arg-node-size">node_size<a class="anchor" aria-label="anchor" href="#arg-node-size"></a></dt>
+<dd><p>Numeric scalar used as a multiplier for the default node
+size. Defaults to <code>1</code>, which keeps the current size. Linkage annotations
+are moved farther from larger nodes, and are hidden with a warning when
+<code>node_size</code> is too large to leave enough annotation space. Values larger
+than <code>2</code> are rejected because residues overlap.</p></dd>
 
 
 <dt id="arg-highlight">highlight<a class="anchor" aria-label="anchor" href="#arg-highlight"></a></dt>

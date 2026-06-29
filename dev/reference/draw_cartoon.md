@@ -12,6 +12,7 @@ draw_cartoon(
   red_end = "",
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
+  node_size = 1,
   highlight = NULL
 )
 ```
@@ -50,6 +51,14 @@ draw_cartoon(
 
   Numeric scalar controlling the linewidth of node borders. Defaults to
   the current value, `0.8`.
+
+- node_size:
+
+  Numeric scalar used as a multiplier for the default node size.
+  Defaults to `1`, which keeps the current size. Linkage annotations are
+  moved farther from larger nodes, and are hidden with a warning when
+  `node_size` is too large to leave enough annotation space. Values
+  larger than `2` are rejected because residues overlap.
 
 - highlight:
 

@@ -11,6 +11,12 @@
 
 ### New features
 
+- Add the `node_size` parameter to
+  [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
+  and
+  [`export_cartoons()`](https://glycoverse.github.io/glydraw/dev/reference/export_cartoons.md)
+  for scaling residue cartoon sizes. Values larger than `2` are rejected
+  because residues overlap.
 - Add the `edge_linewidth` and `node_linewidth` parameters to
   [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
   and
