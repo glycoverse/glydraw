@@ -208,7 +208,8 @@
   linkage_annotation <- .linkage_annotation_data(
     structure,
     coor,
-    node_size = node_size
+    node_size = node_size,
+    orient = orient
   ) |>
     dplyr::mutate(show_without_linkage = FALSE)
   substituent_annotation <- .substituent_annotation_data(
