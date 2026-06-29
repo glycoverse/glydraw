@@ -2,6 +2,7 @@
 # fixed-size cartoon metadata, residue polygons, segments, and text layers.
 
 .default_node_point_size <- 0.215
+.default_cartoon_dpi <- 300
 .node_size_linkage_threshold <- 1.2
 .node_size_upper_boundary <- 2
 

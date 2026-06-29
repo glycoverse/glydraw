@@ -4,26 +4,43 @@
 \alias{save_cartoon}
 \title{Save fixed-size glycan cartoon image to local device.}
 \usage{
-save_cartoon(cartoon, file, dpi = 300)
+save_cartoon(cartoon, file, dpi = 300, scale = 1)
 }
 \arguments{
 \item{cartoon}{A ggplot2 object returned by \code{\link[=draw_cartoon]{draw_cartoon()}}.}
 
 \item{file}{File name of glycan cartoon.}
 
-\item{dpi}{Dots per inch, default = 300.}
+\item{dpi}{Deprecated and ignored. Use \code{scale} to change the output size.}
+
+\item{scale}{Numeric output-size multiplier. The default \code{1} saves the
+cartoon at its natural fixed size; \code{2} saves the same cartoon with twice
+the pixel width and height.}
 }
 \description{
-In theory, you can just use \code{ggplot2::ggsave()} to save the cartoons plotted by \code{\link[=draw_cartoon]{draw_cartoon()}}.
-However, you can have trouble finding the best sizes for each cartoon
-to make them look alike.
-This function is designed to save the cartoons with self-adjusted sizes,
-based on the size of the glycans,
-so that when glycans with different sizes are put together, they will look alike.
+This function saves the glycan cartoon to a file,
+with a suitable size.
 }
+\section{Why not \code{width} and \code{height}?}{
+The familiar \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}} interface uses \code{width}, \code{height}, and \code{dpi}
+because ordinary ggplot2 plots are drawn into a user-chosen device size.
+glydraw cartoons are different: the natural width and height are calculated
+from the glycan structure so residues, linkages, labels, and borders stay
+comparable across different glycans. If users supplied arbitrary \code{width} and
+\code{height}, glydraw would either distort that structure-derived layout or need
+to guess how to reconcile one requested size with the other.
+
+\code{dpi} is also not the right control here because changing it alters how
+point- and inch-based ggplot2 elements are rasterized relative to the fixed
+cartoon canvas. glydraw therefore keeps an internal fixed design scale and
+uses \code{scale} as a single multiplier for the final pixel dimensions. This
+preserves the cartoon's aspect ratio and relative appearance while still
+allowing larger or smaller output files.
+}
+
 \examples{
 \dontrun{
 cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
-save_cartoon(cartoon, "p1.png", dpi = 300)
+save_cartoon(cartoon, "p1.png", scale = 2)
 }
 }

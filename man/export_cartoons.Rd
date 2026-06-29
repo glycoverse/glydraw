@@ -9,6 +9,7 @@ export_cartoons(
   dirname,
   file_ext = "png",
   dpi = 300,
+  scale = 1,
   show_linkage = TRUE,
   orient = c("H", "V"),
   red_end = "",
@@ -27,7 +28,9 @@ it is created.}
 
 \item{file_ext}{File extension supported by \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}}. Defaults to "png".}
 
-\item{dpi}{Dots per inch. Defaults to 300.}
+\item{dpi}{Deprecated and ignored. Use \code{scale} to change the output size.}
+
+\item{scale}{Numeric output-size multiplier passed to \code{\link[=save_cartoon]{save_cartoon()}}.}
 
 \item{show_linkage}{Show linkage annotation or not. Default is TRUE.}
 
@@ -54,12 +57,31 @@ than \code{2} are rejected because residues overlap.}
 The function returns the list of cartoons implicitly.
 }
 \description{
-This function calls \code{\link[=draw_cartoon]{draw_cartoon()}} on each glycan structure in \code{x},
-then calls \code{\link[=save_cartoon]{save_cartoon()}} to save a figure for each of them.
+Draw and save one cartoon for each glycan structure in \code{x}.
+}
+\section{File names}{
 IUPAC-condensed nomenclatures are used as file names. If \code{x} is a named
 character vector or named \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}} vector, the vector
 names are used as file names.
 }
+
+\section{Why not \code{width} and \code{height}?}{
+The familiar \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}} interface uses \code{width}, \code{height}, and \code{dpi}
+because ordinary ggplot2 plots are drawn into a user-chosen device size.
+glydraw cartoons are different: the natural width and height are calculated
+from the glycan structure so residues, linkages, labels, and borders stay
+comparable across different glycans. If users supplied arbitrary \code{width} and
+\code{height}, glydraw would either distort that structure-derived layout or need
+to guess how to reconcile one requested size with the other.
+
+\code{dpi} is also not the right control here because changing it alters how
+point- and inch-based ggplot2 elements are rasterized relative to the fixed
+cartoon canvas. glydraw therefore keeps an internal fixed design scale and
+uses \code{scale} as a single multiplier for the final pixel dimensions. This
+preserves the cartoon's aspect ratio and relative appearance while still
+allowing larger or smaller output files.
+}
+
 \examples{
 export_cartoons(
   c(

@@ -176,6 +176,17 @@ test_that("save_cartoon writes fixed-size image without ggview", {
   expect_gt(file.info(file)$size, 0)
 })
 
+test_that("save_cartoon rejects invalid scale values", {
+  structure <- "Gal(b1-3)GalNAc(a1-"
+  plot <- draw_cartoon(structure)
+  file <- tempfile(fileext = ".png")
+
+  expect_error(
+    save_cartoon(plot, file, scale = 0),
+    "`scale`"
+  )
+})
+
 test_that("draw_cartoon works with vertical orientation", {
   structure <- "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
 
@@ -470,7 +481,7 @@ test_that("save_cartoon saves file correctly", {
   temp_file <- tempfile(fileext = ".png")
   on.exit(unlink(temp_file, recursive = FALSE), add = TRUE)
 
-  expect_no_error(save_cartoon(cartoon, temp_file, dpi = 72))
+  expect_no_error(save_cartoon(cartoon, temp_file))
   expect_true(file.exists(temp_file))
   expect_gt(file.size(temp_file), 0)
 })
@@ -484,12 +495,42 @@ test_that("export_cartoons works with character vector input", {
   on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
   fs::dir_create(temp_dir)
 
-  suppressMessages(result <- export_cartoons(glycans, temp_dir, dpi = 72))
+  suppressMessages(result <- export_cartoons(glycans, temp_dir))
 
   expect_type(result, "list")
   expect_length(result, 2)
   files <- fs::dir_ls(temp_dir, glob = "*.png")
   expect_length(files, 2)
+})
+
+test_that("export_cartoons forwards output scale to saved files", {
+  glycans <- "Gal(b1-3)GalNAc(a1-"
+  default_dir <- tempfile()
+  scaled_dir <- tempfile()
+  on.exit(unlink(c(default_dir, scaled_dir), recursive = TRUE), add = TRUE)
+  fs::dir_create(default_dir)
+  fs::dir_create(scaled_dir)
+
+  suppressMessages(export_cartoons(glycans, default_dir))
+  suppressMessages(export_cartoons(glycans, scaled_dir, scale = 2))
+  default_file <- fs::dir_ls(default_dir, glob = "*.png")
+  scaled_file <- fs::dir_ls(scaled_dir, glob = "*.png")
+  default_image <- png::readPNG(default_file)
+  scaled_image <- png::readPNG(scaled_file)
+
+  expect_equal(dim(scaled_image)[1:2], dim(default_image)[1:2] * 2)
+})
+
+test_that("export_cartoons warns that dpi is ignored", {
+  glycans <- "Gal(b1-3)GalNAc(a1-"
+  temp_dir <- tempfile()
+  on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
+  fs::dir_create(temp_dir)
+
+  expect_warning(
+    suppressMessages(export_cartoons(glycans, temp_dir, dpi = 72)),
+    "`dpi` is deprecated and ignored"
+  )
 })
 
 test_that("export_cartoons forwards custom linewidths", {
@@ -502,7 +543,6 @@ test_that("export_cartoons forwards custom linewidths", {
     result <- export_cartoons(
       glycans,
       temp_dir,
-      dpi = 72,
       edge_linewidth = 1.1,
       node_linewidth = 0.3
     )
@@ -524,15 +564,13 @@ test_that("export_cartoons forwards custom node sizes", {
   suppressMessages(
     default_result <- export_cartoons(
       glycans,
-      default_dir,
-      dpi = 72
+      default_dir
     )
   )
   suppressMessages(
     custom_result <- export_cartoons(
       glycans,
       custom_dir,
-      dpi = 72,
       node_size = 1.2
     )
   )
@@ -572,7 +610,7 @@ test_that("export_cartoons uses character vector names as filenames", {
   on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
   fs::dir_create(temp_dir)
 
-  suppressMessages(result <- export_cartoons(glycans, temp_dir, dpi = 72))
+  suppressMessages(result <- export_cartoons(glycans, temp_dir))
 
   expect_length(result, 2)
   files <- fs::dir_ls(temp_dir, glob = "*.png")
@@ -588,7 +626,7 @@ test_that("export_cartoons falls back to structure filenames for empty names", {
   on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
   fs::dir_create(temp_dir)
 
-  suppressMessages(result <- export_cartoons(glycans, temp_dir, dpi = 72))
+  suppressMessages(result <- export_cartoons(glycans, temp_dir))
 
   expect_length(result, 2)
   files <- fs::dir_ls(temp_dir, glob = "*.png")
@@ -608,7 +646,7 @@ test_that("export_cartoons removes duplicates for character input", {
   on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
   fs::dir_create(temp_dir)
 
-  suppressMessages(result <- export_cartoons(glycans, temp_dir, dpi = 72))
+  suppressMessages(result <- export_cartoons(glycans, temp_dir))
 
   expect_length(result, 2)
   files <- fs::dir_ls(temp_dir, glob = "*.png")
@@ -625,7 +663,7 @@ test_that("export_cartoons works with glyrepr_structure input", {
   on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
   fs::dir_create(temp_dir)
 
-  suppressMessages(result <- export_cartoons(structures, temp_dir, dpi = 72))
+  suppressMessages(result <- export_cartoons(structures, temp_dir))
 
   expect_type(result, "list")
   expect_length(result, 2)
@@ -643,7 +681,7 @@ test_that("export_cartoons uses glyrepr_structure names as filenames", {
   on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
   fs::dir_create(temp_dir)
 
-  suppressMessages(result <- export_cartoons(structures, temp_dir, dpi = 72))
+  suppressMessages(result <- export_cartoons(structures, temp_dir))
 
   expect_length(result, 2)
   files <- fs::dir_ls(temp_dir, glob = "*.png")
@@ -661,7 +699,7 @@ test_that("export_cartoons removes duplicates for glyrepr_structure input", {
   on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
   fs::dir_create(temp_dir)
 
-  suppressMessages(result <- export_cartoons(structures, temp_dir, dpi = 72))
+  suppressMessages(result <- export_cartoons(structures, temp_dir))
 
   expect_length(result, 2)
   files <- fs::dir_ls(temp_dir, glob = "*.png")
@@ -691,7 +729,7 @@ test_that("export_cartoons creates non-existent directory", {
   on.exit(unlink(non_existent_dir, recursive = TRUE), add = TRUE)
 
   suppressMessages(
-    result <- export_cartoons(glycans, non_existent_dir, dpi = 72)
+    result <- export_cartoons(glycans, non_existent_dir)
   )
 
   expect_length(result, 1)
@@ -707,7 +745,7 @@ test_that("export_cartoons works with jpeg extension", {
   fs::dir_create(temp_dir)
 
   suppressMessages(
-    result <- export_cartoons(glycans, temp_dir, file_ext = "jpg", dpi = 72)
+    result <- export_cartoons(glycans, temp_dir, file_ext = "jpg")
   )
   files <- fs::dir_ls(temp_dir, glob = "*.jpg")
   expect_length(files, 1)

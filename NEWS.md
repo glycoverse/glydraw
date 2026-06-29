@@ -6,12 +6,14 @@
 
 ## New features
 
+* Add the `scale` parameter to `save_cartoon()` and `export_cartoons()` for changing output pixel dimensions while preserving cartoon appearance. (#35)
 * Add the `node_size` parameter to `draw_cartoon()` and `export_cartoons()` for scaling residue cartoon sizes. Values larger than `2` are rejected because residues overlap. (#36)
 * Add the `edge_linewidth` and `node_linewidth` parameters to `draw_cartoon()` and `export_cartoons()` for customizing linkage line and node border widths. (#34)
 * Add the `red_end` parameter to `draw_cartoon()` and `export_cartoons()` for custom reducing-end text or a wavy reducing-end annotation. (#31)
 
 ## Minor improvements and bug fixes
 
+* Deprecate `dpi` for `save_cartoon()` and `export_cartoons()` because glydraw uses an internal fixed design scale. Supplying `dpi` now warns that the argument is ignored. (#35)
 * Adjust linkage annotation offsets for diagonal HexNAc links. (#29)
 
 # glydraw 0.5.1
