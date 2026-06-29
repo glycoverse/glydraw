@@ -49,6 +49,11 @@
 
 ### Minor improvements and bug fixes
 
+- Fix
+  [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
+  for structures with two core Fuc branches and one b1-4 GlcNAc branch,
+  avoiding an igraph vertex-selection error and keeping the b1-4 GlcNAc
+  aligned with the core GlcNAc. (#45)
 - Deprecate `dpi` for
   [`save_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/save_cartoon.md)
   and
