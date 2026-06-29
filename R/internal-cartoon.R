@@ -263,6 +263,8 @@
 #' @param annotation_data A list returned by `.cartoon_text_annotation_data()`.
 #' @param show_linkage A logical scalar indicating whether linkage annotations
 #'   should be drawn.
+#' @param edge_linewidth Numeric scalar used for linkage lines.
+#' @param node_linewidth Numeric scalar used for node borders.
 #'
 #' @returns A `glydraw_cartoon` ggplot object with fixed-size metadata
 #'   attributes.
@@ -272,9 +274,17 @@
   polygon_coor,
   filled_color,
   annotation_data,
-  show_linkage
+  show_linkage,
+  edge_linewidth,
+  node_linewidth
 ) {
-  gly_graph <- .cartoon_base_layers(connect_df, polygon_coor, filled_color)
+  gly_graph <- .cartoon_base_layers(
+    connect_df,
+    polygon_coor,
+    filled_color,
+    edge_linewidth,
+    node_linewidth
+  )
   gly_graph <- .add_cartoon_text_layers(
     gly_graph,
     annotation_data,
@@ -282,7 +292,8 @@
   )
   gly_graph <- .add_reducing_end_layers(
     gly_graph,
-    annotation_data$reducing_info
+    annotation_data$reducing_info,
+    edge_linewidth
   )
   .finalize_cartoon_size(gly_graph)
 }
@@ -293,11 +304,19 @@
 #' @param polygon_coor A data frame with polygon vertices, groups, and `alpha`.
 #' @param filled_color A character vector of polygon fill colors, one value per
 #'   row in `polygon_coor`.
+#' @param edge_linewidth Numeric scalar used for linkage lines.
+#' @param node_linewidth Numeric scalar used for node borders.
 #'
 #' @returns A ggplot object containing segment, white mask polygon, colored
 #'   residue polygon, fixed coordinate, and blank theme layers.
 #' @noRd
-.cartoon_base_layers <- function(connect_df, polygon_coor, filled_color) {
+.cartoon_base_layers <- function(
+  connect_df,
+  polygon_coor,
+  filled_color,
+  edge_linewidth,
+  node_linewidth
+) {
   ggplot2::ggplot() +
     ggplot2::geom_segment(
       data = connect_df,
@@ -308,14 +327,14 @@
         yend = .data$end_y
       ),
       alpha = connect_df$transparency,
-      linewidth = 0.8
+      linewidth = edge_linewidth
     ) +
     ggplot2::geom_polygon(
       data = polygon_coor,
       ggplot2::aes(x = .data$point_x, y = .data$point_y, group = .data$group),
       fill = "white",
       color = "white",
-      linewidth = 0.8
+      linewidth = node_linewidth
     ) +
     ggplot2::geom_polygon(
       data = polygon_coor,
@@ -323,7 +342,7 @@
       alpha = polygon_coor$alpha,
       fill = filled_color,
       color = scales::alpha("black", polygon_coor$alpha),
-      linewidth = 0.8
+      linewidth = node_linewidth
     ) +
     ggplot2::coord_fixed(ratio = 1, clip = "off") +
     ggplot2::theme_void() +
@@ -383,17 +402,18 @@
 #'
 #' @param plot A ggplot object.
 #' @param reducing_info A list returned by `.reducing_end_annotation_data()`.
+#' @param edge_linewidth Numeric scalar used for linkage lines.
 #'
 #' @returns A ggplot object with a `geom_path()` wave layer when available and
 #'   a `geom_blank()` bounds layer when bounds are available.
 #' @noRd
-.add_reducing_end_layers <- function(plot, reducing_info) {
+.add_reducing_end_layers <- function(plot, reducing_info, edge_linewidth) {
   if (nrow(reducing_info$wave) > 0) {
     plot <- plot +
       ggplot2::geom_path(
         data = reducing_info$wave,
         ggplot2::aes(x = .data$x, y = .data$y),
-        linewidth = 0.8
+        linewidth = edge_linewidth
       )
   }
   if (nrow(reducing_info$bounds) > 0) {

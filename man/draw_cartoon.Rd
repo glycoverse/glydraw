@@ -9,6 +9,8 @@ draw_cartoon(
   show_linkage = TRUE,
   orient = c("H", "V"),
   red_end = "",
+  edge_linewidth = 0.8,
+  node_linewidth = 0.8,
   highlight = NULL
 )
 }
@@ -24,6 +26,12 @@ Default is "H"}
 \item{red_end}{Reducing-end annotation. The default \code{""} keeps the current
 reducing-end line. Use \code{"~"} to add a wavy reducing end, or any other
 string to draw that string at the reducing end.}
+
+\item{edge_linewidth}{Numeric scalar controlling the linewidth of linkage
+lines. Defaults to the current value, \code{0.8}.}
+
+\item{node_linewidth}{Numeric scalar controlling the linewidth of node
+borders. Defaults to the current value, \code{0.8}.}
 
 \item{highlight}{An integer vector specifying the node indices to highlight.
 This argument is applicable only when \code{structure} is a \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}}.

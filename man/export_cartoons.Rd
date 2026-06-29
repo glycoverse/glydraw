@@ -11,7 +11,9 @@ export_cartoons(
   dpi = 300,
   show_linkage = TRUE,
   orient = c("H", "V"),
-  red_end = ""
+  red_end = "",
+  edge_linewidth = 0.8,
+  node_linewidth = 0.8
 )
 }
 \arguments{
@@ -34,6 +36,12 @@ Default is "H"}
 \item{red_end}{Reducing-end annotation. The default \code{""} keeps the current
 reducing-end line. Use \code{"~"} to add a wavy reducing end, or any other
 string to draw that string at the reducing end.}
+
+\item{edge_linewidth}{Numeric scalar controlling the linewidth of linkage
+lines. Defaults to the current value, \code{0.8}.}
+
+\item{node_linewidth}{Numeric scalar controlling the linewidth of node
+borders. Defaults to the current value, \code{0.8}.}
 }
 \value{
 The function returns the list of cartoons implicitly.

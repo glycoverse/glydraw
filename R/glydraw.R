@@ -8,6 +8,10 @@
 #' @param red_end Reducing-end annotation. The default `""` keeps the current
 #'   reducing-end line. Use `"~"` to add a wavy reducing end, or any other
 #'   string to draw that string at the reducing end.
+#' @param edge_linewidth Numeric scalar controlling the linewidth of linkage
+#'   lines. Defaults to the current value, `0.8`.
+#' @param node_linewidth Numeric scalar controlling the linewidth of node
+#'   borders. Defaults to the current value, `0.8`.
 #' @param highlight An integer vector specifying the node indices to highlight.
 #'   This argument is applicable only when `structure` is a [glyrepr::glycan_structure()].
 #'   Note that for a [glyrepr::glycan_structure()], the node indices correspond exactly
@@ -26,8 +30,12 @@ draw_cartoon <- function(
   show_linkage = TRUE,
   orient = c("H", "V"),
   red_end = "",
+  edge_linewidth = 0.8,
+  node_linewidth = 0.8,
   highlight = NULL
 ) {
+  checkmate::assert_number(edge_linewidth, lower = 0)
+  checkmate::assert_number(node_linewidth, lower = 0)
   inputs <- .prepare_cartoon_inputs(structure, highlight, orient, red_end)
   structure <- inputs$structure
   coor <- inputs$coor
@@ -56,7 +64,9 @@ draw_cartoon <- function(
     polygon_coor,
     filled_color,
     annotation_data,
-    show_linkage
+    show_linkage,
+    edge_linewidth,
+    node_linewidth
   )
 }
 
@@ -173,7 +183,9 @@ export_cartoons <- function(
   dpi = 300,
   show_linkage = TRUE,
   orient = c("H", "V"),
-  red_end = ""
+  red_end = "",
+  edge_linewidth = 0.8,
+  node_linewidth = 0.8
 ) {
   UseMethod("export_cartoons")
 }
@@ -186,7 +198,9 @@ export_cartoons.character <- function(
   dpi = 300,
   show_linkage = TRUE,
   orient = c("H", "V"),
-  red_end = ""
+  red_end = "",
+  edge_linewidth = 0.8,
+  node_linewidth = 0.8
 ) {
   glycans <- unique(.as_glycan_structure_input(x))
   .export_cartoon_list(
@@ -196,7 +210,9 @@ export_cartoons.character <- function(
     dpi = dpi,
     show_linkage = show_linkage,
     orient = orient,
-    red_end = red_end
+    red_end = red_end,
+    edge_linewidth = edge_linewidth,
+    node_linewidth = node_linewidth
   )
 }
 
@@ -208,7 +224,9 @@ export_cartoons.glyrepr_structure <- function(
   dpi = 300,
   show_linkage = TRUE,
   orient = c("H", "V"),
-  red_end = ""
+  red_end = "",
+  edge_linewidth = 0.8,
+  node_linewidth = 0.8
 ) {
   glycans <- unique(x)
   .export_cartoon_list(
@@ -218,7 +236,9 @@ export_cartoons.glyrepr_structure <- function(
     dpi = dpi,
     show_linkage = show_linkage,
     orient = orient,
-    red_end = red_end
+    red_end = red_end,
+    edge_linewidth = edge_linewidth,
+    node_linewidth = node_linewidth
   )
 }
 
@@ -231,6 +251,10 @@ export_cartoons.glyrepr_structure <- function(
 #' @param show_linkage Logical scalar passed to `draw_cartoon()`.
 #' @param orient Drawing orientation, either `"H"` or `"V"`.
 #' @param red_end String reducing-end annotation passed to `draw_cartoon()`.
+#' @param edge_linewidth Numeric linkage line width passed to
+#'   `draw_cartoon()`.
+#' @param node_linewidth Numeric node border line width passed to
+#'   `draw_cartoon()`.
 #'
 #' @return A list of `glydraw_cartoon` objects, invisibly. Files are written to
 #'   `dirname` with sanitized labels and extension `file_ext`.
@@ -242,7 +266,9 @@ export_cartoons.glyrepr_structure <- function(
   dpi,
   show_linkage,
   orient,
-  red_end
+  red_end,
+  edge_linewidth,
+  node_linewidth
 ) {
   cli::cli_alert_info("Exporting {.val {length(glycans)}} glycan cartoons.")
   fs::dir_create(dirname)
@@ -252,7 +278,9 @@ export_cartoons.glyrepr_structure <- function(
     draw_cartoon,
     show_linkage = show_linkage,
     orient = orient,
-    red_end = red_end
+    red_end = red_end,
+    edge_linewidth = edge_linewidth,
+    node_linewidth = node_linewidth
   )
   filenames <- fs::path(
     dirname,

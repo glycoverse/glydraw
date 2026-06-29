@@ -23,6 +23,30 @@ test_that("draw_cartoon uses ggplot2 fixed panel sizing", {
   expect_named(attr(plot, "glydraw_size_px"), c("width", "height"))
 })
 
+test_that("draw_cartoon controls edge and node linewidths", {
+  structure <- "Gal(b1-3)GalNAc(a1-"
+
+  default_plot <- draw_cartoon(structure)
+  default_layers <- ggplot2::ggplot_build(default_plot)$data
+
+  expect_equal(unique(default_layers[[1]]$linewidth), 0.8)
+  expect_equal(unique(default_layers[[2]]$linewidth), 0.8)
+  expect_equal(unique(default_layers[[3]]$linewidth), 0.8)
+
+  custom_plot <- draw_cartoon(
+    structure,
+    red_end = "~",
+    edge_linewidth = 1.2,
+    node_linewidth = 0.4
+  )
+  custom_layers <- ggplot2::ggplot_build(custom_plot)$data
+
+  expect_equal(unique(custom_layers[[1]]$linewidth), 1.2)
+  expect_equal(unique(custom_layers[[2]]$linewidth), 0.4)
+  expect_equal(unique(custom_layers[[3]]$linewidth), 0.4)
+  expect_equal(unique(custom_layers[[5]]$linewidth), 1.2)
+})
+
 test_that("print.glydraw_cartoon rasterizes fixed-size cartoon for display", {
   structure <- paste0(
     "Gal(b1-4)GlcNAc(b1-2)[Gal(b1-4)GlcNAc(b1-4)]Man(a1-3)",
@@ -377,6 +401,27 @@ test_that("export_cartoons works with character vector input", {
   expect_length(result, 2)
   files <- fs::dir_ls(temp_dir, glob = "*.png")
   expect_length(files, 2)
+})
+
+test_that("export_cartoons forwards custom linewidths", {
+  glycans <- "Gal(b1-3)GalNAc(a1-"
+  temp_dir <- tempfile()
+  on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
+  fs::dir_create(temp_dir)
+
+  suppressMessages(
+    result <- export_cartoons(
+      glycans,
+      temp_dir,
+      dpi = 72,
+      edge_linewidth = 1.1,
+      node_linewidth = 0.3
+    )
+  )
+  layers <- ggplot2::ggplot_build(result[[1]])$data
+
+  expect_equal(unique(layers[[1]]$linewidth), 1.1)
+  expect_equal(unique(layers[[3]]$linewidth), 0.3)
 })
 
 test_that("export_cartoons uses character vector names as filenames", {
