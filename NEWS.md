@@ -14,7 +14,6 @@
 ## Minor improvements and bug fixes
 
 * Deprecate `dpi` for `save_cartoon()` and `export_cartoons()` because glydraw uses an internal fixed design scale. Supplying `dpi` now warns that the argument is ignored. (#35)
-* Make `save_cartoon()` keep cartoon appearance stable when `dpi` is changed. (#35)
 * Adjust linkage annotation offsets for diagonal HexNAc links. (#29)
 
 # glydraw 0.5.1
