@@ -151,12 +151,22 @@
 #' @param coor A numeric coordinate matrix with columns `x` and `y`.
 #' @param highlight `NULL` or a numeric vector of 1-based vertex indices to
 #'   highlight.
+#' @param fuc_orient Fuc triangle orientation, either `"flex"` or `"up"`.
 #'
 #' @returns A data frame with columns `center_x`, `center_y`, `glycoform`, and
 #'   `transparency`, one row per residue vertex.
 #' @noRd
-.cartoon_residue_data <- function(structure, coor, highlight = NULL) {
-  gly_list <- data.frame(coor, glycoform = .residue_glycoforms(structure))
+.cartoon_residue_data <- function(
+  structure,
+  coor,
+  highlight = NULL,
+  fuc_orient = c("flex", "up")
+) {
+  fuc_orient <- rlang::arg_match(fuc_orient)
+  gly_list <- data.frame(
+    coor,
+    glycoform = .residue_glycoforms(structure, coor, fuc_orient)
+  )
   if (!is.null(highlight)) {
     gly_list$transparency <- replace(
       rep(0.3, length(structure)),

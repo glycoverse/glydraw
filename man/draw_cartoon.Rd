@@ -9,6 +9,7 @@ draw_cartoon(
   ...,
   show_linkage = TRUE,
   orient = c("H", "V"),
+  fuc_orient = c("flex", "up"),
   red_end = "",
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
@@ -27,6 +28,11 @@ TRUE. Substituent annotations are always shown.}
 
 \item{orient}{The orientation of glycan structure. "H" for horizontal, "V" for vertical.
 Default is "H"}
+
+\item{fuc_orient}{Fuc triangle orientation. \code{"flex"} points non-reducing Fuc
+residues toward their rendered linkage direction, while \code{"up"} draws all
+Fuc triangles pointing upward. Reducing-end Fuc residues always point
+upward. Defaults to \code{"flex"}.}
 
 \item{red_end}{Reducing-end annotation. The default \code{""} keeps the current
 reducing-end line. Use \code{"~"} to add a wavy reducing end, or any other
