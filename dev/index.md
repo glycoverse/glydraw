@@ -1,7 +1,9 @@
 # glydraw
 
-The goal of glydraw is to draw published-ready Structure Nomenclature
-For Glycans (SNFG). We use ggplot2 as the backend to draw the cartoons.
+`glydraw` is a ggplot2-native R engine for drawing reproducible SNFG
+glycan cartoons from glycan structure objects or text notations, with
+support for batch export, structural highlighting, and deep appearance
+customization.
 
 ## Installation
 
