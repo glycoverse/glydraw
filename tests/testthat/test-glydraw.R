@@ -547,6 +547,34 @@ test_that("draw_cartoon handles two Fuc branches plus one non-Fuc branch", {
   expect_gt(unname(coor[3, "y"]), unname(coor[4, "y"]))
 })
 
+test_that("child subtree packing preserves anchored leaf Fuc offsets", {
+  structure <- .as_single_glycan_structure(
+    "Fuc(a1-3)[Fuc(a1-6)][Man(b1-4)GlcNAc(b1-4)]GlcNAc(b1-"
+  )
+  graph <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
+  coor <- .initialize_residue_coordinates(graph)
+  coor <- .spread_rough_child_subtrees(graph, coor)
+  coor <- .orient_fucose_branch_subtrees(graph, coor)
+  parent <- length(graph)
+  child_pos <- as.integer(igraph::neighbors(graph, parent, mode = "out"))
+  rough_offsets <- as.numeric(coor[child_pos, "y"] - coor[parent, "y"])
+  child_order <- order(rough_offsets, child_pos)
+  child_pos <- child_pos[child_order]
+  rough_offsets <- rough_offsets[child_order]
+  layouts <- purrr::map(
+    child_pos,
+    \(child) .compact_subtree_coordinates(graph, child, coor)
+  )
+
+  shifts <- .pack_child_subtree_layouts(
+    layouts,
+    preferred_shifts = rough_offsets,
+    fixed_shifts = c(TRUE, FALSE, TRUE)
+  )
+
+  expect_equal(shifts, c(-1, 0, 1))
+})
+
 test_that("draw_cartoon controls Fuc triangle orientation", {
   structure <- "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-4)GlcNAc(b1-"
 

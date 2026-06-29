@@ -269,18 +269,89 @@
 #'
 #' @param layouts A list of child subtree layout lists in bottom-to-top branch
 #'   order. Each layout has vector `y` and data frame `profile`.
+#' @param preferred_shifts Numeric vector with one preferred child-root shift per
+#'   layout. Defaults to zero shifts.
+#' @param fixed_shifts Logical vector with one value per layout. `TRUE` entries
+#'   are kept at their preferred shifts unless there is no flexible sibling that
+#'   can resolve a collision.
 #' @param min_gap A numeric minimum vertical gap in any shared `x` column.
 #'
-#' @returns A numeric vector with one vertical shift per layout. Shifts are
-#'   centered around zero so the packed group stays near the parent.
+#' @returns A numeric vector with one vertical shift per layout. Shifts stay as
+#'   compact as possible while preserving anchored Fuc child positions.
 #' @noRd
-.pack_child_subtree_layouts <- function(layouts, min_gap = 1) {
+.pack_child_subtree_layouts <- function(
+  layouts,
+  preferred_shifts = NULL,
+  fixed_shifts = NULL,
+  min_gap = 1
+) {
   layout_num <- length(layouts)
   if (layout_num == 0) {
     return(numeric(0))
   }
 
+  if (is.null(preferred_shifts)) {
+    preferred_shifts <- rep(0, layout_num)
+  }
+  if (is.null(fixed_shifts)) {
+    fixed_shifts <- rep(FALSE, layout_num)
+  }
+  checkmate::assert_numeric(
+    preferred_shifts,
+    any.missing = FALSE,
+    len = layout_num
+  )
+  checkmate::assert_logical(
+    fixed_shifts,
+    any.missing = FALSE,
+    len = layout_num
+  )
+
+  # Keep the historical compact layout unless a caller has a child that must
+  # retain its rough-layout side. This avoids applying rough offsets broadly:
+  # they are branch-order hints, not final coordinates for ordinary children.
+  shifts <- .pack_child_subtree_layouts_tightly(layouts, min_gap)
+  if (!any(fixed_shifts)) {
+    return(shifts)
+  }
+
+  # Fixed shifts are reserved for children whose rough-layout offset already
+  # carries semantic information. For now that means leaf Fuc children, whose
+  # a1-3/a1-6 linkages decide whether they sit below or above the parent.
+  shifts[fixed_shifts] <- as.numeric(preferred_shifts[fixed_shifts])
+  shifts <- .apply_isolated_preferred_shifts(
+    layouts,
+    shifts,
+    preferred_shifts,
+    fixed_shifts
+  )
+  for (iter in seq_len(layout_num * layout_num)) {
+    result <- .pack_child_subtree_layouts_once(
+      layouts,
+      shifts,
+      fixed_shifts,
+      min_gap
+    )
+    shifts <- result$shifts
+    if (!result$changed) {
+      break
+    }
+  }
+
+  shifts
+}
+
+#' Pack child subtree layouts without preferred anchors
+#'
+#' @inheritParams .pack_child_subtree_layouts
+#'
+#' @returns A numeric vector with one vertical shift per layout. Shifts are
+#'   centered around zero so the packed group stays near the parent.
+#' @noRd
+.pack_child_subtree_layouts_tightly <- function(layouts, min_gap = 1) {
+  layout_num <- length(layouts)
   shifts <- rep(0, layout_num)
+
   for (i in seq_len(layout_num)) {
     if (i == 1) {
       next
@@ -300,6 +371,104 @@
   }
 
   shifts - mean(range(shifts))
+}
+
+#' Apply preferred shifts to isolated flexible child layouts
+#'
+#' @param layouts A list of child subtree layout lists in bottom-to-top branch
+#'   order.
+#' @param shifts Numeric vector with one current vertical shift per layout.
+#' @param preferred_shifts Numeric vector with one preferred child-root shift per
+#'   layout.
+#' @param fixed_shifts Logical vector with one anchoring flag per layout.
+#'
+#' @returns A numeric vector of updated `shifts`. Flexible centered children are
+#'   restored to their preferred shift only when they cannot collide with any
+#'   sibling subtree columns.
+#' @noRd
+.apply_isolated_preferred_shifts <- function(
+  layouts,
+  shifts,
+  preferred_shifts,
+  fixed_shifts
+) {
+  flexible_centered <- which(
+    !fixed_shifts &
+      abs(preferred_shifts) <= sqrt(.Machine$double.eps)
+  )
+  if (length(flexible_centered) == 0) {
+    return(shifts)
+  }
+
+  for (child in flexible_centered) {
+    # This replaces the old post-pack `.restore_isolated_centered_child()`
+    # repair. A centered arm may return to its preferred y = 0 only when its
+    # subtree columns cannot collide with sibling subtree columns.
+    child_x <- unique(layouts[[child]]$profile$x)
+    sibling_x <- unique(unlist(purrr::map(
+      layouts[-child],
+      \(layout) layout$profile$x
+    )))
+    if (length(intersect(child_x, sibling_x)) == 0) {
+      shifts[child] <- preferred_shifts[child]
+    }
+  }
+
+  shifts
+}
+
+#' Run one sibling-spacing pass for child subtree layouts
+#'
+#' @param layouts A list of child subtree layout lists in bottom-to-top branch
+#'   order.
+#' @param shifts Numeric vector with one current vertical shift per layout.
+#' @param fixed_shifts Logical vector with one anchoring flag per layout.
+#' @param min_gap A numeric minimum vertical gap in any shared `x` column.
+#'
+#' @returns A list with adjusted `shifts` and logical `changed`.
+#' @noRd
+.pack_child_subtree_layouts_once <- function(
+  layouts,
+  shifts,
+  fixed_shifts,
+  min_gap
+) {
+  layout_num <- length(layouts)
+  changed <- FALSE
+  tolerance <- sqrt(.Machine$double.eps)
+
+  for (i in seq_len(layout_num)) {
+    if (i == 1) {
+      next
+    }
+
+    for (j in seq_len(i - 1)) {
+      required_shift <- shifts[j] +
+        .subtree_profile_gap(
+          layouts[[j]]$profile,
+          layouts[[i]]$profile,
+          min_gap
+        )
+      violation <- required_shift - shifts[i]
+      if (violation <= tolerance) {
+        next
+      }
+
+      # Move a flexible subtree when possible. If the upper subtree is fixed,
+      # push the lower flexible sibling down instead; if both are fixed, keep
+      # bottom-to-top ordering by moving the upper subtree as the last resort.
+      if (!fixed_shifts[i]) {
+        shifts[i] <- shifts[i] + violation
+      } else if (!fixed_shifts[j]) {
+        shifts[j] <- shifts[j] - violation
+      } else {
+        shifts[i] <- shifts[i] + violation
+      }
+      changed <- TRUE
+    }
+  }
+
+  list(shifts = shifts, changed = changed)
 }
 
 #' Infer whether a child subtree should stay below or above its parent
@@ -368,49 +537,6 @@
     }
   }
 
-  shifts
-}
-
-#' Restore a centered child subtree when it cannot collide with siblings
-#'
-#' @param layouts A list of child subtree layout lists in bottom-to-top branch
-#'   order.
-#' @param shifts A numeric vector of proposed vertical shifts, one per layout.
-#' @param rough_offsets A numeric vector of child root offsets from the parent
-#'   before compaction.
-#' @param parent_x Numeric `x` coordinate of the parent residue.
-#'
-#' @returns A numeric vector of adjusted shifts, the same length as `shifts`.
-#'   A single child with zero rough offset is restored to the parent horizon
-#'   only when its occupied `x` columns do not include the parent column and do
-#'   not overlap sibling child-subtree columns.
-#' @noRd
-.restore_isolated_centered_child <- function(
-  layouts,
-  shifts,
-  rough_offsets,
-  parent_x
-) {
-  centered_child <- which(abs(rough_offsets) <= sqrt(.Machine$double.eps))
-  if (length(centered_child) != 1) {
-    return(shifts)
-  }
-
-  child <- centered_child[[1]]
-  child_x <- unique(layouts[[child]]$profile$x)
-  if (parent_x %in% child_x) {
-    return(shifts)
-  }
-
-  sibling_x <- unique(unlist(purrr::map(
-    layouts[-child],
-    \(layout) layout$profile$x
-  )))
-  if (length(intersect(child_x, sibling_x)) != 0) {
-    return(shifts)
-  }
-
-  shifts[child] <- 0
   shifts
 }
 
@@ -502,6 +628,24 @@
   0
 }
 
+#' Identify child subtrees whose root shift should stay anchored
+#'
+#' @param structure An igraph glycan graph whose vertices include `mono`.
+#' @param child_pos Integer vector of child vertex indices in bottom-to-top order.
+#'
+#' @returns A logical vector the same length as `child_pos`. Single-residue Fuc
+#'   children are anchored because their rough shift already encodes the
+#'   linkage-specific Fuc side.
+#' @noRd
+.fixed_child_subtree_shifts <- function(structure, child_pos) {
+  purrr::map_lgl(child_pos, function(child) {
+    # Only leaf Fuc children are anchored. Elongated Fuc branches need normal
+    # compaction because their descendants can create real subtree collisions.
+    igraph::V(structure)[[child]]$mono == "Fuc" &&
+      length(igraph::neighbors(structure, child, mode = "out")) == 0
+  })
+}
+
 #' Recursively compact coordinates for one residue subtree
 #'
 #' @param structure An igraph glycan graph.
@@ -536,19 +680,21 @@
     child_pos,
     \(child) .compact_subtree_coordinates(structure, child, coor, min_gap)
   )
-  shifts <- .pack_child_subtree_layouts(layouts, min_gap)
+  # Rough offsets choose branch side and ordering. The packer may use them as
+  # fixed positions for leaf Fuc children, but ordinary child subtrees still use
+  # the compact centered packing path.
+  shifts <- .pack_child_subtree_layouts(
+    layouts,
+    preferred_shifts = rough_offsets,
+    fixed_shifts = .fixed_child_subtree_shifts(structure, child_pos),
+    min_gap = min_gap
+  )
   shifts <- .separate_children_from_parent_column(
     layouts,
     shifts,
     rough_offsets,
     parent_x = as.numeric(coor[ver, "x"]),
     min_gap = min_gap
-  )
-  shifts <- .restore_isolated_centered_child(
-    layouts,
-    shifts,
-    rough_offsets,
-    parent_x = as.numeric(coor[ver, "x"])
   )
   shifted_layouts <- purrr::map2(layouts, shifts, .shift_subtree_layout)
 
