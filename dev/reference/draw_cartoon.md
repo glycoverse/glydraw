@@ -46,10 +46,10 @@ draw_cartoon(
 
 - fuc_orient:
 
-  Fuc triangle orientation. `"flex"` points non-reducing Fuc residues
-  toward their rendered linkage direction, while `"up"` draws all Fuc
-  triangles pointing upward. Reducing-end Fuc residues always point
-  upward. Defaults to `"flex"`.
+  Fuc-like triangle orientation. `"flex"` points non-reducing Fuc-like
+  residues toward their rendered linkage direction, while `"up"` draws
+  all Fuc-like triangles pointing upward. Reducing-end Fuc-like residues
+  always point upward. Defaults to `"flex"`.
 
 - red_end:
 

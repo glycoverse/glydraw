@@ -49,6 +49,8 @@
 
 ### Minor improvements and bug fixes
 
+- Extend Fuc-style branch layout and flexible orientation to additional
+  Fuc-like residues. (#46)
 - Fix
   [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
   for structures with two core Fuc branches and one b1-4 GlcNAc branch,
