@@ -10,6 +10,8 @@ draw_cartoon(
   show_linkage = TRUE,
   orient = c("H", "V"),
   red_end = "",
+  edge_linewidth = 0.8,
+  node_linewidth = 0.8,
   highlight = NULL
 )
 ```
@@ -38,6 +40,16 @@ draw_cartoon(
   Reducing-end annotation. The default `""` keeps the current
   reducing-end line. Use `"~"` to add a wavy reducing end, or any other
   string to draw that string at the reducing end.
+
+- edge_linewidth:
+
+  Numeric scalar controlling the linewidth of linkage lines. Defaults to
+  the current value, `0.8`.
+
+- node_linewidth:
+
+  Numeric scalar controlling the linewidth of node borders. Defaults to
+  the current value, `0.8`.
 
 - highlight:
 

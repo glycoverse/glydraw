@@ -42,6 +42,8 @@
 <span>  show_linkage <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  orient <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"H"</span>, <span class="st">"V"</span><span class="op">)</span>,</span>
 <span>  red_end <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  edge_linewidth <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>  node_linewidth <span class="op">=</span> <span class="fl">0.8</span>,</span>
 <span>  highlight <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -68,6 +70,16 @@ Default is "H"</p></dd>
 <dd><p>Reducing-end annotation. The default <code>""</code> keeps the current
 reducing-end line. Use <code>"~"</code> to add a wavy reducing end, or any other
 string to draw that string at the reducing end.</p></dd>
+
+
+<dt id="arg-edge-linewidth">edge_linewidth<a class="anchor" aria-label="anchor" href="#arg-edge-linewidth"></a></dt>
+<dd><p>Numeric scalar controlling the linewidth of linkage
+lines. Defaults to the current value, <code>0.8</code>.</p></dd>
+
+
+<dt id="arg-node-linewidth">node_linewidth<a class="anchor" aria-label="anchor" href="#arg-node-linewidth"></a></dt>
+<dd><p>Numeric scalar controlling the linewidth of node
+borders. Defaults to the current value, <code>0.8</code>.</p></dd>
 
 
 <dt id="arg-highlight">highlight<a class="anchor" aria-label="anchor" href="#arg-highlight"></a></dt>
