@@ -24,6 +24,51 @@ has_triangle_apex <- function(polygon, center, direction) {
   )
 }
 
+fuc_like_branch_graph <- function(monos, linkages = c("a1-3", "a1-6")) {
+  parent <- length(monos) + 1
+  graph <- igraph::make_empty_graph(parent, directed = TRUE)
+  graph <- igraph::add_edges(graph, as.vector(rbind(parent, seq_along(monos))))
+  igraph::V(graph)$mono <- c(monos, "GlcNAc")
+  igraph::E(graph)$linkage <- linkages
+  graph
+}
+
+fuc_like_layout_monos <- c(
+  "Qui",
+  "Rha",
+  "6dGul",
+  "6dAlt",
+  "6dTal",
+  "QuiNAc",
+  "RhaNAc",
+  "6dAltNAc",
+  "6dTalNAc",
+  "FucNAc",
+  "Oli",
+  "Tyv",
+  "Abe",
+  "Par",
+  "Dig",
+  "Col",
+  "Ara",
+  "Lyx",
+  "Xyl",
+  "Rib"
+)
+
+fuc_like_orient_monos <- c(
+  "Qui",
+  "Rha",
+  "6dGul",
+  "6dAlt",
+  "6dTal",
+  "QuiNAc",
+  "RhaNAc",
+  "6dAltNAc",
+  "6dTalNAc",
+  "FucNAc"
+)
+
 test_that("draw_cartoon works with valid branched glycan structure", {
   structure <- "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
 
@@ -531,6 +576,19 @@ test_that("draw_cartoon places a1-6 core Fuc up and a1-3 core Fuc down", {
   expect_lt(min(fuc_segments$yend), -0.5)
 })
 
+test_that("Fuc-like residues use linkage-specific branch sides", {
+  purrr::walk(fuc_like_layout_monos, function(mono) {
+    graph <- fuc_like_branch_graph(c(mono, mono))
+    coor <- .calculate_residue_coordinates(graph)
+
+    expect_equal(
+      unname(coor[1:2, "y"]),
+      c(-1, 1),
+      info = mono
+    )
+  })
+})
+
 test_that("draw_cartoon handles two Fuc branches plus one non-Fuc branch", {
   structure <- .as_single_glycan_structure(
     "Fuc(a1-3)[Fuc(a1-6)][GlcNAc(b1-4)]GlcNAc(b1-"
@@ -589,6 +647,40 @@ test_that("draw_cartoon controls Fuc triangle orientation", {
   expect_true(has_triangle_apex(up_fuc[[2]], c(x = -1, y = 1), "up"))
 })
 
+test_that("Fuc-like residues inherit flexible triangle orientation", {
+  purrr::walk(fuc_like_orient_monos, function(mono) {
+    graph <- fuc_like_branch_graph(c(mono, mono))
+    horizontal_coor <- matrix(
+      c(-1, -1, -1, 1, -1, 0),
+      ncol = 2,
+      byrow = TRUE,
+      dimnames = list(NULL, c("x", "y"))
+    )
+    vertical_coor <- matrix(
+      c(-1, 1, 1, 1, 0, 1),
+      ncol = 2,
+      byrow = TRUE,
+      dimnames = list(NULL, c("x", "y"))
+    )
+
+    expect_equal(
+      .residue_glycoforms(graph, horizontal_coor, fuc_orient = "flex"),
+      c(mono, paste0(mono, "Up"), "GlcNAc"),
+      info = mono
+    )
+    expect_equal(
+      .residue_glycoforms(graph, vertical_coor, fuc_orient = "flex"),
+      c(paste0(mono, "Right"), paste0(mono, "Left"), "GlcNAc"),
+      info = mono
+    )
+    expect_equal(
+      .residue_glycoforms(graph, vertical_coor, fuc_orient = "up"),
+      c(mono, mono, "GlcNAc"),
+      info = mono
+    )
+  })
+})
+
 test_that("draw_cartoon points vertical Fuc triangles toward their linkage", {
   structure <- "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-4)GlcNAc(b1-"
 
@@ -606,6 +698,17 @@ test_that("draw_cartoon keeps reducing-end Fuc triangles up", {
   fuc <- fuc_triangle_polygons(plot)
 
   expect_true(has_triangle_apex(fuc[[1]], c(x = 0, y = 0), "up"))
+})
+
+test_that("draw_cartoon renders Fuc-like ddHex branches", {
+  glycans <- paste0(
+    c("Oli", "Tyv", "Abe", "Par", "Dig", "Col"),
+    "(a1-3)GlcNAc(b1-"
+  )
+
+  cartoons <- purrr::map(glycans, draw_cartoon)
+
+  purrr::walk(cartoons, expect_s3_class, "glydraw_cartoon")
 })
 
 test_that(".calculate_residue_coordinates keeps same-column residues at least one unit apart", {

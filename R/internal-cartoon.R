@@ -89,7 +89,7 @@
 #' @returns A character vector of supported public monosaccharide names.
 #' @noRd
 .supported_color_monosaccharides <- function() {
-  setdiff(names(glycan_dict), c("FucUp", "FucRight", "FucLeft"))
+  setdiff(names(glycan_dict), .directional_fucose_like_glycoforms())
 }
 
 #' Resolve polygon fill colors
@@ -228,7 +228,7 @@
 #' @param coor A numeric coordinate matrix with columns `x` and `y`.
 #' @param highlight `NULL` or a numeric vector of 1-based vertex indices to
 #'   highlight.
-#' @param fuc_orient Fuc triangle orientation, either `"flex"` or `"up"`.
+#' @param fuc_orient Fuc-like triangle orientation, either `"flex"` or `"up"`.
 #'
 #' @returns A data frame with columns `center_x`, `center_y`, `glycoform`, and
 #'   `transparency`, one row per residue vertex.
