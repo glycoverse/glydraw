@@ -73,7 +73,7 @@ test_that("draw_cartoon scales node polygons with node_size", {
   )
 })
 
-test_that("draw_cartoon moves linkage annotations away from larger nodes", {
+test_that("draw_cartoon moves linkage annotations along the line for larger nodes", {
   structure <- "Gal(b1-3)GalNAc(a1-"
 
   default_plot <- draw_cartoon(structure)
@@ -82,18 +82,28 @@ test_that("draw_cartoon moves linkage annotations away from larger nodes", {
   custom_text <- ggplot2::ggplot_build(custom_plot)$data[[4]]
   default_beta <- default_text[default_text$label == "beta", ]
   custom_beta <- custom_text[custom_text$label == "beta", ]
+  default_three <- default_text[default_text$label == "3", ]
+  custom_three <- custom_text[custom_text$label == "3", ]
   child_center <- c(x = -1, y = 0)
+  parent_center <- c(x = 0, y = 0)
 
-  default_distance <- sqrt(
-    (default_beta$x - child_center[["x"]])^2 +
-      (default_beta$y - child_center[["y"]])^2
-  )
-  custom_distance <- sqrt(
-    (custom_beta$x - child_center[["x"]])^2 +
-      (custom_beta$y - child_center[["y"]])^2
-  )
+  default_beta_line_distance <- abs(default_beta$y - child_center[["y"]])
+  custom_beta_line_distance <- abs(custom_beta$y - child_center[["y"]])
+  default_three_line_distance <- abs(default_three$y - parent_center[["y"]])
+  custom_three_line_distance <- abs(custom_three$y - parent_center[["y"]])
 
-  expect_gt(custom_distance, default_distance)
+  expect_equal(
+    custom_beta_line_distance,
+    default_beta_line_distance,
+    tolerance = 1e-6
+  )
+  expect_equal(
+    custom_three_line_distance,
+    default_three_line_distance,
+    tolerance = 1e-6
+  )
+  expect_gt(custom_beta$x, default_beta$x)
+  expect_lt(custom_three$x, default_three$x)
 })
 
 test_that("draw_cartoon warns and hides linkage annotations for oversized nodes", {

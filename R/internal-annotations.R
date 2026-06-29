@@ -11,8 +11,8 @@
 #'   child-side linkage label.
 #' @param par_offset Numeric distance from the parent residue center to the
 #'   parent-side linkage label.
-#' @param node_size Numeric node-size multiplier used to push labels away from
-#'   scaled residue polygons.
+#' @param node_size Numeric node-size multiplier used to push labels along the
+#'   linkage segment away from scaled residue polygons.
 #'
 #' @returns A list with two numeric 2-row matrices, `chil` and `par`. Each
 #'   matrix is an `(x, y)` offset vector to add to the child or parent residue
@@ -65,13 +65,13 @@
   chil_annot_loc <- chil_rotate_matrix %*% chil_location
   par_annot_loc <- par_rotate_matrix %*% par_location
   extra_offset <- .annotation_extra_offset(node_size)
-  chil_annot_loc <- .push_label_position_away_from_segment(
+  chil_annot_loc <- .push_label_position_along_segment(
     label_offset = chil_annot_loc,
     anchor = c(x = chil_glyx, y = chil_glyy),
     other = c(x = par_glyx, y = par_glyy),
     extra_offset = extra_offset
   )
-  par_annot_loc <- .push_label_position_away_from_segment(
+  par_annot_loc <- .push_label_position_along_segment(
     label_offset = par_annot_loc,
     anchor = c(x = par_glyx, y = par_glyy),
     other = c(x = chil_glyx, y = chil_glyy),
@@ -91,17 +91,17 @@
   .default_node_point_size * pmax(node_size - 1, 0)
 }
 
-#' Push a linkage label offset away from its linkage segment
+#' Push a linkage label offset along its linkage segment
 #'
 #' @param label_offset A two-row matrix giving the current label offset from
 #'   the anchor residue.
 #' @param anchor Numeric `x` and `y` coordinates of the anchor residue.
 #' @param other Numeric `x` and `y` coordinates of the linked residue.
-#' @param extra_offset Numeric distance to add perpendicular to the segment.
+#' @param extra_offset Numeric distance to add along the segment.
 #'
 #' @returns A two-row matrix with the adjusted label offset.
 #' @noRd
-.push_label_position_away_from_segment <- function(
+.push_label_position_along_segment <- function(
   label_offset,
   anchor,
   other,
@@ -117,15 +117,7 @@
     return(label_offset)
   }
 
-  direction_unit <- direction / direction_norm
-  parallel <- sum(label_offset * direction_unit) * direction_unit
-  perpendicular <- label_offset - parallel
-  perpendicular_norm <- norm(perpendicular, type = "2")
-  if (perpendicular_norm <= .Machine$double.eps) {
-    return(label_offset)
-  }
-
-  label_offset + extra_offset * perpendicular / perpendicular_norm
+  label_offset + extra_offset * direction / direction_norm
 }
 
 #' Choose the label offset for one side of a linkage
