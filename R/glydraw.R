@@ -15,7 +15,8 @@
 #' @param node_size Numeric scalar used as a multiplier for the default node
 #'   size. Defaults to `1`, which keeps the current size. Linkage annotations
 #'   are moved farther from larger nodes, and are hidden with a warning when
-#'   `node_size` is too large to leave enough annotation space.
+#'   `node_size` is too large to leave enough annotation space. Values larger
+#'   than `2` are rejected because residues overlap.
 #' @param highlight An integer vector specifying the node indices to highlight.
 #'   This argument is applicable only when `structure` is a [glyrepr::glycan_structure()].
 #'   Note that for a [glyrepr::glycan_structure()], the node indices correspond exactly
@@ -41,7 +42,7 @@ draw_cartoon <- function(
 ) {
   checkmate::assert_number(edge_linewidth, lower = 0)
   checkmate::assert_number(node_linewidth, lower = 0)
-  checkmate::assert_number(node_size, lower = 0)
+  .validate_node_size(node_size)
   inputs <- .prepare_cartoon_inputs(structure, highlight, orient, red_end)
   structure <- inputs$structure
   coor <- inputs$coor
@@ -199,6 +200,7 @@ export_cartoons <- function(
   node_linewidth = 0.8,
   node_size = 1
 ) {
+  .validate_node_size(node_size)
   UseMethod("export_cartoons")
 }
 
@@ -288,6 +290,7 @@ export_cartoons.glyrepr_structure <- function(
   node_linewidth,
   node_size
 ) {
+  .validate_node_size(node_size)
   cli::cli_alert_info("Exporting {.val {length(glycans)}} glycan cartoons.")
   fs::dir_create(dirname)
   glycan_list <- purrr::map(seq_along(glycans), ~ glycans[[.x]])

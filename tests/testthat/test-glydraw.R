@@ -123,6 +123,19 @@ test_that("draw_cartoon warns and hides linkage annotations for oversized nodes"
   expect_false(any(text$label %in% c("alpha", "beta", "3")))
 })
 
+test_that("draw_cartoon rejects node_size values that make residues overlap", {
+  structure <- "Gal(b1-3)GalNAc(a1-"
+
+  expect_error(
+    draw_cartoon(structure, node_size = 2.1),
+    "`node_size` must be no larger than 2"
+  )
+  expect_warning(
+    expect_s3_class(draw_cartoon(structure, node_size = 2), "glydraw_cartoon"),
+    "Linkage annotations are hidden"
+  )
+})
+
 test_that("print.glydraw_cartoon rasterizes fixed-size cartoon for display", {
   structure <- paste0(
     "Gal(b1-4)GlcNAc(b1-2)[Gal(b1-4)GlcNAc(b1-4)]Man(a1-3)",
@@ -536,6 +549,17 @@ test_that("export_cartoons forwards custom node sizes", {
     diff(range(first_custom_node$x)) / diff(range(first_default_node$x)),
     1.2,
     tolerance = 1e-6
+  )
+})
+
+test_that("export_cartoons rejects node_size values that make residues overlap", {
+  glycans <- "Gal(b1-3)GalNAc(a1-"
+  temp_dir <- tempfile()
+  on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
+
+  expect_error(
+    suppressMessages(export_cartoons(glycans, temp_dir, node_size = 2.1)),
+    "`node_size` must be no larger than 2"
   )
 })
 

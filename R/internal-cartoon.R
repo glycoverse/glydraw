@@ -3,6 +3,24 @@
 
 .default_node_point_size <- 0.215
 .node_size_linkage_threshold <- 1.2
+.node_size_upper_boundary <- 2
+
+#' Validate node-size input
+#'
+#' @param node_size Numeric node-size multiplier.
+#'
+#' @returns `node_size`, invisibly.
+#' @noRd
+.validate_node_size <- function(node_size) {
+  checkmate::assert_number(node_size, lower = 0)
+  if (node_size > .node_size_upper_boundary) {
+    cli::cli_abort(
+      "{.arg node_size} must be no larger than {.val {(.node_size_upper_boundary)}} because larger values make residues overlap."
+    )
+  }
+
+  invisible(node_size)
+}
 
 #' Resolve whether text annotations can be shown for the requested node size
 #'
