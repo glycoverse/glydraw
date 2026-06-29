@@ -66,6 +66,21 @@ glycan_dict <- list(
   'FucUp' = c('dHexUp', 'glyRed'),
   'FucRight' = c('dHexRight', 'glyRed'),
   'FucLeft' = c('dHexLeft', 'glyRed'),
+  'QuiUp' = c('dHexUp', 'glyBlue'),
+  'QuiRight' = c('dHexRight', 'glyBlue'),
+  'QuiLeft' = c('dHexLeft', 'glyBlue'),
+  'RhaUp' = c('dHexUp', 'glyGreen'),
+  'RhaRight' = c('dHexRight', 'glyGreen'),
+  'RhaLeft' = c('dHexLeft', 'glyGreen'),
+  '6dGulUp' = c('dHexUp', 'glyOrange'),
+  '6dGulRight' = c('dHexRight', 'glyOrange'),
+  '6dGulLeft' = c('dHexLeft', 'glyOrange'),
+  '6dAltUp' = c('dHexUp', 'glyPink'),
+  '6dAltRight' = c('dHexRight', 'glyPink'),
+  '6dAltLeft' = c('dHexLeft', 'glyPink'),
+  '6dTalUp' = c('dHexUp', 'glyLightBlue'),
+  '6dTalRight' = c('dHexRight', 'glyLightBlue'),
+  '6dTalLeft' = c('dHexLeft', 'glyLightBlue'),
 
   'dHexNAc' = c('dHexNAc', 'glyWhite', 'glyWhite'),
   'QuiNAc' = c('dHexNAc', 'glyBlue', 'glyWhite'),
@@ -73,6 +88,28 @@ glycan_dict <- list(
   '6dAltNAc' = c('dHexNAc', 'glyPink', 'glyWhite'),
   '6dTalNAc' = c('dHexNAc', 'glyLightBlue', 'glyWhite'),
   'FucNAc' = c('dHexNAc', 'glyRed', 'glyWhite'),
+  'QuiNAcUp' = c('dHexNAcUp', 'glyBlue', 'glyWhite'),
+  'QuiNAcRight' = c('dHexNAcRight', 'glyBlue', 'glyWhite'),
+  'QuiNAcLeft' = c('dHexNAcLeft', 'glyBlue', 'glyWhite'),
+  'RhaNAcUp' = c('dHexNAcUp', 'glyGreen', 'glyWhite'),
+  'RhaNAcRight' = c('dHexNAcRight', 'glyGreen', 'glyWhite'),
+  'RhaNAcLeft' = c('dHexNAcLeft', 'glyGreen', 'glyWhite'),
+  '6dAltNAcUp' = c('dHexNAcUp', 'glyPink', 'glyWhite'),
+  '6dAltNAcRight' = c('dHexNAcRight', 'glyPink', 'glyWhite'),
+  '6dAltNAcLeft' = c('dHexNAcLeft', 'glyPink', 'glyWhite'),
+  '6dTalNAcUp' = c('dHexNAcUp', 'glyLightBlue', 'glyWhite'),
+  '6dTalNAcRight' = c('dHexNAcRight', 'glyLightBlue', 'glyWhite'),
+  '6dTalNAcLeft' = c('dHexNAcLeft', 'glyLightBlue', 'glyWhite'),
+  'FucNAcUp' = c('dHexNAcUp', 'glyRed', 'glyWhite'),
+  'FucNAcRight' = c('dHexNAcRight', 'glyRed', 'glyWhite'),
+  'FucNAcLeft' = c('dHexNAcLeft', 'glyRed', 'glyWhite'),
+
+  'Oli' = c('ddHex', 'glyBlue'),
+  'Tyv' = c('ddHex', 'glyGreen'),
+  'Abe' = c('ddHex', 'glyOrange'),
+  'Par' = c('ddHex', 'glyPink'),
+  'Dig' = c('ddHex', 'glyPurple'),
+  'Col' = c('ddHex', 'glyLightBlue'),
 
   'Pen' = c('Pen', 'glyWhite'),
   'Ara' = c('Pen', 'glyGreen'),
@@ -153,6 +190,24 @@ glycan_shape <- list(
     xx = c(0, -1, 0, 0),
     yy = c(0.67 * sqrt(3), -0.33 * sqrt(3), -0.33 * sqrt(3), 0.67 * sqrt(3))
   ),
+  'dHexNAcUp' = data.frame(
+    x = c(0, 1, 0, 0),
+    y = c(-0.67 * sqrt(3), 0.33 * sqrt(3), 0.33 * sqrt(3), -0.67 * sqrt(3)),
+    xx = c(0, -1, 0, 0),
+    yy = c(-0.67 * sqrt(3), 0.33 * sqrt(3), 0.33 * sqrt(3), -0.67 * sqrt(3))
+  ),
+  'dHexNAcRight' = data.frame(
+    x = c(0.67 * sqrt(3), -0.33 * sqrt(3), -0.33 * sqrt(3), 0.67 * sqrt(3)),
+    y = c(0, 1, 0, 0),
+    xx = c(0.67 * sqrt(3), -0.33 * sqrt(3), -0.33 * sqrt(3), 0.67 * sqrt(3)),
+    yy = c(0, -1, 0, 0)
+  ),
+  'dHexNAcLeft' = data.frame(
+    x = c(-0.67 * sqrt(3), 0.33 * sqrt(3), 0.33 * sqrt(3), -0.67 * sqrt(3)),
+    y = c(0, 1, 0, 0),
+    xx = c(-0.67 * sqrt(3), 0.33 * sqrt(3), 0.33 * sqrt(3), -0.67 * sqrt(3)),
+    yy = c(0, -1, 0, 0)
+  ),
   'ddHex' = data.frame(x = c(-1, 1, 1, -1), y = c(0.5, 0.5, -0.5, -0.5)),
   'Pen' = data.frame(
     x = c(
@@ -193,3 +248,76 @@ glycan_shape <- list(
     y = c(0.905, 0.2132, -0.905, -0.905, 0.2132, 0.905)
   )
 )
+
+.fucose_like_layout_monosaccharides <- c(
+  "Fuc",
+  "Qui",
+  "Rha",
+  "6dGul",
+  "6dAlt",
+  "6dTal",
+  "QuiNAc",
+  "RhaNAc",
+  "6dAltNAc",
+  "6dTalNAc",
+  "FucNAc",
+  "Oli",
+  "Tyv",
+  "Abe",
+  "Par",
+  "Dig",
+  "Col",
+  "Ara",
+  "Lyx",
+  "Xyl",
+  "Rib"
+)
+
+.fucose_like_orient_monosaccharides <- c(
+  "Fuc",
+  "Qui",
+  "Rha",
+  "6dGul",
+  "6dAlt",
+  "6dTal",
+  "QuiNAc",
+  "RhaNAc",
+  "6dAltNAc",
+  "6dTalNAc",
+  "FucNAc"
+)
+
+#' Identify residues that use Fuc-like branch layout
+#'
+#' @param mono A character vector of monosaccharide names.
+#'
+#' @returns A logical vector indicating whether each monosaccharide should use
+#'   linkage-specific Fuc-like branch offsets.
+#' @noRd
+.is_fucose_like_layout_monosaccharide <- function(mono) {
+  mono %in% .fucose_like_layout_monosaccharides
+}
+
+#' Identify residues that use Fuc-like directional shapes
+#'
+#' @param mono A character vector of monosaccharide names.
+#'
+#' @returns A logical vector indicating whether each monosaccharide should use
+#'   directional glycoform names when `fuc_orient = "flex"`.
+#' @noRd
+.is_fucose_like_orient_monosaccharide <- function(mono) {
+  mono %in% .fucose_like_orient_monosaccharides
+}
+
+#' Get internal directional Fuc-like glycoform names
+#'
+#' @returns A character vector of glycoform names used only for directional
+#'   rendering of Fuc-like residues.
+#' @noRd
+.directional_fucose_like_glycoforms <- function() {
+  as.vector(outer(
+    .fucose_like_orient_monosaccharides,
+    c("Up", "Right", "Left"),
+    paste0
+  ))
+}

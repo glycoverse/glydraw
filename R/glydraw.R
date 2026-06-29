@@ -7,10 +7,10 @@
 #'   TRUE. Substituent annotations are always shown.
 #' @param orient The orientation of glycan structure. "H" for horizontal, "V" for vertical.
 #'   Default is "H"
-#' @param fuc_orient Fuc triangle orientation. `"flex"` points non-reducing Fuc
-#'   residues toward their rendered linkage direction, while `"up"` draws all
-#'   Fuc triangles pointing upward. Reducing-end Fuc residues always point
-#'   upward. Defaults to `"flex"`.
+#' @param fuc_orient Fuc-like triangle orientation. `"flex"` points
+#'   non-reducing Fuc-like residues toward their rendered linkage direction,
+#'   while `"up"` draws all Fuc-like triangles pointing upward. Reducing-end
+#'   Fuc-like residues always point upward. Defaults to `"flex"`.
 #' @param red_end Reducing-end annotation. The default `""` keeps the current
 #'   reducing-end line. Use `"~"` to add a wavy reducing end, or any other
 #'   string to draw that string at the reducing end.
@@ -334,7 +334,7 @@ export_cartoons.glyrepr_structure <- function(
 #' @param scale Numeric output-size multiplier passed to `save_cartoon()`.
 #' @param show_linkage Logical scalar passed to `draw_cartoon()`.
 #' @param orient Drawing orientation, either `"H"` or `"V"`.
-#' @param fuc_orient Fuc triangle orientation passed to `draw_cartoon()`.
+#' @param fuc_orient Fuc-like triangle orientation passed to `draw_cartoon()`.
 #' @param red_end String reducing-end annotation passed to `draw_cartoon()`.
 #' @param edge_linewidth Numeric linkage line width passed to
 #'   `draw_cartoon()`.

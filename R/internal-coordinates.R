@@ -9,7 +9,7 @@
 #'
 #' @returns A numeric matrix with one row per vertex and columns `x` and `y`.
 #'   `x` is the negative graph distance from the reducing end, and `y` starts
-#'   at 0 except for preliminary Fuc subtree offsets.
+#'   at 0 except for preliminary Fuc-like subtree offsets.
 #' @noRd
 .initialize_residue_coordinates <- function(structure) {
   ver_num <- length(structure)
@@ -23,7 +23,8 @@
   coor[, 'x'] <- init_X
   for (i in seq(1, length(structure))) {
     if (
-      igraph::V(structure)[[i]]$mono == 'Fuc' && !.is_reducing_end(structure, i)
+      .is_fucose_like_layout_monosaccharide(igraph::V(structure)[[i]]$mono) &&
+        !.is_reducing_end(structure, i)
     ) {
       coor <- .shift_subtree_axis(structure, i, coor, "x", 1)
     }
@@ -87,17 +88,17 @@
   return(coor)
 }
 
-#' Rotate descendants of an elongated Fuc branch
+#' Rotate descendants of an elongated Fuc-like branch
 #'
 #' @param structure An igraph glycan graph.
-#' @param fuc_pos A single integer vertex index whose residue is Fuc.
+#' @param fuc_pos A single integer vertex index whose residue is Fuc-like.
 #' @param coor A numeric coordinate matrix with columns `x` and `y`.
-#' @param branch_offset A numeric vertical offset for the Fuc branch. Its sign
-#'   determines whether descendants rotate upward or downward.
+#' @param branch_offset A numeric vertical offset for the Fuc-like branch. Its
+#'   sign determines whether descendants rotate upward or downward.
 #'
 #' @returns The same coordinate matrix shape as `coor`, with descendants of
-#'   `fuc_pos` rotated around the Fuc coordinate. If the Fuc has no descendants
-#'   or the offset has no direction, `coor` is returned unchanged.
+#'   `fuc_pos` rotated around the Fuc-like coordinate. If the residue has no
+#'   descendants or the offset has no direction, `coor` is returned unchanged.
 #' @noRd
 .orient_fucose_branch_subtree <- function(
   structure,
@@ -128,11 +129,11 @@
   coor
 }
 
-#' Convert Fuc linkage positions to vertical branch offsets
+#' Convert Fuc-like linkage positions to vertical branch offsets
 #'
 #' @param structure An igraph glycan graph whose edge attributes include
 #'   `linkage`.
-#' @param fuc_pos An integer vector of Fuc vertex indices.
+#' @param fuc_pos An integer vector of Fuc-like vertex indices.
 #'
 #' @returns A numeric vector the same length as `fuc_pos`. Linkages ending in
 #'   `2` or `3` return `-1`; other linkage positions return `1`.
@@ -151,16 +152,16 @@
 #'   `linkage` and whose vertices include `mono`.
 #' @param ver A single integer vertex index.
 #'
-#' @returns An igraph vertex sequence of neighbors for `ver`, excluding Fuc
-#'   neighbors. Numeric linkage positions are sorted decreasing; unknown or
-#'   compound linkage values are placed at the bottom.
+#' @returns An igraph vertex sequence of neighbors for `ver`, excluding
+#'   Fuc-like neighbors. Numeric linkage positions are sorted decreasing;
+#'   unknown or compound linkage values are placed at the bottom.
 #'
 #' @noRd
 .order_child_vertices_by_linkage <- function(structure, ver) {
   neigh_pos <- igraph::neighbors(structure, ver) # Get neighbor vertices
-  fuc_pos <- neigh_pos[which(neigh_pos$mono == 'Fuc')]
+  fuc_pos <- neigh_pos[.is_fucose_like_layout_monosaccharide(neigh_pos$mono)]
   if (length(fuc_pos) != 0) {
-    neigh_pos <- neigh_pos[!neigh_pos %in% c(fuc_pos)] # Exclude Fucose in neighbor vertices
+    neigh_pos <- neigh_pos[!neigh_pos %in% c(fuc_pos)] # Exclude Fuc-like neighbor vertices
   }
   linkage_chars <- sub('.*-', '', igraph::E(structure)$linkage[neigh_pos])
   neigh_linkage <- suppressWarnings(as.numeric(linkage_chars))
@@ -207,15 +208,15 @@
   return(coor)
 }
 
-#' Spread non-Fuc child subtrees when a parent also has Fuc
+#' Spread non-Fuc-like child subtrees when a parent also has Fuc-like children
 #'
 #' @param coor A numeric coordinate matrix with columns `x` and `y`.
 #' @param structure An igraph glycan graph.
-#' @param ver A single integer parent vertex with Fuc and non-Fuc child
-#'   neighbors.
+#' @param ver A single integer parent vertex with Fuc-like and non-Fuc-like
+#'   child neighbors.
 #'
-#' @returns The same coordinate matrix shape as `coor`, with the two non-Fuc
-#'   child subtrees shifted to `+0.5` and `-0.5`.
+#' @returns The same coordinate matrix shape as `coor`, with the two
+#'   non-Fuc-like child subtrees shifted to `+0.5` and `-0.5`.
 #' @noRd
 .spread_non_fucose_children <- function(coor, structure, ver) {
   arrange_other_neigh_pos <- .order_child_vertices_by_linkage(structure, ver)
@@ -277,7 +278,7 @@
 #' @param min_gap A numeric minimum vertical gap in any shared `x` column.
 #'
 #' @returns A numeric vector with one vertical shift per layout. Shifts stay as
-#'   compact as possible while preserving anchored Fuc child positions.
+#'   compact as possible while preserving anchored Fuc-like child positions.
 #' @noRd
 .pack_child_subtree_layouts <- function(
   layouts,
@@ -316,8 +317,8 @@
   }
 
   # Fixed shifts are reserved for children whose rough-layout offset already
-  # carries semantic information. For now that means leaf Fuc children, whose
-  # a1-3/a1-6 linkages decide whether they sit below or above the parent.
+  # carries semantic information. For now that means leaf Fuc-like children,
+  # whose a1-3/a1-6 linkages decide whether they sit below or above the parent.
   shifts[fixed_shifts] <- as.numeric(preferred_shifts[fixed_shifts])
   shifts <- .apply_isolated_preferred_shifts(
     layouts,
@@ -633,15 +634,15 @@
 #' @param structure An igraph glycan graph whose vertices include `mono`.
 #' @param child_pos Integer vector of child vertex indices in bottom-to-top order.
 #'
-#' @returns A logical vector the same length as `child_pos`. Single-residue Fuc
-#'   children are anchored because their rough shift already encodes the
-#'   linkage-specific Fuc side.
+#' @returns A logical vector the same length as `child_pos`. Single-residue
+#'   Fuc-like children are anchored because their rough shift already encodes
+#'   the linkage-specific side.
 #' @noRd
 .fixed_child_subtree_shifts <- function(structure, child_pos) {
   purrr::map_lgl(child_pos, function(child) {
-    # Only leaf Fuc children are anchored. Elongated Fuc branches need normal
+    # Only leaf Fuc-like children are anchored. Elongated branches need normal
     # compaction because their descendants can create real subtree collisions.
-    igraph::V(structure)[[child]]$mono == "Fuc" &&
+    .is_fucose_like_layout_monosaccharide(igraph::V(structure)[[child]]$mono) &&
       length(igraph::neighbors(structure, child, mode = "out")) == 0
   })
 }
@@ -681,8 +682,8 @@
     \(child) .compact_subtree_coordinates(structure, child, coor, min_gap)
   )
   # Rough offsets choose branch side and ordering. The packer may use them as
-  # fixed positions for leaf Fuc children, but ordinary child subtrees still use
-  # the compact centered packing path.
+  # fixed positions for leaf Fuc-like children, but ordinary child subtrees
+  # still use the compact centered packing path.
   shifts <- .pack_child_subtree_layouts(
     layouts,
     preferred_shifts = rough_offsets,
@@ -748,8 +749,8 @@
 #' @param coor A numeric coordinate matrix with columns `x` and `y`.
 #'
 #' @returns The same coordinate matrix shape as `coor`, with two-child,
-#'   three-child, and Fuc-containing branch subtrees vertically spread before
-#'   final compaction.
+#'   three-child, and Fuc-like-containing branch subtrees vertically spread
+#'   before final compaction.
 #' @noRd
 .spread_rough_child_subtrees <- function(structure, coor) {
   for (ver in .reverse_vertex_order(structure)) {
@@ -770,9 +771,10 @@
 #' @noRd
 .spread_child_subtrees_for_vertex <- function(coor, structure, ver) {
   gly_neighbors <- igraph::neighbors(structure, ver)
-  has_fucose <- 'Fuc' %in% gly_neighbors$mono
+  is_fucose_like <- .is_fucose_like_layout_monosaccharide(gly_neighbors$mono)
+  has_fucose <- any(is_fucose_like)
   neighbor_num <- length(gly_neighbors)
-  non_fucose_num <- sum(gly_neighbors$mono != 'Fuc')
+  non_fucose_num <- sum(!is_fucose_like)
 
   if (neighbor_num == 2 && !has_fucose) {
     return(.spread_two_child_subtrees(coor, structure, ver))
@@ -786,15 +788,15 @@
   coor
 }
 
-#' Apply Fuc branch offsets and orientation to all vertices
+#' Apply Fuc-like branch offsets and orientation to all vertices
 #'
 #' @param structure An igraph glycan graph whose vertices include `mono` and
 #'   whose edges include `linkage`.
 #' @param coor A numeric coordinate matrix with columns `x` and `y`.
 #'
-#' @returns The same coordinate matrix shape as `coor`, with Fuc branches moved
-#'   to the linkage-specific side and any elongated Fuc descendants rotated with
-#'   the branch.
+#' @returns The same coordinate matrix shape as `coor`, with Fuc-like branches
+#'   moved to the linkage-specific side and any elongated descendants rotated
+#'   with the branch.
 #' @noRd
 .orient_fucose_branch_subtrees <- function(structure, coor) {
   for (ver in .reverse_vertex_order(structure)) {
@@ -803,20 +805,20 @@
   coor
 }
 
-#' Apply Fuc branch offsets and orientation for one parent vertex
+#' Apply Fuc-like branch offsets and orientation for one parent vertex
 #'
 #' @param structure An igraph glycan graph whose vertices include `mono` and
 #'   whose edges include `linkage`.
 #' @param coor A numeric coordinate matrix with columns `x` and `y`.
 #' @param ver A single integer parent vertex index.
 #'
-#' @returns The same coordinate matrix shape as `coor`. If `ver` has Fuc
-#'   children, each Fuc subtree is shifted and elongated descendants are
-#'   oriented with the branch; otherwise `coor` is returned unchanged.
+#' @returns The same coordinate matrix shape as `coor`. If `ver` has Fuc-like
+#'   children, each subtree is shifted and elongated descendants are oriented
+#'   with the branch; otherwise `coor` is returned unchanged.
 #' @noRd
 .orient_fucose_children_for_vertex <- function(structure, coor, ver) {
   neigh_pos <- igraph::neighbors(structure, ver)
-  fuc_pos <- neigh_pos[which(neigh_pos$mono == 'Fuc')]
+  fuc_pos <- neigh_pos[.is_fucose_like_layout_monosaccharide(neigh_pos$mono)]
   if (length(fuc_pos) == 0) {
     return(coor)
   }
@@ -882,12 +884,12 @@
 #' @param structure An igraph glycan graph whose vertices include `mono`.
 #' @param coor A numeric coordinate matrix with rendered columns `x` and `y`,
 #'   one row per graph vertex.
-#' @param fuc_orient Fuc triangle orientation, either `"flex"` or `"up"`.
+#' @param fuc_orient Fuc-like triangle orientation, either `"flex"` or `"up"`.
 #'
 #' @returns A character vector with one value per vertex. Most values are copied
-#'   from `mono`; in flexible Fuc orientation, non-reducing Fuc residues are
-#'   mapped to directional shape names so the triangle apex points toward the
-#'   rendered linkage direction.
+#'   from `mono`; in flexible Fuc-like orientation, non-reducing Fuc-like
+#'   orientable residues are mapped to directional shape names so the triangle
+#'   apex points toward the rendered linkage direction.
 #' @noRd
 .residue_glycoforms <- function(
   structure,
@@ -903,7 +905,7 @@
     coor <- .calculate_residue_coordinates(structure)
   }
 
-  for (i in c(which(glycoform == 'Fuc'))) {
+  for (i in which(.is_fucose_like_orient_monosaccharide(glycoform))) {
     if (!.is_reducing_end(structure, i)) {
       glycoform[i] <- .fucose_directional_glycoform(structure, coor, i)
     }
@@ -911,30 +913,32 @@
   return(glycoform)
 }
 
-#' Get directional Fuc shape name from rendered linkage direction
+#' Get directional Fuc-like shape name from rendered linkage direction
 #'
 #' @param structure An igraph glycan graph.
 #' @param coor A numeric coordinate matrix with rendered columns `x` and `y`.
-#' @param fuc_pos A single integer vertex index whose residue is Fuc.
+#' @param fuc_pos A single integer vertex index whose residue is Fuc-like.
 #'
-#' @returns A Fuc glycoform string: `"Fuc"` points up, `"FucUp"` points down,
-#'   `"FucRight"` points right, and `"FucLeft"` points left.
+#' @returns A glycoform string with no suffix for up-pointing shapes, an `"Up"`
+#'   suffix for down-pointing shapes, a `"Right"` suffix for right-pointing
+#'   shapes, and a `"Left"` suffix for left-pointing shapes.
 #' @noRd
 .fucose_directional_glycoform <- function(structure, coor, fuc_pos) {
+  mono <- igraph::V(structure)[[fuc_pos]]$mono
   parent_pos <- as.integer(igraph::neighbors(structure, fuc_pos, mode = "in"))
   if (length(parent_pos) == 0) {
-    return("Fuc")
+    return(mono)
   }
 
   linkage_vec <- coor[parent_pos[1], c("x", "y")] - coor[fuc_pos, c("x", "y")]
   if (abs(linkage_vec[["x"]]) > abs(linkage_vec[["y"]])) {
     if (linkage_vec[["x"]] > 0) {
-      return("FucRight")
+      return(paste0(mono, "Right"))
     }
-    return("FucLeft")
+    return(paste0(mono, "Left"))
   }
   if (linkage_vec[["y"]] < 0) {
-    return("FucUp")
+    return(paste0(mono, "Up"))
   }
-  "Fuc"
+  mono
 }

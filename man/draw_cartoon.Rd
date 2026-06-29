@@ -30,10 +30,10 @@ TRUE. Substituent annotations are always shown.}
 \item{orient}{The orientation of glycan structure. "H" for horizontal, "V" for vertical.
 Default is "H"}
 
-\item{fuc_orient}{Fuc triangle orientation. \code{"flex"} points non-reducing Fuc
-residues toward their rendered linkage direction, while \code{"up"} draws all
-Fuc triangles pointing upward. Reducing-end Fuc residues always point
-upward. Defaults to \code{"flex"}.}
+\item{fuc_orient}{Fuc-like triangle orientation. \code{"flex"} points
+non-reducing Fuc-like residues toward their rendered linkage direction,
+while \code{"up"} draws all Fuc-like triangles pointing upward. Reducing-end
+Fuc-like residues always point upward. Defaults to \code{"flex"}.}
 
 \item{red_end}{Reducing-end annotation. The default \code{""} keeps the current
 reducing-end line. Use \code{"~"} to add a wavy reducing end, or any other
