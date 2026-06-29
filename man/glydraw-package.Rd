@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Draw beautiful SNFG cartoons.
+A ggplot2-native R engine for drawing reproducible SNFG glycan cartoons from glycan structure objects or text notations, with support for batch export, structural highlighting, and deep appearance customization.
 }
 \seealso{
 Useful links:
