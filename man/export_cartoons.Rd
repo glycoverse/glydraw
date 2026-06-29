@@ -35,7 +35,8 @@ it is created.}
 
 \item{scale}{Numeric output-size multiplier passed to \code{\link[=save_cartoon]{save_cartoon()}}.}
 
-\item{show_linkage}{Show linkage annotation or not. Default is TRUE.}
+\item{show_linkage}{Show glycosidic linkage annotations or not. Default is
+TRUE. Substituent annotations are always shown.}
 
 \item{orient}{The orientation of glycan structure. "H" for horizontal, "V" for vertical.
 Default is "H"}

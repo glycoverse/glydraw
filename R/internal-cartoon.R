@@ -182,8 +182,9 @@
 #'   size.
 #'
 #' @returns A list with `annotation`, the complete text annotation data frame;
-#'   `red_end_text`, only custom reducing-end text rows; and `reducing_info`,
-#'   the list returned by `.reducing_end_annotation_data()`.
+#'   `show_without_linkage`, substituent and custom reducing-end text rows that
+#'   remain visible when linkage labels are hidden; and `reducing_info`, the
+#'   list returned by `.reducing_end_annotation_data()`.
 #' @noRd
 .cartoon_text_annotation_data <- function(
   structure,
@@ -194,14 +195,22 @@
   node_size = 1
 ) {
   orient <- rlang::arg_match(orient)
+  linkage_annotation <- .linkage_annotation_data(
+    structure,
+    coor,
+    node_size = node_size
+  ) |>
+    dplyr::mutate(show_without_linkage = FALSE)
+  substituent_annotation <- .substituent_annotation_data(
+    structure,
+    coor,
+    orient,
+    node_size = node_size
+  ) |>
+    dplyr::mutate(show_without_linkage = TRUE)
   struc_annotation <- dplyr::bind_rows(
-    .linkage_annotation_data(structure, coor, node_size = node_size),
-    .substituent_annotation_data(
-      structure,
-      coor,
-      orient,
-      node_size = node_size
-    )
+    linkage_annotation,
+    substituent_annotation
   )
   reducing_info <- .reducing_end_annotation_data(
     structure,
@@ -209,9 +218,11 @@
     orient,
     red_end
   )
+  reducing_annotation <- reducing_info$annotation |>
+    dplyr::mutate(show_without_linkage = .data$is_red_end_text)
   struc_annotation <- dplyr::bind_rows(
     struc_annotation,
-    reducing_info$annotation
+    reducing_annotation
   )
   struc_annotation <- .separate_overlapping_annotations(struc_annotation)
   struc_annotation <- .apply_highlight_to_annotations(
@@ -222,7 +233,10 @@
 
   list(
     annotation = struc_annotation,
-    red_end_text = dplyr::filter(struc_annotation, .data$is_red_end_text),
+    show_without_linkage = dplyr::filter(
+      struc_annotation,
+      .data$show_without_linkage
+    ),
     reducing_info = reducing_info
   )
 }
@@ -404,9 +418,8 @@
 #'
 #' @param plot A ggplot object.
 #' @param annotation_data A list returned by `.cartoon_text_annotation_data()`.
-#' @param show_linkage A logical scalar. `TRUE` draws all linkage and
-#'   reducing-end text; `FALSE` draws only custom reducing-end text when
-#'   present.
+#' @param show_linkage A logical scalar. `TRUE` draws all text; `FALSE` draws
+#'   only substituent and custom reducing-end text when present.
 #'
 #' @returns A ggplot object with zero or one added text layer.
 #' @noRd
@@ -418,8 +431,8 @@
   if (show_linkage) {
     return(.add_plotmath_text_layer(plot, annotation_data$annotation))
   }
-  if (nrow(annotation_data$red_end_text) > 0) {
-    return(.add_plotmath_text_layer(plot, annotation_data$red_end_text))
+  if (nrow(annotation_data$show_without_linkage) > 0) {
+    return(.add_plotmath_text_layer(plot, annotation_data$show_without_linkage))
   }
   plot
 }
