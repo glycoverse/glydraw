@@ -13,6 +13,12 @@
 
 ### New features
 
+- Add the `fuc_orient` parameter to
+  [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
+  and
+  [`export_cartoons()`](https://glycoverse.github.io/glydraw/dev/reference/export_cartoons.md)
+  for choosing whether Fuc triangles always point upward or flex toward
+  their linkage direction. (#42)
 - Add the `scale` parameter to
   [`save_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/save_cartoon.md)
   and

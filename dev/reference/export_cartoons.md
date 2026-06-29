@@ -14,6 +14,7 @@ export_cartoons(
   scale = 1,
   show_linkage = TRUE,
   orient = c("H", "V"),
+  fuc_orient = c("flex", "up"),
   red_end = "",
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
@@ -64,6 +65,13 @@ export_cartoons(
 
   The orientation of glycan structure. "H" for horizontal, "V" for
   vertical. Default is "H"
+
+- fuc_orient:
+
+  Fuc triangle orientation. `"flex"` points non-reducing Fuc residues
+  toward their rendered linkage direction, while `"up"` draws all Fuc
+  triangles pointing upward. Reducing-end Fuc residues always point
+  upward. Defaults to `"flex"`.
 
 - red_end:
 
