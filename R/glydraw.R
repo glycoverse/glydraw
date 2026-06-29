@@ -118,16 +118,23 @@ print.glydraw_cartoon <- function(
 #'
 #' @param cartoon A ggplot2 object returned by [draw_cartoon()].
 #' @param file File name of glycan cartoon.
-#' @param dpi Dots per inch, default = 300.
+#' @param dpi Deprecated and ignored. Use `scale` to change the output size.
+#' @param scale Numeric output-size multiplier. The default `1` saves the
+#'   cartoon at its natural fixed size; `2` saves the same cartoon with twice
+#'   the pixel width and height.
 #'
 #' @examples
 #' \dontrun{
 #' cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
-#' save_cartoon(cartoon, "p1.png", dpi = 300)
+#' save_cartoon(cartoon, "p1.png", scale = 2)
 #' }
 #' @export
-save_cartoon <- function(cartoon, file, dpi = 300) {
+save_cartoon <- function(cartoon, file, dpi = 300, scale = 1) {
   checkmate::assert_class(cartoon, "glydraw_cartoon")
+  if (!missing(dpi)) {
+    .warn_ignored_dpi()
+  }
+  .validate_output_scale(scale)
   file_ext <- tools::file_ext(file)
   bg_color <- ifelse(
     file_ext == "jpeg" | file_ext == "jpg",
@@ -144,18 +151,19 @@ save_cartoon <- function(cartoon, file, dpi = 300) {
     identical.to = c("width", "height")
   )
   border_px <- (size - panel_size) / 2
+  render_dpi <- .default_cartoon_dpi
   cartoon <- cartoon |>
-    .add_plot_border(border_px[["width"]] / dpi * 72) |>
-    .set_fixed_panel_size(panel_size, dpi = dpi) |>
+    .add_plot_border(border_px[["width"]] / render_dpi * 72) |>
+    .set_fixed_panel_size(panel_size, dpi = render_dpi) |>
     .strip_cartoon_class()
 
   ggplot2::ggsave(
     filename = file,
     plot = cartoon,
-    width = size[["width"]],
-    height = size[["height"]],
+    width = size[["width"]] * scale,
+    height = size[["height"]] * scale,
     units = "px",
-    dpi = dpi,
+    dpi = render_dpi * scale,
     bg = bg_color
   )
 }
@@ -174,10 +182,19 @@ save_cartoon <- function(cartoon, file, dpi = 300) {
 #' @param dirname Directory name to save the cartoons. If it does not exist,
 #'   it is created.
 #' @param file_ext File extension supported by [ggplot2::ggsave()]. Defaults to "png".
-#' @param dpi Dots per inch. Defaults to 300.
+#' @param dpi Deprecated and ignored. Use `scale` to change the output size.
+#' @param scale Numeric output-size multiplier passed to [save_cartoon()].
 #' @inheritParams draw_cartoon
 #'
 #' @return The function returns the list of cartoons implicitly.
+#'
+#' @details
+#' glydraw sizes each cartoon from the glycan structure itself. Residues,
+#' linkages, labels, and the plot border are laid out on an internal fixed
+#' 300-DPI design scale, then saved as a raster image. This keeps cartoons from
+#' different structures visually comparable without manually choosing a width
+#' and height for every glycan. Use `scale` when you need more or fewer output
+#' pixels; the relative appearance of the cartoon is preserved.
 #'
 #' @examples
 #' export_cartoons(
@@ -193,6 +210,7 @@ export_cartoons <- function(
   dirname,
   file_ext = "png",
   dpi = 300,
+  scale = 1,
   show_linkage = TRUE,
   orient = c("H", "V"),
   red_end = "",
@@ -201,6 +219,10 @@ export_cartoons <- function(
   node_size = 1
 ) {
   .validate_node_size(node_size)
+  if (!missing(dpi)) {
+    .warn_ignored_dpi()
+  }
+  .validate_output_scale(scale)
   UseMethod("export_cartoons")
 }
 
@@ -210,6 +232,7 @@ export_cartoons.character <- function(
   dirname,
   file_ext = "png",
   dpi = 300,
+  scale = 1,
   show_linkage = TRUE,
   orient = c("H", "V"),
   red_end = "",
@@ -222,7 +245,7 @@ export_cartoons.character <- function(
     glycans,
     dirname,
     file_ext = file_ext,
-    dpi = dpi,
+    scale = scale,
     show_linkage = show_linkage,
     orient = orient,
     red_end = red_end,
@@ -238,6 +261,7 @@ export_cartoons.glyrepr_structure <- function(
   dirname,
   file_ext = "png",
   dpi = 300,
+  scale = 1,
   show_linkage = TRUE,
   orient = c("H", "V"),
   red_end = "",
@@ -250,7 +274,7 @@ export_cartoons.glyrepr_structure <- function(
     glycans,
     dirname,
     file_ext = file_ext,
-    dpi = dpi,
+    scale = scale,
     show_linkage = show_linkage,
     orient = orient,
     red_end = red_end,
@@ -265,7 +289,7 @@ export_cartoons.glyrepr_structure <- function(
 #' @param glycans A vector of `glyrepr::glycan_structure()` values.
 #' @param dirname String path to the output directory.
 #' @param file_ext String output file extension without leading dot.
-#' @param dpi Numeric dots per inch passed to `save_cartoon()`.
+#' @param scale Numeric output-size multiplier passed to `save_cartoon()`.
 #' @param show_linkage Logical scalar passed to `draw_cartoon()`.
 #' @param orient Drawing orientation, either `"H"` or `"V"`.
 #' @param red_end String reducing-end annotation passed to `draw_cartoon()`.
@@ -282,7 +306,7 @@ export_cartoons.glyrepr_structure <- function(
   glycans,
   dirname,
   file_ext,
-  dpi,
+  scale,
   show_linkage,
   orient,
   red_end,
@@ -309,7 +333,7 @@ export_cartoons.glyrepr_structure <- function(
     .sanitize_export_filenames(.export_filename_labels(glycans)),
     ext = file_ext
   )
-  purrr::walk2(cartoons, filenames, save_cartoon, dpi = dpi)
+  purrr::walk2(cartoons, filenames, save_cartoon, scale = scale)
   invisible(cartoons)
 }
 

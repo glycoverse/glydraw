@@ -4,14 +4,18 @@
 \alias{save_cartoon}
 \title{Save fixed-size glycan cartoon image to local device.}
 \usage{
-save_cartoon(cartoon, file, dpi = 300)
+save_cartoon(cartoon, file, dpi = 300, scale = 1)
 }
 \arguments{
 \item{cartoon}{A ggplot2 object returned by \code{\link[=draw_cartoon]{draw_cartoon()}}.}
 
 \item{file}{File name of glycan cartoon.}
 
-\item{dpi}{Dots per inch, default = 300.}
+\item{dpi}{Deprecated and ignored. Use \code{scale} to change the output size.}
+
+\item{scale}{Numeric output-size multiplier. The default \code{1} saves the
+cartoon at its natural fixed size; \code{2} saves the same cartoon with twice
+the pixel width and height.}
 }
 \description{
 In theory, you can just use \code{ggplot2::ggsave()} to save the cartoons plotted by \code{\link[=draw_cartoon]{draw_cartoon()}}.
@@ -24,6 +28,6 @@ so that when glycans with different sizes are put together, they will look alike
 \examples{
 \dontrun{
 cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
-save_cartoon(cartoon, "p1.png", dpi = 300)
+save_cartoon(cartoon, "p1.png", scale = 2)
 }
 }

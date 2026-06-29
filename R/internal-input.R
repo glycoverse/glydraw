@@ -33,6 +33,31 @@
   x
 }
 
+#' Validate output-size scale
+#'
+#' @param scale Numeric output-size multiplier.
+#'
+#' @return `scale`, invisibly.
+#' @noRd
+.validate_output_scale <- function(scale) {
+  checkmate::assert_number(scale, finite = TRUE)
+  if (scale <= 0) {
+    cli::cli_abort("{.arg scale} must be larger than {.val 0}.")
+  }
+  invisible(scale)
+}
+
+#' Warn about ignored DPI input
+#'
+#' @return `NULL`, invisibly.
+#' @noRd
+.warn_ignored_dpi <- function() {
+  cli::cli_warn(c(
+    "{.arg dpi} is deprecated and ignored.",
+    "i" = "Use {.arg scale} to change output size without changing cartoon appearance."
+  ))
+}
+
 #' Convert supported input to glycan-structure data
 #'
 #' @param x A `glyrepr::glycan_structure()` vector or a character vector of

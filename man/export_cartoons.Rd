@@ -9,6 +9,7 @@ export_cartoons(
   dirname,
   file_ext = "png",
   dpi = 300,
+  scale = 1,
   show_linkage = TRUE,
   orient = c("H", "V"),
   red_end = "",
@@ -27,7 +28,9 @@ it is created.}
 
 \item{file_ext}{File extension supported by \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}}. Defaults to "png".}
 
-\item{dpi}{Dots per inch. Defaults to 300.}
+\item{dpi}{Deprecated and ignored. Use \code{scale} to change the output size.}
+
+\item{scale}{Numeric output-size multiplier passed to \code{\link[=save_cartoon]{save_cartoon()}}.}
 
 \item{show_linkage}{Show linkage annotation or not. Default is TRUE.}
 
@@ -59,6 +62,14 @@ then calls \code{\link[=save_cartoon]{save_cartoon()}} to save a figure for each
 IUPAC-condensed nomenclatures are used as file names. If \code{x} is a named
 character vector or named \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}} vector, the vector
 names are used as file names.
+}
+\details{
+glydraw sizes each cartoon from the glycan structure itself. Residues,
+linkages, labels, and the plot border are laid out on an internal fixed
+300-DPI design scale, then saved as a raster image. This keeps cartoons from
+different structures visually comparable without manually choosing a width
+and height for every glycan. Use \code{scale} when you need more or fewer output
+pixels; the relative appearance of the cartoon is preserved.
 }
 \examples{
 export_cartoons(
