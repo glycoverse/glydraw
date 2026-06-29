@@ -57,20 +57,31 @@ than \code{2} are rejected because residues overlap.}
 The function returns the list of cartoons implicitly.
 }
 \description{
-This function calls \code{\link[=draw_cartoon]{draw_cartoon()}} on each glycan structure in \code{x},
-then calls \code{\link[=save_cartoon]{save_cartoon()}} to save a figure for each of them.
+Draw and save one cartoon for each glycan structure in \code{x}.
+}
+\section{File names}{
 IUPAC-condensed nomenclatures are used as file names. If \code{x} is a named
 character vector or named \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}} vector, the vector
 names are used as file names.
 }
-\details{
-glydraw sizes each cartoon from the glycan structure itself. Residues,
-linkages, labels, and the plot border are laid out on an internal fixed
-300-DPI design scale, then saved as a raster image. This keeps cartoons from
-different structures visually comparable without manually choosing a width
-and height for every glycan. Use \code{scale} when you need more or fewer output
-pixels; the relative appearance of the cartoon is preserved.
+
+\section{Why not \code{width} and \code{height}?}{
+The familiar \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}} interface uses \code{width}, \code{height}, and \code{dpi}
+because ordinary ggplot2 plots are drawn into a user-chosen device size.
+glydraw cartoons are different: the natural width and height are calculated
+from the glycan structure so residues, linkages, labels, and borders stay
+comparable across different glycans. If users supplied arbitrary \code{width} and
+\code{height}, glydraw would either distort that structure-derived layout or need
+to guess how to reconcile one requested size with the other.
+
+\code{dpi} is also not the right control here because changing it alters how
+point- and inch-based ggplot2 elements are rasterized relative to the fixed
+cartoon canvas. glydraw therefore keeps an internal fixed design scale and
+uses \code{scale} as a single multiplier for the final pixel dimensions. This
+preserves the cartoon's aspect ratio and relative appearance while still
+allowing larger or smaller output files.
 }
+
 \examples{
 export_cartoons(
   c(

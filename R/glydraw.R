@@ -109,12 +109,8 @@ print.glydraw_cartoon <- function(
 
 #' Save fixed-size glycan cartoon image to local device.
 #'
-#' In theory, you can just use `ggplot2::ggsave()` to save the cartoons plotted by [draw_cartoon()].
-#' However, you can have trouble finding the best sizes for each cartoon
-#' to make them look alike.
-#' This function is designed to save the cartoons with self-adjusted sizes,
-#' based on the size of the glycans,
-#' so that when glycans with different sizes are put together, they will look alike.
+#' This function saves the glycan cartoon to a file,
+#' with a suitable size.
 #'
 #' @param cartoon A ggplot2 object returned by [draw_cartoon()].
 #' @param file File name of glycan cartoon.
@@ -122,6 +118,24 @@ print.glydraw_cartoon <- function(
 #' @param scale Numeric output-size multiplier. The default `1` saves the
 #'   cartoon at its natural fixed size; `2` saves the same cartoon with twice
 #'   the pixel width and height.
+#'
+#' @details
+#' # Why not `width` and `height`?
+#'
+#' The familiar [ggplot2::ggsave()] interface uses `width`, `height`, and `dpi`
+#' because ordinary ggplot2 plots are drawn into a user-chosen device size.
+#' glydraw cartoons are different: the natural width and height are calculated
+#' from the glycan structure so residues, linkages, labels, and borders stay
+#' comparable across different glycans. If users supplied arbitrary `width` and
+#' `height`, glydraw would either distort that structure-derived layout or need
+#' to guess how to reconcile one requested size with the other.
+#'
+#' `dpi` is also not the right control here because changing it alters how
+#' point- and inch-based ggplot2 elements are rasterized relative to the fixed
+#' cartoon canvas. glydraw therefore keeps an internal fixed design scale and
+#' uses `scale` as a single multiplier for the final pixel dimensions. This
+#' preserves the cartoon's aspect ratio and relative appearance while still
+#' allowing larger or smaller output files.
 #'
 #' @examples
 #' \dontrun{
@@ -170,11 +184,7 @@ save_cartoon <- function(cartoon, file, dpi = 300, scale = 1) {
 
 #' Export all glycan structures to figures
 #'
-#' This function calls [draw_cartoon()] on each glycan structure in `x`,
-#' then calls [save_cartoon()] to save a figure for each of them.
-#' IUPAC-condensed nomenclatures are used as file names. If `x` is a named
-#' character vector or named [glyrepr::glycan_structure()] vector, the vector
-#' names are used as file names.
+#' Draw and save one cartoon for each glycan structure in `x`.
 #'
 #' @param x A [glyrepr::glycan_structure()] vector, or a character vector of
 #'   any glycan structure text nomenclatures supported by
@@ -189,12 +199,12 @@ save_cartoon <- function(cartoon, file, dpi = 300, scale = 1) {
 #' @return The function returns the list of cartoons implicitly.
 #'
 #' @details
-#' glydraw sizes each cartoon from the glycan structure itself. Residues,
-#' linkages, labels, and the plot border are laid out on an internal fixed
-#' 300-DPI design scale, then saved as a raster image. This keeps cartoons from
-#' different structures visually comparable without manually choosing a width
-#' and height for every glycan. Use `scale` when you need more or fewer output
-#' pixels; the relative appearance of the cartoon is preserved.
+#' # File names
+#' IUPAC-condensed nomenclatures are used as file names. If `x` is a named
+#' character vector or named [glyrepr::glycan_structure()] vector, the vector
+#' names are used as file names.
+#'
+#' @inheritSection save_cartoon Why not `width` and `height`?
 #'
 #' @examples
 #' export_cartoons(
