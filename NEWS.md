@@ -7,6 +7,7 @@
 
 ## New features
 
+* Add the `colors` parameter to `draw_cartoon()` and `export_cartoons()` for customizing monosaccharide fill colors.
 * Add the `fuc_orient` parameter to `draw_cartoon()` and `export_cartoons()` for choosing whether Fuc triangles always point upward or flex toward their linkage direction. (#42)
 * Add the `scale` parameter to `save_cartoon()` and `export_cartoons()` for changing output pixel dimensions while preserving cartoon appearance. (#35)
 * Add the `node_size` parameter to `draw_cartoon()` and `export_cartoons()` for scaling residue cartoon sizes. Values larger than `2` are rejected because residues overlap. (#36)

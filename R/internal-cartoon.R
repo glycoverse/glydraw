@@ -44,25 +44,101 @@
   FALSE
 }
 
+#' Validate custom monosaccharide colors
+#'
+#' @param colors `NULL` or a named character vector of color values.
+#'
+#' @returns A named character vector of custom colors.
+#' @noRd
+.validate_custom_colors <- function(colors = NULL) {
+  if (is.null(colors)) {
+    return(character())
+  }
+
+  checkmate::assert_character(colors, any.missing = FALSE)
+  if (length(colors) == 0) {
+    return(character())
+  }
+
+  color_names <- names(colors)
+  if (
+    is.null(color_names) ||
+      anyNA(color_names) ||
+      any(color_names == "") ||
+      anyDuplicated(color_names)
+  ) {
+    cli::cli_abort(
+      "{.arg colors} must be a character vector with unique, non-empty names."
+    )
+  }
+
+  supported_monosaccharides <- .supported_color_monosaccharides()
+  invalid_names <- setdiff(color_names, supported_monosaccharides)
+  if (length(invalid_names) > 0) {
+    cli::cli_abort(c(
+      "{.arg colors} must be named with supported monosaccharides.",
+      "x" = "Unsupported {cli::qty(invalid_names)} name{?s}: {.val {invalid_names}}."
+    ))
+  }
+
+  invisible(colors)
+}
+
+#' Get monosaccharide names accepted by custom colors
+#'
+#' @returns A character vector of supported public monosaccharide names.
+#' @noRd
+.supported_color_monosaccharides <- function() {
+  setdiff(names(glycan_dict), c("FucUp", "FucRight", "FucLeft"))
+}
+
+#' Resolve polygon fill colors
+#'
+#' @param polygon_coor A data frame returned by `.residue_polygon_data()`.
+#' @param colors A named character vector returned by `.validate_custom_colors()`.
+#'
+#' @returns A character vector of polygon fill colors, one value per row in
+#'   `polygon_coor`.
+#' @noRd
+.resolve_residue_fill_colors <- function(polygon_coor, colors = character()) {
+  default_colors <- glycan_color[as.character(polygon_coor$color)]
+  if (length(colors) == 0) {
+    return(unname(default_colors))
+  }
+
+  custom_colors <- colors[as.character(polygon_coor$mono)]
+  has_custom_color <- !is.na(custom_colors)
+  default_colors[has_custom_color] <- custom_colors[has_custom_color]
+  unname(default_colors)
+}
+
 #' Convert residue centers to polygon vertices
 #'
 #' @param gly_list A data frame with columns `center_x`, `center_y`,
-#'   `glycoform`, and `transparency`, usually from `.cartoon_residue_data()`.
+#'   `mono`, `glycoform`, and `transparency`, usually from
+#'   `.cartoon_residue_data()`.
 #' @param point_size Numeric scale factor for SNFG shape templates.
 #'
-#' @returns A data frame with columns `point_x`, `point_y`, `group`, `color`,
-#'   and `alpha`. Multi-part residue shapes contribute multiple groups.
+#' @returns A data frame with columns `point_x`, `point_y`, `group`, `mono`,
+#'   `color`, and `alpha`. Multi-part residue shapes contribute multiple groups.
 #' @noRd
 .residue_polygon_data <- function(gly_list, point_size) {
   # Progressively read and process lines in gly_list
   polygon_coor <- gly_list |>
-    purrr::pmap_dfr(function(center_x, center_y, glycoform, transparency) {
+    purrr::pmap_dfr(function(
+      center_x,
+      center_y,
+      mono,
+      glycoform,
+      transparency
+    ) {
       composition <- glycan_dict[[glycoform]][1] # Mapping the Composition of Glycoform, e.g.'Fuc'->'dHex'
       df1 <- data.frame(
         point_x = c(point_size * glycan_shape[[composition]]$x + center_x),
         point_y = c(point_size * glycan_shape[[composition]]$y + center_y),
         # For Distinguishing the Coordinates of each point
         group = paste0(glycoform, center_x, "_", center_y),
+        mono = mono,
         color = glycan_dict[[glycoform]][2],
         alpha = transparency
       )
@@ -72,6 +148,7 @@
           point_y = c(point_size * glycan_shape[[composition]]$yy + center_y),
           # For Distinguishing the Coordinates of each point
           group = paste0(glycoform, center_x, "_", center_y, 'remain'),
+          mono = mono,
           color = glycan_dict[[glycoform]][3],
           alpha = transparency
         )
@@ -165,6 +242,7 @@
   fuc_orient <- rlang::arg_match(fuc_orient)
   gly_list <- data.frame(
     coor,
+    mono = igraph::V(structure)$mono,
     glycoform = .residue_glycoforms(structure, coor, fuc_orient)
   )
   if (!is.null(highlight)) {
@@ -176,7 +254,13 @@
   } else {
     gly_list$transparency <- 1.0
   }
-  colnames(gly_list) <- c("center_x", "center_y", "glycoform", "transparency")
+  colnames(gly_list) <- c(
+    "center_x",
+    "center_y",
+    "mono",
+    "glycoform",
+    "transparency"
+  )
   gly_list
 }
 
