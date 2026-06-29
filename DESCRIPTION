@@ -12,6 +12,8 @@ Description: A ggplot2-native R engine for drawing reproducible SNFG glycan cart
     highlighting, and deep appearance customization.
 License: MIT + file LICENSE
 Suggests: 
+    knitr,
+    rmarkdown,
     testthat (>= 3.0.0),
     vdiffr
 Config/testthat/edition: 3
@@ -32,3 +34,4 @@ Imports:
     checkmate,
     scales,
     fs
+VignetteBuilder: knitr
