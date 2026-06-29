@@ -6,6 +6,7 @@
 
 ## New features
 
+* Add the `edge_linewidth` and `node_linewidth` parameters to `draw_cartoon()` and `export_cartoons()` for customizing linkage line and node border widths.
 * Add the `red_end` parameter to `draw_cartoon()` and `export_cartoons()` for custom reducing-end text or a wavy reducing-end annotation. (#31)
 
 ## Minor improvements and bug fixes
