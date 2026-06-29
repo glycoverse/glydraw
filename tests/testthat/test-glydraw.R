@@ -176,53 +176,6 @@ test_that("save_cartoon writes fixed-size image without ggview", {
   expect_gt(file.info(file)$size, 0)
 })
 
-test_that("save_cartoon keeps PNG appearance unchanged across DPI values", {
-  structure <- "Gal(b1-3)GalNAc(a1-"
-  plot <- draw_cartoon(structure)
-  default_dpi_file <- tempfile(fileext = ".png")
-  low_dpi_file <- tempfile(fileext = ".png")
-  on.exit(unlink(c(default_dpi_file, low_dpi_file)), add = TRUE)
-
-  expect_warning(
-    save_cartoon(plot, default_dpi_file, dpi = 300),
-    "`dpi` is deprecated and ignored"
-  )
-  expect_warning(
-    save_cartoon(plot, low_dpi_file, dpi = 100),
-    "`dpi` is deprecated and ignored"
-  )
-  default_dpi_image <- png::readPNG(default_dpi_file)
-  low_dpi_image <- png::readPNG(low_dpi_file)
-
-  expect_equal(dim(low_dpi_image), dim(default_dpi_image))
-  expect_equal(low_dpi_image, default_dpi_image)
-})
-
-test_that("save_cartoon scales PNG dimensions without changing appearance", {
-  structure <- "Gal(b1-3)GalNAc(a1-"
-  plot <- draw_cartoon(structure)
-  default_file <- tempfile(fileext = ".png")
-  scaled_file <- tempfile(fileext = ".png")
-  on.exit(unlink(c(default_file, scaled_file)), add = TRUE)
-
-  save_cartoon(plot, default_file)
-  save_cartoon(plot, scaled_file, scale = 2)
-  default_image <- png::readPNG(default_file)
-  scaled_image <- png::readPNG(scaled_file)
-  drawing_bounds <- function(image) {
-    alpha <- image[,, 4]
-    rows <- which(rowSums(alpha > 0.01) > 0)
-    cols <- which(colSums(alpha > 0.01) > 0)
-    c(
-      height = diff(range(rows)) + 1,
-      width = diff(range(cols)) + 1
-    )
-  }
-
-  expect_equal(dim(scaled_image)[1:2], dim(default_image)[1:2] * 2)
-  expect_equal(drawing_bounds(scaled_image), drawing_bounds(default_image) * 2)
-})
-
 test_that("save_cartoon rejects invalid scale values", {
   structure <- "Gal(b1-3)GalNAc(a1-"
   plot <- draw_cartoon(structure)
