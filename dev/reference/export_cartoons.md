@@ -57,7 +57,8 @@ export_cartoons(
 
 - show_linkage:
 
-  Show linkage annotation or not. Default is TRUE.
+  Show glycosidic linkage annotations or not. Default is TRUE.
+  Substituent annotations are always shown.
 
 - orient:
 
