@@ -6,6 +6,7 @@
 \usage{
 draw_cartoon(
   structure,
+  ...,
   show_linkage = TRUE,
   orient = c("H", "V"),
   red_end = "",
@@ -18,6 +19,8 @@ draw_cartoon(
 \arguments{
 \item{structure}{A \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}} scalar,
 or a string of any glycan structure text nomenclatures supported by \code{\link[glyparse:auto_parse]{glyparse::auto_parse()}}.}
+
+\item{...}{Ignored.}
 
 \item{show_linkage}{Show linkage annotation or not. Default is TRUE.}
 
