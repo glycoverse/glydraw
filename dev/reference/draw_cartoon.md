@@ -7,6 +7,7 @@ Draw a Symbol Nomenclature For Glycan (SNFG)
 ``` r
 draw_cartoon(
   structure,
+  ...,
   show_linkage = TRUE,
   orient = c("H", "V"),
   red_end = "",
@@ -26,6 +27,10 @@ draw_cartoon(
   scalar, or a string of any glycan structure text nomenclatures
   supported by
   [`glyparse::auto_parse()`](https://glycoverse.github.io/glyparse/reference/auto_parse.html).
+
+- ...:
+
+  Ignored.
 
 - show_linkage:
 

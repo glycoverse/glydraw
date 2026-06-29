@@ -5,7 +5,7 @@ This function saves the glycan cartoon to a file, with a suitable size.
 ## Usage
 
 ``` r
-save_cartoon(cartoon, file, dpi = 300, scale = 1)
+save_cartoon(cartoon, file, ..., dpi = 300, scale = 1)
 ```
 
 ## Arguments
@@ -18,6 +18,10 @@ save_cartoon(cartoon, file, dpi = 300, scale = 1)
 - file:
 
   File name of glycan cartoon.
+
+- ...:
+
+  Ignored.
 
 - dpi:
 

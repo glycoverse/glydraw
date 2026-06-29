@@ -6,7 +6,7 @@ Print glycan cartoon
 
 ``` r
 # S3 method for class 'glydraw_cartoon'
-print(x, newpage = is.null(vp), vp = NULL, ...)
+print(x, ..., newpage = is.null(vp), vp = NULL)
 ```
 
 ## Arguments
@@ -16,6 +16,10 @@ print(x, newpage = is.null(vp), vp = NULL, ...)
   A ggplot2 object returned by
   [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md).
 
+- ...:
+
+  Ignored.
+
 - newpage:
 
   Draw the plot on a new page.
@@ -23,10 +27,6 @@ print(x, newpage = is.null(vp), vp = NULL, ...)
 - vp:
 
   A grid viewport object or viewport name.
-
-- ...:
-
-  Additional arguments passed to ggplot2's print method.
 
 ## Value
 

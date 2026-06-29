@@ -8,6 +8,7 @@ Draw and save one cartoon for each glycan structure in `x`.
 export_cartoons(
   x,
   dirname,
+  ...,
   file_ext = "png",
   dpi = 300,
   scale = 1,
@@ -34,6 +35,10 @@ export_cartoons(
 
   Directory name to save the cartoons. If it does not exist, it is
   created.
+
+- ...:
+
+  Ignored.
 
 - file_ext:
 

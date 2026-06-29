@@ -8,6 +8,8 @@
   no longer supports
   [`glyexp::experiment()`](https://glycoverse.github.io/glyexp/reference/experiment.html)
   input, and `glyexp` is no longer a package dependency. (#33)
+- Specifying optianl arguments in a positional manner is no longer
+  supported. Please use `arg = value` instead. (#40)
 
 ### New features
 
