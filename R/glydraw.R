@@ -12,6 +12,10 @@
 #'   lines. Defaults to the current value, `0.8`.
 #' @param node_linewidth Numeric scalar controlling the linewidth of node
 #'   borders. Defaults to the current value, `0.8`.
+#' @param node_size Numeric scalar used as a multiplier for the default node
+#'   size. Defaults to `1`, which keeps the current size. Linkage annotations
+#'   are moved farther from larger nodes, and are hidden with a warning when
+#'   `node_size` is too large to leave enough annotation space.
 #' @param highlight An integer vector specifying the node indices to highlight.
 #'   This argument is applicable only when `structure` is a [glyrepr::glycan_structure()].
 #'   Note that for a [glyrepr::glycan_structure()], the node indices correspond exactly
@@ -32,25 +36,32 @@ draw_cartoon <- function(
   red_end = "",
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
+  node_size = 1,
   highlight = NULL
 ) {
   checkmate::assert_number(edge_linewidth, lower = 0)
   checkmate::assert_number(node_linewidth, lower = 0)
+  checkmate::assert_number(node_size, lower = 0)
   inputs <- .prepare_cartoon_inputs(structure, highlight, orient, red_end)
   structure <- inputs$structure
   coor <- inputs$coor
   highlight <- inputs$highlight
   orient <- inputs$orient
+  show_linkage <- .resolve_linkage_visibility(show_linkage, node_size)
 
   gly_list <- .cartoon_residue_data(structure, coor, highlight)
-  polygon_coor <- .residue_polygon_data(gly_list, 0.215)
+  polygon_coor <- .residue_polygon_data(
+    gly_list,
+    .default_node_point_size * node_size
+  )
   filled_color <- glycan_color[as.character(polygon_coor$color)]
   annotation_data <- .cartoon_text_annotation_data(
     structure,
     coor,
     orient,
     red_end,
-    highlight
+    highlight,
+    node_size = node_size
   )
   connect_df <- .cartoon_segment_data(
     structure,
@@ -185,7 +196,8 @@ export_cartoons <- function(
   orient = c("H", "V"),
   red_end = "",
   edge_linewidth = 0.8,
-  node_linewidth = 0.8
+  node_linewidth = 0.8,
+  node_size = 1
 ) {
   UseMethod("export_cartoons")
 }
@@ -200,7 +212,8 @@ export_cartoons.character <- function(
   orient = c("H", "V"),
   red_end = "",
   edge_linewidth = 0.8,
-  node_linewidth = 0.8
+  node_linewidth = 0.8,
+  node_size = 1
 ) {
   glycans <- unique(.as_glycan_structure_input(x))
   .export_cartoon_list(
@@ -212,7 +225,8 @@ export_cartoons.character <- function(
     orient = orient,
     red_end = red_end,
     edge_linewidth = edge_linewidth,
-    node_linewidth = node_linewidth
+    node_linewidth = node_linewidth,
+    node_size = node_size
   )
 }
 
@@ -226,7 +240,8 @@ export_cartoons.glyrepr_structure <- function(
   orient = c("H", "V"),
   red_end = "",
   edge_linewidth = 0.8,
-  node_linewidth = 0.8
+  node_linewidth = 0.8,
+  node_size = 1
 ) {
   glycans <- unique(x)
   .export_cartoon_list(
@@ -238,7 +253,8 @@ export_cartoons.glyrepr_structure <- function(
     orient = orient,
     red_end = red_end,
     edge_linewidth = edge_linewidth,
-    node_linewidth = node_linewidth
+    node_linewidth = node_linewidth,
+    node_size = node_size
   )
 }
 
@@ -255,6 +271,7 @@ export_cartoons.glyrepr_structure <- function(
 #'   `draw_cartoon()`.
 #' @param node_linewidth Numeric node border line width passed to
 #'   `draw_cartoon()`.
+#' @param node_size Numeric node size multiplier passed to `draw_cartoon()`.
 #'
 #' @return A list of `glydraw_cartoon` objects, invisibly. Files are written to
 #'   `dirname` with sanitized labels and extension `file_ext`.
@@ -268,7 +285,8 @@ export_cartoons.glyrepr_structure <- function(
   orient,
   red_end,
   edge_linewidth,
-  node_linewidth
+  node_linewidth,
+  node_size
 ) {
   cli::cli_alert_info("Exporting {.val {length(glycans)}} glycan cartoons.")
   fs::dir_create(dirname)
@@ -280,7 +298,8 @@ export_cartoons.glyrepr_structure <- function(
     orient = orient,
     red_end = red_end,
     edge_linewidth = edge_linewidth,
-    node_linewidth = node_linewidth
+    node_linewidth = node_linewidth,
+    node_size = node_size
   )
   filenames <- fs::path(
     dirname,

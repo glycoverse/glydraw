@@ -47,6 +47,72 @@ test_that("draw_cartoon controls edge and node linewidths", {
   expect_equal(unique(custom_layers[[5]]$linewidth), 1.2)
 })
 
+test_that("draw_cartoon scales node polygons with node_size", {
+  structure <- "Gal(b1-3)GalNAc(a1-"
+
+  default_plot <- draw_cartoon(structure)
+  custom_plot <- draw_cartoon(structure, node_size = 1.2)
+  default_nodes <- ggplot2::ggplot_build(default_plot)$data[[3]]
+  custom_nodes <- ggplot2::ggplot_build(custom_plot)$data[[3]]
+  first_default_node <- default_nodes[
+    default_nodes$group == default_nodes$group[1],
+  ]
+  first_custom_node <- custom_nodes[
+    custom_nodes$group == custom_nodes$group[1],
+  ]
+
+  expect_equal(
+    diff(range(first_custom_node$x)) / diff(range(first_default_node$x)),
+    1.2,
+    tolerance = 1e-6
+  )
+  expect_equal(
+    diff(range(first_custom_node$y)) / diff(range(first_default_node$y)),
+    1.2,
+    tolerance = 1e-6
+  )
+})
+
+test_that("draw_cartoon moves linkage annotations away from larger nodes", {
+  structure <- "Gal(b1-3)GalNAc(a1-"
+
+  default_plot <- draw_cartoon(structure)
+  custom_plot <- draw_cartoon(structure, node_size = 1.2)
+  default_text <- ggplot2::ggplot_build(default_plot)$data[[4]]
+  custom_text <- ggplot2::ggplot_build(custom_plot)$data[[4]]
+  default_beta <- default_text[default_text$label == "beta", ]
+  custom_beta <- custom_text[custom_text$label == "beta", ]
+  child_center <- c(x = -1, y = 0)
+
+  default_distance <- sqrt(
+    (default_beta$x - child_center[["x"]])^2 +
+      (default_beta$y - child_center[["y"]])^2
+  )
+  custom_distance <- sqrt(
+    (custom_beta$x - child_center[["x"]])^2 +
+      (custom_beta$y - child_center[["y"]])^2
+  )
+
+  expect_gt(custom_distance, default_distance)
+})
+
+test_that("draw_cartoon warns and hides linkage annotations for oversized nodes", {
+  structure <- "Gal(b1-3)GalNAc(a1-"
+
+  expect_warning(
+    plot <- draw_cartoon(structure, node_size = 1.25, red_end = "Ser/Thr"),
+    "Linkage annotations are hidden"
+  )
+  text_layers <- purrr::keep(
+    ggplot2::ggplot_build(plot)$data,
+    ~ "label" %in% names(.x)
+  )
+  text <- dplyr::bind_rows(text_layers)
+
+  expect_true(any(text$label == '"Ser/Thr"'))
+  expect_false(any(text$label %in% c("alpha", "beta", "3")))
+})
+
 test_that("print.glydraw_cartoon rasterizes fixed-size cartoon for display", {
   structure <- paste0(
     "Gal(b1-4)GlcNAc(b1-2)[Gal(b1-4)GlcNAc(b1-4)]Man(a1-3)",
@@ -422,6 +488,45 @@ test_that("export_cartoons forwards custom linewidths", {
 
   expect_equal(unique(layers[[1]]$linewidth), 1.1)
   expect_equal(unique(layers[[3]]$linewidth), 0.3)
+})
+
+test_that("export_cartoons forwards custom node sizes", {
+  glycans <- "Gal(b1-3)GalNAc(a1-"
+  default_dir <- tempfile()
+  custom_dir <- tempfile()
+  on.exit(unlink(c(default_dir, custom_dir), recursive = TRUE), add = TRUE)
+  fs::dir_create(default_dir)
+  fs::dir_create(custom_dir)
+
+  suppressMessages(
+    default_result <- export_cartoons(
+      glycans,
+      default_dir,
+      dpi = 72
+    )
+  )
+  suppressMessages(
+    custom_result <- export_cartoons(
+      glycans,
+      custom_dir,
+      dpi = 72,
+      node_size = 1.2
+    )
+  )
+  default_nodes <- ggplot2::ggplot_build(default_result[[1]])$data[[3]]
+  custom_nodes <- ggplot2::ggplot_build(custom_result[[1]])$data[[3]]
+  first_default_node <- default_nodes[
+    default_nodes$group == default_nodes$group[1],
+  ]
+  first_custom_node <- custom_nodes[
+    custom_nodes$group == custom_nodes$group[1],
+  ]
+
+  expect_equal(
+    diff(range(first_custom_node$x)) / diff(range(first_default_node$x)),
+    1.2,
+    tolerance = 1e-6
+  )
 })
 
 test_that("export_cartoons uses character vector names as filenames", {
