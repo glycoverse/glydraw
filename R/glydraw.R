@@ -3,7 +3,8 @@
 #' @param structure A [glyrepr::glycan_structure()] scalar,
 #'   or a string of any glycan structure text nomenclatures supported by [glyparse::auto_parse()].
 #' @param ... Ignored.
-#' @param show_linkage Show linkage annotation or not. Default is TRUE.
+#' @param show_linkage Show glycosidic linkage annotations or not. Default is
+#'   TRUE. Substituent annotations are always shown.
 #' @param orient The orientation of glycan structure. "H" for horizontal, "V" for vertical.
 #'   Default is "H"
 #' @param red_end Reducing-end annotation. The default `""` keeps the current

@@ -287,6 +287,20 @@ test_that("draw_cartoon works with linkage hidden", {
   expect_s3_class(plot_no_linkage, "glydraw_cartoon")
 })
 
+test_that("draw_cartoon keeps substituent annotations with linkage hidden", {
+  structure <- "Gal6S(a1-"
+
+  plot <- draw_cartoon(structure, show_linkage = FALSE)
+  text_layers <- purrr::keep(
+    ggplot2::ggplot_build(plot)$data,
+    ~ "label" %in% names(.x)
+  )
+  labels <- unlist(purrr::map(text_layers, "label"), use.names = FALSE)
+
+  expect_true(any(grepl("6S", labels, fixed = TRUE)))
+  expect_false(any(labels == "alpha"))
+})
+
 test_that("draw_cartoon places substituent annotations by orientation", {
   structure <- "GalNAc6S(b1-3)GalNAc(a1-"
 
