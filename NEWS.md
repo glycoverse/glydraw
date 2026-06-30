@@ -1,5 +1,9 @@
 # glydraw (development version)
 
+## Minor improvements and bug fixes
+
+* Fix Fuc-like triangle geometry so triangle bottoms and apexes align with rectangle node bounds. (#49)
+
 # glydraw 0.6.0
 
 ## Breaking changes
