@@ -170,11 +170,11 @@ glycan_shape <- list(
   ),
   'dHex' = data.frame(
     x = c(-1, 0, 1, -1),
-    y = c(-0.33 * sqrt(3), 0.67 * sqrt(3), -0.33 * sqrt(3), -0.33 * sqrt(3))
-  ), # The center is the Midpoint of the Base
+    y = c(-1, 1, -1, -1)
+  ),
   'dHexUp' = data.frame(
     x = c(-1, 0, 1, -1),
-    y = c(0.33 * sqrt(3), -0.67 * sqrt(3), 0.33 * sqrt(3), 0.33 * sqrt(3))
+    y = c(1, -1, 1, 1)
   ),
   'dHexRight' = data.frame(
     x = c(-0.33 * sqrt(3), 0.67 * sqrt(3), -0.33 * sqrt(3), -0.33 * sqrt(3)),
@@ -186,15 +186,15 @@ glycan_shape <- list(
   ),
   'dHexNAc' = data.frame(
     x = c(0, 1, 0, 0),
-    y = c(0.67 * sqrt(3), -0.33 * sqrt(3), -0.33 * sqrt(3), 0.67 * sqrt(3)),
+    y = c(1, -1, -1, 1),
     xx = c(0, -1, 0, 0),
-    yy = c(0.67 * sqrt(3), -0.33 * sqrt(3), -0.33 * sqrt(3), 0.67 * sqrt(3))
+    yy = c(1, -1, -1, 1)
   ),
   'dHexNAcUp' = data.frame(
     x = c(0, 1, 0, 0),
-    y = c(-0.67 * sqrt(3), 0.33 * sqrt(3), 0.33 * sqrt(3), -0.67 * sqrt(3)),
+    y = c(-1, 1, 1, -1),
     xx = c(0, -1, 0, 0),
-    yy = c(-0.67 * sqrt(3), 0.33 * sqrt(3), 0.33 * sqrt(3), -0.67 * sqrt(3))
+    yy = c(-1, 1, 1, -1)
   ),
   'dHexNAcRight' = data.frame(
     x = c(0.67 * sqrt(3), -0.33 * sqrt(3), -0.33 * sqrt(3), 0.67 * sqrt(3)),

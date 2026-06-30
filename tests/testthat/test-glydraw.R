@@ -189,6 +189,30 @@ test_that("draw_cartoon works with reducing-end O-Fuc glycans", {
   purrr::walk(cartoons, expect_s3_class, "glydraw_cartoon")
 })
 
+test_that("Fuc-like triangles share vertical bounds with rectangle nodes", {
+  gly_list <- tibble::tibble(
+    center_x = 0,
+    center_y = 0,
+    mono = c("Fuc", "FucNAc", "GlcNAc"),
+    glycoform = c("Fuc", "FucNAc", "GlcNAc"),
+    transparency = 1
+  )
+
+  polygon_data <- .residue_polygon_data(gly_list, point_size = 1)
+  bounds <- polygon_data |>
+    dplyr::group_by(.data$mono) |>
+    dplyr::summarise(
+      y_min = min(.data$point_y),
+      y_max = max(.data$point_y),
+      .groups = "drop"
+    )
+  rectangle_bounds <- dplyr::filter(bounds, .data$mono == "GlcNAc")
+  triangle_bounds <- dplyr::filter(bounds, .data$mono %in% c("Fuc", "FucNAc"))
+
+  expect_equal(triangle_bounds$y_min, rep(rectangle_bounds$y_min, 2))
+  expect_equal(triangle_bounds$y_max, rep(rectangle_bounds$y_max, 2))
+})
+
 test_that("save_cartoon saves file correctly", {
   structure <- "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
   cartoon <- draw_cartoon(structure)
