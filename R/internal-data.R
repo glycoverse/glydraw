@@ -177,11 +177,11 @@ glycan_shape <- list(
     y = c(1, -1, 1, 1)
   ),
   'dHexRight' = data.frame(
-    x = c(-0.33 * sqrt(3), 0.67 * sqrt(3), -0.33 * sqrt(3), -0.33 * sqrt(3)),
+    x = c(-1, 1, -1, -1),
     y = c(1, 0, -1, 1)
   ),
   'dHexLeft' = data.frame(
-    x = c(0.33 * sqrt(3), -0.67 * sqrt(3), 0.33 * sqrt(3), 0.33 * sqrt(3)),
+    x = c(1, -1, 1, 1),
     y = c(1, 0, -1, 1)
   ),
   'dHexNAc' = data.frame(
@@ -197,15 +197,15 @@ glycan_shape <- list(
     yy = c(-1, 1, 1, -1)
   ),
   'dHexNAcRight' = data.frame(
-    x = c(0.67 * sqrt(3), -0.33 * sqrt(3), -0.33 * sqrt(3), 0.67 * sqrt(3)),
+    x = c(1, -1, -1, 1),
     y = c(0, 1, 0, 0),
-    xx = c(0.67 * sqrt(3), -0.33 * sqrt(3), -0.33 * sqrt(3), 0.67 * sqrt(3)),
+    xx = c(1, -1, -1, 1),
     yy = c(0, -1, 0, 0)
   ),
   'dHexNAcLeft' = data.frame(
-    x = c(-0.67 * sqrt(3), 0.33 * sqrt(3), 0.33 * sqrt(3), -0.67 * sqrt(3)),
+    x = c(-1, 1, 1, -1),
     y = c(0, 1, 0, 0),
-    xx = c(-0.67 * sqrt(3), 0.33 * sqrt(3), 0.33 * sqrt(3), -0.67 * sqrt(3)),
+    xx = c(-1, 1, 1, -1),
     yy = c(0, -1, 0, 0)
   ),
   'ddHex' = data.frame(x = c(-1, 1, 1, -1), y = c(0.5, 0.5, -0.5, -0.5)),
