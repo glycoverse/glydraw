@@ -890,25 +890,31 @@
     x = as.numeric(coor[sub_pos, "x"] + offset["x"]),
     y = as.numeric(coor[sub_pos, "y"] + offset["y"]),
     hjust = if (orient == "H") 0.5 else 0,
-    vjust = 0.5,
+    vjust = if (orient == "H") 0 else 0.5,
     stringsAsFactors = FALSE
   )
 }
 
-#' Build invisible bounds for vertical substituent labels
+#' Build invisible bounds for substituent labels
 #'
 #' @param annotation A substituent annotation data frame returned by
 #'   `.substituent_annotation_data()`.
 #' @param orient Drawing orientation, either `"H"` or `"V"`.
 #'
-#' @returns A data frame with numeric columns `x` and `y`. Vertical labels
-#'   return one right-side bound point per substituent; horizontal labels return
-#'   zero rows because their centered text keeps the previous sizing behavior.
+#' @returns A data frame with numeric columns `x` and `y`. Horizontal labels
+#'   return top bound points; vertical labels return right-side bound points.
 #' @noRd
 .substituent_annotation_bounds <- function(annotation, orient = c("H", "V")) {
   orient <- rlang::arg_match(orient)
-  if (orient == "H" || nrow(annotation) == 0) {
+  if (nrow(annotation) == 0) {
     return(data.frame(x = numeric(0), y = numeric(0)))
+  }
+
+  if (orient == "H") {
+    return(data.frame(
+      x = annotation$x,
+      y = annotation$y + .substituent_label_height(annotation$annot)
+    ))
   }
 
   data.frame(
@@ -925,6 +931,16 @@
 #' @noRd
 .substituent_label_width <- function(label) {
   pmax(nchar(label), 1) * 0.18
+}
+
+#' Approximate substituent label height in coordinate units
+#'
+#' @param label A character vector of substituent labels.
+#'
+#' @returns A numeric vector with one height per label.
+#' @noRd
+.substituent_label_height <- function(label) {
+  rep(0.36, length(label))
 }
 
 #' Check whether text is already valid plotmath
