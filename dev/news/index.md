@@ -2,6 +2,8 @@
 
 ## glydraw (development version)
 
+## glydraw 0.6.1
+
 ### Minor improvements and bug fixes
 
 - Fix Fuc-like triangle geometry so triangle bases and apexes align with
