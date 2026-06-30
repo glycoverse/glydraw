@@ -147,6 +147,21 @@ test_that("draw_cartoon works with vertical orientation", {
   expect_s3_class(v_plot, "ggplot")
 })
 
+test_that("left and right Fuc-like triangles align with rectangle borders", {
+  rectangle <- glycan_shape[["HexNAc"]]
+  shape_names <- c("dHexRight", "dHexLeft", "dHexNAcRight", "dHexNAcLeft")
+
+  purrr::walk(shape_names, function(shape_name) {
+    shape <- glycan_shape[[shape_name]]
+
+    expect_equal(
+      range(shape$x),
+      range(rectangle$x),
+      info = shape_name
+    )
+  })
+})
+
 test_that("draw_cartoon left-aligns vertical substituent labels", {
   structure <- "Neu5Ac9Ac(a2-3)Gal6S(b1-"
 
