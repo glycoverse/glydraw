@@ -277,8 +277,9 @@
 #'
 #' @returns A list with `annotation`, the complete text annotation data frame;
 #'   `show_without_linkage`, substituent and custom reducing-end text rows that
-#'   remain visible when linkage labels are hidden; and `reducing_info`, the
-#'   list returned by `.reducing_end_annotation_data()`.
+#'   remain visible when linkage labels are hidden; `bounds`, invisible bound
+#'   points for text sizing; and `reducing_info`, the list returned by
+#'   `.reducing_end_annotation_data()`.
 #' @noRd
 .cartoon_text_annotation_data <- function(
   structure,
@@ -301,7 +302,12 @@
     coor,
     orient,
     node_size = node_size
-  ) |>
+  )
+  substituent_bounds <- .substituent_annotation_bounds(
+    substituent_annotation,
+    orient
+  )
+  substituent_annotation <- substituent_annotation |>
     dplyr::mutate(show_without_linkage = TRUE)
   struc_annotation <- dplyr::bind_rows(
     linkage_annotation,
@@ -332,6 +338,7 @@
       struc_annotation,
       .data$show_without_linkage
     ),
+    bounds = substituent_bounds,
     reducing_info = reducing_info
   )
 }
@@ -450,6 +457,7 @@
     annotation_data,
     show_linkage
   )
+  gly_graph <- .add_cartoon_text_bounds(gly_graph, annotation_data$bounds)
   gly_graph <- .add_reducing_end_layers(
     gly_graph,
     annotation_data$reducing_info,
@@ -554,6 +562,25 @@
       alpha = annotation$transparency,
       parse = TRUE,
       size = 6,
+    )
+}
+
+#' Add invisible text bounds to a cartoon
+#'
+#' @param plot A ggplot object.
+#' @param bounds A data frame with numeric columns `x` and `y`.
+#'
+#' @returns A ggplot object with one `geom_blank()` layer when bounds are
+#'   available.
+#' @noRd
+.add_cartoon_text_bounds <- function(plot, bounds) {
+  if (nrow(bounds) == 0) {
+    return(plot)
+  }
+  plot +
+    ggplot2::geom_blank(
+      data = bounds,
+      ggplot2::aes(x = .data$x, y = .data$y)
     )
 }
 
