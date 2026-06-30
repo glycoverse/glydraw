@@ -841,9 +841,10 @@
 #' @param node_size Numeric node-size multiplier used to keep labels outside
 #'   scaled residue polygons.
 #'
-#' @returns A data frame with columns `vertice`, `annot`, `x`, and `y`.
-#'   Unknown linkage prefixes such as `?` are removed from `annot`. Returns an
-#'   empty data frame with the same columns when no substituents are present.
+#' @returns A data frame with columns `vertice`, `annot`, `x`, `y`, `hjust`,
+#'   and `vjust`. Unknown linkage prefixes such as `?` are removed from
+#'   `annot`. Returns an empty data frame with the same columns when no
+#'   substituents are present.
 #' @noRd
 .substituent_annotation_data <- function(
   structure,
@@ -857,7 +858,9 @@
       vertice = character(0),
       annot = character(0),
       x = numeric(0),
-      y = numeric(0)
+      y = numeric(0),
+      hjust = numeric(0),
+      vjust = numeric(0)
     ))
   }
 
@@ -868,7 +871,9 @@
       vertice = character(0),
       annot = character(0),
       x = numeric(0),
-      y = numeric(0)
+      y = numeric(0),
+      hjust = numeric(0),
+      vjust = numeric(0)
     ))
   }
 
@@ -884,8 +889,42 @@
     annot = sub("^\\?+", "", sub[sub_pos]),
     x = as.numeric(coor[sub_pos, "x"] + offset["x"]),
     y = as.numeric(coor[sub_pos, "y"] + offset["y"]),
+    hjust = if (orient == "H") 0.5 else 0,
+    vjust = 0.5,
     stringsAsFactors = FALSE
   )
+}
+
+#' Build invisible bounds for vertical substituent labels
+#'
+#' @param annotation A substituent annotation data frame returned by
+#'   `.substituent_annotation_data()`.
+#' @param orient Drawing orientation, either `"H"` or `"V"`.
+#'
+#' @returns A data frame with numeric columns `x` and `y`. Vertical labels
+#'   return one right-side bound point per substituent; horizontal labels return
+#'   zero rows because their centered text keeps the previous sizing behavior.
+#' @noRd
+.substituent_annotation_bounds <- function(annotation, orient = c("H", "V")) {
+  orient <- rlang::arg_match(orient)
+  if (orient == "H" || nrow(annotation) == 0) {
+    return(data.frame(x = numeric(0), y = numeric(0)))
+  }
+
+  data.frame(
+    x = annotation$x + .substituent_label_width(annotation$annot),
+    y = annotation$y
+  )
+}
+
+#' Approximate substituent label width in coordinate units
+#'
+#' @param label A character vector of substituent labels.
+#'
+#' @returns A numeric vector with one width per label.
+#' @noRd
+.substituent_label_width <- function(label) {
+  pmax(nchar(label), 1) * 0.18
 }
 
 #' Check whether text is already valid plotmath

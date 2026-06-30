@@ -147,6 +147,18 @@ test_that("draw_cartoon works with vertical orientation", {
   expect_s3_class(v_plot, "ggplot")
 })
 
+test_that("draw_cartoon left-aligns vertical substituent labels", {
+  structure <- "Neu5Ac9Ac(a2-3)Gal6S(b1-"
+
+  plot <- draw_cartoon(structure, orient = "V")
+  annotation <- ggplot2::ggplot_build(plot)$data[[4]]
+  substituent <- dplyr::filter(annotation, .data$label == '"9Ac"')
+  x_range <- ggplot2::get_panel_scales(plot)$x$range$range
+
+  expect_equal(substituent$hjust, 0)
+  expect_gt(x_range[[2]], substituent$x + 0.5)
+})
+
 test_that("draw_cartoon works with linkage hidden", {
   structure <- "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
 
