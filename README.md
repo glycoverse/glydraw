@@ -62,30 +62,48 @@ glycoverse](https://github.com/glycoverse/glycoverse#installation).
 
 ## Example
 
-Call `draw_cartoon()` to plot a SNFG:
-
 ``` r
 library(glydraw)
 
-draw_cartoon("Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-")
-```
-
-<img src="man/figures/N-core.png" width="400" />
-
-And call `save_cartoon()` to save it to a file:
-
-``` r
-cartoon <- draw_cartoon("Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-")
-save_cartoon(cartoon, "N-core.png", dpi = 300)
-```
-
-You can also use `export_cartoons()` to save multiple SNFGs from
-character vectors to a directory:
-
-``` r
-glycans <- c(
-  core = "Man(a1-3)Man(b1-4)GlcNAc(b1-",
-  antenna = "Gal(b1-4)GlcNAc(b1-"
+glycan <- paste0(
+  "Glc(a1-2)Glc(a1-3)Glc(a1-3)Man(a1-2)Man(a1-2)Man(a1-3)[Man(a1-2)Man(a1-3)",
+  "[Man(a1-2)Man(a1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(a1-"
 )
-export_cartoons(glycans, "path/to/save")
+draw_cartoon(glycan, red_end = "PP-Dol")
 ```
+
+![](man/figures/README-unnamed-chunk-2-1.png)<!-- -->
+
+``` r
+glycan <- paste0(
+  "Neu5Ac(a2-3)Gal(b1-3)[Fuc(a1-2)Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-3)",
+  "[Gal(b1-4)[Fuc(a1-3)]GlcNAc(b1-6)]Gal(b1-4)GlcNAc(b1-6)]GalNAc(a1-"
+)
+draw_cartoon(glycan, red_end = "~", node_size = 1.2)
+```
+
+![](man/figures/README-unnamed-chunk-3-1.png)<!-- -->
+
+``` r
+glycan <- "Gal(b1-3)[Neu5Ac(a2-3)Gal6S(b1-4)[Fuc(a1-3)]GlcNAc(b1-6)]GalNAc(a1-"
+draw_cartoon(glycan, orient = "V", red_end = "Ser/Thr")
+```
+
+![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
+
+``` r
+glycan <- "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-"
+draw_cartoon(glycan, orient = "V", red_end = "Asn", fuc_orient = "up")
+```
+
+![](man/figures/README-unnamed-chunk-5-1.png)<!-- -->
+
+``` r
+glycan <- paste0(
+  "WURCS=2.0/3,4,3/[a2122h-1a_1-5_2*N][a1122h-1a_1-5_2*OP^XOCCN/3O/3=O]",
+  "[a1122h-1a_1-5_6*OP^XOCCN/3O/3=O]/1-2-3-3/a4-b1_b6-c1_c2-d1"
+)
+draw_cartoon(glycan)
+```
+
+![](man/figures/README-unnamed-chunk-6-1.png)<!-- -->
