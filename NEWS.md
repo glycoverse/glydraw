@@ -2,7 +2,7 @@
 
 ## Minor improvements and bug fixes
 
-* Fix Fuc-like triangle geometry so triangle bases and apexes align with rectangle node bounds. (#49)
+* Fix Fuc-like triangle geometry so triangle bases and apexes align with rectangle node bounds. (#49, #50)
 
 # glydraw 0.6.0
 
