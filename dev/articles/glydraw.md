@@ -203,7 +203,7 @@ outfile <- file.path(tempdir(), "n-core.png")
 
 save_cartoon(cartoon, outfile, scale = 2)
 outfile
-#> [1] "/tmp/Rtmp2nqF81/n-core.png"
+#> [1] "/tmp/RtmpMlTItF/n-core.png"
 ```
 
 `glydraw` does not expose separate `width` and `height` controls because
