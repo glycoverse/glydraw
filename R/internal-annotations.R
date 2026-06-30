@@ -877,7 +877,7 @@
     ))
   }
 
-  offset_distance <- .scaled_annotation_offset(0.4, node_size)
+  offset_distance <- .scaled_annotation_offset(0.28, node_size)
   offset <- if (orient == "H") {
     c(x = 0, y = offset_distance)
   } else {
