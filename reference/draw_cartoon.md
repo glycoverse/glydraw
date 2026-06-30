@@ -7,8 +7,15 @@ Draw a Symbol Nomenclature For Glycan (SNFG)
 ``` r
 draw_cartoon(
   structure,
+  ...,
   show_linkage = TRUE,
   orient = c("H", "V"),
+  fuc_orient = c("flex", "up"),
+  red_end = "",
+  edge_linewidth = 0.8,
+  node_linewidth = 0.8,
+  node_size = 1,
+  colors = NULL,
   highlight = NULL
 )
 ```
@@ -23,14 +30,58 @@ draw_cartoon(
   supported by
   [`glyparse::auto_parse()`](https://glycoverse.github.io/glyparse/reference/auto_parse.html).
 
+- ...:
+
+  Ignored.
+
 - show_linkage:
 
-  Show linkage annotation or not. Default is TRUE.
+  Show glycosidic linkage annotations or not. Default is TRUE.
+  Substituent annotations are always shown.
 
 - orient:
 
   The orientation of glycan structure. "H" for horizontal, "V" for
   vertical. Default is "H"
+
+- fuc_orient:
+
+  Fuc-like triangle orientation. `"flex"` points non-reducing Fuc-like
+  residues toward their rendered linkage direction, while `"up"` draws
+  all Fuc-like triangles pointing upward. Reducing-end Fuc-like residues
+  always point upward. Defaults to `"flex"`.
+
+- red_end:
+
+  Reducing-end annotation. The default `""` keeps the current
+  reducing-end line. Use `"~"` to add a wavy reducing end, or any other
+  string to draw that string at the reducing end.
+
+- edge_linewidth:
+
+  Numeric scalar controlling the linewidth of linkage lines. Defaults to
+  the current value, `0.8`.
+
+- node_linewidth:
+
+  Numeric scalar controlling the linewidth of node borders. Defaults to
+  the current value, `0.8`.
+
+- node_size:
+
+  Numeric scalar used as a multiplier for the default node size.
+  Defaults to `1`, which keeps the current size. Linkage annotations are
+  moved farther from larger nodes, and are hidden with a warning when
+  `node_size` is too large to leave enough annotation space. Values
+  larger than `2` are rejected because residues overlap.
+
+- colors:
+
+  Optional named character vector of custom monosaccharide fill colors.
+  Names must be supported monosaccharide names, such as `"Gal"` or
+  `"GlcNAc"`. User-provided colors overwrite the default SNFG colors,
+  while unprovided monosaccharides keep their default colors. Defaults
+  to `NULL`.
 
 - highlight:
 

@@ -1,13 +1,6 @@
 # Export all glycan structures to figures
 
-This function calls
-[`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md)
-on each glycan structure in `x`, then calls
-[`save_cartoon()`](https://glycoverse.github.io/glydraw/reference/save_cartoon.md)
-to save a figure for each of them. IUPAC-condensed nomenclatures are
-used as file names. If `x` is a named character vector or named
-[`glyrepr::glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/glycan_structure.html)
-vector, the vector names are used as file names.
+Draw and save one cartoon for each glycan structure in `x`.
 
 ## Usage
 
@@ -15,10 +8,18 @@ vector, the vector names are used as file names.
 export_cartoons(
   x,
   dirname,
+  ...,
   file_ext = "png",
   dpi = 300,
+  scale = 1,
   show_linkage = TRUE,
-  orient = c("H", "V")
+  orient = c("H", "V"),
+  fuc_orient = c("flex", "up"),
+  red_end = "",
+  edge_linewidth = 0.8,
+  node_linewidth = 0.8,
+  node_size = 1,
+  colors = NULL
 )
 ```
 
@@ -27,8 +28,6 @@ export_cartoons(
 - x:
 
   A
-  [`glyexp::experiment()`](https://glycoverse.github.io/glyexp/reference/experiment.html),
-  a
   [`glyrepr::glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/glycan_structure.html)
   vector, or a character vector of any glycan structure text
   nomenclatures supported by
@@ -39,6 +38,10 @@ export_cartoons(
   Directory name to save the cartoons. If it does not exist, it is
   created.
 
+- ...:
+
+  Ignored.
+
 - file_ext:
 
   File extension supported by
@@ -47,26 +50,101 @@ export_cartoons(
 
 - dpi:
 
-  Dots per inch. Defaults to 300.
+  Deprecated and ignored. Use `scale` to change the output size.
+
+- scale:
+
+  Numeric output-size multiplier passed to
+  [`save_cartoon()`](https://glycoverse.github.io/glydraw/reference/save_cartoon.md).
 
 - show_linkage:
 
-  Show linkage annotation or not. Default is TRUE.
+  Show glycosidic linkage annotations or not. Default is TRUE.
+  Substituent annotations are always shown.
 
 - orient:
 
   The orientation of glycan structure. "H" for horizontal, "V" for
   vertical. Default is "H"
 
+- fuc_orient:
+
+  Fuc-like triangle orientation. `"flex"` points non-reducing Fuc-like
+  residues toward their rendered linkage direction, while `"up"` draws
+  all Fuc-like triangles pointing upward. Reducing-end Fuc-like residues
+  always point upward. Defaults to `"flex"`.
+
+- red_end:
+
+  Reducing-end annotation. The default `""` keeps the current
+  reducing-end line. Use `"~"` to add a wavy reducing end, or any other
+  string to draw that string at the reducing end.
+
+- edge_linewidth:
+
+  Numeric scalar controlling the linewidth of linkage lines. Defaults to
+  the current value, `0.8`.
+
+- node_linewidth:
+
+  Numeric scalar controlling the linewidth of node borders. Defaults to
+  the current value, `0.8`.
+
+- node_size:
+
+  Numeric scalar used as a multiplier for the default node size.
+  Defaults to `1`, which keeps the current size. Linkage annotations are
+  moved farther from larger nodes, and are hidden with a warning when
+  `node_size` is too large to leave enough annotation space. Values
+  larger than `2` are rejected because residues overlap.
+
+- colors:
+
+  Optional named character vector of custom monosaccharide fill colors.
+  Names must be supported monosaccharide names, such as `"Gal"` or
+  `"GlcNAc"`. User-provided colors overwrite the default SNFG colors,
+  while unprovided monosaccharides keep their default colors. Defaults
+  to `NULL`.
+
 ## Value
 
 The function returns the list of cartoons implicitly.
 
+## File names
+
+IUPAC-condensed nomenclatures are used as file names. If `x` is a named
+character vector or named
+[`glyrepr::glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/glycan_structure.html)
+vector, the vector names are used as file names.
+
+## Why not `width` and `height`?
+
+The familiar
+[`ggplot2::ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html)
+interface uses `width`, `height`, and `dpi` because ordinary ggplot2
+plots are drawn into a user-chosen device size. glydraw cartoons are
+different: the natural width and height are calculated from the glycan
+structure so residues, linkages, labels, and borders stay comparable
+across different glycans. If users supplied arbitrary `width` and
+`height`, glydraw would either distort that structure-derived layout or
+need to guess how to reconcile one requested size with the other.
+
+`dpi` is also not the right control here because changing it alters how
+point- and inch-based ggplot2 elements are rasterized relative to the
+fixed cartoon canvas. glydraw therefore keeps an internal fixed design
+scale and uses `scale` as a single multiplier for the final pixel
+dimensions. This preserves the cartoon's aspect ratio and relative
+appearance while still allowing larger or smaller output files.
+
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-library(glyexp)
-export_cartoons(real_experiment, "path/to/save")
-} # }
+export_cartoons(
+  c(
+    "Man(a1-3)Man(b1-4)GlcNAc(b1-",
+    "Gal(b1-4)GlcNAc(b1-"
+  ),
+  "path/to/save"
+)
+#> ℹ Exporting 2 glycan cartoons.
 ```

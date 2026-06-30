@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glydraw</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -15,7 +15,8 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/glydraw.html">Get started</a></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -30,6 +31,34 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.0" id="glydraw-060">glydraw 0.6.0<a class="anchor" aria-label="anchor" href="#glydraw-060"></a></h2>
+<div class="section level3">
+<h3 id="breaking-changes-0-6-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-6-0"></a></h3>
+<ul><li>
+<code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> no longer supports <code><a href="https://glycoverse.github.io/glyexp/reference/experiment.html" class="external-link">glyexp::experiment()</a></code> input, and <code>glyexp</code> is no longer a package dependency. (#33)</li>
+<li>Specifying optional arguments in a positional manner is no longer supported. Please use <code>arg = value</code> instead. (#40)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-0-6-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-6-0"></a></h3>
+<ul><li>Add the <code>colors</code> parameter to <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> for customizing monosaccharide fill colors. (#44)</li>
+<li>Add the <code>fuc_orient</code> parameter to <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> for choosing whether Fuc triangles always point upward or flex toward their linkage direction. (#42)</li>
+<li>Add the <code>scale</code> parameter to <code><a href="../reference/save_cartoon.html">save_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> for changing output pixel dimensions while preserving cartoon appearance. (#35)</li>
+<li>Add the <code>node_size</code> parameter to <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> for scaling residue cartoon sizes. Values larger than <code>2</code> are rejected because residues overlap. (#36)</li>
+<li>Add the <code>edge_linewidth</code> and <code>node_linewidth</code> parameters to <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> for customizing linkage line and node border widths. (#34)</li>
+<li>Add the <code>red_end</code> parameter to <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> for custom reducing-end text or a wavy reducing-end annotation. (#31)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="minor-improvements-and-bug-fixes-0-6-0">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-0-6-0"></a></h3>
+<ul><li>Fix substituent label alignment so horizontal labels are bottom-aligned and vertical labels are left-aligned. (#48)</li>
+<li>Extend Fuc-style branch layout and flexible orientation to additional Fuc-like residues. (#46)</li>
+<li>Fix <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> for structures with two core Fuc branches and one b1-4 GlcNAc branch, avoiding an igraph vertex-selection error and keeping the b1-4 GlcNAc aligned with the core GlcNAc. (#45)</li>
+<li>Deprecate <code>dpi</code> for <code><a href="../reference/save_cartoon.html">save_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> because glydraw uses an internal fixed design scale. Supplying <code>dpi</code> now warns that the argument is ignored. (#35)</li>
+<li>Keep substituent annotations visible when <code>show_linkage = FALSE</code>. (#41)</li>
+<li>Fix diagonal HexNAc linkage annotation offsets when <code>orient = "V"</code>. (#43)</li>
+<li>Adjust linkage annotation offsets for diagonal HexNAc links. (#29)</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.1" id="glydraw-051">glydraw 0.5.1<a class="anchor" aria-label="anchor" href="#glydraw-051"></a></h2>
 <div class="section level3">

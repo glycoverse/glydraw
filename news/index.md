@@ -1,5 +1,75 @@
 # Changelog
 
+## glydraw 0.6.0
+
+### Breaking changes
+
+- [`export_cartoons()`](https://glycoverse.github.io/glydraw/reference/export_cartoons.md)
+  no longer supports
+  [`glyexp::experiment()`](https://glycoverse.github.io/glyexp/reference/experiment.html)
+  input, and `glyexp` is no longer a package dependency. (#33)
+- Specifying optional arguments in a positional manner is no longer
+  supported. Please use `arg = value` instead. (#40)
+
+### New features
+
+- Add the `colors` parameter to
+  [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md)
+  and
+  [`export_cartoons()`](https://glycoverse.github.io/glydraw/reference/export_cartoons.md)
+  for customizing monosaccharide fill colors. (#44)
+- Add the `fuc_orient` parameter to
+  [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md)
+  and
+  [`export_cartoons()`](https://glycoverse.github.io/glydraw/reference/export_cartoons.md)
+  for choosing whether Fuc triangles always point upward or flex toward
+  their linkage direction. (#42)
+- Add the `scale` parameter to
+  [`save_cartoon()`](https://glycoverse.github.io/glydraw/reference/save_cartoon.md)
+  and
+  [`export_cartoons()`](https://glycoverse.github.io/glydraw/reference/export_cartoons.md)
+  for changing output pixel dimensions while preserving cartoon
+  appearance. (#35)
+- Add the `node_size` parameter to
+  [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md)
+  and
+  [`export_cartoons()`](https://glycoverse.github.io/glydraw/reference/export_cartoons.md)
+  for scaling residue cartoon sizes. Values larger than `2` are rejected
+  because residues overlap. (#36)
+- Add the `edge_linewidth` and `node_linewidth` parameters to
+  [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md)
+  and
+  [`export_cartoons()`](https://glycoverse.github.io/glydraw/reference/export_cartoons.md)
+  for customizing linkage line and node border widths. (#34)
+- Add the `red_end` parameter to
+  [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md)
+  and
+  [`export_cartoons()`](https://glycoverse.github.io/glydraw/reference/export_cartoons.md)
+  for custom reducing-end text or a wavy reducing-end annotation. (#31)
+
+### Minor improvements and bug fixes
+
+- Fix substituent label alignment so horizontal labels are
+  bottom-aligned and vertical labels are left-aligned. (#48)
+- Extend Fuc-style branch layout and flexible orientation to additional
+  Fuc-like residues. (#46)
+- Fix
+  [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md)
+  for structures with two core Fuc branches and one b1-4 GlcNAc branch,
+  avoiding an igraph vertex-selection error and keeping the b1-4 GlcNAc
+  aligned with the core GlcNAc. (#45)
+- Deprecate `dpi` for
+  [`save_cartoon()`](https://glycoverse.github.io/glydraw/reference/save_cartoon.md)
+  and
+  [`export_cartoons()`](https://glycoverse.github.io/glydraw/reference/export_cartoons.md)
+  because glydraw uses an internal fixed design scale. Supplying `dpi`
+  now warns that the argument is ignored. (#35)
+- Keep substituent annotations visible when `show_linkage = FALSE`.
+  (#41)
+- Fix diagonal HexNAc linkage annotation offsets when `orient = "V"`.
+  (#43)
+- Adjust linkage annotation offsets for diagonal HexNAc links. (#29)
+
 ## glydraw 0.5.1
 
 ### Minor improvements and bug fixes
