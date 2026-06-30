@@ -2,13 +2,15 @@
 
 ## glydraw (development version)
 
+## glydraw 0.6.0
+
 ### Breaking changes
 
 - [`export_cartoons()`](https://glycoverse.github.io/glydraw/dev/reference/export_cartoons.md)
   no longer supports
   [`glyexp::experiment()`](https://glycoverse.github.io/glyexp/reference/experiment.html)
   input, and `glyexp` is no longer a package dependency. (#33)
-- Specifying optianl arguments in a positional manner is no longer
+- Specifying optional arguments in a positional manner is no longer
   supported. Please use `arg = value` instead. (#40)
 
 ### New features

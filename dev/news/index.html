@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glydraw</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.5.1.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.6.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,14 +33,17 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="glydraw-development-version">glydraw (development version)<a class="anchor" aria-label="anchor" href="#glydraw-development-version"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.0" id="glydraw-060">glydraw 0.6.0<a class="anchor" aria-label="anchor" href="#glydraw-060"></a></h2>
 <div class="section level3">
-<h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
+<h3 id="breaking-changes-0-6-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-6-0"></a></h3>
 <ul><li>
 <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> no longer supports <code><a href="https://glycoverse.github.io/glyexp/reference/experiment.html" class="external-link">glyexp::experiment()</a></code> input, and <code>glyexp</code> is no longer a package dependency. (#33)</li>
-<li>Specifying optianl arguments in a positional manner is no longer supported. Please use <code>arg = value</code> instead. (#40)</li>
+<li>Specifying optional arguments in a positional manner is no longer supported. Please use <code>arg = value</code> instead. (#40)</li>
 </ul></div>
 <div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<h3 id="new-features-0-6-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-6-0"></a></h3>
 <ul><li>Add the <code>colors</code> parameter to <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> for customizing monosaccharide fill colors. (#44)</li>
 <li>Add the <code>fuc_orient</code> parameter to <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> for choosing whether Fuc triangles always point upward or flex toward their linkage direction. (#42)</li>
 <li>Add the <code>scale</code> parameter to <code><a href="../reference/save_cartoon.html">save_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> for changing output pixel dimensions while preserving cartoon appearance. (#35)</li>
@@ -49,7 +52,7 @@
 <li>Add the <code>red_end</code> parameter to <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> for custom reducing-end text or a wavy reducing-end annotation. (#31)</li>
 </ul></div>
 <div class="section level3">
-<h3 id="minor-improvements-and-bug-fixes-development-version">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-development-version"></a></h3>
+<h3 id="minor-improvements-and-bug-fixes-0-6-0">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-0-6-0"></a></h3>
 <ul><li>Fix substituent label alignment so horizontal labels are bottom-aligned and vertical labels are left-aligned. (#48)</li>
 <li>Extend Fuc-style branch layout and flexible orientation to additional Fuc-like residues. (#46)</li>
 <li>Fix <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> for structures with two core Fuc branches and one b1-4 GlcNAc branch, avoiding an igraph vertex-selection error and keeping the b1-4 GlcNAc aligned with the core GlcNAc. (#45)</li>
