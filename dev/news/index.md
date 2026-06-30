@@ -49,6 +49,8 @@
 
 ### Minor improvements and bug fixes
 
+- Fix substituent label alignment so horizontal labels are
+  bottom-aligned and vertical labels are left-aligned. (#48)
 - Extend Fuc-style branch layout and flexible orientation to additional
   Fuc-like residues. (#46)
 - Fix
