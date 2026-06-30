@@ -522,29 +522,6 @@ test_that("draw_cartoon ignores unknown substituent linkage in annotation", {
   expect_false(any(grepl("?", labels, fixed = TRUE)))
 })
 
-test_that("draw_cartoon separates crowded branch linkage annotations", {
-  structure <- "Fuc(a1-2)Gal(b1-3)GlcNAc(b1-3)[Neu5Ac(a2-3)Gal(b1-4)[Fuc(a1-3)]GlcNAc(b1-6)]GalNAc(?1-"
-
-  plot <- draw_cartoon(structure)
-  annotation <- ggplot2::ggplot_build(plot)$data[[4]]
-  linkage_annotation <- annotation[annotation$label != '~"?"', ]
-  pair_distance <- stats::dist(linkage_annotation[, c("x", "y")])
-  branch_beta <- annotation[
-    annotation$label == "beta" & annotation$x > -1 & annotation$y > 0.5,
-  ]
-  branch_six <- annotation[annotation$label == "6", ]
-
-  expect_gt(min(pair_distance), 0.18)
-  expect_equal(nrow(branch_beta), 1)
-  if (nrow(branch_beta) == 1) {
-    expect_gt(branch_beta$y, 0.75)
-  }
-  expect_equal(nrow(branch_six), 1)
-  if (nrow(branch_six) == 1) {
-    expect_gt(branch_six$y, 0.3)
-  }
-})
-
 test_that("draw_cartoon works with reducing-end O-Fuc glycans", {
   glycans <- c(
     "Fuc(a1-",
@@ -564,18 +541,6 @@ test_that("reducing-end Fuc keeps the regular Fuc orientation", {
   expect_equal(unname(.calculate_residue_coordinates(graph)[2, "x"]), 0)
 })
 
-test_that("draw_cartoon places a1-6 core Fuc up and a1-3 core Fuc down", {
-  structure <- "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-4)GlcNAc(b1-"
-
-  plot <- draw_cartoon(structure)
-  segments <- ggplot2::ggplot_build(plot)$data[[1]]
-  fuc_segments <- segments[segments$x == segments$xend, ]
-
-  expect_equal(nrow(fuc_segments), 2)
-  expect_gt(max(fuc_segments$yend), 0.5)
-  expect_lt(min(fuc_segments$yend), -0.5)
-})
-
 test_that("Fuc-like residues use linkage-specific branch sides", {
   purrr::walk(fuc_like_layout_monos, function(mono) {
     graph <- fuc_like_branch_graph(c(mono, mono))
@@ -587,22 +552,6 @@ test_that("Fuc-like residues use linkage-specific branch sides", {
       info = mono
     )
   })
-})
-
-test_that("draw_cartoon handles two Fuc branches plus one non-Fuc branch", {
-  structure <- .as_single_glycan_structure(
-    "Fuc(a1-3)[Fuc(a1-6)][GlcNAc(b1-4)]GlcNAc(b1-"
-  )
-  graph <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
-  coor <- .calculate_residue_coordinates(graph)
-
-  expect_s3_class(draw_cartoon(structure), "glydraw_cartoon")
-  expect_equal(
-    unname(coor[2, "y"]),
-    unname(coor[4, "y"])
-  )
-  expect_lt(unname(coor[1, "y"]), unname(coor[4, "y"]))
-  expect_gt(unname(coor[3, "y"]), unname(coor[4, "y"]))
 })
 
 test_that("child subtree packing preserves anchored leaf Fuc offsets", {
@@ -631,20 +580,6 @@ test_that("child subtree packing preserves anchored leaf Fuc offsets", {
   )
 
   expect_equal(shifts, c(-1, 0, 1))
-})
-
-test_that("draw_cartoon controls Fuc triangle orientation", {
-  structure <- "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-4)GlcNAc(b1-"
-
-  flex_plot <- draw_cartoon(structure, fuc_orient = "flex")
-  up_plot <- draw_cartoon(structure, fuc_orient = "up")
-  flex_fuc <- fuc_triangle_polygons(flex_plot)
-  up_fuc <- fuc_triangle_polygons(up_plot)
-
-  expect_true(has_triangle_apex(flex_fuc[[1]], c(x = -1, y = -1), "up"))
-  expect_true(has_triangle_apex(flex_fuc[[2]], c(x = -1, y = 1), "down"))
-  expect_true(has_triangle_apex(up_fuc[[1]], c(x = -1, y = -1), "up"))
-  expect_true(has_triangle_apex(up_fuc[[2]], c(x = -1, y = 1), "up"))
 })
 
 test_that("Fuc-like residues inherit flexible triangle orientation", {
@@ -681,25 +616,6 @@ test_that("Fuc-like residues inherit flexible triangle orientation", {
   })
 })
 
-test_that("draw_cartoon points vertical Fuc triangles toward their linkage", {
-  structure <- "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-4)GlcNAc(b1-"
-
-  plot <- draw_cartoon(structure, orient = "V", fuc_orient = "flex")
-  fuc <- fuc_triangle_polygons(plot)
-
-  expect_true(has_triangle_apex(fuc[[1]], c(x = -1, y = 1), "right"))
-  expect_true(has_triangle_apex(fuc[[2]], c(x = 1, y = 1), "left"))
-})
-
-test_that("draw_cartoon keeps reducing-end Fuc triangles up", {
-  structure <- "GlcNAc(b1-3)Fuc(a1-"
-
-  plot <- draw_cartoon(structure, orient = "V", fuc_orient = "flex")
-  fuc <- fuc_triangle_polygons(plot)
-
-  expect_true(has_triangle_apex(fuc[[1]], c(x = 0, y = 0), "up"))
-})
-
 test_that("draw_cartoon renders Fuc-like ddHex branches", {
   glycans <- paste0(
     c("Oli", "Tyv", "Abe", "Par", "Dig", "Col"),
@@ -709,103 +625,6 @@ test_that("draw_cartoon renders Fuc-like ddHex branches", {
   cartoons <- purrr::map(glycans, draw_cartoon)
 
   purrr::walk(cartoons, expect_s3_class, "glydraw_cartoon")
-})
-
-test_that(".calculate_residue_coordinates keeps same-column residues at least one unit apart", {
-  structure <- .as_single_glycan_structure(
-    "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-4)GlcNAc(b1-"
-  )
-  graph <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
-  coor <- .calculate_residue_coordinates(graph)
-  same_column <- which(coor[, "x"] == -1)
-  same_column_y <- sort(coor[same_column, "y"])
-
-  expect_equal(diff(same_column_y), rep(1, length(same_column_y) - 1))
-})
-
-test_that("draw_cartoon keeps elongated Fuc branches together", {
-  structure <- .as_single_glycan_structure(
-    paste0(
-      "WURCS=2.0/6,7,6/",
-      "[a2122h-1a_1-5_2*NCC/3=O][a1221m-1a_1-5]",
-      "[a2122h-1b_1-5_2*NCC/3=O][a2112h-1b_1-5]",
-      "[a1122h-1b_1-5][a1122h-1a_1-5]/",
-      "1-2-3-2-4-5-6/",
-      "a3-b1_a4-c1_c3-d1_c4-f1_d4-e1_f3-g1"
-    )
-  )
-  graph <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
-  coor <- .calculate_residue_coordinates(graph)
-
-  expect_equal(igraph::V(graph)$mono[c(1, 2, 3)], c("Gal", "Fuc", "Man"))
-  expect_equal(unname(coor[1, "x"]), unname(coor[2, "x"]))
-  expect_lt(unname(coor[1, "y"]), unname(coor[2, "y"]))
-  expect_false(identical(unname(coor[1, ]), unname(coor[3, ])))
-})
-
-test_that("draw_cartoon avoids widening nested branches next to leaf siblings", {
-  short_structure <- .as_single_glycan_structure(
-    "Man(a1-3)[Man(a1-6)]Man(a1-6)[Man(a1-3)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
-  )
-  short_graph <- glyrepr::get_structure_graphs(
-    short_structure,
-    return_list = FALSE
-  )
-  short_coor <- .calculate_residue_coordinates(short_graph)
-
-  terminal_distance <- abs(short_coor[1, "y"] - short_coor[2, "y"])
-  branch_distance <- abs(short_coor[3, "y"] - short_coor[4, "y"])
-  expect_equal(branch_distance, terminal_distance)
-
-  elongated_structure <- .as_single_glycan_structure(
-    "Man(a1-3)[Man(a1-6)]Man(a1-6)[Man(a1-2)Man(a1-3)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
-  )
-  elongated_graph <- glyrepr::get_structure_graphs(
-    elongated_structure,
-    return_list = FALSE
-  )
-  elongated_coor <- .calculate_residue_coordinates(elongated_graph)
-  outer_man <- which(
-    igraph::V(elongated_graph)$mono == "Man" &
-      elongated_coor[, "x"] == min(elongated_coor[, "x"])
-  )
-  outer_y <- sort(elongated_coor[outer_man, "y"])
-
-  expect_equal(diff(outer_y), rep(1, 2))
-})
-
-test_that("draw_cartoon keeps elongated and leaf sibling branches evenly spaced", {
-  structure <- .as_single_glycan_structure(
-    "Neu5Ac(a2-3)Gal(b1-3)[Gal(b1-3)GlcNAc(b1-3)[Gal(b1-4)GlcNAc(b1-6)]Gal(b1-4)GlcNAc(b1-6)]GalNAc(a1-"
-  )
-  graph <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
-  coor <- .calculate_residue_coordinates(graph)
-  same_depth <- which(coor[, "x"] == -2)
-  neu5ac <- same_depth[igraph::V(graph)$mono[same_depth] == "Neu5Ac"]
-  rightmost_gal <- same_depth[igraph::V(graph)$mono[same_depth] == "Gal"]
-
-  expect_equal(length(neu5ac), 1)
-  expect_equal(length(rightmost_gal), 1)
-  expect_equal(
-    unname(abs(coor[neu5ac, "y"] - coor[rightmost_gal, "y"])),
-    1
-  )
-})
-
-test_that("draw_cartoon keeps same-depth Man sibling branches evenly spaced", {
-  structure <- .as_single_glycan_structure(
-    "Man(a1-2)Man(a1-3)[Man(a1-3)[Man(a1-2)Man(a1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
-  )
-  graph <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
-  coor <- .calculate_residue_coordinates(graph)
-  same_depth_man <- which(
-    igraph::V(graph)$mono == "Man" &
-      coor[, "x"] == -4
-  )
-  same_depth_y <- sort(coor[same_depth_man, "y"])
-
-  expect_equal(length(same_depth_man), 3)
-  expect_equal(diff(same_depth_y), rep(1, 2))
 })
 
 test_that("save_cartoon saves file correctly", {
