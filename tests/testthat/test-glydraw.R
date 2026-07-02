@@ -204,6 +204,42 @@ test_that("draw_cartoon works with reducing-end O-Fuc glycans", {
   purrr::walk(cartoons, expect_s3_class, "glydraw_cartoon")
 })
 
+test_that("draw_cartoon preserves nested Xyl-Gal-Fuc side-chain order", {
+  structure <- "Glc(b1-4)[Fuc(a1-2)Gal(b1-2)Xyl(a1-6)]Glc(b1-4)Glc(b1-"
+
+  inputs <- .prepare_cartoon_inputs(structure, NULL, "H", "")
+  graph <- inputs$structure
+  coor <- inputs$coor
+  mono <- igraph::V(graph)$mono
+  fuc <- which(mono == "Fuc")
+  gal <- which(mono == "Gal")
+  xyl <- which(mono == "Xyl")
+
+  expect_equal(
+    unname(coor[c(xyl, gal, fuc), "x"]),
+    rep(unname(coor[xyl, "x"]), 3)
+  )
+  expect_gt(coor[gal, "y"], coor[xyl, "y"])
+  expect_gt(coor[fuc, "y"], coor[gal, "y"])
+
+  annotation <- .cartoon_text_annotation_data(
+    graph,
+    coor,
+    "H",
+    "",
+    NULL
+  )$annotation
+  fuc_labels <- dplyr::filter(annotation, .data$vertice == as.character(fuc))
+  gal_labels <- dplyr::filter(annotation, .data$vertice == as.character(gal))
+
+  expect_true(all(
+    fuc_labels$y > coor[gal, "y"] & fuc_labels$y < coor[fuc, "y"]
+  ))
+  expect_true(all(
+    gal_labels$y > coor[xyl, "y"] & gal_labels$y < coor[gal, "y"]
+  ))
+})
+
 test_that("save_cartoon saves file correctly", {
   structure <- "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
   cartoon <- draw_cartoon(structure)

@@ -146,6 +146,30 @@
   return(offset)
 }
 
+#' Check whether a residue is nested under a Fuc-like side branch
+#'
+#' @param structure An igraph glycan graph whose vertices include `mono`.
+#' @param ver A single integer vertex index.
+#'
+#' @returns A logical scalar: `TRUE` when any ancestor between the reducing end
+#'   and `ver` uses Fuc-like branch layout.
+#' @noRd
+.has_fucose_like_layout_ancestor <- function(structure, ver) {
+  path <- as.integer(igraph::shortest_paths(
+    structure,
+    length(structure),
+    ver
+  )$vpath[[1]])
+  ancestors <- setdiff(path[-length(path)], length(structure))
+  if (length(ancestors) == 0) {
+    return(FALSE)
+  }
+
+  any(.is_fucose_like_layout_monosaccharide(
+    igraph::V(structure)[ancestors]$mono
+  ))
+}
+
 #' Order child vertices by linkage position
 #'
 #' @param structure An igraph glycan graph whose edge attributes include
@@ -819,6 +843,15 @@
 .orient_fucose_children_for_vertex <- function(structure, coor, ver) {
   neigh_pos <- igraph::neighbors(structure, ver)
   fuc_pos <- neigh_pos[.is_fucose_like_layout_monosaccharide(neigh_pos$mono)]
+  if (length(fuc_pos) == 0) {
+    return(coor)
+  }
+  fuc_pos <- fuc_pos[
+    !purrr::map_lgl(
+      as.integer(fuc_pos),
+      \(fuc_vertex) .has_fucose_like_layout_ancestor(structure, fuc_vertex)
+    )
+  ]
   if (length(fuc_pos) == 0) {
     return(coor)
   }

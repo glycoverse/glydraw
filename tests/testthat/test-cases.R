@@ -230,6 +230,14 @@ test_that("Draw representative Fuc-like residues", {
   )
 })
 
+test_that("Draw nested Xyl-Gal-Fuc side chain", {
+  glycan <- "Glc(b1-4)[Fuc(a1-2)Gal(b1-2)Xyl(a1-6)]Glc(b1-4)Glc(b1-"
+  vdiffr::expect_doppelganger(
+    "nested Xyl-Gal-Fuc side chain",
+    draw_cartoon(glycan)
+  )
+})
+
 test_that("Exported cartoons preserve Fuc orientation", {
   glycan <- "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-4)GlcNAc(b1-"
   temp_dir <- tempfile()
