@@ -2,6 +2,8 @@
 
 ## glydraw (development version)
 
+## glydraw 0.6.2
+
 ### Minor improvements and bug fixes
 
 - Fix nested Fuc-like side-chain layout so xyloglucan-like branches
