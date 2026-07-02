@@ -50,6 +50,14 @@ readme_cartoon_examples <- list(
       "[a1122h-1a_1-5_6*OP^XOCCN/3O/3=O]/1-2-3-3/a4-b1_b6-c1_c2-d1"
     ),
     args = list()
+  ),
+  list(
+    file = "man/figures/README-unnamed-chunk-7-1.png",
+    glycan = paste0(
+      "Glc(b1-4)[Xyl(a1-6)][Xyl(a1-2)]Glc(b1-4)[Xyl(a1-6)]Glc(b1-4)",
+      "[Fuc(a1-2)Gal(b1-2)Xyl(a1-6)]Glc(b1-4)Glc(b1-4)[Xyl(a1-6)]Glc(b1-"
+    ),
+    args = list(fuc_orient = "up")
   )
 )
 
@@ -177,4 +185,13 @@ draw_cartoon(glycan)
 
 ```{r, echo = FALSE, results = "asis"}
 readme_img(5)
+```
+
+``` r
+glycan <- "Glc(b1-4)[Xyl(a1-6)][Xyl(a1-2)]Glc(b1-4)[Xyl(a1-6)]Glc(b1-4)[Fuc(a1-2)Gal(b1-2)Xyl(a1-6)]Glc(b1-4)Glc(b1-4)[Xyl(a1-6)]Glc(b1-"
+draw_cartoon(glycan, fuc_orient = "up")
+```
+
+```{r, echo = FALSE, results = "asis"}
+readme_img(6)
 ```

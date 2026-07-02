@@ -107,3 +107,10 @@ draw_cartoon(glycan)
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="351" />
+
+``` r
+glycan <- "Glc(b1-4)[Xyl(a1-6)][Xyl(a1-2)]Glc(b1-4)[Xyl(a1-6)]Glc(b1-4)[Fuc(a1-2)Gal(b1-2)Xyl(a1-6)]Glc(b1-4)Glc(b1-4)[Xyl(a1-6)]Glc(b1-"
+draw_cartoon(glycan, fuc_orient = "up")
+```
+
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="523" />
