@@ -1,4 +1,4 @@
-# glydraw (development version)
+# glydraw 0.6.2
 
 ## Minor improvements and bug fixes
 
