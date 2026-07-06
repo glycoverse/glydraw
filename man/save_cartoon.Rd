@@ -41,8 +41,6 @@ allowing larger or smaller output files.
 }
 
 \examples{
-\dontrun{
 cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
-save_cartoon(cartoon, "p1.png", scale = 2)
-}
+save_cartoon(cartoon, tempfile(fileext = ".png"))
 }

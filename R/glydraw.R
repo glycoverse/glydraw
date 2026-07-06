@@ -36,9 +36,7 @@
 #'
 #' @returns a ggplot2 object
 #' @examples
-#' \dontrun{
 #' draw_cartoon("Gal(b1-3)GalNAc(a1-")
-#' }
 #' @export
 draw_cartoon <- function(
   structure,
@@ -154,10 +152,8 @@ print.glydraw_cartoon <- function(
 #' allowing larger or smaller output files.
 #'
 #' @examples
-#' \dontrun{
 #' cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
-#' save_cartoon(cartoon, "p1.png", scale = 2)
-#' }
+#' save_cartoon(cartoon, tempfile(fileext = ".png"))
 #' @export
 save_cartoon <- function(cartoon, file, ..., dpi = 300, scale = 1) {
   checkmate::assert_class(cartoon, "glydraw_cartoon")
@@ -229,7 +225,7 @@ save_cartoon <- function(cartoon, file, ..., dpi = 300, scale = 1) {
 #'     "Man(a1-3)Man(b1-4)GlcNAc(b1-",
 #'     "Gal(b1-4)GlcNAc(b1-"
 #'   ),
-#'   "path/to/save"
+#'   tempdir()
 #' )
 #' @export
 export_cartoons <- function(

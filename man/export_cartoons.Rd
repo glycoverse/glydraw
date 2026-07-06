@@ -104,6 +104,6 @@ export_cartoons(
     "Man(a1-3)Man(b1-4)GlcNAc(b1-",
     "Gal(b1-4)GlcNAc(b1-"
   ),
-  "path/to/save"
+  tempdir()
 )
 }
