@@ -14,6 +14,8 @@ A 'ggplot2'-native plotting engine for drawing reproducible beautiful Symbol Nom
 Useful links:
 \itemize{
   \item \url{https://glycoverse.github.io/glydraw/}
+  \item \url{https://github.com/glycoverse/glydraw}
+  \item Report bugs at \url{https://github.com/glycoverse/glydraw/issues}
 }
 
 }
