@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Draw beautiful SNFG cartoons • glydraw</title>
+<title>Draw Beautiful Symbol Nomenclature for Glycans • glydraw</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Draw beautiful SNFG cartoons">
-<meta name="description" content="A ggplot2-native R engine for drawing reproducible SNFG glycan cartoons from glycan structure objects or text notations, with support for batch export, structural highlighting, and deep appearance customization.">
-<meta property="og:description" content="A ggplot2-native R engine for drawing reproducible SNFG glycan cartoons from glycan structure objects or text notations, with support for batch export, structural highlighting, and deep appearance customization.">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Draw Beautiful Symbol Nomenclature for Glycans">
+<meta name="description" content="A ggplot2-native plotting engine for drawing reproducible beautiful Symbol Nomenclature for Glycans (SNFG) glycan cartoons from glycan structure objects or text notations, with support for batch export, structural highlighting, and deep appearance customization. It follows the SNFG specification described at &lt;https://www.ncbi.nlm.nih.gov/glycans/snfg.html&gt;.">
+<meta property="og:description" content="A ggplot2-native plotting engine for drawing reproducible beautiful Symbol Nomenclature for Glycans (SNFG) glycan cartoons from glycan structure objects or text notations, with support for batch export, structural highlighting, and deep appearance customization. It follows the SNFG specification described at &lt;https://www.ncbi.nlm.nih.gov/glycans/snfg.html&gt;.">
 <meta property="og:image" content="https://glycoverse.github.io/glydraw/logo.png">
 <meta name="robots" content="noindex">
 </head>
@@ -41,6 +41,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
 </form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/glycoverse/glydraw/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -70,24 +71,24 @@
 <h3 id="install-glydraw-alone">Install glydraw alone<a class="anchor" aria-label="anchor" href="#install-glydraw-alone"></a>
 </h3>
 <p>If you don’t want to install all glycoverse packages, you can only install glydraw.</p>
-<p>You can install the latest release of glydraw from <a href="https://glycoverse.r-universe.dev/glydraw" class="external-link">r-universe</a> (<strong>recommended</strong>):</p>
+<p>You can install the latest release of glydraw from CRAN:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
-<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/repo_add.html" class="external-link">repo_add</a></span><span class="op">(</span>glycoverse <span class="op">=</span> <span class="st">"https://glycoverse.r-universe.dev"</span><span class="op">)</span></span>
-<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pkg_install.html" class="external-link">pkg_install</a></span><span class="op">(</span><span class="st">"glydraw"</span><span class="op">)</span></span></code></pre></div>
-<p>Or from <a href="https://github.com/glycoverse/glydraw" class="external-link">GitHub</a>:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"glydraw"</span><span class="op">)</span></span></code></pre></div>
+<p>Or from <a href="https://glycoverse.r-universe.dev/glydraw" class="external-link">r-universe</a>:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pkg_install.html" class="external-link">pkg_install</a></span><span class="op">(</span><span class="st">"glycoverse/glydraw@*release"</span><span class="op">)</span></span></code></pre></div>
-<p>Or install the development version (NOT recommended):</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'glydraw'</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'https://glycoverse.r-universe.dev'</span>, <span class="st">'https://cloud.r-project.org'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Or from <a href="https://github.com/glycoverse/glydraw" class="external-link">GitHub</a>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pkg_install.html" class="external-link">pkg_install</a></span><span class="op">(</span><span class="st">"glycoverse/glydraw"</span><span class="op">)</span></span></code></pre></div>
-<p><strong>Note:</strong> Tips and troubleshooting for the meta-package <a href="https://github.com/glycoverse/glycoverse" class="external-link">glycoverse</a> are also applicable here: <a href="https://github.com/glycoverse/glycoverse#installation" class="external-link">Installation of glycoverse</a>.</p>
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"glycoverse/glydraw@*release"</span><span class="op">)</span></span></code></pre></div>
+<p>Or install the development version:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"glycoverse/glydraw"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glycoverse.github.io/glydraw/">glydraw</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">glycan</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
@@ -96,35 +97,43 @@
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="va">glycan</span>, red_end <span class="op">=</span> <span class="st">"PP-Dol"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-2-1.png" width="850"></p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">glycan</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
 <span>  <span class="st">"Neu5Ac(a2-3)Gal(b1-3)[Fuc(a1-2)Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-3)"</span>,</span>
 <span>  <span class="st">"[Gal(b1-4)[Fuc(a1-3)]GlcNAc(b1-6)]Gal(b1-4)GlcNAc(b1-6)]GalNAc(a1-"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="va">glycan</span>, red_end <span class="op">=</span> <span class="st">"~"</span>, node_size <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-3-1.png" width="443"></p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">glycan</span> <span class="op">&lt;-</span> <span class="st">"Gal(b1-3)[Neu5Ac(a2-3)Gal6S(b1-4)[Fuc(a1-3)]GlcNAc(b1-6)]GalNAc(a1-"</span></span>
 <span><span class="fu"><a href="reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="va">glycan</span>, orient <span class="op">=</span> <span class="st">"V"</span>, red_end <span class="op">=</span> <span class="st">"Ser/Thr"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-4-1.png" width="269"></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">glycan</span> <span class="op">&lt;-</span> <span class="st">"Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-"</span></span>
 <span><span class="fu"><a href="reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="va">glycan</span>, orient <span class="op">=</span> <span class="st">"V"</span>, red_end <span class="op">=</span> <span class="st">"Asn"</span>, fuc_orient <span class="op">=</span> <span class="st">"up"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-5-1.png" width="232"></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">glycan</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
 <span>  <span class="st">"WURCS=2.0/3,4,3/[a2122h-1a_1-5_2*N][a1122h-1a_1-5_2*OP^XOCCN/3O/3=O]"</span>,</span>
 <span>  <span class="st">"[a1122h-1a_1-5_6*OP^XOCCN/3O/3=O]/1-2-3-3/a4-b1_b6-c1_c2-d1"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="va">glycan</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-6-1.png" width="351"></p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">glycan</span> <span class="op">&lt;-</span> <span class="st">"Glc(b1-4)[Xyl(a1-6)][Xyl(a1-2)]Glc(b1-4)[Xyl(a1-6)]Glc(b1-4)[Fuc(a1-2)Gal(b1-2)Xyl(a1-6)]Glc(b1-4)Glc(b1-4)[Xyl(a1-6)]Glc(b1-"</span></span>
 <span><span class="fu"><a href="reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="va">glycan</span>, fuc_orient <span class="op">=</span> <span class="st">"up"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-7-1.png" width="523"></p>
 </div>
 </div>
-  </main><aside class="col-md-3"><div class="license">
+  </main><aside class="col-md-3"><div class="links">
+<h2 data-toc-skip>Links</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/glycoverse/glydraw/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/glycoverse/glydraw/issues" class="external-link">Report a bug</a></li>
+</ul>
+</div>
+
+<div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>

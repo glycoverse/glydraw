@@ -20,6 +20,7 @@
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/glycoverse/glydraw/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -28,7 +29,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Changelog</h1>
-
+      <small>Source: <a href="https://github.com/glycoverse/glydraw/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
     <div class="section level2">
@@ -38,14 +39,14 @@
 <h2 class="pkg-version" data-toc-text="0.6.2" id="glydraw-062">glydraw 0.6.2<a class="anchor" aria-label="anchor" href="#glydraw-062"></a></h2>
 <div class="section level3">
 <h3 id="minor-improvements-and-bug-fixes-0-6-2">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-0-6-2"></a></h3>
-<ul><li>Fix nested Fuc-like side-chain layout so xyloglucan-like branches preserve residue order and linkage annotations. (#51)</li>
+<ul><li>Fix nested Fuc-like side-chain layout so xyloglucan-like branches preserve residue order and linkage annotations. (<a href="https://github.com/glycoverse/glydraw/issues/51" class="external-link">#51</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.6.1" id="glydraw-061">glydraw 0.6.1<a class="anchor" aria-label="anchor" href="#glydraw-061"></a></h2>
 <div class="section level3">
 <h3 id="minor-improvements-and-bug-fixes-0-6-1">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-0-6-1"></a></h3>
-<ul><li>Fix Fuc-like triangle geometry so triangle bases and apexes align with rectangle node bounds. (#49, #50)</li>
+<ul><li>Fix Fuc-like triangle geometry so triangle bases and apexes align with rectangle node bounds. (<a href="https://github.com/glycoverse/glydraw/issues/49" class="external-link">#49</a>, <a href="https://github.com/glycoverse/glydraw/issues/50" class="external-link">#50</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -53,27 +54,27 @@
 <div class="section level3">
 <h3 id="breaking-changes-0-6-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-6-0"></a></h3>
 <ul><li>
-<code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> no longer supports <code><a href="https://glycoverse.github.io/glyexp/reference/experiment.html" class="external-link">glyexp::experiment()</a></code> input, and <code>glyexp</code> is no longer a package dependency. (#33)</li>
-<li>Specifying optional arguments in a positional manner is no longer supported. Please use <code>arg = value</code> instead. (#40)</li>
+<code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> no longer supports <code><a href="https://glycoverse.github.io/glyexp/reference/experiment.html" class="external-link">glyexp::experiment()</a></code> input, and <code>glyexp</code> is no longer a package dependency. (<a href="https://github.com/glycoverse/glydraw/issues/33" class="external-link">#33</a>)</li>
+<li>Specifying optional arguments in a positional manner is no longer supported. Please use <code>arg = value</code> instead. (<a href="https://github.com/glycoverse/glydraw/issues/40" class="external-link">#40</a>)</li>
 </ul></div>
 <div class="section level3">
 <h3 id="new-features-0-6-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-6-0"></a></h3>
-<ul><li>Add the <code>colors</code> parameter to <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> for customizing monosaccharide fill colors. (#44)</li>
-<li>Add the <code>fuc_orient</code> parameter to <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> for choosing whether Fuc triangles always point upward or flex toward their linkage direction. (#42)</li>
-<li>Add the <code>scale</code> parameter to <code><a href="../reference/save_cartoon.html">save_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> for changing output pixel dimensions while preserving cartoon appearance. (#35)</li>
-<li>Add the <code>node_size</code> parameter to <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> for scaling residue cartoon sizes. Values larger than <code>2</code> are rejected because residues overlap. (#36)</li>
-<li>Add the <code>edge_linewidth</code> and <code>node_linewidth</code> parameters to <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> for customizing linkage line and node border widths. (#34)</li>
-<li>Add the <code>red_end</code> parameter to <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> for custom reducing-end text or a wavy reducing-end annotation. (#31)</li>
+<ul><li>Add the <code>colors</code> parameter to <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> for customizing monosaccharide fill colors. (<a href="https://github.com/glycoverse/glydraw/issues/44" class="external-link">#44</a>)</li>
+<li>Add the <code>fuc_orient</code> parameter to <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> for choosing whether Fuc triangles always point upward or flex toward their linkage direction. (<a href="https://github.com/glycoverse/glydraw/issues/42" class="external-link">#42</a>)</li>
+<li>Add the <code>scale</code> parameter to <code><a href="../reference/save_cartoon.html">save_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> for changing output pixel dimensions while preserving cartoon appearance. (<a href="https://github.com/glycoverse/glydraw/issues/35" class="external-link">#35</a>)</li>
+<li>Add the <code>node_size</code> parameter to <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> for scaling residue cartoon sizes. Values larger than <code>2</code> are rejected because residues overlap. (<a href="https://github.com/glycoverse/glydraw/issues/36" class="external-link">#36</a>)</li>
+<li>Add the <code>edge_linewidth</code> and <code>node_linewidth</code> parameters to <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> for customizing linkage line and node border widths. (<a href="https://github.com/glycoverse/glydraw/issues/34" class="external-link">#34</a>)</li>
+<li>Add the <code>red_end</code> parameter to <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> for custom reducing-end text or a wavy reducing-end annotation. (<a href="https://github.com/glycoverse/glydraw/issues/31" class="external-link">#31</a>)</li>
 </ul></div>
 <div class="section level3">
 <h3 id="minor-improvements-and-bug-fixes-0-6-0">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-0-6-0"></a></h3>
-<ul><li>Fix substituent label alignment so horizontal labels are bottom-aligned and vertical labels are left-aligned. (#48)</li>
-<li>Extend Fuc-style branch layout and flexible orientation to additional Fuc-like residues. (#46)</li>
-<li>Fix <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> for structures with two core Fuc branches and one b1-4 GlcNAc branch, avoiding an igraph vertex-selection error and keeping the b1-4 GlcNAc aligned with the core GlcNAc. (#45)</li>
-<li>Deprecate <code>dpi</code> for <code><a href="../reference/save_cartoon.html">save_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> because glydraw uses an internal fixed design scale. Supplying <code>dpi</code> now warns that the argument is ignored. (#35)</li>
-<li>Keep substituent annotations visible when <code>show_linkage = FALSE</code>. (#41)</li>
-<li>Fix diagonal HexNAc linkage annotation offsets when <code>orient = "V"</code>. (#43)</li>
-<li>Adjust linkage annotation offsets for diagonal HexNAc links. (#29)</li>
+<ul><li>Fix substituent label alignment so horizontal labels are bottom-aligned and vertical labels are left-aligned. (<a href="https://github.com/glycoverse/glydraw/issues/48" class="external-link">#48</a>)</li>
+<li>Extend Fuc-style branch layout and flexible orientation to additional Fuc-like residues. (<a href="https://github.com/glycoverse/glydraw/issues/46" class="external-link">#46</a>)</li>
+<li>Fix <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> for structures with two core Fuc branches and one b1-4 GlcNAc branch, avoiding an igraph vertex-selection error and keeping the b1-4 GlcNAc aligned with the core GlcNAc. (<a href="https://github.com/glycoverse/glydraw/issues/45" class="external-link">#45</a>)</li>
+<li>Deprecate <code>dpi</code> for <code><a href="../reference/save_cartoon.html">save_cartoon()</a></code> and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> because glydraw uses an internal fixed design scale. Supplying <code>dpi</code> now warns that the argument is ignored. (<a href="https://github.com/glycoverse/glydraw/issues/35" class="external-link">#35</a>)</li>
+<li>Keep substituent annotations visible when <code>show_linkage = FALSE</code>. (<a href="https://github.com/glycoverse/glydraw/issues/41" class="external-link">#41</a>)</li>
+<li>Fix diagonal HexNAc linkage annotation offsets when <code>orient = "V"</code>. (<a href="https://github.com/glycoverse/glydraw/issues/43" class="external-link">#43</a>)</li>
+<li>Adjust linkage annotation offsets for diagonal HexNAc links. (<a href="https://github.com/glycoverse/glydraw/issues/29" class="external-link">#29</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -88,24 +89,24 @@
 <h2 class="pkg-version" data-toc-text="0.5.0" id="glydraw-050">glydraw 0.5.0<a class="anchor" aria-label="anchor" href="#glydraw-050"></a></h2>
 <div class="section level3">
 <h3 id="new-features-0-5-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-5-0"></a></h3>
-<ul><li>Use native ggplot2 theme to manage cartoon size, so <code>ggview</code> is no longer dependent. (#27)</li>
+<ul><li>Use native ggplot2 theme to manage cartoon size, so <code>ggview</code> is no longer dependent. (<a href="https://github.com/glycoverse/glydraw/issues/27" class="external-link">#27</a>)</li>
 </ul></div>
 <div class="section level3">
 <h3 id="minor-improvements-and-bug-fixes-0-5-0">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-0-5-0"></a></h3>
-<ul><li>Fix overlapping linkage annotations for some glycans. (#21)</li>
-<li>Fix overlapping a1-3 and a1-6 core Fucose residues. (#23)</li>
-<li>Orient reducing end annotation line vertically when <code>orient = "V"</code>. (#24)</li>
-<li>Redesign the node coordination layout algorithm to fix inaccurate branch spacing for some glycans. (#26, #28)</li>
+<ul><li>Fix overlapping linkage annotations for some glycans. (<a href="https://github.com/glycoverse/glydraw/issues/21" class="external-link">#21</a>)</li>
+<li>Fix overlapping a1-3 and a1-6 core Fucose residues. (<a href="https://github.com/glycoverse/glydraw/issues/23" class="external-link">#23</a>)</li>
+<li>Orient reducing end annotation line vertically when <code>orient = "V"</code>. (<a href="https://github.com/glycoverse/glydraw/issues/24" class="external-link">#24</a>)</li>
+<li>Redesign the node coordination layout algorithm to fix inaccurate branch spacing for some glycans. (<a href="https://github.com/glycoverse/glydraw/issues/26" class="external-link">#26</a>, <a href="https://github.com/glycoverse/glydraw/issues/28" class="external-link">#28</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.1" id="glydraw-041">glydraw 0.4.1<a class="anchor" aria-label="anchor" href="#glydraw-041"></a></h2>
 <div class="section level3">
 <h3 id="minor-improvements-and-bug-fixes-0-4-1">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-0-4-1"></a></h3>
-<ul><li>Fix substituent annotations in glycan cartoons. (#16)</li>
-<li>Fix reducing-end Fuc orientation in O-Fuc glycans. (#15)</li>
-<li>Make <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> create the output directory when needed. (#17)</li>
-<li>Make <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> use vector names as output filenames when available. (#17)</li>
+<ul><li>Fix substituent annotations in glycan cartoons. (<a href="https://github.com/glycoverse/glydraw/issues/16" class="external-link">#16</a>)</li>
+<li>Fix reducing-end Fuc orientation in O-Fuc glycans. (<a href="https://github.com/glycoverse/glydraw/issues/15" class="external-link">#15</a>)</li>
+<li>Make <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> create the output directory when needed. (<a href="https://github.com/glycoverse/glydraw/issues/17" class="external-link">#17</a>)</li>
+<li>Make <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> use vector names as output filenames when available. (<a href="https://github.com/glycoverse/glydraw/issues/17" class="external-link">#17</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -121,10 +122,10 @@
 </ul></div>
 <div class="section level3">
 <h3 id="minor-improvements-and-bug-fixes-0-4-0">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-0-4-0"></a></h3>
-<ul><li>Fix the bug that reducing end annotation was not shown with unknown anomer information. (#12)</li>
-<li>Fix the bug that glycans with only one monosaccharide could not be plotted. (#11)</li>
-<li>Fix the bug that “?” in linkages was not correctly handled. (#9)</li>
-<li>Fix the incorrect reducing end annotation direction in some situations. (#8)</li>
+<ul><li>Fix the bug that reducing end annotation was not shown with unknown anomer information. (<a href="https://github.com/glycoverse/glydraw/issues/12" class="external-link">#12</a>)</li>
+<li>Fix the bug that glycans with only one monosaccharide could not be plotted. (<a href="https://github.com/glycoverse/glydraw/issues/11" class="external-link">#11</a>)</li>
+<li>Fix the bug that “?” in linkages was not correctly handled. (<a href="https://github.com/glycoverse/glydraw/issues/9" class="external-link">#9</a>)</li>
+<li>Fix the incorrect reducing end annotation direction in some situations. (<a href="https://github.com/glycoverse/glydraw/issues/8" class="external-link">#8</a>)</li>
 <li>Fix the bug that glycan structures with multiple branches had incorrect layouts. (2ac4e9f)</li>
 <li>Fix the bug that “png” is not supported in <code><a href="../reference/save_cartoon.html">save_cartoon()</a></code>. (fed89b9)</li>
 <li>Fix the bug that structures with generic “NeuAc” and “NeuGc” cannot be plotted. (3b78303)</li>
