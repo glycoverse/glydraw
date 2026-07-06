@@ -4,7 +4,7 @@
 \name{glydraw-package}
 \alias{glydraw}
 \alias{glydraw-package}
-\title{glydraw: Draw beautiful SNFG cartoons}
+\title{glydraw: Draw Beautiful SNFG Glycan Cartoons}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 

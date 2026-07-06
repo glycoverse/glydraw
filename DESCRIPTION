@@ -1,5 +1,5 @@
 Package: glydraw
-Title: Draw beautiful SNFG cartoons
+Title: Draw Beautiful SNFG Glycan Cartoons
 Version: 0.6.2.9000
 Authors@R: c(
     person("Bin", "Fu", , "23110220018@m.fudan.edu.cn", role = c("aut", "cre", "cph"),
