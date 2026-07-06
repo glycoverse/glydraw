@@ -1,4 +1,6 @@
 skip_on_ci()
+skip_on_cran()
+skip_if_not_installed("vdiffr")
 
 test_that("Draw G97345NY", {
   glycan <- "Neu5Ac(a2-3)Gal(b1-3)[Neu5Ac(a2-3)Gal(b1-4)[Fuc(a1-3)]GlcNAc(b1-6)]GalNAc(a1-"
