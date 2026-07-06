@@ -1,5 +1,5 @@
 Package: glydraw
-Title: Draw Beautiful Symbol Nomenclatures For Glycans
+Title: Draw Beautiful Symbol Nomenclature for Glycans
 Version: 0.6.2.9000
 Authors@R: c(
     person("Bin", "Fu", , "23110220018@m.fudan.edu.cn", role = c("aut", "cre", "cph"),
@@ -7,8 +7,8 @@ Authors@R: c(
     person("Xisong", "Feng", , "1225774778@qq.com", role = c("aut"),
            comment = c(ORCID = "0009-0000-4057-1295"))
     )
-Description: A `ggplot2`-native R engine for drawing reproducible Beautiful
-    Symbol Nomenclatures For Glycans (SNFG) glycan cartoons from glycan structure
+Description: A 'ggplot2'-native plotting engine for drawing reproducible beautiful
+    Symbol Nomenclature for Glycans (SNFG) glycan cartoons from glycan structure
     objects or text notations, with support for batch export, structural
     highlighting, and deep appearance customization. 
     <https://www.ncbi.nlm.nih.gov/glycans/snfg.html>
