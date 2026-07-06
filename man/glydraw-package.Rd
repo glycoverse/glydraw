@@ -4,11 +4,11 @@
 \name{glydraw-package}
 \alias{glydraw}
 \alias{glydraw-package}
-\title{glydraw: Draw Beautiful SNFG Glycan Cartoons}
+\title{glydraw: Draw Beautiful Symbol Nomenclatures For Glycans}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-A ggplot2-native R engine for drawing reproducible SNFG glycan cartoons from glycan structure objects or text notations, with support for batch export, structural highlighting, and deep appearance customization.
+A `ggplot2`-native R engine for drawing reproducible Beautiful Symbol Nomenclatures For Glycans (SNFG) glycan cartoons from glycan structure objects or text notations, with support for batch export, structural highlighting, and deep appearance customization.
 }
 \seealso{
 Useful links:
