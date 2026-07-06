@@ -106,7 +106,7 @@ which includes this package and other core glycoverse packages.
 
 If you don't want to install all glycoverse packages, you can only install glydraw.
 
-You can install the latest release of glydraw from [CRAN](https://CRAN.R-project.org/package=glydraw):
+You can install the latest release of glydraw from CRAN:
 
 ``` r
 install.packages("glydraw")
