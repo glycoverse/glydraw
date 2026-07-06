@@ -10,8 +10,8 @@ Authors@R: c(
 Description: A 'ggplot2'-native plotting engine for drawing reproducible beautiful
     Symbol Nomenclature for Glycans (SNFG) glycan cartoons from glycan structure
     objects or text notations, with support for batch export, structural
-    highlighting, and deep appearance customization. 
-    <https://www.ncbi.nlm.nih.gov/glycans/snfg.html>
+    highlighting, and deep appearance customization. It follows the SNFG
+    specification described at <https://www.ncbi.nlm.nih.gov/glycans/snfg.html>.
 License: MIT + file LICENSE
 Suggests: 
     knitr,
