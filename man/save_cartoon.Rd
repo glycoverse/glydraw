@@ -19,6 +19,9 @@ save_cartoon(cartoon, file, ..., dpi = 300, scale = 1)
 cartoon at its natural fixed size; \code{2} saves the same cartoon with twice
 the pixel width and height.}
 }
+\value{
+Path of the saved cartoon file.
+}
 \description{
 This function saves the glycan cartoon to a file,
 with a suitable size.

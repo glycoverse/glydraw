@@ -151,6 +151,8 @@ print.glydraw_cartoon <- function(
 #' preserves the cartoon's aspect ratio and relative appearance while still
 #' allowing larger or smaller output files.
 #'
+#' @returns Path of the saved cartoon file.
+#'
 #' @examples
 #' cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
 #' save_cartoon(cartoon, tempfile(fileext = ".png"))
@@ -209,7 +211,7 @@ save_cartoon <- function(cartoon, file, ..., dpi = 300, scale = 1) {
 #' @param scale Numeric output-size multiplier passed to [save_cartoon()].
 #' @inheritParams draw_cartoon
 #'
-#' @return The function returns the list of cartoons implicitly.
+#' @returns The function returns the list of cartoons implicitly.
 #'
 #' @details
 #' # File names
