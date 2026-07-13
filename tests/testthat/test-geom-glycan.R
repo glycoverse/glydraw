@@ -115,7 +115,6 @@ test_that("geom_glycan uses size as a whole-cartoon scale multiplier", {
     rasters,
     ~ unclass(.x$raster)[[1]]
   )
-
   expect_equal(unname(scales), data$size)
   purrr::walk(rasters, expect_s3_class, "rastergrob")
   expect_equal(unname(corner_pixels), rep(0L, nrow(data)))
@@ -179,7 +178,7 @@ test_that("geom_glycan maps hjust and vjust to whole-cartoon alignment", {
   purrr::walk(child_viewports, expect_s3_class, "viewport")
 })
 
-test_that("geom_glycan omits standalone cartoon framing and expansion", {
+test_that("geom_glycan justifies content while preserving drawing allowance", {
   data <- data.frame(
     x = 1,
     y = 1,
@@ -197,10 +196,11 @@ test_that("geom_glycan omits standalone cartoon framing and expansion", {
 
   grob <- ggplot2::layer_grob(plot)[[1]]$children[[1]]
   geom_cartoon <- .glycan_grob_to_plot(grob)
-  geom_data_range <- ggplot2::get_panel_scales(geom_cartoon)$y$range$range
-  geom_panel_range <- ggplot2::ggplot_build(
-    geom_cartoon
-  )$layout$panel_params[[1]]$y.range
+  geom_built <- ggplot2::ggplot_build(geom_cartoon)
+  geom_x_data_range <- geom_built$layout$panel_scales_x[[1]]$range$range
+  geom_y_data_range <- geom_built$layout$panel_scales_y[[1]]$range$range
+  geom_x_panel_range <- geom_built$layout$panel_params[[1]]$x.range
+  geom_y_panel_range <- geom_built$layout$panel_params[[1]]$y.range
   geom_size <- attr(geom_cartoon, "glydraw_size_px")
   geom_panel_size <- attr(geom_cartoon, "glydraw_panel_size_px")
   standalone_cartoon <- draw_cartoon(data$structure, orient = "V")
@@ -215,13 +215,30 @@ test_that("geom_glycan omits standalone cartoon framing and expansion", {
     standalone_cartoon,
     "glydraw_panel_size_px"
   )
+  justification_offset <- .glycan_justification_offset(
+    geom_cartoon,
+    geom_size,
+    scale = 1,
+    hjust = 0.5,
+    vjust = 0
+  )
+  endpoint <- min(grob$connect_df$end_y)
+  endpoint_in <- (endpoint - geom_y_panel_range[[1]]) /
+    diff(geom_y_panel_range) *
+    geom_size[["height"]] /
+    .default_cartoon_dpi
+  endpoint_from_anchor <- justification_offset[["y"]] -
+    geom_size[["height"]] / .default_cartoon_dpi / 2 +
+    endpoint_in
 
   expect_equal(grob$glydraw_border_px, 0)
   expect_false(grob$glydraw_background)
-  expect_false(grob$glydraw_expand)
   expect_equal(geom_size, geom_panel_size)
-  expect_equal(geom_panel_range, geom_data_range)
-  expect_equal(min(grob$connect_df$end_y), geom_panel_range[[1]])
+  expect_lt(geom_x_panel_range[[1]], geom_x_data_range[[1]])
+  expect_gt(geom_x_panel_range[[2]], geom_x_data_range[[2]])
+  expect_lt(geom_y_panel_range[[1]], geom_y_data_range[[1]])
+  expect_gt(geom_y_panel_range[[2]], geom_y_data_range[[2]])
+  expect_equal(endpoint_from_anchor, 0)
   expect_s3_class(
     ggplot2::calc_element("plot.background", geom_cartoon$theme),
     "element_blank"

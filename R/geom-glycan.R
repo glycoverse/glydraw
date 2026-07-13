@@ -11,7 +11,7 @@
 #' coordinates. Use scale expansion or explicit coordinate limits when the
 #' cartoons need more room around the panel edges. Unlike standalone cartoons
 #' returned by [draw_cartoon()], cartoons in this layer have no output border or
-#' background, and their internal coordinate ranges are not expanded.
+#' background.
 #'
 #' @param mapping Set of aesthetic mappings created by [ggplot2::aes()]. The
 #'   `x`, `y`, and `structure` aesthetics are required.
@@ -43,9 +43,11 @@
 #'   multipliers. This is distinct from `node_size`, which changes residue size
 #'   within the cartoon.
 #' - `hjust`, an optional horizontal justification that defaults to `0.5`.
-#'   `0` aligns the cartoon's left edge with `x`, and `1` aligns its right edge.
+#'   `0` aligns the cartoon content's left bound with `x`, and `1` aligns its
+#'   right bound.
 #' - `vjust`, an optional vertical justification that defaults to `0.5`.
-#'   `0` aligns the cartoon's bottom edge with `y`, and `1` aligns its top edge.
+#'   `0` aligns the cartoon content's bottom bound with `y`, including the end
+#'   of a reducing-end annotation line, and `1` aligns its top bound.
 #'
 #' @returns A ggplot2 layer that can be added to a [ggplot2::ggplot()] object.
 #'
@@ -238,7 +240,6 @@ geom_glycan <- function(
   grob$glydraw_vjust <- vjust
   grob$glydraw_border_px <- 0
   grob$glydraw_background <- FALSE
-  grob$glydraw_expand <- FALSE
   grob$vp <- grid::viewport(
     x = grid::unit(x, "native"),
     y = grid::unit(y, "native"),
