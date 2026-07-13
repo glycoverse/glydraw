@@ -179,7 +179,7 @@ test_that("geom_glycan maps hjust and vjust to whole-cartoon alignment", {
   purrr::walk(child_viewports, expect_s3_class, "viewport")
 })
 
-test_that("geom_glycan omits standalone cartoon borders and backgrounds", {
+test_that("geom_glycan omits standalone cartoon framing and expansion", {
   data <- data.frame(
     x = 1,
     y = 1,
@@ -193,13 +193,23 @@ test_that("geom_glycan omits standalone cartoon borders and backgrounds", {
       structure = .data$structure
     )
   ) +
-    geom_glycan()
+    geom_glycan(orient = "V", vjust = 0)
 
   grob <- ggplot2::layer_grob(plot)[[1]]$children[[1]]
   geom_cartoon <- .glycan_grob_to_plot(grob)
+  geom_data_range <- ggplot2::get_panel_scales(geom_cartoon)$y$range$range
+  geom_panel_range <- ggplot2::ggplot_build(
+    geom_cartoon
+  )$layout$panel_params[[1]]$y.range
   geom_size <- attr(geom_cartoon, "glydraw_size_px")
   geom_panel_size <- attr(geom_cartoon, "glydraw_panel_size_px")
-  standalone_cartoon <- draw_cartoon(data$structure)
+  standalone_cartoon <- draw_cartoon(data$structure, orient = "V")
+  standalone_data_range <- ggplot2::get_panel_scales(
+    standalone_cartoon
+  )$y$range$range
+  standalone_panel_range <- ggplot2::ggplot_build(
+    standalone_cartoon
+  )$layout$panel_params[[1]]$y.range
   standalone_size <- attr(standalone_cartoon, "glydraw_size_px")
   standalone_panel_size <- attr(
     standalone_cartoon,
@@ -208,7 +218,10 @@ test_that("geom_glycan omits standalone cartoon borders and backgrounds", {
 
   expect_equal(grob$glydraw_border_px, 0)
   expect_false(grob$glydraw_background)
+  expect_false(grob$glydraw_expand)
   expect_equal(geom_size, geom_panel_size)
+  expect_equal(geom_panel_range, geom_data_range)
+  expect_equal(min(grob$connect_df$end_y), geom_panel_range[[1]])
   expect_s3_class(
     ggplot2::calc_element("plot.background", geom_cartoon$theme),
     "element_blank"
@@ -217,4 +230,5 @@ test_that("geom_glycan omits standalone cartoon borders and backgrounds", {
     (standalone_size - standalone_panel_size) / 2,
     c(width = 50, height = 50)
   )
+  expect_lt(standalone_panel_range[[1]], standalone_data_range[[1]])
 })

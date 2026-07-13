@@ -88,6 +88,10 @@ glycanGrob <- function(
   if (is.null(background)) {
     background <- TRUE
   }
+  expand <- grob$glydraw_expand
+  if (is.null(expand)) {
+    expand <- TRUE
+  }
 
   .assemble_cartoon_plot(
     grob$connect_df,
@@ -98,7 +102,8 @@ glycanGrob <- function(
     grob$edge_linewidth,
     grob$node_linewidth,
     border_px = border_px,
-    background = background
+    background = background,
+    expand = expand
   )
 }
 
