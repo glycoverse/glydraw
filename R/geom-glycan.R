@@ -9,7 +9,9 @@
 #' text, and spacing, without changing their relative appearance. Like points
 #' and text, the cartoons do not expand the position scales beyond their anchor
 #' coordinates. Use scale expansion or explicit coordinate limits when the
-#' cartoons need more room around the panel edges.
+#' cartoons need more room around the panel edges. Unlike standalone cartoons
+#' returned by [draw_cartoon()], cartoons in this layer have no output border or
+#' background.
 #'
 #' @param mapping Set of aesthetic mappings created by [ggplot2::aes()]. The
 #'   `x`, `y`, and `structure` aesthetics are required.
@@ -234,6 +236,8 @@ geom_glycan <- function(
   grob$glydraw_scale <- size
   grob$glydraw_hjust <- hjust
   grob$glydraw_vjust <- vjust
+  grob$glydraw_border_px <- 0
+  grob$glydraw_background <- FALSE
   grob$vp <- grid::viewport(
     x = grid::unit(x, "native"),
     y = grid::unit(y, "native"),
