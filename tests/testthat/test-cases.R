@@ -268,3 +268,31 @@ test_that("Exported cartoons preserve custom node size", {
 
   vdiffr::expect_doppelganger("exported custom node size", result[[1]])
 })
+
+test_that("Draw glycans as ggplot2 annotations", {
+  data <- data.frame(
+    x = c(1, 3),
+    y = c(1, 2),
+    structure = c(
+      "Gal(b1-3)GalNAc(a1-",
+      "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-"
+    )
+  )
+  plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(
+      x = .data$x,
+      y = .data$y,
+      structure = .data$structure
+    )
+  ) +
+    geom_glycan() +
+    ggplot2::coord_cartesian(
+      xlim = c(0, 4),
+      ylim = c(0, 3),
+      expand = FALSE
+    ) +
+    ggplot2::theme_void()
+
+  vdiffr::expect_doppelganger("ggplot2 glycan annotations", plot)
+})
