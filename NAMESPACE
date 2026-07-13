@@ -2,8 +2,11 @@
 
 S3method(export_cartoons,character)
 S3method(export_cartoons,glyrepr_structure)
+S3method(makeContent,glycanGrob)
 S3method(print,glydraw_cartoon)
 export(draw_cartoon)
 export(export_cartoons)
+export(glycanGrob)
 export(save_cartoon)
+importFrom(grid,makeContent)
 importFrom(rlang,.data)
