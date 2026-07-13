@@ -99,7 +99,7 @@ and text, the cartoons do not expand the position scales beyond their anchor
 coordinates. Use scale expansion or explicit coordinate limits when the
 cartoons need more room around the panel edges. Unlike standalone cartoons
 returned by \code{\link[=draw_cartoon]{draw_cartoon()}}, cartoons in this layer have no output border or
-background, and their internal coordinate ranges are not expanded.
+background.
 }
 \section{Aesthetics}{
 
@@ -116,9 +116,11 @@ Mapped values are transformed by ggplot2's size scale; use
 multipliers. This is distinct from \code{node_size}, which changes residue size
 within the cartoon.
 \item \code{hjust}, an optional horizontal justification that defaults to \code{0.5}.
-\code{0} aligns the cartoon's left edge with \code{x}, and \code{1} aligns its right edge.
+\code{0} aligns the cartoon content's left bound with \code{x}, and \code{1} aligns its
+right bound.
 \item \code{vjust}, an optional vertical justification that defaults to \code{0.5}.
-\code{0} aligns the cartoon's bottom edge with \code{y}, and \code{1} aligns its top edge.
+\code{0} aligns the cartoon content's bottom bound with \code{y}, including the end
+of a reducing-end annotation line, and \code{1} aligns its top bound.
 }
 }
 

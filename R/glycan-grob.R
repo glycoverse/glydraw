@@ -88,11 +88,6 @@ glycanGrob <- function(
   if (is.null(background)) {
     background <- TRUE
   }
-  expand <- grob$glydraw_expand
-  if (is.null(expand)) {
-    expand <- TRUE
-  }
-
   .assemble_cartoon_plot(
     grob$connect_df,
     grob$polygon_coor,
@@ -102,8 +97,7 @@ glycanGrob <- function(
     grob$edge_linewidth,
     grob$node_linewidth,
     border_px = border_px,
-    background = background,
-    expand = expand
+    background = background
   )
 }
 
@@ -140,6 +134,7 @@ makeContent.glycanGrob <- function(x) {
   }
   child <- .justify_glycan_child(
     child,
+    plot,
     size_px,
     scale,
     hjust,
@@ -180,6 +175,7 @@ makeContent.glycanGrob <- function(x) {
 #' Justify a rendered glycan child around its panel anchor
 #'
 #' @param child Rendered grid grob containing one glycan cartoon.
+#' @param plot A `glydraw_cartoon` ggplot object.
 #' @param size_px Named numeric vector with the cartoon's natural `width` and
 #'   `height` in pixels.
 #' @param scale Positive numeric whole-cartoon scale multiplier.
@@ -189,20 +185,92 @@ makeContent.glycanGrob <- function(x) {
 #' @returns `child` with a viewport that offsets the complete cartoon from its
 #'   centered panel anchor. Centered cartoons are returned unchanged.
 #' @noRd
-.justify_glycan_child <- function(child, size_px, scale, hjust, vjust) {
+.justify_glycan_child <- function(
+  child,
+  plot,
+  size_px,
+  scale,
+  hjust,
+  vjust
+) {
   horizontally_centered <- isTRUE(all.equal(hjust, 0.5))
   vertically_centered <- isTRUE(all.equal(vjust, 0.5))
   if (horizontally_centered && vertically_centered) {
     return(child)
   }
 
-  width_in <- size_px[["width"]] / .default_cartoon_dpi * scale
-  height_in <- size_px[["height"]] / .default_cartoon_dpi * scale
+  offset <- .glycan_justification_offset(
+    plot,
+    size_px,
+    scale,
+    hjust,
+    vjust
+  )
   child$vp <- grid::viewport(
     x = grid::unit(0.5, "npc") +
-      grid::unit((0.5 - hjust) * width_in, "in"),
+      grid::unit(offset[["x"]], "in"),
     y = grid::unit(0.5, "npc") +
-      grid::unit((0.5 - vjust) * height_in, "in")
+      grid::unit(offset[["y"]], "in")
   )
   child
+}
+
+#' Calculate a glycan justification offset from its unexpanded coordinates
+#'
+#' @param plot A `glydraw_cartoon` ggplot object.
+#' @param size_px Named numeric vector with the rendered cartoon's `width` and
+#'   `height` in pixels.
+#' @param scale Positive numeric whole-cartoon scale multiplier.
+#' @param hjust Numeric horizontal justification.
+#' @param vjust Numeric vertical justification.
+#'
+#' @returns A named numeric vector `c(x, y)` containing offsets in inches.
+#' @noRd
+.glycan_justification_offset <- function(
+  plot,
+  size_px,
+  scale,
+  hjust,
+  vjust
+) {
+  built <- ggplot2::ggplot_build(plot)
+  x_anchor <- .normalized_cartoon_anchor(
+    built$layout$panel_scales_x[[1]]$range$range,
+    built$layout$panel_params[[1]]$x.range,
+    hjust
+  )
+  y_anchor <- .normalized_cartoon_anchor(
+    built$layout$panel_scales_y[[1]]$range$range,
+    built$layout$panel_params[[1]]$y.range,
+    vjust
+  )
+
+  c(
+    x = (0.5 - x_anchor) *
+      size_px[["width"]] /
+      .default_cartoon_dpi *
+      scale,
+    y = (0.5 - y_anchor) *
+      size_px[["height"]] /
+      .default_cartoon_dpi *
+      scale
+  )
+}
+
+#' Normalize a raw cartoon anchor within its expanded panel range
+#'
+#' @param data_range Numeric two-element unexpanded data range.
+#' @param panel_range Numeric two-element expanded panel range.
+#' @param justification Numeric justification value.
+#'
+#' @returns Numeric scalar between the panel edges for justification values
+#'   between zero and one.
+#' @noRd
+.normalized_cartoon_anchor <- function(
+  data_range,
+  panel_range,
+  justification
+) {
+  anchor <- data_range[[1]] + justification * diff(data_range)
+  (anchor - panel_range[[1]]) / diff(panel_range)
 }
