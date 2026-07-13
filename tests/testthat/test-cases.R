@@ -351,7 +351,13 @@ test_that("Justify vertical ggplot2 glycan annotations", {
       ylim = c(0, 5),
       expand = FALSE
     ) +
-    ggplot2::theme_void()
+    ggplot2::theme_void() +
+    ggplot2::theme(
+      panel.background = ggplot2::element_rect(
+        fill = "#F2F2F2",
+        colour = NA
+      )
+    )
 
   vdiffr::expect_doppelganger("justified vertical ggplot2 glycans", plot)
 })

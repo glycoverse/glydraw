@@ -80,6 +80,14 @@ glycanGrob <- function(
 #' @noRd
 .glycan_grob_to_plot <- function(grob) {
   checkmate::assert_class(grob, "glycanGrob")
+  border_px <- grob$glydraw_border_px
+  if (is.null(border_px)) {
+    border_px <- .default_cartoon_border_px
+  }
+  background <- grob$glydraw_background
+  if (is.null(background)) {
+    background <- TRUE
+  }
 
   .assemble_cartoon_plot(
     grob$connect_df,
@@ -88,7 +96,9 @@ glycanGrob <- function(
     grob$annotation_data,
     grob$show_linkage,
     grob$edge_linewidth,
-    grob$node_linewidth
+    grob$node_linewidth,
+    border_px = border_px,
+    background = background
   )
 }
 

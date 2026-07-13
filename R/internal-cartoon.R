@@ -3,6 +3,7 @@
 
 .default_node_point_size <- 0.215
 .default_cartoon_dpi <- 300
+.default_cartoon_border_px <- 50
 .node_size_linkage_threshold <- 1.2
 .node_size_upper_boundary <- 2
 
@@ -432,6 +433,9 @@
 #'   should be drawn.
 #' @param edge_linewidth Numeric scalar used for linkage lines.
 #' @param node_linewidth Numeric scalar used for node borders.
+#' @param border_px Numeric plot border size in pixels.
+#' @param background Logical scalar indicating whether the ggplot background
+#'   grob should be retained.
 #'
 #' @returns A `glydraw_cartoon` ggplot object with fixed-size metadata
 #'   attributes.
@@ -443,7 +447,9 @@
   annotation_data,
   show_linkage,
   edge_linewidth,
-  node_linewidth
+  node_linewidth,
+  border_px = .default_cartoon_border_px,
+  background = TRUE
 ) {
   gly_graph <- .cartoon_base_layers(
     connect_df,
@@ -463,7 +469,10 @@
     annotation_data$reducing_info,
     edge_linewidth
   )
-  .finalize_cartoon_size(gly_graph)
+  if (!background) {
+    gly_graph <- .remove_cartoon_background(gly_graph)
+  }
+  .finalize_cartoon_size(gly_graph, border_px = border_px)
 }
 
 #' Build segment and residue polygon layers
@@ -622,7 +631,11 @@
 #'   `glydraw_panel_size_px` and `glydraw_size_px`, each a named numeric vector
 #'   with `width` and `height`.
 #' @noRd
-.finalize_cartoon_size <- function(plot, dpi = 300, border_px = 50) {
+.finalize_cartoon_size <- function(
+  plot,
+  dpi = 300,
+  border_px = .default_cartoon_border_px
+) {
   plot <- .add_plot_border(plot, border_px / dpi * 72)
   panel_size <- .cartoon_size_pixels(plot, border_px = 0)
   size <- .cartoon_size_pixels(plot, border_px = border_px)
@@ -649,6 +662,20 @@
   width <- panel_width + 2 * border_px
   height <- panel_height + 2 * border_px
   return(list(width = width, height = height))
+}
+
+#' Remove background grobs from a cartoon plot
+#'
+#' @param plot A ggplot2 object.
+#'
+#' @returns `plot` with blank panel and plot backgrounds.
+#' @noRd
+.remove_cartoon_background <- function(plot) {
+  plot +
+    ggplot2::theme(
+      panel.background = ggplot2::element_blank(),
+      plot.background = ggplot2::element_blank()
+    )
 }
 
 #' Add a fixed plot margin border
