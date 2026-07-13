@@ -296,3 +296,31 @@ test_that("Draw glycans as ggplot2 annotations", {
 
   vdiffr::expect_doppelganger("ggplot2 glycan annotations", plot)
 })
+
+test_that("Scale ggplot2 glycan annotations", {
+  data <- data.frame(
+    x = c(1, 3),
+    y = c(1.5, 1.5),
+    size = c(0.6, 1.4),
+    structure = rep("Gal(b1-3)GalNAc(a1-", 2)
+  )
+  plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(
+      x = .data$x,
+      y = .data$y,
+      structure = .data$structure,
+      size = .data$size
+    )
+  ) +
+    geom_glycan() +
+    ggplot2::scale_size_identity() +
+    ggplot2::coord_cartesian(
+      xlim = c(0, 4),
+      ylim = c(0, 3),
+      expand = FALSE
+    ) +
+    ggplot2::theme_void()
+
+  vdiffr::expect_doppelganger("ggplot2 glycan sizes", plot)
+})

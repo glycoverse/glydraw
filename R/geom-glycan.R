@@ -2,12 +2,14 @@
 
 #' Draw glycans at ggplot2 positions
 #'
-#' `geom_glycan()` draws one fixed-size glycan cartoon for each data row. Each
-#' cartoon is centered at its mapped `x` and `y` position and retains the
-#' structure-derived dimensions and appearance used by [draw_cartoon()].
-#' Like points and text, the fixed-size cartoons do not expand the position
-#' scales beyond their center coordinates. Use scale expansion or explicit
-#' coordinate limits when the cartoons need more room around the panel edges.
+#' `geom_glycan()` draws one glycan cartoon for each data row. Each cartoon is
+#' centered at its mapped `x` and `y` position and retains the
+#' structure-derived dimensions and appearance used by [draw_cartoon()]. The
+#' optional `size` aesthetic scales the complete cartoon uniformly, including
+#' nodes, lines, text, and spacing, without changing their relative appearance.
+#' Like points and text, the cartoons do not expand the position scales beyond
+#' their center coordinates. Use scale expansion or explicit coordinate limits
+#' when the cartoons need more room around the panel edges.
 #'
 #' @param mapping Set of aesthetic mappings created by [ggplot2::aes()]. The
 #'   `x`, `y`, and `structure` aesthetics are required.
@@ -32,6 +34,11 @@
 #' - `y`
 #' - `structure`, containing glycan structure strings or
 #'   [glyrepr::glycan_structure()] values
+#' - `size`, an optional whole-cartoon scale multiplier that defaults to `1`.
+#'   Mapped values are transformed by ggplot2's size scale; use
+#'   [ggplot2::scale_size_identity()] when the mapped values are literal
+#'   multipliers. This is distinct from `node_size`, which changes residue size
+#'   within the cartoon.
 #'
 #' @returns A ggplot2 layer that can be added to a [ggplot2::ggplot()] object.
 #'
@@ -39,6 +46,7 @@
 #' glycans <- data.frame(
 #'   x = c(1, 3),
 #'   y = c(1, 2),
+#'   size = c(0.7, 1.1),
 #'   structure = c(
 #'     "Gal(b1-3)GalNAc(a1-",
 #'     "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-"
@@ -47,9 +55,10 @@
 #'
 #' ggplot2::ggplot(
 #'   glycans,
-#'   ggplot2::aes(x = x, y = y, structure = structure)
+#'   ggplot2::aes(x = x, y = y, structure = structure, size = size)
 #' ) +
 #'   geom_glycan() +
+#'   ggplot2::scale_size_identity() +
 #'   ggplot2::coord_cartesian(
 #'     xlim = c(0, 4),
 #'     ylim = c(0, 3),
@@ -147,14 +156,16 @@ geom_glycan <- function(
   }
 
   coordinates <- coord$transform(data, panel_params)
+  .validate_glycan_sizes(coordinates$size)
   grobs <- purrr::pmap(
     list(
       structure = coordinates$structure,
       x = coordinates$x,
       y = coordinates$y,
+      size = coordinates$size,
       index = seq_len(nrow(coordinates))
     ),
-    function(structure, x, y, index) {
+    function(structure, x, y, size, index) {
       glycanGrob(
         structure,
         show_linkage = show_linkage,
@@ -167,7 +178,7 @@ geom_glycan <- function(
         colors = colours,
         highlight = highlight
       ) |>
-        .position_glycan_grob(x, y, index)
+        .position_glycan_grob(x, y, size, index)
     }
   )
 
@@ -182,18 +193,37 @@ geom_glycan <- function(
 #' @param grob A `glycanGrob` object.
 #' @param x Numeric transformed horizontal panel position.
 #' @param y Numeric transformed vertical panel position.
+#' @param size Positive numeric whole-cartoon scale multiplier.
 #' @param index Integer row index used to create a unique grob name.
 #'
 #' @returns The input grob with a panel-positioning viewport and unique name.
 #' @noRd
-.position_glycan_grob <- function(grob, x, y, index) {
+.position_glycan_grob <- function(grob, x, y, size, index) {
   grob$name <- paste0("geom_glycan.", index)
+  grob$glydraw_scale <- size
   grob$vp <- grid::viewport(
     x = grid::unit(x, "native"),
     y = grid::unit(y, "native"),
     just = c("center", "center")
   )
   grob
+}
+
+#' Validate mapped glycan size multipliers
+#'
+#' @param size Numeric vector of transformed `size` aesthetic values.
+#'
+#' @returns `size`, invisibly. Throws an error when values are not finite,
+#'   missing, or strictly positive.
+#' @noRd
+.validate_glycan_sizes <- function(size) {
+  checkmate::assert_numeric(size, any.missing = FALSE, finite = TRUE)
+  if (any(size <= 0)) {
+    cli::cli_abort(
+      "The {.field size} aesthetic values must be larger than 0."
+    )
+  }
+  invisible(size)
 }
 
 #' ggplot2 geom for glycan grobs
@@ -203,7 +233,8 @@ GeomGlycan <- ggplot2::ggproto(
   "GeomGlycan",
   ggplot2::Geom,
   required_aes = c("x", "y", "structure"),
-  default_aes = ggplot2::aes(),
+  non_missing_aes = "size",
+  default_aes = ggplot2::aes(size = 1),
   extra_params = "na.rm",
   draw_key = ggplot2::draw_key_blank,
   draw_panel = .draw_glycan_panel
