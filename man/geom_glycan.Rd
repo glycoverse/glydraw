@@ -91,17 +91,18 @@ A ggplot2 layer that can be added to a \code{\link[ggplot2:ggplot]{ggplot2::ggpl
 }
 \description{
 \code{geom_glycan()} draws one glycan cartoon for each data row. Each cartoon is
-centered at its mapped \code{x} and \code{y} position and retains the
-structure-derived dimensions and appearance used by \code{\link[=draw_cartoon]{draw_cartoon()}}. The
-optional \code{size} aesthetic scales the complete cartoon uniformly, including
-nodes, lines, text, and spacing, without changing their relative appearance.
-Like points and text, the cartoons do not expand the position scales beyond
-their center coordinates. Use scale expansion or explicit coordinate limits
-when the cartoons need more room around the panel edges.
+anchored at its mapped \code{x} and \code{y} position and retains the structure-derived
+dimensions and appearance used by \code{\link[=draw_cartoon]{draw_cartoon()}}. The optional \code{size}
+aesthetic scales the complete cartoon uniformly, including nodes, lines,
+text, and spacing, without changing their relative appearance. Like points
+and text, the cartoons do not expand the position scales beyond their anchor
+coordinates. Use scale expansion or explicit coordinate limits when the
+cartoons need more room around the panel edges.
 }
 \section{Aesthetics}{
 
-\code{geom_glycan()} requires the following aesthetics:
+\code{geom_glycan()} understands the following aesthetics. \code{x}, \code{y}, and
+\code{structure} are required; the remaining aesthetics are optional:
 \itemize{
 \item \code{x}
 \item \code{y}
@@ -112,6 +113,10 @@ Mapped values are transformed by ggplot2's size scale; use
 \code{\link[ggplot2:scale_identity]{ggplot2::scale_size_identity()}} when the mapped values are literal
 multipliers. This is distinct from \code{node_size}, which changes residue size
 within the cartoon.
+\item \code{hjust}, an optional horizontal justification that defaults to \code{0.5}.
+\code{0} aligns the cartoon's left edge with \code{x}, and \code{1} aligns its right edge.
+\item \code{vjust}, an optional vertical justification that defaults to \code{0.5}.
+\code{0} aligns the cartoon's bottom edge with \code{y}, and \code{1} aligns its top edge.
 }
 }
 
@@ -128,7 +133,12 @@ glycans <- data.frame(
 
 ggplot2::ggplot(
   glycans,
-  ggplot2::aes(x = x, y = y, structure = structure, size = size)
+  ggplot2::aes(
+    x = .data$x,
+    y = .data$y,
+    structure = .data$structure,
+    size = .data$size
+  )
 ) +
   geom_glycan() +
   ggplot2::scale_size_identity() +
@@ -137,4 +147,11 @@ ggplot2::ggplot(
     ylim = c(0, 3),
     expand = FALSE
   )
+
+# Bottom-align a row of vertical glycans with different heights.
+ggplot2::ggplot(
+  glycans,
+  ggplot2::aes(x = .data$x, y = 1, structure = .data$structure)
+) +
+  geom_glycan(orient = "V", vjust = 0)
 }

@@ -21,6 +21,8 @@ test_that("geom_glycan maps structures to x and y positions", {
 
   expect_equal(built$data[[1]]$structure, data$structure)
   expect_equal(built$data[[1]]$size, rep(1, nrow(data)))
+  expect_equal(built$data[[1]]$hjust, rep(0.5, nrow(data)))
+  expect_equal(built$data[[1]]$vjust, rep(0.5, nrow(data)))
   expect_setequal(GeomGlycan$required_aes, c("x", "y", "structure"))
 })
 
@@ -136,4 +138,38 @@ test_that("geom_glycan rejects non-positive size multipliers", {
     ggplot2::layer_grob(plot),
     "must be larger than 0"
   )
+})
+
+test_that("geom_glycan maps hjust and vjust to whole-cartoon alignment", {
+  rplots <- "Rplots.pdf"
+  unlink(rplots)
+  on.exit(unlink(rplots), add = TRUE)
+  data <- data.frame(
+    x = c(1, 3),
+    y = c(1, 1),
+    hjust = c(0, 1),
+    vjust = c(1, 0),
+    structure = rep("Gal(b1-3)GalNAc(a1-", 2)
+  )
+  plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(
+      x = .data$x,
+      y = .data$y,
+      structure = .data$structure,
+      hjust = .data$hjust,
+      vjust = .data$vjust
+    )
+  ) +
+    geom_glycan()
+
+  layer <- ggplot2::layer_grob(plot)[[1]]
+  hjust <- purrr::map_dbl(layer$children, "glydraw_hjust")
+  vjust <- purrr::map_dbl(layer$children, "glydraw_vjust")
+  content <- purrr::map(layer$children, grid::makeContent)
+  child_viewports <- purrr::map(content, ~ .x$children[[1]]$vp)
+
+  expect_equal(unname(hjust), data$hjust)
+  expect_equal(unname(vjust), data$vjust)
+  purrr::walk(child_viewports, expect_s3_class, "viewport")
 })
