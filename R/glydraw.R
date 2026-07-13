@@ -51,48 +51,20 @@ draw_cartoon <- function(
   colors = NULL,
   highlight = NULL
 ) {
-  checkmate::assert_number(edge_linewidth, lower = 0)
-  checkmate::assert_number(node_linewidth, lower = 0)
-  .validate_node_size(node_size)
-  colors <- .validate_custom_colors(colors)
-  fuc_orient <- rlang::arg_match(fuc_orient)
-  inputs <- .prepare_cartoon_inputs(structure, highlight, orient, red_end)
-  structure <- inputs$structure
-  coor <- inputs$coor
-  highlight <- inputs$highlight
-  orient <- inputs$orient
-  show_linkage <- .resolve_linkage_visibility(show_linkage, node_size)
-
-  gly_list <- .cartoon_residue_data(structure, coor, highlight, fuc_orient)
-  polygon_coor <- .residue_polygon_data(
-    gly_list,
-    .default_node_point_size * node_size
-  )
-  filled_color <- .resolve_residue_fill_colors(polygon_coor, colors)
-  annotation_data <- .cartoon_text_annotation_data(
+  glycanGrob(
     structure,
-    coor,
-    orient,
-    red_end,
-    highlight,
-    node_size = node_size
-  )
-  connect_df <- .cartoon_segment_data(
-    structure,
-    coor,
-    annotation_data$reducing_info$segment,
-    gly_list
-  )
-
-  .assemble_cartoon_plot(
-    connect_df,
-    polygon_coor,
-    filled_color,
-    annotation_data,
-    show_linkage,
-    edge_linewidth,
-    node_linewidth
-  )
+    ...,
+    show_linkage = show_linkage,
+    orient = orient,
+    fuc_orient = fuc_orient,
+    red_end = red_end,
+    edge_linewidth = edge_linewidth,
+    node_linewidth = node_linewidth,
+    node_size = node_size,
+    colors = colors,
+    highlight = highlight
+  ) |>
+    .glycan_grob_to_plot()
 }
 
 #' Print glycan cartoon
