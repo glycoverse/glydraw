@@ -99,7 +99,7 @@ and text, the cartoons do not expand the position scales beyond their anchor
 coordinates. Use scale expansion or explicit coordinate limits when the
 cartoons need more room around the panel edges. Unlike standalone cartoons
 returned by \code{\link[=draw_cartoon]{draw_cartoon()}}, cartoons in this layer have no output border or
-background.
+background, and their internal coordinate ranges are not expanded.
 }
 \section{Aesthetics}{
 

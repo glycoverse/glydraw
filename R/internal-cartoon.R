@@ -436,6 +436,7 @@
 #' @param border_px Numeric plot border size in pixels.
 #' @param background Logical scalar indicating whether the ggplot background
 #'   grob should be retained.
+#' @param expand Logical scalar passed to the internal fixed coordinate system.
 #'
 #' @returns A `glydraw_cartoon` ggplot object with fixed-size metadata
 #'   attributes.
@@ -449,14 +450,16 @@
   edge_linewidth,
   node_linewidth,
   border_px = .default_cartoon_border_px,
-  background = TRUE
+  background = TRUE,
+  expand = TRUE
 ) {
   gly_graph <- .cartoon_base_layers(
     connect_df,
     polygon_coor,
     filled_color,
     edge_linewidth,
-    node_linewidth
+    node_linewidth,
+    expand = expand
   )
   gly_graph <- .add_cartoon_text_layers(
     gly_graph,
@@ -483,6 +486,7 @@
 #'   row in `polygon_coor`.
 #' @param edge_linewidth Numeric scalar used for linkage lines.
 #' @param node_linewidth Numeric scalar used for node borders.
+#' @param expand Logical scalar passed to [ggplot2::coord_fixed()].
 #'
 #' @returns A ggplot object containing segment, white mask polygon, colored
 #'   residue polygon, fixed coordinate, and blank theme layers.
@@ -492,7 +496,8 @@
   polygon_coor,
   filled_color,
   edge_linewidth,
-  node_linewidth
+  node_linewidth,
+  expand = TRUE
 ) {
   ggplot2::ggplot() +
     ggplot2::geom_segment(
@@ -521,7 +526,7 @@
       color = scales::alpha("black", polygon_coor$alpha),
       linewidth = node_linewidth
     ) +
-    ggplot2::coord_fixed(ratio = 1, clip = "off") +
+    ggplot2::coord_fixed(ratio = 1, expand = expand, clip = "off") +
     ggplot2::theme_void() +
     ggplot2::theme(legend.position = "none")
 }
