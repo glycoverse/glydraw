@@ -3,13 +3,13 @@
 #' Draw glycans at ggplot2 positions
 #'
 #' `geom_glycan()` draws one glycan cartoon for each data row. Each cartoon is
-#' centered at its mapped `x` and `y` position and retains the
-#' structure-derived dimensions and appearance used by [draw_cartoon()]. The
-#' optional `size` aesthetic scales the complete cartoon uniformly, including
-#' nodes, lines, text, and spacing, without changing their relative appearance.
-#' Like points and text, the cartoons do not expand the position scales beyond
-#' their center coordinates. Use scale expansion or explicit coordinate limits
-#' when the cartoons need more room around the panel edges.
+#' anchored at its mapped `x` and `y` position and retains the structure-derived
+#' dimensions and appearance used by [draw_cartoon()]. The optional `size`
+#' aesthetic scales the complete cartoon uniformly, including nodes, lines,
+#' text, and spacing, without changing their relative appearance. Like points
+#' and text, the cartoons do not expand the position scales beyond their anchor
+#' coordinates. Use scale expansion or explicit coordinate limits when the
+#' cartoons need more room around the panel edges.
 #'
 #' @param mapping Set of aesthetic mappings created by [ggplot2::aes()]. The
 #'   `x`, `y`, and `structure` aesthetics are required.
@@ -28,7 +28,8 @@
 #' @inheritParams draw_cartoon
 #'
 #' @section Aesthetics:
-#' `geom_glycan()` requires the following aesthetics:
+#' `geom_glycan()` understands the following aesthetics. `x`, `y`, and
+#' `structure` are required; the remaining aesthetics are optional:
 #'
 #' - `x`
 #' - `y`
@@ -39,6 +40,10 @@
 #'   [ggplot2::scale_size_identity()] when the mapped values are literal
 #'   multipliers. This is distinct from `node_size`, which changes residue size
 #'   within the cartoon.
+#' - `hjust`, an optional horizontal justification that defaults to `0.5`.
+#'   `0` aligns the cartoon's left edge with `x`, and `1` aligns its right edge.
+#' - `vjust`, an optional vertical justification that defaults to `0.5`.
+#'   `0` aligns the cartoon's bottom edge with `y`, and `1` aligns its top edge.
 #'
 #' @returns A ggplot2 layer that can be added to a [ggplot2::ggplot()] object.
 #'
@@ -55,7 +60,12 @@
 #'
 #' ggplot2::ggplot(
 #'   glycans,
-#'   ggplot2::aes(x = x, y = y, structure = structure, size = size)
+#'   ggplot2::aes(
+#'     x = .data$x,
+#'     y = .data$y,
+#'     structure = .data$structure,
+#'     size = .data$size
+#'   )
 #' ) +
 #'   geom_glycan() +
 #'   ggplot2::scale_size_identity() +
@@ -64,6 +74,13 @@
 #'     ylim = c(0, 3),
 #'     expand = FALSE
 #'   )
+#'
+#' # Bottom-align a row of vertical glycans with different heights.
+#' ggplot2::ggplot(
+#'   glycans,
+#'   ggplot2::aes(x = .data$x, y = 1, structure = .data$structure)
+#' ) +
+#'   geom_glycan(orient = "V", vjust = 0)
 #' @export
 geom_glycan <- function(
   mapping = NULL,
@@ -119,8 +136,8 @@ geom_glycan <- function(
 
 #' Draw a panel of positioned glycan grobs
 #'
-#' @param data Data frame prepared by ggplot2 with `x`, `y`, and `structure`
-#'   columns.
+#' @param data Data frame prepared by ggplot2 with `x`, `y`, `structure`,
+#'   `size`, `hjust`, and `vjust` columns.
 #' @param panel_params Panel scale parameters supplied by ggplot2.
 #' @param coord Coordinate system supplied by ggplot2.
 #' @param show_linkage Logical scalar passed to [glycanGrob()].
@@ -157,15 +174,19 @@ geom_glycan <- function(
 
   coordinates <- coord$transform(data, panel_params)
   .validate_glycan_sizes(coordinates$size)
+  .validate_glycan_justification(coordinates$hjust, "hjust")
+  .validate_glycan_justification(coordinates$vjust, "vjust")
   grobs <- purrr::pmap(
     list(
       structure = coordinates$structure,
       x = coordinates$x,
       y = coordinates$y,
       size = coordinates$size,
+      hjust = coordinates$hjust,
+      vjust = coordinates$vjust,
       index = seq_len(nrow(coordinates))
     ),
-    function(structure, x, y, size, index) {
+    function(structure, x, y, size, hjust, vjust, index) {
       glycanGrob(
         structure,
         show_linkage = show_linkage,
@@ -178,7 +199,7 @@ geom_glycan <- function(
         colors = colours,
         highlight = highlight
       ) |>
-        .position_glycan_grob(x, y, size, index)
+        .position_glycan_grob(x, y, size, hjust, vjust, index)
     }
   )
 
@@ -194,13 +215,25 @@ geom_glycan <- function(
 #' @param x Numeric transformed horizontal panel position.
 #' @param y Numeric transformed vertical panel position.
 #' @param size Positive numeric whole-cartoon scale multiplier.
+#' @param hjust Numeric horizontal justification.
+#' @param vjust Numeric vertical justification.
 #' @param index Integer row index used to create a unique grob name.
 #'
 #' @returns The input grob with a panel-positioning viewport and unique name.
 #' @noRd
-.position_glycan_grob <- function(grob, x, y, size, index) {
+.position_glycan_grob <- function(
+  grob,
+  x,
+  y,
+  size,
+  hjust,
+  vjust,
+  index
+) {
   grob$name <- paste0("geom_glycan.", index)
   grob$glydraw_scale <- size
+  grob$glydraw_hjust <- hjust
+  grob$glydraw_vjust <- vjust
   grob$vp <- grid::viewport(
     x = grid::unit(x, "native"),
     y = grid::unit(y, "native"),
@@ -226,6 +259,24 @@ geom_glycan <- function(
   invisible(size)
 }
 
+#' Validate mapped glycan justification values
+#'
+#' @param justification Numeric vector of transformed justification values.
+#' @param aesthetic String identifying the aesthetic for error messages.
+#'
+#' @returns `justification`, invisibly. Throws an error when values are not
+#'   finite numeric values.
+#' @noRd
+.validate_glycan_justification <- function(justification, aesthetic) {
+  checkmate::assert_numeric(
+    justification,
+    any.missing = FALSE,
+    finite = TRUE,
+    .var.name = aesthetic
+  )
+  invisible(justification)
+}
+
 #' ggplot2 geom for glycan grobs
 #'
 #' @noRd
@@ -233,8 +284,8 @@ GeomGlycan <- ggplot2::ggproto(
   "GeomGlycan",
   ggplot2::Geom,
   required_aes = c("x", "y", "structure"),
-  non_missing_aes = "size",
-  default_aes = ggplot2::aes(size = 1),
+  non_missing_aes = c("size", "hjust", "vjust"),
+  default_aes = ggplot2::aes(size = 1, hjust = 0.5, vjust = 0.5),
   extra_params = "na.rm",
   draw_key = ggplot2::draw_key_blank,
   draw_panel = .draw_glycan_panel

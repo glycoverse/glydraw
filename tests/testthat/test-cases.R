@@ -324,3 +324,34 @@ test_that("Scale ggplot2 glycan annotations", {
 
   vdiffr::expect_doppelganger("ggplot2 glycan sizes", plot)
 })
+
+test_that("Justify vertical ggplot2 glycan annotations", {
+  data <- data.frame(
+    x = c(1, 3, 5),
+    y = 1,
+    structure = c(
+      "Gal(b1-3)GalNAc(a1-",
+      "Gal(b1-4)GlcNAc(b1-3)GalNAc(a1-",
+      "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-"
+    )
+  )
+  plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(
+      x = .data$x,
+      y = .data$y,
+      structure = .data$structure,
+    )
+  ) +
+    ggplot2::geom_hline(yintercept = 1, colour = "grey80") +
+    ggplot2::geom_point() +
+    geom_glycan(orient = "V", vjust = 0, hjust = 0.5) +
+    ggplot2::coord_cartesian(
+      xlim = c(0, 6),
+      ylim = c(0, 5),
+      expand = FALSE
+    ) +
+    ggplot2::theme_void()
+
+  vdiffr::expect_doppelganger("justified vertical ggplot2 glycans", plot)
+})

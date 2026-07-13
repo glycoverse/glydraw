@@ -102,28 +102,48 @@ glycanGrob <- function(
 #' @export
 makeContent.glycanGrob <- function(x) {
   scale <- x$glydraw_scale
-  if (!is.null(scale) && !isTRUE(all.equal(scale, 1))) {
-    child <- .scaled_glycan_raster_grob(x, scale)
-    return(grid::setChildren(x, grid::gList(child)))
+  if (is.null(scale)) {
+    scale <- 1
+  }
+  hjust <- x$glydraw_hjust
+  if (is.null(hjust)) {
+    hjust <- 0.5
+  }
+  vjust <- x$glydraw_vjust
+  if (is.null(vjust)) {
+    vjust <- 0.5
   }
 
-  plot <- .glycan_grob_to_plot(x) |>
-    .strip_cartoon_class()
-  child <- ggplot2::ggplotGrob(plot)
+  plot <- .glycan_grob_to_plot(x)
+  size_px <- attr(plot, "glydraw_size_px")
+  if (!isTRUE(all.equal(scale, 1))) {
+    child <- .scaled_glycan_raster_grob(plot, scale, x$name)
+  } else {
+    child <- plot |>
+      .strip_cartoon_class() |>
+      ggplot2::ggplotGrob()
+  }
+  child <- .justify_glycan_child(
+    child,
+    size_px,
+    scale,
+    hjust,
+    vjust
+  )
 
   grid::setChildren(x, grid::gList(child))
 }
 
 #' Render a uniformly scaled glycan raster grob
 #'
-#' @param grob A `glycanGrob` object.
+#' @param plot A `glydraw_cartoon` ggplot object.
 #' @param scale Positive numeric whole-cartoon scale multiplier.
+#' @param name String used to name the raster grob.
 #'
 #' @returns A raster grob whose physical width and height are the cartoon's
 #'   natural dimensions multiplied by `scale`.
 #' @noRd
-.scaled_glycan_raster_grob <- function(grob, scale) {
-  plot <- .glycan_grob_to_plot(grob)
+.scaled_glycan_raster_grob <- function(plot, scale, name) {
   size_px <- attr(plot, "glydraw_size_px")
   raster <- .render_cartoon_raster(plot, scale = scale)
 
@@ -138,6 +158,36 @@ makeContent.glycanGrob <- function(x) {
       "in"
     ),
     interpolate = TRUE,
-    name = paste0(grob$name, ".scaled")
+    name = paste0(name, ".scaled")
   )
+}
+
+#' Justify a rendered glycan child around its panel anchor
+#'
+#' @param child Rendered grid grob containing one glycan cartoon.
+#' @param size_px Named numeric vector with the cartoon's natural `width` and
+#'   `height` in pixels.
+#' @param scale Positive numeric whole-cartoon scale multiplier.
+#' @param hjust Numeric horizontal justification.
+#' @param vjust Numeric vertical justification.
+#'
+#' @returns `child` with a viewport that offsets the complete cartoon from its
+#'   centered panel anchor. Centered cartoons are returned unchanged.
+#' @noRd
+.justify_glycan_child <- function(child, size_px, scale, hjust, vjust) {
+  horizontally_centered <- isTRUE(all.equal(hjust, 0.5))
+  vertically_centered <- isTRUE(all.equal(vjust, 0.5))
+  if (horizontally_centered && vertically_centered) {
+    return(child)
+  }
+
+  width_in <- size_px[["width"]] / .default_cartoon_dpi * scale
+  height_in <- size_px[["height"]] / .default_cartoon_dpi * scale
+  child$vp <- grid::viewport(
+    x = grid::unit(0.5, "npc") +
+      grid::unit((0.5 - hjust) * width_in, "in"),
+    y = grid::unit(0.5, "npc") +
+      grid::unit((0.5 - vjust) * height_in, "in")
+  )
+  child
 }
