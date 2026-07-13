@@ -90,12 +90,14 @@ combining with them.}
 A ggplot2 layer that can be added to a \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object.
 }
 \description{
-\code{geom_glycan()} draws one fixed-size glycan cartoon for each data row. Each
-cartoon is centered at its mapped \code{x} and \code{y} position and retains the
-structure-derived dimensions and appearance used by \code{\link[=draw_cartoon]{draw_cartoon()}}.
-Like points and text, the fixed-size cartoons do not expand the position
-scales beyond their center coordinates. Use scale expansion or explicit
-coordinate limits when the cartoons need more room around the panel edges.
+\code{geom_glycan()} draws one glycan cartoon for each data row. Each cartoon is
+centered at its mapped \code{x} and \code{y} position and retains the
+structure-derived dimensions and appearance used by \code{\link[=draw_cartoon]{draw_cartoon()}}. The
+optional \code{size} aesthetic scales the complete cartoon uniformly, including
+nodes, lines, text, and spacing, without changing their relative appearance.
+Like points and text, the cartoons do not expand the position scales beyond
+their center coordinates. Use scale expansion or explicit coordinate limits
+when the cartoons need more room around the panel edges.
 }
 \section{Aesthetics}{
 
@@ -105,6 +107,11 @@ coordinate limits when the cartoons need more room around the panel edges.
 \item \code{y}
 \item \code{structure}, containing glycan structure strings or
 \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}} values
+\item \code{size}, an optional whole-cartoon scale multiplier that defaults to \code{1}.
+Mapped values are transformed by ggplot2's size scale; use
+\code{\link[ggplot2:scale_identity]{ggplot2::scale_size_identity()}} when the mapped values are literal
+multipliers. This is distinct from \code{node_size}, which changes residue size
+within the cartoon.
 }
 }
 
@@ -112,6 +119,7 @@ coordinate limits when the cartoons need more room around the panel edges.
 glycans <- data.frame(
   x = c(1, 3),
   y = c(1, 2),
+  size = c(0.7, 1.1),
   structure = c(
     "Gal(b1-3)GalNAc(a1-",
     "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-"
@@ -120,9 +128,10 @@ glycans <- data.frame(
 
 ggplot2::ggplot(
   glycans,
-  ggplot2::aes(x = x, y = y, structure = structure)
+  ggplot2::aes(x = x, y = y, structure = structure, size = size)
 ) +
   geom_glycan() +
+  ggplot2::scale_size_identity() +
   ggplot2::coord_cartesian(
     xlim = c(0, 4),
     ylim = c(0, 3),

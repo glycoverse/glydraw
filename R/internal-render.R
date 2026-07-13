@@ -7,11 +7,19 @@
 #'   `glydraw_size_px`, a named numeric vector containing `width` and `height`.
 #' @param dpi Numeric dots per inch used by the cartoon size metadata.
 #' @param bg Background color passed to `ggplot2::ggsave()`.
+#' @param scale Positive numeric multiplier applied to the raster pixel
+#'   dimensions and rendering resolution.
 #'
 #' @return A `nativeRaster` matrix read from a temporary PNG file. Matrix
-#'   dimensions match `glydraw_size_px` within device rounding.
+#'   dimensions match `glydraw_size_px * scale` within device rounding.
 #' @noRd
-.render_cartoon_raster <- function(cartoon, dpi = 300, bg = "transparent") {
+.render_cartoon_raster <- function(
+  cartoon,
+  dpi = 300,
+  bg = "transparent",
+  scale = 1
+) {
+  .validate_output_scale(scale)
   size <- attr(cartoon, "glydraw_size_px")
   checkmate::assert_numeric(size, names = "strict", any.missing = FALSE)
   checkmate::assert_names(names(size), identical.to = c("width", "height"))
@@ -22,10 +30,10 @@
   ggplot2::ggsave(
     filename = file,
     plot = .strip_cartoon_class(cartoon),
-    width = size[["width"]],
-    height = size[["height"]],
+    width = size[["width"]] * scale,
+    height = size[["height"]] * scale,
     units = "px",
-    dpi = dpi,
+    dpi = dpi * scale,
     bg = bg
   )
   png::readPNG(file, native = TRUE)

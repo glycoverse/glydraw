@@ -101,9 +101,43 @@ glycanGrob <- function(
 #' @importFrom grid makeContent
 #' @export
 makeContent.glycanGrob <- function(x) {
+  scale <- x$glydraw_scale
+  if (!is.null(scale) && !isTRUE(all.equal(scale, 1))) {
+    child <- .scaled_glycan_raster_grob(x, scale)
+    return(grid::setChildren(x, grid::gList(child)))
+  }
+
   plot <- .glycan_grob_to_plot(x) |>
     .strip_cartoon_class()
   child <- ggplot2::ggplotGrob(plot)
 
   grid::setChildren(x, grid::gList(child))
+}
+
+#' Render a uniformly scaled glycan raster grob
+#'
+#' @param grob A `glycanGrob` object.
+#' @param scale Positive numeric whole-cartoon scale multiplier.
+#'
+#' @returns A raster grob whose physical width and height are the cartoon's
+#'   natural dimensions multiplied by `scale`.
+#' @noRd
+.scaled_glycan_raster_grob <- function(grob, scale) {
+  plot <- .glycan_grob_to_plot(grob)
+  size_px <- attr(plot, "glydraw_size_px")
+  raster <- .render_cartoon_raster(plot, scale = scale)
+
+  grid::rasterGrob(
+    raster,
+    width = grid::unit(
+      size_px[["width"]] / .default_cartoon_dpi * scale,
+      "in"
+    ),
+    height = grid::unit(
+      size_px[["height"]] / .default_cartoon_dpi * scale,
+      "in"
+    ),
+    interpolate = TRUE,
+    name = paste0(grob$name, ".scaled")
+  )
 }
