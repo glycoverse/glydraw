@@ -14,6 +14,7 @@ scale_x_glycan(
   sec.axis = ggplot2::waiver(),
   continuous.limits = NULL,
   size = 0.4,
+  angle = 0,
   vjust = 0,
   nudge_x = 0,
   nudge_y = 0,
@@ -35,6 +36,7 @@ scale_y_glycan(
   sec.axis = ggplot2::waiver(),
   continuous.limits = NULL,
   size = 0.4,
+  angle = 0,
   hjust = 1,
   nudge_x = 0,
   nudge_y = 0,
@@ -67,6 +69,9 @@ scale.}
 
 \item{size}{Positive scalar that uniformly scales each axis-label cartoon.
 Defaults to \code{0.4}.}
+
+\item{angle}{Rotation in degrees applied to each axis-label cartoon,
+independently of the cartoon orientation. Defaults to \code{0}.}
 
 \item{vjust}{Vertical justification for x-axis cartoons. \code{0} aligns their
 bottom bounds, while \code{1} aligns their top bounds. Defaults to \code{0}.}

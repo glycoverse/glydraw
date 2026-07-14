@@ -19,6 +19,8 @@
 #'   scale.
 #' @param size Positive scalar that uniformly scales each axis-label cartoon.
 #'   Defaults to `0.4`.
+#' @param angle Rotation in degrees applied to each axis-label cartoon,
+#'   independently of the cartoon orientation. Defaults to `0`.
 #' @param vjust Vertical justification for x-axis cartoons. `0` aligns their
 #'   bottom bounds, while `1` aligns their top bounds. Defaults to `0`.
 #' @param hjust Horizontal justification for y-axis cartoons. `0` aligns their
@@ -62,6 +64,7 @@ scale_x_glycan <- function(
   sec.axis = ggplot2::waiver(),
   continuous.limits = NULL,
   size = 0.4,
+  angle = 0,
   vjust = 0,
   nudge_x = 0,
   nudge_y = 0,
@@ -76,6 +79,7 @@ scale_x_glycan <- function(
   guide <- .new_glycan_axis_guide(
     orient = "V",
     size = size,
+    angle = angle,
     hjust = 0.5,
     vjust = vjust,
     nudge_x = nudge_x,
@@ -112,6 +116,7 @@ scale_y_glycan <- function(
   sec.axis = ggplot2::waiver(),
   continuous.limits = NULL,
   size = 0.4,
+  angle = 0,
   hjust = 1,
   nudge_x = 0,
   nudge_y = 0,
@@ -126,6 +131,7 @@ scale_y_glycan <- function(
   guide <- .new_glycan_axis_guide(
     orient = "H",
     size = size,
+    angle = angle,
     hjust = hjust,
     vjust = 0.5,
     nudge_x = nudge_x,
@@ -155,6 +161,7 @@ scale_y_glycan <- function(
 #'
 #' @param orient Glycan drawing orientation.
 #' @param size Positive whole-cartoon scale multiplier.
+#' @param angle Rotation in degrees applied to each cartoon.
 #' @param hjust Horizontal glycan justification.
 #' @param vjust Vertical glycan justification.
 #' @param nudge_x Horizontal adjustment in millimetres.
@@ -172,6 +179,7 @@ scale_y_glycan <- function(
 .new_glycan_axis_guide <- function(
   orient,
   size,
+  angle,
   hjust,
   vjust,
   nudge_x,
@@ -186,6 +194,7 @@ scale_y_glycan <- function(
 ) {
   orient <- rlang::arg_match(orient, c("H", "V"))
   .validate_output_scale(size)
+  checkmate::assert_number(angle, finite = TRUE)
   checkmate::assert_number(hjust, lower = 0, upper = 1)
   checkmate::assert_number(vjust, lower = 0, upper = 1)
   checkmate::assert_number(nudge_x, finite = TRUE)
@@ -208,6 +217,7 @@ scale_y_glycan <- function(
     cap = "none",
     glycan_orient = orient,
     glycan_size = size,
+    glycan_angle = angle,
     glycan_hjust = hjust,
     glycan_vjust = vjust,
     glycan_nudge_x = nudge_x,
@@ -281,6 +291,7 @@ scale_y_glycan <- function(
     colors = params$glycan_colors
   )
   grob$glydraw_scale <- params$glycan_size
+  grob$glydraw_angle <- params$glycan_angle
   grob$glydraw_hjust <- params$glycan_hjust
   grob$glydraw_vjust <- params$glycan_vjust
   grob$glydraw_nudge_x <- params$glycan_nudge_x
@@ -293,6 +304,7 @@ scale_y_glycan <- function(
   grob$vp <- .glycan_axis_label_viewport(
     position,
     vertical = params$vertical,
+    angle = params$glycan_angle,
     hjust = params$glycan_hjust,
     vjust = params$glycan_vjust,
     nudge_x = params$glycan_nudge_x,
@@ -305,6 +317,7 @@ scale_y_glycan <- function(
 #'
 #' @param position Numeric axis position in the guide viewport.
 #' @param vertical Whether the axis guide is vertical.
+#' @param angle Rotation in degrees.
 #' @param hjust Horizontal glycan justification.
 #' @param vjust Vertical glycan justification.
 #' @param nudge_x Horizontal adjustment in millimetres.
@@ -315,6 +328,7 @@ scale_y_glycan <- function(
 .glycan_axis_label_viewport <- function(
   position,
   vertical,
+  angle,
   hjust,
   vjust,
   nudge_x,
@@ -325,6 +339,7 @@ scale_y_glycan <- function(
       grid::viewport(
         x = grid::unit(hjust, "npc") + grid::unit(nudge_x, "mm"),
         y = grid::unit(position, "native") + grid::unit(nudge_y, "mm"),
+        angle = angle,
         clip = "off"
       )
     )
@@ -333,6 +348,7 @@ scale_y_glycan <- function(
   grid::viewport(
     x = grid::unit(position, "native") + grid::unit(nudge_x, "mm"),
     y = grid::unit(vjust, "npc") + grid::unit(nudge_y, "mm"),
+    angle = angle,
     clip = "off"
   )
 }
@@ -349,15 +365,22 @@ scale_y_glycan <- function(
     return(grid::unit(0, "pt"))
   }
 
-  extent <- switch(
-    dimension,
-    width = grid::grobWidth,
-    height = grid::grobHeight
-  )
-  extents <- purrr::map(
-    x$children,
-    ~ extent(.x$children[[1]])
-  )
+  extents <- purrr::map(x$children, function(label) {
+    child <- label$children[[1]]
+    angle <- label$glydraw_angle
+    if (is.null(angle)) {
+      angle <- 0
+    }
+    radians <- angle * pi / 180
+    width <- grid::grobWidth(child)
+    height <- grid::grobHeight(child)
+
+    switch(
+      dimension,
+      width = abs(cos(radians)) * width + abs(sin(radians)) * height,
+      height = abs(sin(radians)) * width + abs(cos(radians)) * height
+    )
+  })
   rlang::exec(grid::unit.pmax, !!!extents)
 }
 
@@ -394,6 +417,7 @@ GuideGlycanAxis <- ggplot2::ggproto(
     list(
       glycan_orient = "H",
       glycan_size = 0.4,
+      glycan_angle = 0,
       glycan_hjust = 0.5,
       glycan_vjust = 0.5,
       glycan_nudge_x = 0,

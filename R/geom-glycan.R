@@ -22,6 +22,10 @@
 #' @param position A position adjustment to use on the data for this layer.
 #'   Defaults to `"identity"`.
 #' @param ... Other arguments passed to [ggplot2::layer()].
+#' @param angle Rotation in degrees. Like [ggplot2::geom_text()], this can be
+#'   supplied as an aesthetic or a fixed layer value. It rotates each completed
+#'   cartoon around its mapped position independently of `orient`. Defaults to
+#'   `0`.
 #' @param na.rm If `FALSE`, the default, missing values are removed with a
 #'   warning. If `TRUE`, missing values are silently removed.
 #' @param show.legend Logical. Should this layer be included in the legends?
@@ -48,6 +52,8 @@
 #' - `vjust`, an optional vertical justification that defaults to `0.5`.
 #'   `0` aligns the cartoon content's bottom bound with `y`, including the end
 #'   of a reducing-end annotation line, and `1` aligns its top bound.
+#' - `angle`, an optional rotation in degrees that defaults to `0`. Rotation is
+#'   applied after the cartoon is drawn, independently of `orient`.
 #'
 #' @returns A ggplot2 layer that can be added to a [ggplot2::ggplot()] object.
 #'
@@ -92,6 +98,7 @@ geom_glycan <- function(
   stat = "identity",
   position = "identity",
   ...,
+  angle = 0,
   show_linkage = TRUE,
   orient = c("H", "V"),
   fuc_orient = c("flex", "up"),
@@ -114,6 +121,23 @@ geom_glycan <- function(
   fuc_orient <- rlang::arg_match(fuc_orient)
   show_linkage <- .resolve_linkage_visibility(show_linkage, node_size)
 
+  params <- rlang::list2(
+    show_linkage = show_linkage,
+    orient = orient,
+    fuc_orient = fuc_orient,
+    red_end = red_end,
+    edge_linewidth = edge_linewidth,
+    node_linewidth = node_linewidth,
+    node_size = node_size,
+    colours = colors,
+    highlight = highlight,
+    na.rm = na.rm,
+    ...
+  )
+  if (!missing(angle)) {
+    params$angle <- angle
+  }
+
   ggplot2::layer(
     mapping = mapping,
     data = data,
@@ -122,26 +146,14 @@ geom_glycan <- function(
     position = position,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
-    params = rlang::list2(
-      show_linkage = show_linkage,
-      orient = orient,
-      fuc_orient = fuc_orient,
-      red_end = red_end,
-      edge_linewidth = edge_linewidth,
-      node_linewidth = node_linewidth,
-      node_size = node_size,
-      colours = colors,
-      highlight = highlight,
-      na.rm = na.rm,
-      ...
-    )
+    params = params
   )
 }
 
 #' Draw a panel of positioned glycan grobs
 #'
 #' @param data Data frame prepared by ggplot2 with `x`, `y`, `structure`,
-#'   `size`, `hjust`, and `vjust` columns.
+#'   `size`, `hjust`, `vjust`, and `angle` columns.
 #' @param panel_params Panel scale parameters supplied by ggplot2.
 #' @param coord Coordinate system supplied by ggplot2.
 #' @param show_linkage Logical scalar passed to [glycanGrob()].
@@ -180,6 +192,7 @@ geom_glycan <- function(
   .validate_glycan_sizes(coordinates$size)
   .validate_glycan_justification(coordinates$hjust, "hjust")
   .validate_glycan_justification(coordinates$vjust, "vjust")
+  .validate_glycan_angles(coordinates$angle)
   grobs <- purrr::pmap(
     list(
       structure = coordinates$structure,
@@ -188,9 +201,10 @@ geom_glycan <- function(
       size = coordinates$size,
       hjust = coordinates$hjust,
       vjust = coordinates$vjust,
+      angle = coordinates$angle,
       index = seq_len(nrow(coordinates))
     ),
-    function(structure, x, y, size, hjust, vjust, index) {
+    function(structure, x, y, size, hjust, vjust, angle, index) {
       glycanGrob(
         structure,
         show_linkage = show_linkage,
@@ -203,7 +217,7 @@ geom_glycan <- function(
         colors = colours,
         highlight = highlight
       ) |>
-        .position_glycan_grob(x, y, size, hjust, vjust, index)
+        .position_glycan_grob(x, y, size, hjust, vjust, angle, index)
     }
   )
 
@@ -221,6 +235,7 @@ geom_glycan <- function(
 #' @param size Positive numeric whole-cartoon scale multiplier.
 #' @param hjust Numeric horizontal justification.
 #' @param vjust Numeric vertical justification.
+#' @param angle Numeric rotation in degrees.
 #' @param index Integer row index used to create a unique grob name.
 #'
 #' @returns The input grob with a panel-positioning viewport and unique name.
@@ -232,18 +247,21 @@ geom_glycan <- function(
   size,
   hjust,
   vjust,
+  angle,
   index
 ) {
   grob$name <- paste0("geom_glycan.", index)
   grob$glydraw_scale <- size
   grob$glydraw_hjust <- hjust
   grob$glydraw_vjust <- vjust
+  grob$glydraw_angle <- angle
   grob$glydraw_border_px <- 0
   grob$glydraw_background <- FALSE
   grob$vp <- grid::viewport(
     x = grid::unit(x, "native"),
     y = grid::unit(y, "native"),
-    just = c("center", "center")
+    just = c("center", "center"),
+    angle = angle
   )
   grob
 }
@@ -283,6 +301,18 @@ geom_glycan <- function(
   invisible(justification)
 }
 
+#' Validate mapped glycan rotation angles
+#'
+#' @param angle Numeric vector of rotation angles in degrees.
+#'
+#' @returns `angle`, invisibly. Throws an error when values are missing or not
+#'   finite numeric values.
+#' @noRd
+.validate_glycan_angles <- function(angle) {
+  checkmate::assert_numeric(angle, any.missing = FALSE, finite = TRUE)
+  invisible(angle)
+}
+
 #' ggplot2 geom for glycan grobs
 #'
 #' @noRd
@@ -290,8 +320,8 @@ GeomGlycan <- ggplot2::ggproto(
   "GeomGlycan",
   ggplot2::Geom,
   required_aes = c("x", "y", "structure"),
-  non_missing_aes = c("size", "hjust", "vjust"),
-  default_aes = ggplot2::aes(size = 1, hjust = 0.5, vjust = 0.5),
+  non_missing_aes = c("size", "hjust", "vjust", "angle"),
+  default_aes = ggplot2::aes(size = 1, hjust = 0.5, vjust = 0.5, angle = 0),
   extra_params = "na.rm",
   draw_key = ggplot2::draw_key_blank,
   draw_panel = .draw_glycan_panel
