@@ -96,6 +96,58 @@ test_that("glycan axis alignment can be adjusted", {
   expect_equal(y_label$glydraw_hjust, 0)
 })
 
+test_that("glycan axis scales rotate labels independently of orientation", {
+  data <- data.frame(
+    structure = "Gal(b1-3)GalNAc(a1-",
+    value = 1
+  )
+  x_plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(x = .data$structure, y = .data$value)
+  ) +
+    ggplot2::geom_col() +
+    scale_x_glycan(angle = 90)
+  x_unrotated_plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(x = .data$structure, y = .data$value)
+  ) +
+    ggplot2::geom_col() +
+    scale_x_glycan()
+  y_plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(x = .data$value, y = .data$structure)
+  ) +
+    ggplot2::geom_col() +
+    scale_y_glycan(angle = -45)
+  x_labels <- .axis_glycan_labels(x_plot, "axis-b")
+  x_unrotated_labels <- .axis_glycan_labels(x_unrotated_plot, "axis-b")
+  x_label <- x_labels$children[[1]]
+  y_label <- .axis_glycan_labels(y_plot, "axis-l")$children[[1]]
+
+  expect_true(x_label$glydraw_axis_vertical)
+  expect_false(y_label$glydraw_axis_vertical)
+  expect_equal(x_label$glydraw_angle, 90)
+  expect_equal(y_label$glydraw_angle, -45)
+  expect_equal(x_label$vp$angle, 90)
+  expect_equal(y_label$vp$angle, -45)
+  expect_equal(
+    grid::convertWidth(grid::grobWidth(x_labels), "mm", valueOnly = TRUE),
+    grid::convertHeight(
+      grid::grobHeight(x_unrotated_labels),
+      "mm",
+      valueOnly = TRUE
+    )
+  )
+  expect_equal(
+    grid::convertHeight(grid::grobHeight(x_labels), "mm", valueOnly = TRUE),
+    grid::convertWidth(
+      grid::grobWidth(x_unrotated_labels),
+      "mm",
+      valueOnly = TRUE
+    )
+  )
+})
+
 test_that("glycan axis labels can be nudged", {
   data <- data.frame(
     structure = "Gal(b1-3)GalNAc(a1-",

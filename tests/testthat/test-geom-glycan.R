@@ -178,6 +178,51 @@ test_that("geom_glycan maps hjust and vjust to whole-cartoon alignment", {
   purrr::walk(child_viewports, expect_s3_class, "viewport")
 })
 
+test_that("geom_glycan rotates cartoons independently of their orientation", {
+  data <- data.frame(
+    x = c(1, 2),
+    y = c(1, 1),
+    angle = c(30, -45),
+    structure = rep("Gal(b1-3)GalNAc(a1-", 2)
+  )
+  plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(
+      x = .data$x,
+      y = .data$y,
+      structure = .data$structure,
+      angle = .data$angle
+    )
+  ) +
+    geom_glycan(orient = "V")
+  static_plot <- ggplot2::ggplot(
+    data[1, c("x", "y", "structure")],
+    ggplot2::aes(x = .data$x, y = .data$y, structure = .data$structure)
+  ) +
+    geom_glycan(orient = "V", angle = 90)
+
+  layer <- ggplot2::layer_grob(plot)[[1]]
+  static_grob <- ggplot2::layer_grob(static_plot)[[1]]$children[[1]]
+
+  expect_equal(
+    unname(purrr::map_dbl(layer$children, "glydraw_angle")),
+    data$angle
+  )
+  expect_equal(
+    unname(purrr::map_dbl(layer$children, ~ .x$vp$angle)),
+    data$angle
+  )
+  expect_true(all(purrr::map_lgl(
+    layer$children,
+    ~ identical(
+      .x$polygon_coor$shape,
+      glycanGrob(data$structure[[1]], orient = "V")$polygon_coor$shape
+    )
+  )))
+  expect_equal(static_grob$glydraw_angle, 90)
+  expect_equal(static_grob$vp$angle, 90)
+})
+
 test_that("geom_glycan justifies content while preserving drawing allowance", {
   data <- data.frame(
     x = 1,

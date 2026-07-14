@@ -10,6 +10,7 @@ geom_glycan(
   stat = "identity",
   position = "identity",
   ...,
+  angle = 0,
   show_linkage = TRUE,
   orient = c("H", "V"),
   fuc_orient = c("flex", "up"),
@@ -38,6 +39,11 @@ layer. Defaults to \code{"identity"}.}
 Defaults to \code{"identity"}.}
 
 \item{...}{Other arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
+
+\item{angle}{Rotation in degrees. Like \code{\link[ggplot2:geom_text]{ggplot2::geom_text()}}, this can be
+supplied as an aesthetic or a fixed layer value. It rotates each completed
+cartoon around its mapped position independently of \code{orient}. Defaults to
+\code{0}.}
 
 \item{show_linkage}{Show glycosidic linkage annotations or not. Default is
 TRUE. Substituent annotations are always shown.}
@@ -121,6 +127,8 @@ right bound.
 \item \code{vjust}, an optional vertical justification that defaults to \code{0.5}.
 \code{0} aligns the cartoon content's bottom bound with \code{y}, including the end
 of a reducing-end annotation line, and \code{1} aligns its top bound.
+\item \code{angle}, an optional rotation in degrees that defaults to \code{0}. Rotation is
+applied after the cartoon is drawn, independently of \code{orient}.
 }
 }
 
