@@ -168,6 +168,7 @@ guide_glycan <- function(
   grob$glydraw_orient <- params$glycan_orient
   grob$glydraw_border_px <- 0
   grob$glydraw_background <- FALSE
+  grob$glydraw_hjust <- 0
   grob <- grid::makeContent(grob)
   child <- grob$children[[1]]
   child_width <- grid::grobWidth(child)
@@ -177,28 +178,28 @@ guide_glycan <- function(
     left = grid::viewport(
       x = grid::unit(0, "npc"),
       y = grid::unit(0.5, "npc"),
-      just = c("left", "center"),
+      just = c("center", "center"),
       width = child_width,
       height = child_height
     ),
     right = grid::viewport(
       x = gap,
       y = grid::unit(0.5, "npc"),
-      just = c("left", "center"),
+      just = c("center", "center"),
       width = child_width,
       height = child_height
     ),
     top = grid::viewport(
       x = grid::unit(0, "npc"),
       y = gap,
-      just = c("left", "bottom"),
+      just = c("center", "bottom"),
       width = child_width,
       height = child_height
     ),
     bottom = grid::viewport(
       x = grid::unit(0, "npc"),
       y = grid::unit(0, "npc"),
-      just = c("left", "bottom"),
+      just = c("center", "bottom"),
       width = child_width,
       height = child_height
     )
