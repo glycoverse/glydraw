@@ -54,9 +54,13 @@ test_that("guide_glycan replaces legend text with glycan cartoons", {
   if (all(label_viewports_are_set)) {
     expect_equal(
       purrr::map_dbl(label_viewports, ~ .x$justification[[1]]),
-      rep(0, length(labels))
+      rep(0.5, length(labels))
     )
   }
+  expect_equal(
+    purrr::map_dbl(labels, ~ .x$children[[1]]$glydraw_hjust),
+    rep(0, length(labels))
+  )
   label_gaps <- purrr::map_dbl(labels, function(label) {
     child <- label$children[[1]]$children[[1]]
     grid::convertWidth(
