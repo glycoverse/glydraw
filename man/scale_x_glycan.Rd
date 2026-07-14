@@ -111,7 +111,9 @@ replace text tick labels with compact glycan cartoons. The discrete values,
 or the values returned by the scale's \code{labels} argument, must be glycan
 structure strings supported by \code{\link[glyparse:auto_parse]{glyparse::auto_parse()}}. X-axis cartoons are
 vertical and bottom-aligned by default, while y-axis cartoons are horizontal
-and right-aligned by default.
+and right-aligned by default. The cartoon orientation and alignment adapt to
+the displayed axis, including when the axes are swapped by
+\code{\link[ggplot2:coord_flip]{ggplot2::coord_flip()}}.
 }
 \examples{
 glycans <- data.frame(

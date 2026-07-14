@@ -2,6 +2,8 @@
 
 # glydraw 0.6.3
 
+* `scale_x_glycan()` and `scale_y_glycan()` now adapt cartoon orientation and alignment when used with `ggplot2::coord_flip()`.
+
 # glydraw 0.6.2
 
 ## Minor improvements and bug fixes

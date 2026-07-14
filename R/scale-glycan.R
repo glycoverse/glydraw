@@ -5,7 +5,9 @@
 #' or the values returned by the scale's `labels` argument, must be glycan
 #' structure strings supported by [glyparse::auto_parse()]. X-axis cartoons are
 #' vertical and bottom-aligned by default, while y-axis cartoons are horizontal
-#' and right-aligned by default.
+#' and right-aligned by default. The cartoon orientation and alignment adapt to
+#' the displayed axis, including when the axes are swapped by
+#' [ggplot2::coord_flip()].
 #'
 #' @param name The name of the scale, displayed as the axis title. Use `NULL`
 #'   to remove the title.
@@ -220,6 +222,8 @@ scale_y_glycan <- function(
     glycan_angle = angle,
     glycan_hjust = hjust,
     glycan_vjust = vjust,
+    glycan_x_vjust = if (identical(orient, "V")) vjust else 0,
+    glycan_y_hjust = if (identical(orient, "H")) hjust else 1,
     glycan_nudge_x = nudge_x,
     glycan_nudge_y = nudge_y,
     glycan_show_linkage = show_linkage,
@@ -420,6 +424,8 @@ GuideGlycanAxis <- ggplot2::ggproto(
       glycan_angle = 0,
       glycan_hjust = 0.5,
       glycan_vjust = 0.5,
+      glycan_x_vjust = 0,
+      glycan_y_hjust = 1,
       glycan_nudge_x = 0,
       glycan_nudge_y = 0,
       glycan_show_linkage = FALSE,
@@ -431,5 +437,20 @@ GuideGlycanAxis <- ggplot2::ggproto(
       glycan_colors = character()
     )
   ),
+  setup_params = function(params) {
+    params <- ggplot2:::GuideAxis$setup_params(params)
+
+    if (params$vertical) {
+      params$glycan_orient <- "H"
+      params$glycan_hjust <- params$glycan_y_hjust
+      params$glycan_vjust <- 0.5
+    } else {
+      params$glycan_orient <- "V"
+      params$glycan_hjust <- 0.5
+      params$glycan_vjust <- params$glycan_x_vjust
+    }
+
+    params
+  },
   build_labels = .build_glycan_axis_labels
 )
