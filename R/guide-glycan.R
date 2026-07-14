@@ -120,11 +120,24 @@ guide_glycan <- function(
   if (nrow(key) == 0 || length(key$.label) == 0) {
     return(rep(list(grid::nullGrob()), nrow(key)))
   }
+  position <- elements$text_position
+  gap <- switch(
+    position,
+    left = elements$spacing_x,
+    right = elements$spacing_x,
+    top = elements$spacing_y,
+    bottom = elements$spacing_y
+  )
+  if (!grid::is.unit(gap)) {
+    gap <- grid::unit(gap, "cm")
+  }
 
   purrr::map(
     as.character(key$.label),
     .new_glycan_legend_label,
-    params = params
+    params = params,
+    gap = gap,
+    position = position
   )
 }
 
@@ -132,11 +145,13 @@ guide_glycan <- function(
 #'
 #' @param structure A glycan structure string used as a legend label.
 #' @param params Guide parameters supplied by ggplot2.
+#' @param gap Grid unit separating the legend key from its cartoon label.
+#' @param position Position of the cartoon label relative to its legend key.
 #'
 #' @returns A measured `glycan_legend_label` grob containing one rendered
 #'   `glycanGrob`.
 #' @noRd
-.new_glycan_legend_label <- function(structure, params) {
+.new_glycan_legend_label <- function(structure, params, gap, position) {
   grob <- glycanGrob(
     structure,
     show_linkage = params$glycan_show_linkage,
@@ -154,6 +169,40 @@ guide_glycan <- function(
   grob$glydraw_border_px <- 0
   grob$glydraw_background <- FALSE
   grob <- grid::makeContent(grob)
+  child <- grob$children[[1]]
+  child_width <- grid::grobWidth(child)
+  child_height <- grid::grobHeight(child)
+  grob$vp <- switch(
+    position,
+    left = grid::viewport(
+      x = grid::unit(0, "npc"),
+      y = grid::unit(0.5, "npc"),
+      just = c("left", "center"),
+      width = child_width,
+      height = child_height
+    ),
+    right = grid::viewport(
+      x = gap,
+      y = grid::unit(0.5, "npc"),
+      just = c("left", "center"),
+      width = child_width,
+      height = child_height
+    ),
+    top = grid::viewport(
+      x = grid::unit(0, "npc"),
+      y = gap,
+      just = c("left", "bottom"),
+      width = child_width,
+      height = child_height
+    ),
+    bottom = grid::viewport(
+      x = grid::unit(0, "npc"),
+      y = grid::unit(0, "npc"),
+      just = c("left", "bottom"),
+      width = child_width,
+      height = child_height
+    )
+  )
 
   label <- grid::gTree(
     children = grid::gList(grob),
@@ -161,6 +210,8 @@ guide_glycan <- function(
     cl = "glycan_legend_label"
   )
   label$glydraw_structure <- structure
+  label$glydraw_gap <- gap
+  label$glydraw_position <- position
   label
 }
 
@@ -174,11 +225,15 @@ guide_glycan <- function(
 .glycan_legend_label_extent <- function(x, dimension) {
   glycan <- x$children[[1]]
   child <- glycan$children[[1]]
+  gap <- x$glydraw_gap
+  position <- x$glydraw_position
 
   switch(
     dimension,
-    width = grid::grobWidth(child),
-    height = grid::grobHeight(child)
+    width = grid::grobWidth(child) +
+      if (position %in% c("left", "right")) gap else grid::unit(0, "pt"),
+    height = grid::grobHeight(child) +
+      if (position %in% c("top", "bottom")) gap else grid::unit(0, "pt")
   )
 }
 

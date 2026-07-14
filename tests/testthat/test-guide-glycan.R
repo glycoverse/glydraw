@@ -48,6 +48,25 @@ test_that("guide_glycan replaces legend text with glycan cartoons", {
     labels,
     ~ .x$children[[1]]$show_linkage
   )))
+  label_viewports <- purrr::map(labels, ~ .x$children[[1]]$vp)
+  label_viewports_are_set <- purrr::map_lgl(label_viewports, Negate(is.null))
+  expect_true(all(label_viewports_are_set))
+  if (all(label_viewports_are_set)) {
+    expect_equal(
+      purrr::map_dbl(label_viewports, ~ .x$justification[[1]]),
+      rep(0, length(labels))
+    )
+  }
+  label_gaps <- purrr::map_dbl(labels, function(label) {
+    child <- label$children[[1]]$children[[1]]
+    grid::convertWidth(
+      grid::grobWidth(label) - grid::grobWidth(child),
+      "mm",
+      valueOnly = TRUE
+    )
+  })
+  expect_true(all(label_gaps > 0))
+  expect_equal(label_gaps, rep(label_gaps[[1]], length(labels)))
 
   # The scale's ordinary fill keys remain visible beside the cartoons.
   expect_length(keys, length(structures))
