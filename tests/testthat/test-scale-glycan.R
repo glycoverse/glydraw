@@ -72,6 +72,36 @@ test_that("scale_y_glycan draws horizontal cartoon labels", {
   expect_no_error(ggplot2::ggplotGrob(plot))
 })
 
+test_that("glycan axis scales adapt their configuration to coord_flip", {
+  data <- data.frame(
+    structure = "Gal(b1-3)GalNAc(a1-",
+    value = 1
+  )
+  x_plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(x = .data$structure, y = .data$value)
+  ) +
+    ggplot2::geom_col() +
+    scale_x_glycan() +
+    ggplot2::coord_flip()
+  y_plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(x = .data$value, y = .data$structure)
+  ) +
+    ggplot2::geom_col() +
+    scale_y_glycan() +
+    ggplot2::coord_flip()
+  x_label <- .axis_glycan_labels(x_plot, "axis-l")$children[[1]]
+  y_label <- .axis_glycan_labels(y_plot, "axis-b")$children[[1]]
+
+  expect_false(x_label$glydraw_axis_vertical)
+  expect_equal(x_label$glydraw_hjust, 1)
+  expect_equal(x_label$glydraw_vjust, 0.5)
+  expect_true(y_label$glydraw_axis_vertical)
+  expect_equal(y_label$glydraw_hjust, 0.5)
+  expect_equal(y_label$glydraw_vjust, 0)
+})
+
 test_that("glycan axis alignment can be adjusted", {
   data <- data.frame(
     structure = "Gal(b1-3)GalNAc(a1-",
