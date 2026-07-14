@@ -260,6 +260,31 @@ heightDetails.glycan_legend_label <- function(x) {
   .glycan_legend_label_extent(x, "height")
 }
 
+#' Set up glycan legend theme elements
+#'
+#' @param params Guide parameters supplied by ggplot2.
+#' @param elements Guide theme elements supplied by ggplot2.
+#' @param theme Complete plot theme supplied by ggplot2.
+#'
+#' @returns Guide legend theme elements with vertical key spacing inherited
+#'   from `legend.key.spacing` when `legend.key.spacing.y` is not set.
+#' @noRd
+.setup_glycan_legend_elements <- function(params, elements, theme) {
+  has_vertical_spacing <- !is.null(theme[["legend.key.spacing.y"]]) ||
+    (!is.null(params$theme) &&
+      !is.null(params$theme[["legend.key.spacing.y"]]))
+
+  elements <- ggplot2:::GuideLegend$setup_elements(
+    params = params,
+    elements = elements,
+    theme = theme
+  )
+  if (identical(params$direction, "vertical") && !has_vertical_spacing) {
+    elements$spacing_y <- elements$spacing_x
+  }
+  elements
+}
+
 #' Build fixed-size legend keys beside glycan labels
 #'
 #' @param decor Legend-key decorations prepared from plot layers.
@@ -314,6 +339,7 @@ GuideGlycan <- ggplot2::ggproto(
       glycan_colors = character()
     )
   ),
+  setup_elements = .setup_glycan_legend_elements,
   build_labels = .build_glycan_legend_labels,
   build_decor = .build_fixed_glycan_legend_keys
 )
