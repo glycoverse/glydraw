@@ -127,6 +127,58 @@ test_that("guide_glycan draws scale labels as cartoons", {
   )))
 })
 
+test_that("guide_glycan separates vertically stacked legend keys", {
+  data <- tibble::tibble(
+    x = 1:6,
+    y = 1:6,
+    glycan = rep(
+      c(
+        "GalNAc(a1-",
+        "Gal(b1-3)GalNAc(a1-",
+        "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"
+      ),
+      each = 2
+    )
+  )
+  plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(x = .data$x, y = .data$y, color = .data$glycan)
+  ) +
+    ggplot2::geom_point() +
+    ggplot2::guides(color = guide_glycan())
+
+  legend <- .glycan_legend_table(plot)
+  key_rows <- legend$layout$t[grepl("^key-", legend$layout$name)]
+  gap_rows <- setdiff(seq(min(key_rows), max(key_rows)), key_rows)
+  gap_heights <- grid::convertHeight(
+    legend$heights[gap_rows],
+    "mm",
+    valueOnly = TRUE
+  )
+
+  expect_length(gap_heights, length(key_rows) - 1)
+  expect_true(all(gap_heights > 0))
+  expect_equal(gap_heights, rep(gap_heights[[1]], length(gap_heights)))
+
+  custom_legend <- .glycan_legend_table(
+    plot + ggplot2::theme(legend.key.spacing.y = grid::unit(4, "mm"))
+  )
+  custom_key_rows <- custom_legend$layout$t[
+    grepl("^key-", custom_legend$layout$name)
+  ]
+  custom_gap_rows <- setdiff(
+    seq(min(custom_key_rows), max(custom_key_rows)),
+    custom_key_rows
+  )
+  custom_gap_heights <- grid::convertHeight(
+    custom_legend$heights[custom_gap_rows],
+    "mm",
+    valueOnly = TRUE
+  )
+
+  expect_equal(custom_gap_heights, rep(4, length(custom_gap_heights)))
+})
+
 test_that("guide_glycan returns a configured legend guide", {
   guide <- guide_glycan(reverse = TRUE, nrow = 1, size = 0.25)
 
