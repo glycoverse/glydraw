@@ -204,6 +204,40 @@ heightDetails.glycan_legend_label <- function(x) {
   .glycan_legend_label_extent(x, "height")
 }
 
+#' Build fixed-size legend keys beside glycan labels
+#'
+#' @param decor Legend-key decorations prepared from plot layers.
+#' @param grobs Guide grobs prepared by ggplot2.
+#' @param elements Guide theme elements supplied by ggplot2.
+#' @param params Guide parameters supplied by ggplot2.
+#'
+#' @returns A list of legend-key grobs whose viewports retain the dimensions
+#'   reported by their layer glyphs instead of filling the glycan-label rows.
+#' @noRd
+.build_fixed_glycan_legend_keys <- function(decor, grobs, elements, params) {
+  keys <- ggplot2:::GuideLegend$build_decor(
+    decor = decor,
+    grobs = grobs,
+    elements = elements,
+    params = params
+  )
+  just <- elements$key_just
+  if (is.null(just)) {
+    just <- c(0.5, 0.5)
+  }
+
+  purrr::map(keys, function(key) {
+    key$vp <- grid::viewport(
+      x = just[[1]],
+      y = just[[2]],
+      just = just,
+      width = grid::unit(attr(key, "width"), "cm"),
+      height = grid::unit(attr(key, "height"), "cm")
+    )
+    key
+  })
+}
+
 #' ggplot2 guide that draws glycan cartoons as legend labels
 #'
 #' @noRd
@@ -224,5 +258,6 @@ GuideGlycan <- ggplot2::ggproto(
       glycan_colors = character()
     )
   ),
-  build_labels = .build_glycan_legend_labels
+  build_labels = .build_glycan_legend_labels,
+  build_decor = .build_fixed_glycan_legend_keys
 )

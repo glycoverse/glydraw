@@ -52,6 +52,22 @@ test_that("guide_glycan replaces legend text with glycan cartoons", {
   # The scale's ordinary fill keys remain visible beside the cartoons.
   expect_length(keys, length(structures))
   expect_true(all(purrr::map_int(keys, ~ length(.x$children)) >= 2))
+  key_viewports_are_fixed <- purrr::map_lgl(keys, ~ !is.null(.x$vp))
+  expect_true(all(key_viewports_are_fixed))
+  if (all(key_viewports_are_fixed)) {
+    key_widths <- purrr::map_dbl(
+      keys,
+      ~ grid::convertWidth(.x$vp$width, "mm", valueOnly = TRUE)
+    )
+    key_heights <- purrr::map_dbl(
+      keys,
+      ~ grid::convertHeight(.x$vp$height, "mm", valueOnly = TRUE)
+    )
+
+    expect_equal(key_widths, rep(key_widths[[1]], length(keys)))
+    expect_equal(key_heights, rep(key_heights[[1]], length(keys)))
+    expect_equal(key_widths, key_heights)
+  }
   expect_no_error(ggplot2::ggplotGrob(plot))
 })
 
