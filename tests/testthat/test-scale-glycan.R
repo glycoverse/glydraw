@@ -72,6 +72,34 @@ test_that("scale_y_glycan draws horizontal cartoon labels", {
   expect_no_error(ggplot2::ggplotGrob(plot))
 })
 
+test_that("glycan axis scales accept glycan structure vectors", {
+  structures <- glyrepr::as_glycan_structure(c(
+    "GalNAc(a1-",
+    "Gal(b1-3)GalNAc(a1-"
+  ))
+  data <- tibble::tibble(structure = structures, value = c(1, 2))
+  x_plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(x = .data$structure, y = .data$value)
+  ) +
+    ggplot2::geom_col() +
+    scale_x_glycan()
+  y_plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(x = .data$value, y = .data$structure)
+  ) +
+    ggplot2::geom_col() +
+    scale_y_glycan()
+
+  x_labels <- .axis_glycan_labels(x_plot, "axis-b")
+  y_labels <- .axis_glycan_labels(y_plot, "axis-l")
+
+  expect_length(x_labels$children, length(structures))
+  expect_length(y_labels$children, length(structures))
+  purrr::walk(x_labels$children, expect_s3_class, "glycanGrob")
+  purrr::walk(y_labels$children, expect_s3_class, "glycanGrob")
+})
+
 test_that("glycan axis scales adapt their configuration to coord_flip", {
   data <- data.frame(
     structure = "Gal(b1-3)GalNAc(a1-",

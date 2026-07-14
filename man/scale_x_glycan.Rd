@@ -107,12 +107,13 @@ A ggplot2 discrete position scale.
 }
 \description{
 \code{scale_x_glycan()} and \code{scale_y_glycan()} are discrete position scales that
-replace text tick labels with compact glycan cartoons. The discrete values,
-or the values returned by the scale's \code{labels} argument, must be glycan
-structure strings supported by \code{\link[glyparse:auto_parse]{glyparse::auto_parse()}}. X-axis cartoons are
-vertical and bottom-aligned by default, while y-axis cartoons are horizontal
-and right-aligned by default. The cartoon orientation and alignment adapt to
-the displayed axis, including when the axes are swapped by
+replace text tick labels with compact glycan cartoons. Mapped discrete values
+and values returned by the scale's \code{labels} argument may be glycan structure
+strings supported by \code{\link[glyparse:auto_parse]{glyparse::auto_parse()}} or
+\code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}} vectors. X-axis cartoons are vertical and
+bottom-aligned by default, while y-axis cartoons are horizontal and
+right-aligned by default. The cartoon orientation and alignment adapt to the
+displayed axis, including when the axes are swapped by
 \code{\link[ggplot2:coord_flip]{ggplot2::coord_flip()}}.
 }
 \examples{

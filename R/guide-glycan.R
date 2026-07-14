@@ -4,8 +4,9 @@
 #'
 #' `guide_glycan()` is a legend guide that replaces the usual text labels with
 #' glycan cartoons while retaining the legend keys drawn by the plot layers.
-#' The values returned by the scale's `labels` argument must therefore be
-#' glycan structure strings supported by [glyparse::auto_parse()].
+#' Mapped discrete values and values returned by the scale's `labels` argument
+#' may be glycan structure strings supported by [glyparse::auto_parse()] or
+#' [glyrepr::glycan_structure()] vectors.
 #'
 #' @inheritParams ggplot2::guide_legend
 #' @param size Positive scalar that uniformly scales each legend-label cartoon.

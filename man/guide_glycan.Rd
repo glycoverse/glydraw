@@ -89,8 +89,9 @@ labels.
 \description{
 \code{guide_glycan()} is a legend guide that replaces the usual text labels with
 glycan cartoons while retaining the legend keys drawn by the plot layers.
-The values returned by the scale's \code{labels} argument must therefore be
-glycan structure strings supported by \code{\link[glyparse:auto_parse]{glyparse::auto_parse()}}.
+Mapped discrete values and values returned by the scale's \code{labels} argument
+may be glycan structure strings supported by \code{\link[glyparse:auto_parse]{glyparse::auto_parse()}} or
+\code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}} vectors.
 }
 \examples{
 glycans <- data.frame(

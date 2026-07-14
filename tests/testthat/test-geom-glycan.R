@@ -26,6 +26,35 @@ test_that("geom_glycan maps structures to x and y positions", {
   expect_setequal(GeomGlycan$required_aes, c("x", "y", "structure"))
 })
 
+test_that("geom_glycan preserves mapped glycan structure vectors", {
+  structures <- glyrepr::as_glycan_structure(c(
+    "GalNAc(a1-",
+    "Gal(b1-3)GalNAc(a1-"
+  ))
+  data <- tibble::tibble(
+    x = c(1, 2),
+    y = c(1, 2),
+    structure = structures
+  )
+  plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(
+      x = .data$x,
+      y = .data$y,
+      structure = .data$structure
+    )
+  ) +
+    geom_glycan()
+  built <- ggplot2::ggplot_build(plot)
+
+  expect_s3_class(built$data[[1]]$structure, "glyrepr_structure")
+  expect_equal(
+    as.character(built$data[[1]]$structure),
+    as.character(structures)
+  )
+  expect_no_error(ggplot2::layer_grob(plot))
+})
+
 test_that("geom_glycan draws one configured glycan grob per row", {
   rplots <- "Rplots.pdf"
   unlink(rplots)
