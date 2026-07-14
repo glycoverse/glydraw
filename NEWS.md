@@ -2,6 +2,7 @@
 
 # glydraw 0.6.3
 
+* Fix `scale_x_glycan()`, `scale_y_glycan()`, and `guide_glycan()` for mapped `glyrepr::glycan_structure()` columns.
 * `scale_x_glycan()` and `scale_y_glycan()` now adapt cartoon orientation and alignment when used with `ggplot2::coord_flip()`.
 
 # glydraw 0.6.2

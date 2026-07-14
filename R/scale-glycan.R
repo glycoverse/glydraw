@@ -1,12 +1,13 @@
 #' Use glycan cartoons as axis labels
 #'
 #' `scale_x_glycan()` and `scale_y_glycan()` are discrete position scales that
-#' replace text tick labels with compact glycan cartoons. The discrete values,
-#' or the values returned by the scale's `labels` argument, must be glycan
-#' structure strings supported by [glyparse::auto_parse()]. X-axis cartoons are
-#' vertical and bottom-aligned by default, while y-axis cartoons are horizontal
-#' and right-aligned by default. The cartoon orientation and alignment adapt to
-#' the displayed axis, including when the axes are swapped by
+#' replace text tick labels with compact glycan cartoons. Mapped discrete values
+#' and values returned by the scale's `labels` argument may be glycan structure
+#' strings supported by [glyparse::auto_parse()] or
+#' [glyrepr::glycan_structure()] vectors. X-axis cartoons are vertical and
+#' bottom-aligned by default, while y-axis cartoons are horizontal and
+#' right-aligned by default. The cartoon orientation and alignment adapt to the
+#' displayed axis, including when the axes are swapped by
 #' [ggplot2::coord_flip()].
 #'
 #' @param name The name of the scale, displayed as the axis title. Use `NULL`
@@ -95,7 +96,7 @@ scale_x_glycan <- function(
     colors = colors
   )
 
-  ggplot2::scale_x_discrete(
+  scale <- ggplot2::scale_x_discrete(
     name = name,
     ...,
     palette = palette,
@@ -105,6 +106,8 @@ scale_x_glycan <- function(
     sec.axis = sec.axis,
     continuous.limits = continuous.limits
   )
+  scale$transform <- .transform_glycan_position
+  scale
 }
 
 #' @rdname scale_x_glycan
@@ -147,7 +150,7 @@ scale_y_glycan <- function(
     colors = colors
   )
 
-  ggplot2::scale_y_discrete(
+  scale <- ggplot2::scale_y_discrete(
     name = name,
     ...,
     palette = palette,
@@ -157,6 +160,8 @@ scale_y_glycan <- function(
     sec.axis = sec.axis,
     continuous.limits = continuous.limits
   )
+  scale$transform <- .transform_glycan_position
+  scale
 }
 
 #' Create a ggplot2 guide that draws glycan cartoons as axis labels

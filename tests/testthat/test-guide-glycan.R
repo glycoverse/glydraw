@@ -94,6 +94,43 @@ test_that("guide_glycan replaces legend text with glycan cartoons", {
   expect_no_error(ggplot2::ggplotGrob(plot))
 })
 
+test_that("guide_glycan accepts mapped glycan structure vectors", {
+  structures <- glyrepr::as_glycan_structure(c(
+    "GalNAc(a1-",
+    "Gal(b1-3)GalNAc(a1-"
+  ))
+  data <- tibble::tibble(
+    x = seq_along(structures),
+    structure = structures,
+    value = c(1, 2)
+  )
+  base_plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(
+      x = .data$x,
+      y = .data$value,
+      fill = .data$structure
+    )
+  ) +
+    ggplot2::geom_col()
+  plots <- list(
+    automatic = base_plot + ggplot2::guides(fill = guide_glycan()),
+    explicit = base_plot +
+      ggplot2::scale_fill_discrete(guide = guide_glycan())
+  )
+
+  purrr::walk(plots, function(plot) {
+    legend <- .glycan_legend_table(plot)
+    labels <- legend$grobs[grepl("^label-", legend$layout$name)]
+
+    expect_length(labels, length(structures))
+    expect_equal(
+      sort(purrr::map_chr(labels, "glydraw_structure")),
+      sort(as.character(structures))
+    )
+  })
+})
+
 test_that("guide_glycan draws scale labels as cartoons", {
   structures <- c(
     A = "Gal(b1-3)GalNAc(a1-",
