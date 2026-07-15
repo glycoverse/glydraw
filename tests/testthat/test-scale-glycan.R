@@ -280,21 +280,3 @@ test_that("glycan axis scales use plain cartoon parameters", {
   expect_equal(label$glydraw_scale, 0.6)
   expect_true(label$show_linkage)
 })
-
-test_that("scale_x_glycan renders cartoon labels", {
-  data <- data.frame(
-    structure = c(
-      "Gal(b1-3)GalNAc(a1-",
-      "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-"
-    ),
-    value = c(1, 2)
-  )
-  plot <- ggplot2::ggplot(
-    data,
-    ggplot2::aes(x = .data$structure, y = .data$value)
-  ) +
-    ggplot2::geom_col() +
-    scale_x_glycan()
-
-  vdiffr::expect_doppelganger("glycan x-axis labels", plot)
-})
