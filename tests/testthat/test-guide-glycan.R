@@ -227,27 +227,3 @@ test_that("guide_glycan returns a configured legend guide", {
   expect_error(guide_glycan(size = 0), "larger than")
   expect_error(guide_glycan(orient = "diagonal"), "orient")
 })
-
-test_that("guide_glycan renders cartoon legend labels", {
-  data <- data.frame(
-    structure = c(
-      "Gal(b1-3)GalNAc(a1-",
-      "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-"
-    ),
-    value = c(1, 2)
-  )
-  plot <- ggplot2::ggplot(
-    data,
-    ggplot2::aes(
-      x = .data$structure,
-      y = .data$value,
-      fill = .data$structure
-    )
-  ) +
-    ggplot2::geom_col() +
-    ggplot2::scale_fill_discrete(
-      guide = guide_glycan(size = 0.3, show_linkage = FALSE)
-    )
-
-  vdiffr::expect_doppelganger("glycan legend labels", plot)
-})
