@@ -77,10 +77,14 @@ independently of the cartoon orientation. Defaults to \code{0}.}
 bottom bounds, while \code{1} aligns their top bounds. Defaults to \code{0}.}
 
 \item{nudge_x}{Horizontal adjustment of each cartoon, in millimetres.
-Positive values move cartoons to the right. Defaults to \code{0}.}
+Positive values move cartoons to the right. When this moves cartoons
+toward or away from a y-axis title, the title moves with them to preserve
+the gap. Defaults to \code{0}.}
 
 \item{nudge_y}{Vertical adjustment of each cartoon, in millimetres. Positive
-values move cartoons upward. Defaults to \code{0}.}
+values move cartoons upward. When this moves cartoons toward or away from
+an x-axis title, the title moves with them to preserve the gap. Defaults
+to \code{0}.}
 
 \item{show_linkage}{Whether to show glycosidic linkage annotations inside
 the cartoons. Defaults to \code{TRUE}.}

@@ -10,6 +10,43 @@
   labels[[1]]
 }
 
+.axis_glycan_title_gap <- function(labels, side) {
+  label <- labels$children[[1]]
+  child <- label$children[[1]]
+  grid::pushViewport(grid::viewport(
+    width = grid::grobWidth(labels),
+    height = grid::grobHeight(labels)
+  ))
+  on.exit(grid::popViewport())
+
+  width <- grid::convertWidth(grid::grobWidth(labels), "mm", valueOnly = TRUE)
+  height <- grid::convertHeight(
+    grid::grobHeight(labels),
+    "mm",
+    valueOnly = TRUE
+  )
+  child_width <- grid::convertWidth(
+    grid::grobWidth(child),
+    "mm",
+    valueOnly = TRUE
+  )
+  child_height <- grid::convertHeight(
+    grid::grobHeight(child),
+    "mm",
+    valueOnly = TRUE
+  )
+  x <- grid::convertX(label$vp$x, "mm", valueOnly = TRUE)
+  y <- grid::convertY(label$vp$y, "mm", valueOnly = TRUE)
+
+  switch(
+    side,
+    bottom = y - label$glydraw_vjust * child_height,
+    top = height - y - (1 - label$glydraw_vjust) * child_height,
+    left = x - label$glydraw_hjust * child_width,
+    right = width - x - (1 - label$glydraw_hjust) * child_width
+  )
+}
+
 test_that("scale_x_glycan draws vertical cartoon labels", {
   data <- data.frame(
     structure = c(
@@ -230,6 +267,84 @@ test_that("glycan axis labels can be nudged", {
   expect_equal(x_label$glydraw_nudge_y, -2)
   expect_equal(y_label$glydraw_nudge_x, -3)
   expect_equal(y_label$glydraw_nudge_y, 4)
+})
+
+test_that("perpendicular nudges preserve the axis-title gap", {
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off(), add = TRUE)
+  grid::grid.newpage()
+  data <- data.frame(
+    structure = "Gal(b1-3)GalNAc(a1-",
+    value = 1
+  )
+  x_plot <- function(position, nudge_y) {
+    ggplot2::ggplot(
+      data,
+      ggplot2::aes(x = .data$structure, y = .data$value)
+    ) +
+      ggplot2::geom_col() +
+      scale_x_glycan(position = position, nudge_y = nudge_y)
+  }
+  y_plot <- function(position, nudge_x) {
+    ggplot2::ggplot(
+      data,
+      ggplot2::aes(x = .data$value, y = .data$structure)
+    ) +
+      ggplot2::geom_col() +
+      scale_y_glycan(position = position, nudge_x = nudge_x)
+  }
+
+  bottom <- .axis_glycan_labels(x_plot("bottom", 0), "axis-b")
+  bottom_nudged <- .axis_glycan_labels(x_plot("bottom", -4), "axis-b")
+  bottom_inward <- .axis_glycan_labels(x_plot("bottom", 4), "axis-b")
+  top <- .axis_glycan_labels(x_plot("top", 0), "axis-t")
+  top_nudged <- .axis_glycan_labels(x_plot("top", 4), "axis-t")
+  left <- .axis_glycan_labels(y_plot("left", 0), "axis-l")
+  left_nudged <- .axis_glycan_labels(y_plot("left", -4), "axis-l")
+  left_inward <- .axis_glycan_labels(y_plot("left", 4), "axis-l")
+  right <- .axis_glycan_labels(y_plot("right", 0), "axis-r")
+  right_nudged <- .axis_glycan_labels(y_plot("right", 4), "axis-r")
+
+  expect_equal(
+    .axis_glycan_title_gap(bottom_nudged, "bottom"),
+    .axis_glycan_title_gap(bottom, "bottom")
+  )
+  expect_equal(
+    .axis_glycan_title_gap(bottom_inward, "bottom"),
+    .axis_glycan_title_gap(bottom, "bottom")
+  )
+  expect_equal(
+    .axis_glycan_title_gap(top_nudged, "top"),
+    .axis_glycan_title_gap(top, "top")
+  )
+  expect_equal(
+    .axis_glycan_title_gap(left_nudged, "left"),
+    .axis_glycan_title_gap(left, "left")
+  )
+  expect_equal(
+    .axis_glycan_title_gap(left_inward, "left"),
+    .axis_glycan_title_gap(left, "left")
+  )
+  expect_equal(
+    .axis_glycan_title_gap(right_nudged, "right"),
+    .axis_glycan_title_gap(right, "right")
+  )
+  expect_equal(
+    grid::convertHeight(
+      grid::grobHeight(bottom_nudged) - grid::grobHeight(bottom),
+      "mm",
+      valueOnly = TRUE
+    ),
+    4
+  )
+  expect_equal(
+    grid::convertWidth(
+      grid::grobWidth(left_nudged) - grid::grobWidth(left),
+      "mm",
+      valueOnly = TRUE
+    ),
+    4
+  )
 })
 
 test_that("glycan axis labels support reducing-end annotations", {

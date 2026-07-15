@@ -29,9 +29,13 @@
 #' @param hjust Horizontal justification for y-axis cartoons. `0` aligns their
 #'   left bounds, while `1` aligns their right bounds. Defaults to `1`.
 #' @param nudge_x Horizontal adjustment of each cartoon, in millimetres.
-#'   Positive values move cartoons to the right. Defaults to `0`.
+#'   Positive values move cartoons to the right. When this moves cartoons
+#'   toward or away from a y-axis title, the title moves with them to preserve
+#'   the gap. Defaults to `0`.
 #' @param nudge_y Vertical adjustment of each cartoon, in millimetres. Positive
-#'   values move cartoons upward. Defaults to `0`.
+#'   values move cartoons upward. When this moves cartoons toward or away from
+#'   an x-axis title, the title moves with them to preserve the gap. Defaults
+#'   to `0`.
 #' @param show_linkage Whether to show glycosidic linkage annotations inside
 #'   the cartoons. Defaults to `TRUE`.
 #' @param red_end Reducing-end annotation passed to [glycanGrob()]. Use `"~"`
@@ -305,6 +309,7 @@ scale_y_glycan <- function(
   grob$glydraw_vjust <- params$glycan_vjust
   grob$glydraw_nudge_x <- params$glycan_nudge_x
   grob$glydraw_nudge_y <- params$glycan_nudge_y
+  grob$glydraw_axis_position <- params$position
   grob$glydraw_border_px <- 0
   grob$glydraw_background <- FALSE
   grob$glydraw_expand <- FALSE
@@ -313,6 +318,7 @@ scale_y_glycan <- function(
   grob$vp <- .glycan_axis_label_viewport(
     position,
     vertical = params$vertical,
+    axis_position = params$position,
     angle = params$glycan_angle,
     hjust = params$glycan_hjust,
     vjust = params$glycan_vjust,
@@ -326,6 +332,7 @@ scale_y_glycan <- function(
 #'
 #' @param position Numeric axis position in the guide viewport.
 #' @param vertical Whether the axis guide is vertical.
+#' @param axis_position Side of the panel on which the axis is drawn.
 #' @param angle Rotation in degrees.
 #' @param hjust Horizontal glycan justification.
 #' @param vjust Vertical glycan justification.
@@ -337,16 +344,25 @@ scale_y_glycan <- function(
 .glycan_axis_label_viewport <- function(
   position,
   vertical,
+  axis_position,
   angle,
   hjust,
   vjust,
   nudge_x,
   nudge_y
 ) {
+  nudge <- .glycan_axis_viewport_nudge(
+    axis_position,
+    hjust,
+    vjust,
+    nudge_x,
+    nudge_y
+  )
+
   if (vertical) {
     return(
       grid::viewport(
-        x = grid::unit(hjust, "npc") + grid::unit(nudge_x, "mm"),
+        x = grid::unit(hjust, "npc") + grid::unit(nudge[["x"]], "mm"),
         y = grid::unit(position, "native") + grid::unit(nudge_y, "mm"),
         angle = angle,
         clip = "off"
@@ -356,9 +372,35 @@ scale_y_glycan <- function(
 
   grid::viewport(
     x = grid::unit(position, "native") + grid::unit(nudge_x, "mm"),
-    y = grid::unit(vjust, "npc") + grid::unit(nudge_y, "mm"),
+    y = grid::unit(vjust, "npc") + grid::unit(nudge[["y"]], "mm"),
     angle = angle,
     clip = "off"
+  )
+}
+
+#' Adjust a glycan-label viewport nudge for the resized guide area
+#'
+#' @param axis_position Side of the panel on which the axis is drawn.
+#' @param hjust Horizontal glycan justification.
+#' @param vjust Vertical glycan justification.
+#' @param nudge_x Horizontal adjustment in millimetres.
+#' @param nudge_y Vertical adjustment in millimetres.
+#'
+#' @returns A named numeric vector containing viewport nudges.
+#' @noRd
+.glycan_axis_viewport_nudge <- function(
+  axis_position,
+  hjust,
+  vjust,
+  nudge_x,
+  nudge_y
+) {
+  switch(
+    axis_position,
+    bottom = c(x = nudge_x, y = vjust * nudge_y),
+    top = c(x = nudge_x, y = (1 - vjust) * nudge_y),
+    left = c(x = hjust * nudge_x, y = nudge_y),
+    right = c(x = (1 - hjust) * nudge_x, y = nudge_y)
   )
 }
 
@@ -384,13 +426,44 @@ scale_y_glycan <- function(
     width <- grid::grobWidth(child)
     height <- grid::grobHeight(child)
 
-    switch(
+    extent <- switch(
       dimension,
       width = abs(cos(radians)) * width + abs(sin(radians)) * height,
       height = abs(sin(radians)) * width + abs(cos(radians)) * height
     )
+    nudge <- .glycan_axis_extent_nudge(label, dimension)
+    grid::unit.pmax(grid::unit(0, "mm"), extent + grid::unit(nudge, "mm"))
   })
   rlang::exec(grid::unit.pmax, !!!extents)
+}
+
+#' Calculate the nudge contribution to a glycan-axis-label extent
+#'
+#' @param label A positioned `glycanGrob` axis label.
+#' @param dimension Either `"width"` or `"height"`.
+#'
+#' @returns A numeric adjustment in millimetres.
+#' @noRd
+.glycan_axis_extent_nudge <- function(label, dimension) {
+  position <- label$glydraw_axis_position
+
+  if (dimension == "height") {
+    return(
+      switch(
+        position,
+        bottom = -label$glydraw_nudge_y,
+        top = label$glydraw_nudge_y,
+        0
+      )
+    )
+  }
+
+  switch(
+    position,
+    left = -label$glydraw_nudge_x,
+    right = label$glydraw_nudge_x,
+    0
+  )
 }
 
 #' Measure glycan axis-label widths
