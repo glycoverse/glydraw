@@ -33,6 +33,10 @@ save_cartoon(cartoon, file, ..., dpi = 300, scale = 1)
   its natural fixed size; `2` saves the same cartoon with twice the
   pixel width and height.
 
+## Value
+
+Path of the saved cartoon file.
+
 ## Why not `width` and `height`?
 
 The familiar
@@ -55,8 +59,6 @@ appearance while still allowing larger or smaller output files.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
 cartoon <- draw_cartoon("Gal(b1-3)GalNAc(a1-")
-save_cartoon(cartoon, "p1.png", scale = 2)
-} # }
+save_cartoon(cartoon, tempfile(fileext = ".png"))
 ```

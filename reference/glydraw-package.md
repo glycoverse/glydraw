@@ -1,14 +1,21 @@
-# glydraw: Draw beautiful SNFG cartoons
+# glydraw: Draw Beautiful Symbol Nomenclature for Glycans
 
-A ggplot2-native R engine for drawing reproducible SNFG glycan cartoons
-from glycan structure objects or text notations, with support for batch
-export, structural highlighting, and deep appearance customization.
+A 'ggplot2'-native plotting engine for drawing reproducible beautiful
+Symbol Nomenclature for Glycans (SNFG) glycan cartoons from glycan
+structure objects or text notations, with support for batch export,
+structural highlighting, and deep appearance customization. It follows
+the SNFG specification described at
+<https://www.ncbi.nlm.nih.gov/glycans/snfg.html>.
 
 ## See also
 
 Useful links:
 
 - <https://glycoverse.github.io/glydraw/>
+
+- <https://github.com/glycoverse/glydraw>
+
+- Report bugs at <https://github.com/glycoverse/glydraw/issues>
 
 ## Author
 
