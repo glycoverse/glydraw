@@ -6,6 +6,20 @@
 
 CRAN release: 2026-07-14
 
+- Fix
+  [`scale_x_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md),
+  [`scale_y_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md),
+  and
+  [`guide_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/guide_glycan.md)
+  for mapped
+  [`glyrepr::glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/glycan_structure.html)
+  columns.
+- [`scale_x_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md)
+  and
+  [`scale_y_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md)
+  now adapt cartoon orientation and alignment when used with
+  [`ggplot2::coord_flip()`](https://ggplot2.tidyverse.org/reference/coord_flip.html).
+
 ## glydraw 0.6.2
 
 ### Minor improvements and bug fixes
