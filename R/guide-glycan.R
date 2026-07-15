@@ -275,7 +275,7 @@ heightDetails.glycan_legend_label <- function(x) {
     (!is.null(params$theme) &&
       !is.null(params$theme[["legend.key.spacing.y"]]))
 
-  elements <- ggplot2:::GuideLegend$setup_elements(
+  elements <- ggplot2::GuideLegend$setup_elements(
     params = params,
     elements = elements,
     theme = theme
@@ -297,7 +297,7 @@ heightDetails.glycan_legend_label <- function(x) {
 #'   reported by their layer glyphs instead of filling the glycan-label rows.
 #' @noRd
 .build_fixed_glycan_legend_keys <- function(decor, grobs, elements, params) {
-  keys <- ggplot2:::GuideLegend$build_decor(
+  keys <- ggplot2::GuideLegend$build_decor(
     decor = decor,
     grobs = grobs,
     elements = elements,
@@ -325,9 +325,9 @@ heightDetails.glycan_legend_label <- function(x) {
 #' @noRd
 GuideGlycan <- ggplot2::ggproto(
   "GuideGlycan",
-  ggplot2:::GuideLegend,
+  ggplot2::GuideLegend,
   params = c(
-    ggplot2:::GuideLegend$params,
+    ggplot2::GuideLegend$params,
     list(
       glycan_size = 0.4,
       glycan_orient = "H",
