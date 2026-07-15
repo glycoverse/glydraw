@@ -114,12 +114,16 @@ scale_y_glycan(
 - nudge_x:
 
   Horizontal adjustment of each cartoon, in millimetres. Positive values
-  move cartoons to the right. Defaults to `0`.
+  move cartoons to the right. When this moves cartoons toward or away
+  from a y-axis title, the title moves with them to preserve the gap.
+  Defaults to `0`.
 
 - nudge_y:
 
   Vertical adjustment of each cartoon, in millimetres. Positive values
-  move cartoons upward. Defaults to `0`.
+  move cartoons upward. When this moves cartoons toward or away from an
+  x-axis title, the title moves with them to preserve the gap. Defaults
+  to `0`.
 
 - show_linkage:
 
