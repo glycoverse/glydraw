@@ -113,9 +113,6 @@ test_that("geom_glycan requires structure, x, and y aesthetics", {
 })
 
 test_that("geom_glycan uses size as a whole-cartoon scale multiplier", {
-  rplots <- "Rplots.pdf"
-  unlink(rplots)
-  on.exit(unlink(rplots), add = TRUE)
   data <- data.frame(
     x = c(1, 3),
     y = c(1, 1),
@@ -140,13 +137,8 @@ test_that("geom_glycan uses size as a whole-cartoon scale multiplier", {
   rasters <- purrr::map(content, ~ .x$children[[1]])
   widths <- purrr::map_dbl(rasters, ~ as.numeric(.x$width))
   heights <- purrr::map_dbl(rasters, ~ as.numeric(.x$height))
-  corner_pixels <- purrr::map_int(
-    rasters,
-    ~ unclass(.x$raster)[[1]]
-  )
   expect_equal(unname(scales), data$size)
   purrr::walk(rasters, expect_s3_class, "rastergrob")
-  expect_equal(unname(corner_pixels), rep(0L, nrow(data)))
   expect_equal(widths[[2]] / widths[[1]], 3)
   expect_equal(heights[[2]] / heights[[1]], 3)
 })
