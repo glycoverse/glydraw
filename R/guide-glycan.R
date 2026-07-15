@@ -84,11 +84,19 @@ guide_glycan <- function(
     )
   }
 
+  names(override.aes) <- ggplot2::standardise_aes_names(names(override.aes))
+  duplicated_aes <- unique(names(override.aes)[duplicated(names(override.aes))])
+  if (length(duplicated_aes) > 0L) {
+    cli::cli_warn(
+      "Duplicated aesthetics after name standardisation: {.field {duplicated_aes}}"
+    )
+  }
+
   ggplot2::new_guide(
     title = title,
     theme = theme,
     direction = direction,
-    override.aes = ggplot2:::rename_aes(override.aes),
+    override.aes = override.aes,
     nrow = nrow,
     ncol = ncol,
     reverse = reverse,

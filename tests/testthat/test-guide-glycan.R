@@ -217,13 +217,19 @@ test_that("guide_glycan separates vertically stacked legend keys", {
 })
 
 test_that("guide_glycan returns a configured legend guide", {
-  guide <- guide_glycan(reverse = TRUE, nrow = 1, size = 0.25)
+  guide <- guide_glycan(
+    reverse = TRUE,
+    nrow = 1,
+    size = 0.25,
+    override.aes = list(color = "red", pch = 16)
+  )
 
   expect_s3_class(guide, "GuideGlycan")
   expect_s3_class(guide, "GuideLegend")
   expect_true(guide$params$reverse)
   expect_equal(guide$params$nrow, 1)
   expect_equal(guide$params$glycan_size, 0.25)
+  expect_named(guide$params$override.aes, c("colour", "shape"))
   expect_error(guide_glycan(size = 0), "larger than")
   expect_error(guide_glycan(orient = "diagonal"), "orient")
 })
