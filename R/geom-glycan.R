@@ -1,5 +1,52 @@
 # ggplot2 layer helpers for positioning glycan grobs inside plot panels.
 
+.hjust_red_end <- "glydraw_hjust_red_end"
+.vjust_red_end <- "glydraw_vjust_red_end"
+
+#' Anchor glycan cartoons at their reducing ends
+#'
+#' These helpers align the reducing end of every glycan cartoon with its anchor
+#' in [geom_glycan()], [scale_x_glycan()], [scale_y_glycan()], or
+#' [guide_glycan()]. Use `hjust_red_end()` for horizontal alignment when
+#' `orient = "V"`, and use `vjust_red_end()` for vertical alignment when
+#' `orient = "H"`. Because the required justification is calculated separately
+#' from each cartoon's rendered bounds, the helpers also work for collections
+#' of glycans with different asymmetric branches. Glycan scales and guides use
+#' reducing-end justification by default along the axis perpendicular to the
+#' drawing orientation; [geom_glycan()] remains centered by default.
+#'
+#' @returns A reducing-end justification marker accepted by the glycan layer,
+#'   scales, and guide.
+#'
+#' @examples
+#' glycan <- data.frame(
+#'   x = 0,
+#'   y = 0,
+#'   structure = "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-"
+#' )
+#'
+#' ggplot2::ggplot(
+#'   glycan,
+#'   ggplot2::aes(x = .data$x, y = .data$y, structure = .data$structure)
+#' ) +
+#'   geom_glycan(orient = "V", hjust = hjust_red_end())
+#'
+#' ggplot2::ggplot(
+#'   glycan,
+#'   ggplot2::aes(x = .data$x, y = .data$y, structure = .data$structure)
+#' ) +
+#'   geom_glycan(orient = "H", vjust = vjust_red_end())
+#' @export
+hjust_red_end <- function() {
+  .hjust_red_end
+}
+
+#' @rdname hjust_red_end
+#' @export
+vjust_red_end <- function() {
+  .vjust_red_end
+}
+
 #' Draw glycans at ggplot2 positions
 #'
 #' `geom_glycan()` draws one glycan cartoon for each data row. Each cartoon is
@@ -47,11 +94,13 @@
 #'   multipliers. This is distinct from `node_size`, which changes residue size
 #'   within the cartoon.
 #' - `hjust`, an optional horizontal justification that defaults to `0.5`.
-#'   `0` aligns the cartoon content's left bound with `x`, and `1` aligns its
-#'   right bound.
+#'   Numeric `0` aligns the cartoon content's left bound with `x`, and `1`
+#'   aligns its right bound. Use [hjust_red_end()] to anchor a vertical cartoon
+#'   at its reducing end.
 #' - `vjust`, an optional vertical justification that defaults to `0.5`.
-#'   `0` aligns the cartoon content's bottom bound with `y`, including the end
-#'   of a reducing-end annotation line, and `1` aligns its top bound.
+#'   Numeric `0` aligns the cartoon content's bottom bound with `y`, including
+#'   the end of a reducing-end annotation line, and `1` aligns its top bound.
+#'   Use [vjust_red_end()] to anchor a horizontal cartoon at its reducing end.
 #' - `angle`, an optional rotation in degrees that defaults to `0`. Rotation is
 #'   applied after the cartoon is drawn, independently of `orient`.
 #'
@@ -137,6 +186,11 @@ geom_glycan <- function(
   if (!missing(angle)) {
     params$angle <- angle
   }
+  .validate_red_end_justification_orientation(
+    params$hjust,
+    params$vjust,
+    orient
+  )
 
   ggplot2::layer(
     mapping = mapping,
@@ -190,6 +244,11 @@ geom_glycan <- function(
 
   coordinates <- coord$transform(data, panel_params)
   .validate_glycan_sizes(coordinates$size)
+  .validate_red_end_justification_orientation(
+    coordinates$hjust,
+    coordinates$vjust,
+    orient
+  )
   .validate_glycan_justification(coordinates$hjust, "hjust")
   .validate_glycan_justification(coordinates$vjust, "vjust")
   .validate_glycan_angles(coordinates$angle)
@@ -292,6 +351,18 @@ geom_glycan <- function(
 #'   finite numeric values.
 #' @noRd
 .validate_glycan_justification <- function(justification, aesthetic) {
+  if (
+    length(justification) > 0 &&
+      all(.is_red_end_justification(justification, aesthetic))
+  ) {
+    return(invisible(justification))
+  }
+  if (!is.numeric(justification)) {
+    helper <- paste0(aesthetic, "_red_end")
+    cli::cli_abort(
+      "The {.field {aesthetic}} aesthetic must contain finite numeric values or be set with {.fn {helper}}."
+    )
+  }
   checkmate::assert_numeric(
     justification,
     any.missing = FALSE,
@@ -299,6 +370,77 @@ geom_glycan <- function(
     .var.name = aesthetic
   )
   invisible(justification)
+}
+
+#' Validate a scalar glycan justification value
+#'
+#' @param justification A numeric scalar or matching reducing-end marker.
+#' @param aesthetic Either `"hjust"` or `"vjust"`.
+#'
+#' @returns `justification`, invisibly. Throws an error when numeric values are
+#'   outside the interval from zero to one.
+#' @noRd
+.validate_glycan_justification_scalar <- function(justification, aesthetic) {
+  .validate_glycan_justification(justification, aesthetic)
+  if (is.numeric(justification)) {
+    checkmate::assert_number(
+      justification,
+      lower = 0,
+      upper = 1,
+      .var.name = aesthetic
+    )
+  }
+  invisible(justification)
+}
+
+#' Check whether justification values request reducing-end alignment
+#'
+#' @param justification A vector of justification values.
+#' @param aesthetic Either `"hjust"` or `"vjust"`.
+#'
+#' @returns A logical vector identifying the matching reducing-end marker.
+#' @noRd
+.is_red_end_justification <- function(justification, aesthetic) {
+  marker <- switch(
+    aesthetic,
+    hjust = .hjust_red_end,
+    vjust = .vjust_red_end
+  )
+  is.character(justification) &
+    !is.na(justification) &
+    justification == marker
+}
+
+#' Validate orientation-specific reducing-end justification
+#'
+#' @param hjust Horizontal justification values or `NULL`.
+#' @param vjust Vertical justification values or `NULL`.
+#' @param orient Glycan drawing orientation.
+#'
+#' @returns `NULL`, invisibly. Throws an error for incompatible combinations.
+#' @noRd
+.validate_red_end_justification_orientation <- function(
+  hjust,
+  vjust,
+  orient
+) {
+  if (
+    any(.is_red_end_justification(hjust, "hjust")) &&
+      !identical(orient, "V")
+  ) {
+    cli::cli_abort(
+      "{.fn hjust_red_end} can only be used when {.code orient = \"V\"}."
+    )
+  }
+  if (
+    any(.is_red_end_justification(vjust, "vjust")) &&
+      !identical(orient, "H")
+  ) {
+    cli::cli_abort(
+      "{.fn vjust_red_end} can only be used when {.code orient = \"H\"}."
+    )
+  }
+  invisible(NULL)
 }
 
 #' Validate mapped glycan rotation angles

@@ -63,6 +63,10 @@ glycanGrob <- function(
   grid::gTree(
     connect_df = connect_df,
     polygon_coor = polygon_coor,
+    reducing_end_coor = c(
+      x = unname(coor[nrow(coor), "x"]),
+      y = unname(coor[nrow(coor), "y"])
+    ),
     filled_color = filled_color,
     annotation_data = annotation_data,
     show_linkage = show_linkage,
@@ -122,6 +126,10 @@ makeContent.glycanGrob <- function(x) {
   if (is.null(vjust)) {
     vjust <- 0.5
   }
+  reducing_end_coor <- x$reducing_end_coor
+  if (is.null(reducing_end_coor)) {
+    reducing_end_coor <- c(x = 0, y = 0)
+  }
 
   plot <- .glycan_grob_to_plot(x)
   size_px <- attr(plot, "glydraw_size_px")
@@ -138,7 +146,8 @@ makeContent.glycanGrob <- function(x) {
     size_px,
     scale,
     hjust,
-    vjust
+    vjust,
+    reducing_end_coor
   )
 
   grid::setChildren(x, grid::gList(child))
@@ -181,6 +190,8 @@ makeContent.glycanGrob <- function(x) {
 #' @param scale Positive numeric whole-cartoon scale multiplier.
 #' @param hjust Numeric horizontal justification.
 #' @param vjust Numeric vertical justification.
+#' @param reducing_end_coor Named numeric vector containing the reducing-end
+#'   residue's `x` and `y` coordinates.
 #'
 #' @returns `child` with a viewport that offsets the complete cartoon from its
 #'   centered panel anchor. Centered cartoons are returned unchanged.
@@ -191,11 +202,13 @@ makeContent.glycanGrob <- function(x) {
   size_px,
   scale,
   hjust,
-  vjust
+  vjust,
+  reducing_end_coor
 ) {
   horizontally_centered <- isTRUE(all.equal(hjust, 0.5))
   vertically_centered <- isTRUE(all.equal(vjust, 0.5))
   if (horizontally_centered && vertically_centered) {
+    child$glydraw_justification_offset <- c(x = 0, y = 0)
     return(child)
   }
 
@@ -204,7 +217,8 @@ makeContent.glycanGrob <- function(x) {
     size_px,
     scale,
     hjust,
-    vjust
+    vjust,
+    reducing_end_coor
   )
   child$vp <- grid::viewport(
     x = grid::unit(0.5, "npc") +
@@ -212,6 +226,7 @@ makeContent.glycanGrob <- function(x) {
     y = grid::unit(0.5, "npc") +
       grid::unit(offset[["y"]], "in")
   )
+  child$glydraw_justification_offset <- offset
   child
 }
 
@@ -223,6 +238,8 @@ makeContent.glycanGrob <- function(x) {
 #' @param scale Positive numeric whole-cartoon scale multiplier.
 #' @param hjust Numeric horizontal justification.
 #' @param vjust Numeric vertical justification.
+#' @param reducing_end_coor Named numeric vector containing the reducing-end
+#'   residue's `x` and `y` coordinates.
 #'
 #' @returns A named numeric vector `c(x, y)` containing offsets in inches.
 #' @noRd
@@ -231,18 +248,25 @@ makeContent.glycanGrob <- function(x) {
   size_px,
   scale,
   hjust,
-  vjust
+  vjust,
+  reducing_end_coor = c(x = 0, y = 0)
 ) {
   built <- ggplot2::ggplot_build(plot)
   x_anchor <- .normalized_cartoon_anchor(
     built$layout$panel_scales_x[[1]]$range$range,
     built$layout$panel_params[[1]]$x.range,
-    hjust
+    hjust,
+    red_end_coordinate = if (.is_red_end_justification(hjust, "hjust")) {
+      reducing_end_coor[["x"]]
+    }
   )
   y_anchor <- .normalized_cartoon_anchor(
     built$layout$panel_scales_y[[1]]$range$range,
     built$layout$panel_params[[1]]$y.range,
-    vjust
+    vjust,
+    red_end_coordinate = if (.is_red_end_justification(vjust, "vjust")) {
+      reducing_end_coor[["y"]]
+    }
   )
 
   c(
@@ -262,6 +286,9 @@ makeContent.glycanGrob <- function(x) {
 #' @param data_range Numeric two-element unexpanded data range.
 #' @param panel_range Numeric two-element expanded panel range.
 #' @param justification Numeric justification value.
+#' @param red_end_coordinate Optional numeric reducing-end coordinate. When
+#'   supplied, it is used instead of calculating an anchor from
+#'   `justification`.
 #'
 #' @returns Numeric scalar between the panel edges for justification values
 #'   between zero and one.
@@ -269,8 +296,13 @@ makeContent.glycanGrob <- function(x) {
 .normalized_cartoon_anchor <- function(
   data_range,
   panel_range,
-  justification
+  justification,
+  red_end_coordinate = NULL
 ) {
-  anchor <- data_range[[1]] + justification * diff(data_range)
+  anchor <- if (is.null(red_end_coordinate)) {
+    data_range[[1]] + justification * diff(data_range)
+  } else {
+    red_end_coordinate
+  }
   (anchor - panel_range[[1]]) / diff(panel_range)
 }

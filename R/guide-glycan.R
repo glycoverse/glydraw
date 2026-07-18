@@ -13,6 +13,12 @@
 #'   Defaults to `0.4`.
 #' @param orient Glycan drawing orientation, either `"H"` for horizontal or
 #'   `"V"` for vertical. Defaults to `"H"`.
+#' @param hjust Horizontal cartoon justification between `0` and `1`, or
+#'   [hjust_red_end()]. It defaults to `0` for horizontal cartoons and
+#'   [hjust_red_end()] for vertical cartoons.
+#' @param vjust Vertical cartoon justification between `0` and `1`, or
+#'   [vjust_red_end()]. It defaults to [vjust_red_end()] for horizontal
+#'   cartoons and `0.5` for vertical cartoons.
 #' @param show_linkage Whether to show glycosidic linkage annotations inside
 #'   the cartoons. Defaults to `TRUE`.
 #' @param red_end Reducing-end annotation passed to [glycanGrob()]. Use `"~"`
@@ -59,6 +65,8 @@ guide_glycan <- function(
   order = 0,
   size = 0.4,
   orient = c("H", "V"),
+  hjust = 0,
+  vjust = vjust_red_end(),
   show_linkage = TRUE,
   red_end = "",
   fuc_orient = c("flex", "up"),
@@ -67,8 +75,19 @@ guide_glycan <- function(
   node_size = 1,
   colors = NULL
 ) {
+  hjust_is_missing <- missing(hjust)
+  vjust_is_missing <- missing(vjust)
   .validate_output_scale(size)
   orient <- rlang::arg_match(orient)
+  if (hjust_is_missing && identical(orient, "V")) {
+    hjust <- hjust_red_end()
+  }
+  if (vjust_is_missing && identical(orient, "V")) {
+    vjust <- 0.5
+  }
+  .validate_red_end_justification_orientation(hjust, vjust, orient)
+  .validate_glycan_justification_scalar(hjust, "hjust")
+  .validate_glycan_justification_scalar(vjust, "vjust")
   fuc_orient <- rlang::arg_match(fuc_orient)
   checkmate::assert_number(edge_linewidth, lower = 0)
   checkmate::assert_number(node_linewidth, lower = 0)
@@ -104,6 +123,8 @@ guide_glycan <- function(
     position = position,
     glycan_size = size,
     glycan_orient = orient,
+    glycan_hjust = hjust,
+    glycan_vjust = vjust,
     glycan_show_linkage = show_linkage,
     glycan_red_end = red_end,
     glycan_fuc_orient = fuc_orient,
@@ -175,13 +196,14 @@ guide_glycan <- function(
   grob$name <- "guide.glycan.label"
   grob$glydraw_scale <- params$glycan_size
   grob$glydraw_orient <- params$glycan_orient
+  grob$glydraw_hjust <- params$glycan_hjust
+  grob$glydraw_vjust <- params$glycan_vjust
   grob$glydraw_border_px <- 0
   grob$glydraw_background <- FALSE
-  grob$glydraw_hjust <- 0
   grob <- grid::makeContent(grob)
   child <- grob$children[[1]]
   child_width <- grid::grobWidth(child)
-  child_height <- grid::grobHeight(child)
+  child_height <- .glycan_legend_child_height(child)
   grob$vp <- switch(
     position,
     left = grid::viewport(
@@ -225,6 +247,22 @@ guide_glycan <- function(
   label
 }
 
+#' Measure a vertically justified glycan child
+#'
+#' @param child Rendered child grob containing its justification offset.
+#'
+#' @returns The height needed to contain the child around its centered legend
+#'   anchor.
+#' @noRd
+.glycan_legend_child_height <- function(child) {
+  offset <- child$glydraw_justification_offset
+  if (is.null(offset)) {
+    offset <- c(x = 0, y = 0)
+  }
+
+  grid::grobHeight(child) + grid::unit(2 * abs(offset[["y"]]), "in")
+}
+
 #' Measure a glycan legend label
 #'
 #' @param x A `glycan_legend_label` grob.
@@ -242,7 +280,7 @@ guide_glycan <- function(
     dimension,
     width = grid::grobWidth(child) +
       if (position %in% c("left", "right")) gap else grid::unit(0, "pt"),
-    height = grid::grobHeight(child) +
+    height = .glycan_legend_child_height(child) +
       if (position %in% c("top", "bottom")) gap else grid::unit(0, "pt")
   )
 }
@@ -339,6 +377,8 @@ GuideGlycan <- ggplot2::ggproto(
     list(
       glycan_size = 0.4,
       glycan_orient = "H",
+      glycan_hjust = 0,
+      glycan_vjust = .vjust_red_end,
       glycan_show_linkage = TRUE,
       glycan_red_end = "",
       glycan_fuc_orient = "flex",

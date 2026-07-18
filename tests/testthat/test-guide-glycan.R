@@ -61,6 +61,10 @@ test_that("guide_glycan replaces legend text with glycan cartoons", {
     purrr::map_dbl(labels, ~ .x$children[[1]]$glydraw_hjust),
     rep(0, length(labels))
   )
+  expect_equal(
+    purrr::map_chr(labels, ~ .x$children[[1]]$glydraw_vjust),
+    rep(vjust_red_end(), length(labels))
+  )
   label_gaps <- purrr::map_dbl(labels, function(label) {
     child <- label$children[[1]]$children[[1]]
     grid::convertWidth(
@@ -164,6 +168,124 @@ test_that("guide_glycan draws scale labels as cartoons", {
   )))
 })
 
+test_that("guide_glycan anchors labels at their reducing ends by default", {
+  structures <- c(
+    paste0(
+      "Man(??-?)[Man(??-?)]Man(??-?)[Man(??-?)]Man(??-?)",
+      "GlcNAc(??-?)GlcNAc(??-"
+    ),
+    "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-"
+  )
+  data <- data.frame(structure = structures, value = c(1, 2))
+  base_plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(
+      x = .data$structure,
+      y = .data$value,
+      fill = .data$structure
+    )
+  ) +
+    ggplot2::geom_col()
+  vertical_plot <- base_plot +
+    ggplot2::scale_fill_discrete(
+      guide = guide_glycan(orient = "V")
+    )
+  horizontal_plot <- base_plot +
+    ggplot2::scale_fill_discrete(
+      guide = guide_glycan(orient = "H")
+    )
+
+  vertical_legend <- .glycan_legend_table(vertical_plot)
+  horizontal_legend <- .glycan_legend_table(horizontal_plot)
+  vertical_labels <- vertical_legend$grobs[
+    grepl("^label-", vertical_legend$layout$name)
+  ]
+  horizontal_labels <- horizontal_legend$grobs[
+    grepl("^label-", horizontal_legend$layout$name)
+  ]
+  vertical_grobs <- purrr::map(vertical_labels, ~ .x$children[[1]])
+  horizontal_grobs <- purrr::map(horizontal_labels, ~ .x$children[[1]])
+
+  expect_equal(
+    unname(purrr::map_dbl(
+      vertical_grobs,
+      .reducing_end_displacement,
+      "x"
+    )),
+    rep(0, length(structures))
+  )
+  expect_equal(
+    unname(purrr::map_dbl(
+      horizontal_grobs,
+      .reducing_end_displacement,
+      "y"
+    )),
+    rep(0, length(structures))
+  )
+})
+
+test_that("guide_glycan includes reducing-end offsets in label heights", {
+  structures <- c(
+    paste0(
+      "Man(??-?)[Man(??-?)]Man(??-?)[Man(??-?)]Man(??-?)",
+      "GlcNAc(??-?)GlcNAc(??-"
+    ),
+    "Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-"
+  )
+  data <- data.frame(structure = structures, value = c(1, 2))
+  plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(
+      x = .data$structure,
+      y = .data$value,
+      fill = .data$structure
+    )
+  ) +
+    ggplot2::geom_col() +
+    ggplot2::scale_fill_discrete(guide = guide_glycan())
+
+  legend <- .glycan_legend_table(plot)
+  labels <- legend$grobs[grepl("^label-", legend$layout$name)]
+
+  purrr::walk(labels, function(label) {
+    glycan <- label$children[[1]]
+    child <- glycan$children[[1]]
+    cartoon <- .glycan_grob_to_plot(glycan)
+    size <- attr(cartoon, "glydraw_size_px")
+    offset <- .glycan_justification_offset(
+      cartoon,
+      size,
+      glycan$glydraw_scale,
+      glycan$glydraw_hjust,
+      glycan$glydraw_vjust,
+      glycan$reducing_end_coor
+    )
+    expected_height <- grid::grobHeight(child) +
+      grid::unit(2 * abs(offset[["y"]]), "in")
+
+    expect_gt(abs(offset[["y"]]), 0)
+    expect_equal(
+      grid::convertHeight(grid::grobHeight(label), "mm", valueOnly = TRUE),
+      grid::convertHeight(expected_height, "mm", valueOnly = TRUE)
+    )
+    expect_equal(
+      grid::convertHeight(glycan$vp$height, "mm", valueOnly = TRUE),
+      grid::convertHeight(expected_height, "mm", valueOnly = TRUE)
+    )
+  })
+})
+
+test_that("guide_glycan reducing-end helpers require matching orientations", {
+  expect_snapshot(
+    error = TRUE,
+    guide_glycan(orient = "H", hjust = hjust_red_end())
+  )
+  expect_snapshot(
+    error = TRUE,
+    guide_glycan(orient = "V", vjust = vjust_red_end())
+  )
+})
+
 test_that("guide_glycan separates vertically stacked legend keys", {
   data <- tibble::tibble(
     x = 1:6,
@@ -221,6 +343,8 @@ test_that("guide_glycan returns a configured legend guide", {
     reverse = TRUE,
     nrow = 1,
     size = 0.25,
+    hjust = 0.25,
+    vjust = 0.75,
     override.aes = list(color = "red", pch = 16)
   )
 
@@ -229,6 +353,8 @@ test_that("guide_glycan returns a configured legend guide", {
   expect_true(guide$params$reverse)
   expect_equal(guide$params$nrow, 1)
   expect_equal(guide$params$glycan_size, 0.25)
+  expect_equal(guide$params$glycan_hjust, 0.25)
+  expect_equal(guide$params$glycan_vjust, 0.75)
   expect_named(guide$params$override.aes, c("colour", "shape"))
   expect_error(guide_glycan(size = 0), "larger than")
   expect_error(guide_glycan(orient = "diagonal"), "orient")
