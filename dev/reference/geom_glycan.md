@@ -176,12 +176,17 @@ object.
   `node_size`, which changes residue size within the cartoon.
 
 - `hjust`, an optional horizontal justification that defaults to `0.5`.
-  `0` aligns the cartoon content's left bound with `x`, and `1` aligns
-  its right bound.
+  Numeric `0` aligns the cartoon content's left bound with `x`, and `1`
+  aligns its right bound. Use
+  [`hjust_red_end()`](https://glycoverse.github.io/glydraw/dev/reference/hjust_red_end.md)
+  to anchor a vertical cartoon at its reducing end.
 
 - `vjust`, an optional vertical justification that defaults to `0.5`.
-  `0` aligns the cartoon content's bottom bound with `y`, including the
-  end of a reducing-end annotation line, and `1` aligns its top bound.
+  Numeric `0` aligns the cartoon content's bottom bound with `y`,
+  including the end of a reducing-end annotation line, and `1` aligns
+  its top bound. Use
+  [`vjust_red_end()`](https://glycoverse.github.io/glydraw/dev/reference/hjust_red_end.md)
+  to anchor a horizontal cartoon at its reducing end.
 
 - `angle`, an optional rotation in degrees that defaults to `0`.
   Rotation is applied after the cartoon is drawn, independently of

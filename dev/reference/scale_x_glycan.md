@@ -26,6 +26,7 @@ scale_x_glycan(
   continuous.limits = NULL,
   size = 0.4,
   angle = 0,
+  hjust = hjust_red_end(),
   vjust = 0,
   nudge_x = 0,
   nudge_y = 0,
@@ -49,6 +50,7 @@ scale_y_glycan(
   size = 0.4,
   angle = 0,
   hjust = 1,
+  vjust = vjust_red_end(),
   nudge_x = 0,
   nudge_y = 0,
   show_linkage = TRUE,
@@ -106,10 +108,17 @@ scale_y_glycan(
   Rotation in degrees applied to each axis-label cartoon, independently
   of the cartoon orientation. Defaults to `0`.
 
+- hjust:
+
+  Horizontal justification. Vertical x-axis cartoons default to
+  [`hjust_red_end()`](https://glycoverse.github.io/glydraw/dev/reference/hjust_red_end.md),
+  while horizontal y-axis cartoons default to `1`.
+
 - vjust:
 
-  Vertical justification for x-axis cartoons. `0` aligns their bottom
-  bounds, while `1` aligns their top bounds. Defaults to `0`.
+  Vertical justification. Vertical x-axis cartoons default to `0`, while
+  horizontal y-axis cartoons default to
+  [`vjust_red_end()`](https://glycoverse.github.io/glydraw/dev/reference/hjust_red_end.md).
 
 - nudge_x:
 
@@ -162,11 +171,6 @@ scale_y_glycan(
   Optional named character vector of monosaccharide fill colors passed
   to
   [`glycanGrob()`](https://glycoverse.github.io/glydraw/dev/reference/glycanGrob.md).
-
-- hjust:
-
-  Horizontal justification for y-axis cartoons. `0` aligns their left
-  bounds, while `1` aligns their right bounds. Defaults to `1`.
 
 ## Value
 

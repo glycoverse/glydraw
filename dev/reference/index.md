@@ -12,6 +12,9 @@
   : Construct a glycan grob
 - [`guide_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/guide_glycan.md)
   : Use glycan cartoons as legend labels
+- [`hjust_red_end()`](https://glycoverse.github.io/glydraw/dev/reference/hjust_red_end.md)
+  [`vjust_red_end()`](https://glycoverse.github.io/glydraw/dev/reference/hjust_red_end.md)
+  : Anchor glycan cartoons at their reducing ends
 - [`print(`*`<glydraw_cartoon>`*`)`](https://glycoverse.github.io/glydraw/dev/reference/print.glydraw_cartoon.md)
   : Print glycan cartoon
 - [`save_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/save_cartoon.md)

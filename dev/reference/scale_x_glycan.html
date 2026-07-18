@@ -73,6 +73,7 @@ displayed axis, including when the axes are swapped by
 <span>  continuous.limits <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  size <span class="op">=</span> <span class="fl">0.4</span>,</span>
 <span>  angle <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  hjust <span class="op">=</span> <span class="fu"><a href="hjust_red_end.html">hjust_red_end</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  vjust <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  nudge_x <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  nudge_y <span class="op">=</span> <span class="fl">0</span>,</span>
@@ -96,6 +97,7 @@ displayed axis, including when the axes are swapped by
 <span>  size <span class="op">=</span> <span class="fl">0.4</span>,</span>
 <span>  angle <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  hjust <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  vjust <span class="op">=</span> <span class="fu"><a href="hjust_red_end.html">vjust_red_end</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  nudge_x <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  nudge_y <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  show_linkage <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -153,9 +155,14 @@ Defaults to <code>0.4</code>.</p></dd>
 independently of the cartoon orientation. Defaults to <code>0</code>.</p></dd>
 
 
+<dt id="arg-hjust">hjust<a class="anchor" aria-label="anchor" href="#arg-hjust"></a></dt>
+<dd><p>Horizontal justification. Vertical x-axis cartoons default to
+<code><a href="hjust_red_end.html">hjust_red_end()</a></code>, while horizontal y-axis cartoons default to <code>1</code>.</p></dd>
+
+
 <dt id="arg-vjust">vjust<a class="anchor" aria-label="anchor" href="#arg-vjust"></a></dt>
-<dd><p>Vertical justification for x-axis cartoons. <code>0</code> aligns their
-bottom bounds, while <code>1</code> aligns their top bounds. Defaults to <code>0</code>.</p></dd>
+<dd><p>Vertical justification. Vertical x-axis cartoons default to
+<code>0</code>, while horizontal y-axis cartoons default to <code><a href="hjust_red_end.html">vjust_red_end()</a></code>.</p></dd>
 
 
 <dt id="arg-nudge-x">nudge_x<a class="anchor" aria-label="anchor" href="#arg-nudge-x"></a></dt>
@@ -201,11 +208,6 @@ for a wave, or another string to display that text. Defaults to <code>""</code>.
 <dt id="arg-colors">colors<a class="anchor" aria-label="anchor" href="#arg-colors"></a></dt>
 <dd><p>Optional named character vector of monosaccharide fill colors
 passed to <code><a href="glycanGrob.html">glycanGrob()</a></code>.</p></dd>
-
-
-<dt id="arg-hjust">hjust<a class="anchor" aria-label="anchor" href="#arg-hjust"></a></dt>
-<dd><p>Horizontal justification for y-axis cartoons. <code>0</code> aligns their
-left bounds, while <code>1</code> aligns their right bounds. Defaults to <code>1</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

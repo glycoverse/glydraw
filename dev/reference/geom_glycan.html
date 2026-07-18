@@ -213,11 +213,13 @@ Mapped values are transformed by ggplot2's size scale; use
 multipliers. This is distinct from <code>node_size</code>, which changes residue size
 within the cartoon.</p></li>
 <li><p><code>hjust</code>, an optional horizontal justification that defaults to <code>0.5</code>.
-<code>0</code> aligns the cartoon content's left bound with <code>x</code>, and <code>1</code> aligns its
-right bound.</p></li>
+Numeric <code>0</code> aligns the cartoon content's left bound with <code>x</code>, and <code>1</code>
+aligns its right bound. Use <code><a href="hjust_red_end.html">hjust_red_end()</a></code> to anchor a vertical cartoon
+at its reducing end.</p></li>
 <li><p><code>vjust</code>, an optional vertical justification that defaults to <code>0.5</code>.
-<code>0</code> aligns the cartoon content's bottom bound with <code>y</code>, including the end
-of a reducing-end annotation line, and <code>1</code> aligns its top bound.</p></li>
+Numeric <code>0</code> aligns the cartoon content's bottom bound with <code>y</code>, including
+the end of a reducing-end annotation line, and <code>1</code> aligns its top bound.
+Use <code><a href="hjust_red_end.html">vjust_red_end()</a></code> to anchor a horizontal cartoon at its reducing end.</p></li>
 <li><p><code>angle</code>, an optional rotation in degrees that defaults to <code>0</code>. Rotation is
 applied after the cartoon is drawn, independently of <code>orient</code>.</p></li>
 </ul></div>

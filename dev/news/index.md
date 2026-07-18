@@ -2,6 +2,23 @@
 
 ## glydraw (development version)
 
+- Add
+  [`hjust_red_end()`](https://glycoverse.github.io/glydraw/dev/reference/hjust_red_end.md)
+  and
+  [`vjust_red_end()`](https://glycoverse.github.io/glydraw/dev/reference/hjust_red_end.md)
+  to anchor vertical and horizontal cartoons at their reducing ends in
+  [`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md),
+  [`scale_x_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md),
+  [`scale_y_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md),
+  and
+  [`guide_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/guide_glycan.md).
+  [`guide_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/guide_glycan.md)
+  also gains `hjust` and `vjust` parameters. Reducing-end justification
+  is the default for scale and guide cartoons along the axis
+  perpendicular to their drawing orientation;
+  [`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md)
+  remains centered by default.
+
 ## glydraw 0.6.3
 
 CRAN release: 2026-07-14

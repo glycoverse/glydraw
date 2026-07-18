@@ -24,6 +24,8 @@ guide_glycan(
   order = 0,
   size = 0.4,
   orient = c("H", "V"),
+  hjust = 0,
+  vjust = vjust_red_end(),
   show_linkage = TRUE,
   red_end = "",
   fuc_orient = c("flex", "up"),
@@ -96,6 +98,22 @@ guide_glycan(
 
   Glycan drawing orientation, either `"H"` for horizontal or `"V"` for
   vertical. Defaults to `"H"`.
+
+- hjust:
+
+  Horizontal cartoon justification between `0` and `1`, or
+  [`hjust_red_end()`](https://glycoverse.github.io/glydraw/dev/reference/hjust_red_end.md).
+  It defaults to `0` for horizontal cartoons and
+  [`hjust_red_end()`](https://glycoverse.github.io/glydraw/dev/reference/hjust_red_end.md)
+  for vertical cartoons.
+
+- vjust:
+
+  Vertical cartoon justification between `0` and `1`, or
+  [`vjust_red_end()`](https://glycoverse.github.io/glydraw/dev/reference/hjust_red_end.md).
+  It defaults to
+  [`vjust_red_end()`](https://glycoverse.github.io/glydraw/dev/reference/hjust_red_end.md)
+  for horizontal cartoons and `0.5` for vertical cartoons.
 
 - show_linkage:
 
