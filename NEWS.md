@@ -1,16 +1,17 @@
 # glydraw (development version)
 
-* Add `hjust_red_end()` and `vjust_red_end()` to anchor vertical and horizontal
-  cartoons at their reducing ends in `geom_glycan()`, `scale_x_glycan()`,
-  `scale_y_glycan()`, and `guide_glycan()`. `guide_glycan()` also gains
-  `hjust` and `vjust` parameters. Reducing-end justification is the default for
-  scale and guide cartoons along the axis perpendicular to their drawing
-  orientation; `geom_glycan()` remains centered by default.
+This version of glydraw introduced some `ggplot2` extensions.
+
+## New features
+
+* New `geom_glycan()` draws glycan cartoons for individual observations in ggplot2 plots, with support for size, rotation, justification, and cartoon appearance.
+* New `guide_glycan()` displays glycan cartoons in ggplot2 legends.
+* New `scale_x_glycan()` and `scale_y_glycan()` display glycan cartoons as discrete ggplot2 axis labels.
+* New `hjust_red_end()` and `vjust_red_end()` anchor vertical and horizontal cartoons at their reducing ends in `geom_glycan()`, `scale_x_glycan()`, `scale_y_glycan()`, and `guide_glycan()`. `guide_glycan()` also gains `hjust` and `vjust` parameters. Reducing-end justification is the default for scale and guide cartoons along the axis perpendicular to their drawing orientation; `geom_glycan()` remains centered by default. (#54)
 
 # glydraw 0.6.3
 
-* Fix `scale_x_glycan()`, `scale_y_glycan()`, and `guide_glycan()` for mapped `glyrepr::glycan_structure()` columns.
-* `scale_x_glycan()` and `scale_y_glycan()` now adapt cartoon orientation and alignment when used with `ggplot2::coord_flip()`.
+* First release on CRAN.
 
 # glydraw 0.6.2
 
