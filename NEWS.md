@@ -1,5 +1,11 @@
 # glydraw (development version)
 
+* Add `hjust_red_end()` and `vjust_red_end()` to anchor vertical and horizontal
+  cartoons at their reducing ends in `geom_glycan()`, `scale_x_glycan()`,
+  `scale_y_glycan()`, and `guide_glycan()`. `guide_glycan()` also gains
+  `hjust` and `vjust` parameters. Reducing-end justification is the default for
+  vertical and horizontal cartoons along their respective perpendicular axes.
+
 # glydraw 0.6.3
 
 * Fix `scale_x_glycan()`, `scale_y_glycan()`, and `guide_glycan()` for mapped `glyrepr::glycan_structure()` columns.

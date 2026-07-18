@@ -21,8 +21,8 @@ test_that("geom_glycan maps structures to x and y positions", {
 
   expect_equal(built$data[[1]]$structure, data$structure)
   expect_equal(built$data[[1]]$size, rep(1, nrow(data)))
-  expect_equal(built$data[[1]]$hjust, rep(0.5, nrow(data)))
-  expect_equal(built$data[[1]]$vjust, rep(0.5, nrow(data)))
+  expect_equal(built$data[[1]]$hjust, rep(.hjust_default, nrow(data)))
+  expect_equal(built$data[[1]]$vjust, rep(.vjust_default, nrow(data)))
   expect_setequal(GeomGlycan$required_aes, c("x", "y", "structure"))
 })
 
@@ -197,6 +197,64 @@ test_that("geom_glycan maps hjust and vjust to whole-cartoon alignment", {
   expect_equal(unname(hjust), data$hjust)
   expect_equal(unname(vjust), data$vjust)
   purrr::walk(child_viewports, expect_s3_class, "viewport")
+})
+
+test_that("geom_glycan anchors vertical glycans at their reducing ends by default", {
+  structures <- c(
+    paste0(
+      "Man(??-?)[Man(??-?)]Man(??-?)[Man(??-?)]Man(??-?)",
+      "GlcNAc(??-?)GlcNAc(??-"
+    ),
+    "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-"
+  )
+  data <- data.frame(
+    x = 0,
+    y = seq_along(structures),
+    structure = structures
+  )
+  plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(x = .data$x, y = .data$y, structure = .data$structure)
+  ) +
+    geom_glycan(orient = "V")
+
+  grobs <- ggplot2::layer_grob(plot)[[1]]$children
+  displacement <- purrr::map_dbl(grobs, .reducing_end_displacement, "x")
+
+  expect_equal(unname(displacement), rep(0, length(structures)))
+})
+
+test_that("geom_glycan anchors horizontal glycans at their reducing ends by default", {
+  structures <- c(
+    "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-",
+    "Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-"
+  )
+  data <- data.frame(
+    x = seq_along(structures),
+    y = 0,
+    structure = structures
+  )
+  plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(x = .data$x, y = .data$y, structure = .data$structure)
+  ) +
+    geom_glycan(orient = "H")
+
+  grobs <- ggplot2::layer_grob(plot)[[1]]$children
+  displacement <- purrr::map_dbl(grobs, .reducing_end_displacement, "y")
+
+  expect_equal(unname(displacement), rep(0, length(structures)))
+})
+
+test_that("reducing-end justification helpers require matching orientations", {
+  expect_snapshot(
+    error = TRUE,
+    geom_glycan(orient = "H", hjust = hjust_red_end())
+  )
+  expect_snapshot(
+    error = TRUE,
+    geom_glycan(orient = "V", vjust = vjust_red_end())
+  )
 })
 
 test_that("geom_glycan rotates cartoons independently of their orientation", {

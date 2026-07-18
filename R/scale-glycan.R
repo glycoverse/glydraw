@@ -24,10 +24,10 @@
 #'   Defaults to `0.4`.
 #' @param angle Rotation in degrees applied to each axis-label cartoon,
 #'   independently of the cartoon orientation. Defaults to `0`.
-#' @param vjust Vertical justification for x-axis cartoons. `0` aligns their
-#'   bottom bounds, while `1` aligns their top bounds. Defaults to `0`.
-#' @param hjust Horizontal justification for y-axis cartoons. `0` aligns their
-#'   left bounds, while `1` aligns their right bounds. Defaults to `1`.
+#' @param hjust Horizontal justification. Vertical x-axis cartoons default to
+#'   [hjust_red_end()], while horizontal y-axis cartoons default to `1`.
+#' @param vjust Vertical justification. Vertical x-axis cartoons default to
+#'   `0`, while horizontal y-axis cartoons default to [vjust_red_end()].
 #' @param nudge_x Horizontal adjustment of each cartoon, in millimetres.
 #'   Positive values move cartoons to the right. When this moves cartoons
 #'   toward or away from a y-axis title, the title moves with them to preserve
@@ -72,6 +72,7 @@ scale_x_glycan <- function(
   continuous.limits = NULL,
   size = 0.4,
   angle = 0,
+  hjust = hjust_red_end(),
   vjust = 0,
   nudge_x = 0,
   nudge_y = 0,
@@ -87,7 +88,7 @@ scale_x_glycan <- function(
     orient = "V",
     size = size,
     angle = angle,
-    hjust = 0.5,
+    hjust = hjust,
     vjust = vjust,
     nudge_x = nudge_x,
     nudge_y = nudge_y,
@@ -127,6 +128,7 @@ scale_y_glycan <- function(
   size = 0.4,
   angle = 0,
   hjust = 1,
+  vjust = vjust_red_end(),
   nudge_x = 0,
   nudge_y = 0,
   show_linkage = TRUE,
@@ -142,7 +144,7 @@ scale_y_glycan <- function(
     size = size,
     angle = angle,
     hjust = hjust,
-    vjust = 0.5,
+    vjust = vjust,
     nudge_x = nudge_x,
     nudge_y = nudge_y,
     show_linkage = show_linkage,
@@ -206,8 +208,9 @@ scale_y_glycan <- function(
   orient <- rlang::arg_match(orient, c("H", "V"))
   .validate_output_scale(size)
   checkmate::assert_number(angle, finite = TRUE)
-  checkmate::assert_number(hjust, lower = 0, upper = 1)
-  checkmate::assert_number(vjust, lower = 0, upper = 1)
+  .validate_red_end_justification_orientation(hjust, vjust, orient)
+  .validate_glycan_justification_scalar(hjust, "hjust")
+  .validate_glycan_justification_scalar(vjust, "vjust")
   checkmate::assert_number(nudge_x, finite = TRUE)
   checkmate::assert_number(nudge_y, finite = TRUE)
   checkmate::assert_number(edge_linewidth, lower = 0)
@@ -231,8 +234,10 @@ scale_y_glycan <- function(
     glycan_angle = angle,
     glycan_hjust = hjust,
     glycan_vjust = vjust,
+    glycan_x_hjust = if (identical(orient, "V")) hjust else .hjust_red_end,
     glycan_x_vjust = if (identical(orient, "V")) vjust else 0,
     glycan_y_hjust = if (identical(orient, "H")) hjust else 1,
+    glycan_y_vjust = if (identical(orient, "H")) vjust else .vjust_red_end,
     glycan_nudge_x = nudge_x,
     glycan_nudge_y = nudge_y,
     glycan_show_linkage = show_linkage,
@@ -502,8 +507,10 @@ GuideGlycanAxis <- ggplot2::ggproto(
       glycan_angle = 0,
       glycan_hjust = 0.5,
       glycan_vjust = 0.5,
+      glycan_x_hjust = .hjust_red_end,
       glycan_x_vjust = 0,
       glycan_y_hjust = 1,
+      glycan_y_vjust = .vjust_red_end,
       glycan_nudge_x = 0,
       glycan_nudge_y = 0,
       glycan_show_linkage = FALSE,
@@ -521,12 +528,17 @@ GuideGlycanAxis <- ggplot2::ggproto(
     if (params$vertical) {
       params$glycan_orient <- "H"
       params$glycan_hjust <- params$glycan_y_hjust
-      params$glycan_vjust <- 0.5
+      params$glycan_vjust <- params$glycan_y_vjust
     } else {
       params$glycan_orient <- "V"
-      params$glycan_hjust <- 0.5
+      params$glycan_hjust <- params$glycan_x_hjust
       params$glycan_vjust <- params$glycan_x_vjust
     }
+    .validate_red_end_justification_orientation(
+      params$glycan_hjust,
+      params$glycan_vjust,
+      params$glycan_orient
+    )
 
     params
   },

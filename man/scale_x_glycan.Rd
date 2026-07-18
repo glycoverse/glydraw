@@ -15,6 +15,7 @@ scale_x_glycan(
   continuous.limits = NULL,
   size = 0.4,
   angle = 0,
+  hjust = hjust_red_end(),
   vjust = 0,
   nudge_x = 0,
   nudge_y = 0,
@@ -38,6 +39,7 @@ scale_y_glycan(
   size = 0.4,
   angle = 0,
   hjust = 1,
+  vjust = vjust_red_end(),
   nudge_x = 0,
   nudge_y = 0,
   show_linkage = TRUE,
@@ -73,8 +75,11 @@ Defaults to \code{0.4}.}
 \item{angle}{Rotation in degrees applied to each axis-label cartoon,
 independently of the cartoon orientation. Defaults to \code{0}.}
 
-\item{vjust}{Vertical justification for x-axis cartoons. \code{0} aligns their
-bottom bounds, while \code{1} aligns their top bounds. Defaults to \code{0}.}
+\item{hjust}{Horizontal justification. Vertical x-axis cartoons default to
+\code{\link[=hjust_red_end]{hjust_red_end()}}, while horizontal y-axis cartoons default to \code{1}.}
+
+\item{vjust}{Vertical justification. Vertical x-axis cartoons default to
+\code{0}, while horizontal y-axis cartoons default to \code{\link[=vjust_red_end]{vjust_red_end()}}.}
 
 \item{nudge_x}{Horizontal adjustment of each cartoon, in millimetres.
 Positive values move cartoons to the right. When this moves cartoons
@@ -102,9 +107,6 @@ for a wave, or another string to display that text. Defaults to \code{""}.}
 
 \item{colors}{Optional named character vector of monosaccharide fill colors
 passed to \code{\link[=glycanGrob]{glycanGrob()}}.}
-
-\item{hjust}{Horizontal justification for y-axis cartoons. \code{0} aligns their
-left bounds, while \code{1} aligns their right bounds. Defaults to \code{1}.}
 }
 \value{
 A ggplot2 discrete position scale.

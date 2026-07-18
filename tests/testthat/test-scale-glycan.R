@@ -72,6 +72,10 @@ test_that("scale_x_glycan draws vertical cartoon labels", {
     "glydraw_axis_vertical"
   )))
   expect_equal(
+    unname(purrr::map_chr(labels$children, "glydraw_hjust")),
+    rep(hjust_red_end(), nrow(data))
+  )
+  expect_equal(
     unname(purrr::map_dbl(labels$children, "glydraw_vjust")),
     c(0, 0)
   )
@@ -105,6 +109,10 @@ test_that("scale_y_glycan draws horizontal cartoon labels", {
   expect_equal(
     unname(purrr::map_dbl(labels$children, "glydraw_hjust")),
     c(1, 1)
+  )
+  expect_equal(
+    unname(purrr::map_chr(labels$children, "glydraw_vjust")),
+    rep(vjust_red_end(), nrow(data))
   )
   expect_no_error(ggplot2::ggplotGrob(plot))
 })
@@ -161,9 +169,9 @@ test_that("glycan axis scales adapt their configuration to coord_flip", {
 
   expect_false(x_label$glydraw_axis_vertical)
   expect_equal(x_label$glydraw_hjust, 1)
-  expect_equal(x_label$glydraw_vjust, 0.5)
+  expect_equal(x_label$glydraw_vjust, vjust_red_end())
   expect_true(y_label$glydraw_axis_vertical)
-  expect_equal(y_label$glydraw_hjust, 0.5)
+  expect_equal(y_label$glydraw_hjust, hjust_red_end())
   expect_equal(y_label$glydraw_vjust, 0)
 })
 
@@ -189,6 +197,83 @@ test_that("glycan axis alignment can be adjusted", {
 
   expect_equal(x_label$glydraw_vjust, 1)
   expect_equal(y_label$glydraw_hjust, 0)
+})
+
+test_that("glycan axis scales anchor labels at their reducing ends by default", {
+  structures <- c(
+    paste0(
+      "Man(??-?)[Man(??-?)]Man(??-?)[Man(??-?)]Man(??-?)",
+      "GlcNAc(??-?)GlcNAc(??-"
+    ),
+    "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-"
+  )
+  data <- data.frame(structure = structures, value = c(1, 2))
+  x_plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(x = .data$structure, y = .data$value)
+  ) +
+    ggplot2::geom_col() +
+    scale_x_glycan()
+  y_plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(x = .data$value, y = .data$structure)
+  ) +
+    ggplot2::geom_col() +
+    scale_y_glycan()
+
+  x_labels <- .axis_glycan_labels(x_plot, "axis-b")$children
+  y_labels <- .axis_glycan_labels(y_plot, "axis-l")$children
+
+  expect_equal(
+    unname(purrr::map_dbl(x_labels, .reducing_end_displacement, "x")),
+    rep(0, length(structures))
+  )
+  expect_equal(
+    unname(purrr::map_dbl(y_labels, .reducing_end_displacement, "y")),
+    rep(0, length(structures))
+  )
+})
+
+test_that("glycan axis reducing-end helpers require matching orientations", {
+  expect_snapshot(
+    error = TRUE,
+    scale_x_glycan(vjust = vjust_red_end())
+  )
+  expect_snapshot(
+    error = TRUE,
+    scale_y_glycan(hjust = hjust_red_end())
+  )
+})
+
+test_that("default glycan axis reducing-end alignment adapts to coord_flip", {
+  data <- data.frame(
+    structure = "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-",
+    value = 1
+  )
+  x_plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(x = .data$structure, y = .data$value)
+  ) +
+    ggplot2::geom_col() +
+    scale_x_glycan() +
+    ggplot2::coord_flip()
+  y_plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(x = .data$value, y = .data$structure)
+  ) +
+    ggplot2::geom_col() +
+    scale_y_glycan() +
+    ggplot2::coord_flip()
+
+  x_label <- .axis_glycan_labels(x_plot, "axis-l")$children[[1]]
+  y_label <- .axis_glycan_labels(y_plot, "axis-b")$children[[1]]
+
+  expect_equal(x_label$glydraw_hjust, 1)
+  expect_equal(x_label$glydraw_vjust, vjust_red_end())
+  expect_equal(.reducing_end_displacement(x_label, "y"), 0)
+  expect_equal(y_label$glydraw_hjust, hjust_red_end())
+  expect_equal(y_label$glydraw_vjust, 0)
+  expect_equal(.reducing_end_displacement(y_label, "x"), 0)
 })
 
 test_that("glycan axis scales rotate labels independently of orientation", {

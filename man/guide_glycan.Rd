@@ -16,6 +16,8 @@ guide_glycan(
   order = 0,
   size = 0.4,
   orient = c("H", "V"),
+  hjust = 0,
+  vjust = vjust_red_end(),
   show_linkage = TRUE,
   red_end = "",
   fuc_orient = c("flex", "up"),
@@ -64,6 +66,14 @@ Defaults to \code{0.4}.}
 
 \item{orient}{Glycan drawing orientation, either \code{"H"} for horizontal or
 \code{"V"} for vertical. Defaults to \code{"H"}.}
+
+\item{hjust}{Horizontal cartoon justification between \code{0} and \code{1}, or
+\code{\link[=hjust_red_end]{hjust_red_end()}}. It defaults to \code{0} for horizontal cartoons and
+\code{\link[=hjust_red_end]{hjust_red_end()}} for vertical cartoons.}
+
+\item{vjust}{Vertical cartoon justification between \code{0} and \code{1}, or
+\code{\link[=vjust_red_end]{vjust_red_end()}}. It defaults to \code{\link[=vjust_red_end]{vjust_red_end()}} for horizontal
+cartoons and \code{0.5} for vertical cartoons.}
 
 \item{show_linkage}{Whether to show glycosidic linkage annotations inside
 the cartoons. Defaults to \code{TRUE}.}
