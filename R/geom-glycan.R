@@ -2,8 +2,6 @@
 
 .hjust_red_end <- "glydraw_hjust_red_end"
 .vjust_red_end <- "glydraw_vjust_red_end"
-.hjust_default <- "glydraw_hjust_default"
-.vjust_default <- "glydraw_vjust_default"
 
 #' Anchor glycan cartoons at their reducing ends
 #'
@@ -13,8 +11,9 @@
 #' `orient = "V"`, and use `vjust_red_end()` for vertical alignment when
 #' `orient = "H"`. Because the required justification is calculated separately
 #' from each cartoon's rendered bounds, the helpers also work for collections
-#' of glycans with different asymmetric branches. Reducing-end justification
-#' is the default along the axis perpendicular to the drawing orientation.
+#' of glycans with different asymmetric branches. Glycan scales and guides use
+#' reducing-end justification by default along the axis perpendicular to the
+#' drawing orientation; [geom_glycan()] remains centered by default.
 #'
 #' @returns A reducing-end justification marker accepted by the glycan layer,
 #'   scales, and guide.
@@ -94,14 +93,14 @@ vjust_red_end <- function() {
 #'   [ggplot2::scale_size_identity()] when the mapped values are literal
 #'   multipliers. This is distinct from `node_size`, which changes residue size
 #'   within the cartoon.
-#' - `hjust`, an optional horizontal justification. With `orient = "V"`, it
-#'   defaults to [hjust_red_end()]; with `orient = "H"`, it defaults to `0.5`.
+#' - `hjust`, an optional horizontal justification that defaults to `0.5`.
 #'   Numeric `0` aligns the cartoon content's left bound with `x`, and `1`
-#'   aligns its right bound.
-#' - `vjust`, an optional vertical justification. With `orient = "H"`, it
-#'   defaults to [vjust_red_end()]; with `orient = "V"`, it defaults to `0.5`.
+#'   aligns its right bound. Use [hjust_red_end()] to anchor a vertical cartoon
+#'   at its reducing end.
+#' - `vjust`, an optional vertical justification that defaults to `0.5`.
 #'   Numeric `0` aligns the cartoon content's bottom bound with `y`, including
 #'   the end of a reducing-end annotation line, and `1` aligns its top bound.
+#'   Use [vjust_red_end()] to anchor a horizontal cartoon at its reducing end.
 #' - `angle`, an optional rotation in degrees that defaults to `0`. Rotation is
 #'   applied after the cartoon is drawn, independently of `orient`.
 #'
@@ -244,16 +243,6 @@ geom_glycan <- function(
   }
 
   coordinates <- coord$transform(data, panel_params)
-  coordinates$hjust <- .resolve_default_glycan_justification(
-    coordinates$hjust,
-    "hjust",
-    orient
-  )
-  coordinates$vjust <- .resolve_default_glycan_justification(
-    coordinates$vjust,
-    "vjust",
-    orient
-  )
   .validate_glycan_sizes(coordinates$size)
   .validate_red_end_justification_orientation(
     coordinates$hjust,
@@ -404,45 +393,6 @@ geom_glycan <- function(
   invisible(justification)
 }
 
-#' Resolve an orientation-aware default glycan justification
-#'
-#' @param justification A vector of justification values.
-#' @param aesthetic Either `"hjust"` or `"vjust"`.
-#' @param orient Glycan drawing orientation.
-#'
-#' @returns The input values, with an internal default marker replaced by the
-#'   orientation-appropriate numeric or reducing-end justification.
-#' @noRd
-.resolve_default_glycan_justification <- function(
-  justification,
-  aesthetic,
-  orient
-) {
-  marker <- switch(
-    aesthetic,
-    hjust = .hjust_default,
-    vjust = .vjust_default
-  )
-  is_default <- is.character(justification) &
-    !is.na(justification) &
-    justification == marker
-  if (!any(is_default)) {
-    return(justification)
-  }
-  if (!all(is_default)) {
-    cli::cli_abort(
-      "Internal glycan justification defaults cannot be mixed with mapped values."
-    )
-  }
-
-  replacement <- switch(
-    aesthetic,
-    hjust = if (identical(orient, "V")) .hjust_red_end else 0.5,
-    vjust = if (identical(orient, "H")) .vjust_red_end else 0.5
-  )
-  rep(replacement, length(justification))
-}
-
 #' Check whether justification values request reducing-end alignment
 #'
 #' @param justification A vector of justification values.
@@ -513,12 +463,7 @@ GeomGlycan <- ggplot2::ggproto(
   ggplot2::Geom,
   required_aes = c("x", "y", "structure"),
   non_missing_aes = c("size", "hjust", "vjust", "angle"),
-  default_aes = ggplot2::aes(
-    size = 1,
-    hjust = "glydraw_hjust_default",
-    vjust = "glydraw_vjust_default",
-    angle = 0
-  ),
+  default_aes = ggplot2::aes(size = 1, hjust = 0.5, vjust = 0.5, angle = 0),
   extra_params = "na.rm",
   draw_key = ggplot2::draw_key_blank,
   draw_panel = .draw_glycan_panel

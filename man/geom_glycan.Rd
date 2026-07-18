@@ -121,14 +121,14 @@ Mapped values are transformed by ggplot2's size scale; use
 \code{\link[ggplot2:scale_identity]{ggplot2::scale_size_identity()}} when the mapped values are literal
 multipliers. This is distinct from \code{node_size}, which changes residue size
 within the cartoon.
-\item \code{hjust}, an optional horizontal justification. With \code{orient = "V"}, it
-defaults to \code{\link[=hjust_red_end]{hjust_red_end()}}; with \code{orient = "H"}, it defaults to \code{0.5}.
+\item \code{hjust}, an optional horizontal justification that defaults to \code{0.5}.
 Numeric \code{0} aligns the cartoon content's left bound with \code{x}, and \code{1}
-aligns its right bound.
-\item \code{vjust}, an optional vertical justification. With \code{orient = "H"}, it
-defaults to \code{\link[=vjust_red_end]{vjust_red_end()}}; with \code{orient = "V"}, it defaults to \code{0.5}.
+aligns its right bound. Use \code{\link[=hjust_red_end]{hjust_red_end()}} to anchor a vertical cartoon
+at its reducing end.
+\item \code{vjust}, an optional vertical justification that defaults to \code{0.5}.
 Numeric \code{0} aligns the cartoon content's bottom bound with \code{y}, including
 the end of a reducing-end annotation line, and \code{1} aligns its top bound.
+Use \code{\link[=vjust_red_end]{vjust_red_end()}} to anchor a horizontal cartoon at its reducing end.
 \item \code{angle}, an optional rotation in degrees that defaults to \code{0}. Rotation is
 applied after the cartoon is drawn, independently of \code{orient}.
 }

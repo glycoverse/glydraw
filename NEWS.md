@@ -4,7 +4,8 @@
   cartoons at their reducing ends in `geom_glycan()`, `scale_x_glycan()`,
   `scale_y_glycan()`, and `guide_glycan()`. `guide_glycan()` also gains
   `hjust` and `vjust` parameters. Reducing-end justification is the default for
-  vertical and horizontal cartoons along their respective perpendicular axes.
+  scale and guide cartoons along the axis perpendicular to their drawing
+  orientation; `geom_glycan()` remains centered by default.
 
 # glydraw 0.6.3
 

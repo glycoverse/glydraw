@@ -21,8 +21,8 @@ test_that("geom_glycan maps structures to x and y positions", {
 
   expect_equal(built$data[[1]]$structure, data$structure)
   expect_equal(built$data[[1]]$size, rep(1, nrow(data)))
-  expect_equal(built$data[[1]]$hjust, rep(.hjust_default, nrow(data)))
-  expect_equal(built$data[[1]]$vjust, rep(.vjust_default, nrow(data)))
+  expect_equal(built$data[[1]]$hjust, rep(0.5, nrow(data)))
+  expect_equal(built$data[[1]]$vjust, rep(0.5, nrow(data)))
   expect_setequal(GeomGlycan$required_aes, c("x", "y", "structure"))
 })
 
@@ -199,7 +199,25 @@ test_that("geom_glycan maps hjust and vjust to whole-cartoon alignment", {
   purrr::walk(child_viewports, expect_s3_class, "viewport")
 })
 
-test_that("geom_glycan anchors vertical glycans at their reducing ends by default", {
+test_that("geom_glycan centers both orientations by default", {
+  data <- data.frame(
+    x = 1,
+    y = 1,
+    structure = "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-"
+  )
+  plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(x = .data$x, y = .data$y, structure = .data$structure)
+  )
+  horizontal <- ggplot2::layer_grob(plot + geom_glycan(orient = "H"))[[1]]
+  vertical <- ggplot2::layer_grob(plot + geom_glycan(orient = "V"))[[1]]
+  grobs <- c(horizontal$children, vertical$children)
+
+  expect_equal(unname(purrr::map_dbl(grobs, "glydraw_hjust")), c(0.5, 0.5))
+  expect_equal(unname(purrr::map_dbl(grobs, "glydraw_vjust")), c(0.5, 0.5))
+})
+
+test_that("geom_glycan anchors vertical glycans at their reducing ends", {
   structures <- c(
     paste0(
       "Man(??-?)[Man(??-?)]Man(??-?)[Man(??-?)]Man(??-?)",
@@ -216,7 +234,7 @@ test_that("geom_glycan anchors vertical glycans at their reducing ends by defaul
     data,
     ggplot2::aes(x = .data$x, y = .data$y, structure = .data$structure)
   ) +
-    geom_glycan(orient = "V")
+    geom_glycan(orient = "V", hjust = hjust_red_end())
 
   grobs <- ggplot2::layer_grob(plot)[[1]]$children
   displacement <- purrr::map_dbl(grobs, .reducing_end_displacement, "x")
@@ -224,7 +242,7 @@ test_that("geom_glycan anchors vertical glycans at their reducing ends by defaul
   expect_equal(unname(displacement), rep(0, length(structures)))
 })
 
-test_that("geom_glycan anchors horizontal glycans at their reducing ends by default", {
+test_that("geom_glycan anchors horizontal glycans at their reducing ends", {
   structures <- c(
     "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-",
     "Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-"
@@ -238,7 +256,7 @@ test_that("geom_glycan anchors horizontal glycans at their reducing ends by defa
     data,
     ggplot2::aes(x = .data$x, y = .data$y, structure = .data$structure)
   ) +
-    geom_glycan(orient = "H")
+    geom_glycan(orient = "H", vjust = vjust_red_end())
 
   grobs <- ggplot2::layer_grob(plot)[[1]]$children
   displacement <- purrr::map_dbl(grobs, .reducing_end_displacement, "y")
