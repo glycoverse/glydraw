@@ -203,7 +203,7 @@ guide_glycan <- function(
   grob <- grid::makeContent(grob)
   child <- grob$children[[1]]
   child_width <- grid::grobWidth(child)
-  child_height <- grid::grobHeight(child)
+  child_height <- .glycan_legend_child_height(child)
   grob$vp <- switch(
     position,
     left = grid::viewport(
@@ -247,6 +247,22 @@ guide_glycan <- function(
   label
 }
 
+#' Measure a vertically justified glycan child
+#'
+#' @param child Rendered child grob containing its justification offset.
+#'
+#' @returns The height needed to contain the child around its centered legend
+#'   anchor.
+#' @noRd
+.glycan_legend_child_height <- function(child) {
+  offset <- child$glydraw_justification_offset
+  if (is.null(offset)) {
+    offset <- c(x = 0, y = 0)
+  }
+
+  grid::grobHeight(child) + grid::unit(2 * abs(offset[["y"]]), "in")
+}
+
 #' Measure a glycan legend label
 #'
 #' @param x A `glycan_legend_label` grob.
@@ -264,7 +280,7 @@ guide_glycan <- function(
     dimension,
     width = grid::grobWidth(child) +
       if (position %in% c("left", "right")) gap else grid::unit(0, "pt"),
-    height = grid::grobHeight(child) +
+    height = .glycan_legend_child_height(child) +
       if (position %in% c("top", "bottom")) gap else grid::unit(0, "pt")
   )
 }

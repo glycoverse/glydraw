@@ -208,6 +208,7 @@ makeContent.glycanGrob <- function(x) {
   horizontally_centered <- isTRUE(all.equal(hjust, 0.5))
   vertically_centered <- isTRUE(all.equal(vjust, 0.5))
   if (horizontally_centered && vertically_centered) {
+    child$glydraw_justification_offset <- c(x = 0, y = 0)
     return(child)
   }
 
@@ -225,6 +226,7 @@ makeContent.glycanGrob <- function(x) {
     y = grid::unit(0.5, "npc") +
       grid::unit(offset[["y"]], "in")
   )
+  child$glydraw_justification_offset <- offset
   child
 }
 

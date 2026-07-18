@@ -224,6 +224,57 @@ test_that("guide_glycan anchors labels at their reducing ends by default", {
   )
 })
 
+test_that("guide_glycan includes reducing-end offsets in label heights", {
+  structures <- c(
+    paste0(
+      "Man(??-?)[Man(??-?)]Man(??-?)[Man(??-?)]Man(??-?)",
+      "GlcNAc(??-?)GlcNAc(??-"
+    ),
+    "Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-"
+  )
+  data <- data.frame(structure = structures, value = c(1, 2))
+  plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(
+      x = .data$structure,
+      y = .data$value,
+      fill = .data$structure
+    )
+  ) +
+    ggplot2::geom_col() +
+    ggplot2::scale_fill_discrete(guide = guide_glycan())
+
+  legend <- .glycan_legend_table(plot)
+  labels <- legend$grobs[grepl("^label-", legend$layout$name)]
+
+  purrr::walk(labels, function(label) {
+    glycan <- label$children[[1]]
+    child <- glycan$children[[1]]
+    cartoon <- .glycan_grob_to_plot(glycan)
+    size <- attr(cartoon, "glydraw_size_px")
+    offset <- .glycan_justification_offset(
+      cartoon,
+      size,
+      glycan$glydraw_scale,
+      glycan$glydraw_hjust,
+      glycan$glydraw_vjust,
+      glycan$reducing_end_coor
+    )
+    expected_height <- grid::grobHeight(child) +
+      grid::unit(2 * abs(offset[["y"]]), "in")
+
+    expect_gt(abs(offset[["y"]]), 0)
+    expect_equal(
+      grid::convertHeight(grid::grobHeight(label), "mm", valueOnly = TRUE),
+      grid::convertHeight(expected_height, "mm", valueOnly = TRUE)
+    )
+    expect_equal(
+      grid::convertHeight(glycan$vp$height, "mm", valueOnly = TRUE),
+      grid::convertHeight(expected_height, "mm", valueOnly = TRUE)
+    )
+  })
+})
+
 test_that("guide_glycan reducing-end helpers require matching orientations", {
   expect_snapshot(
     error = TRUE,
