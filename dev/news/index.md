@@ -2,11 +2,28 @@
 
 ## glydraw (development version)
 
-- Add
+This version of glydraw introduced some `ggplot2` extensions.
+
+### New features
+
+- New
+  [`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md)
+  draws glycan cartoons for individual observations in ggplot2 plots,
+  with support for size, rotation, justification, and cartoon
+  appearance.
+- New
+  [`guide_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/guide_glycan.md)
+  displays glycan cartoons in ggplot2 legends.
+- New
+  [`scale_x_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md)
+  and
+  [`scale_y_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md)
+  display glycan cartoons as discrete ggplot2 axis labels.
+- New
   [`hjust_red_end()`](https://glycoverse.github.io/glydraw/dev/reference/hjust_red_end.md)
   and
   [`vjust_red_end()`](https://glycoverse.github.io/glydraw/dev/reference/hjust_red_end.md)
-  to anchor vertical and horizontal cartoons at their reducing ends in
+  anchor vertical and horizontal cartoons at their reducing ends in
   [`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md),
   [`scale_x_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md),
   [`scale_y_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md),
@@ -18,24 +35,13 @@
   perpendicular to their drawing orientation;
   [`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md)
   remains centered by default.
+  ([\#54](https://github.com/glycoverse/glydraw/issues/54))
 
 ## glydraw 0.6.3
 
 CRAN release: 2026-07-14
 
-- Fix
-  [`scale_x_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md),
-  [`scale_y_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md),
-  and
-  [`guide_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/guide_glycan.md)
-  for mapped
-  [`glyrepr::glycan_structure()`](https://glycoverse.github.io/glyrepr/reference/glycan_structure.html)
-  columns.
-- [`scale_x_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md)
-  and
-  [`scale_y_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md)
-  now adapt cartoon orientation and alignment when used with
-  [`ggplot2::coord_flip()`](https://ggplot2.tidyverse.org/reference/coord_flip.html).
+- First release on CRAN.
 
 ## glydraw 0.6.2
 
