@@ -46,11 +46,9 @@ export_cartoons <- function(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
-  colors = NULL
+  colors = NULL,
+  style = NULL
 ) {
-  .validate_node_size(node_size)
-  colors <- .validate_custom_colors(colors)
-  fuc_orient <- rlang::arg_match(fuc_orient)
   if (!missing(dpi)) {
     .warn_ignored_dpi()
   }
@@ -73,21 +71,43 @@ export_cartoons.character <- function(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
-  colors = NULL
+  colors = NULL,
+  style = NULL
 ) {
+  style <- .resolve_glydraw_style(
+    style = style,
+    show_linkage = show_linkage,
+    orient = orient,
+    fuc_orient = fuc_orient,
+    red_end = red_end,
+    edge_linewidth = edge_linewidth,
+    node_linewidth = node_linewidth,
+    node_size = node_size,
+    colors = colors,
+    .supplied = c(
+      show_linkage = !missing(show_linkage),
+      orient = !missing(orient),
+      fuc_orient = !missing(fuc_orient),
+      red_end = !missing(red_end),
+      edge_linewidth = !missing(edge_linewidth),
+      node_linewidth = !missing(node_linewidth),
+      node_size = !missing(node_size),
+      colors = !missing(colors)
+    )
+  )
   .export_cartoon_list(
     unique(.as_glycan_structure_input(x)),
     dirname,
     file_ext,
     scale,
-    show_linkage,
-    orient,
-    fuc_orient,
-    red_end,
-    edge_linewidth,
-    node_linewidth,
-    node_size,
-    colors
+    style$show_linkage,
+    style$orient,
+    style$fuc_orient,
+    style$red_end,
+    style$edge_linewidth,
+    style$node_linewidth,
+    style$node_size,
+    style$colors
   )
 }
 
@@ -106,21 +126,43 @@ export_cartoons.glyrepr_structure <- function(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
-  colors = NULL
+  colors = NULL,
+  style = NULL
 ) {
+  style <- .resolve_glydraw_style(
+    style = style,
+    show_linkage = show_linkage,
+    orient = orient,
+    fuc_orient = fuc_orient,
+    red_end = red_end,
+    edge_linewidth = edge_linewidth,
+    node_linewidth = node_linewidth,
+    node_size = node_size,
+    colors = colors,
+    .supplied = c(
+      show_linkage = !missing(show_linkage),
+      orient = !missing(orient),
+      fuc_orient = !missing(fuc_orient),
+      red_end = !missing(red_end),
+      edge_linewidth = !missing(edge_linewidth),
+      node_linewidth = !missing(node_linewidth),
+      node_size = !missing(node_size),
+      colors = !missing(colors)
+    )
+  )
   .export_cartoon_list(
     unique(x),
     dirname,
     file_ext,
     scale,
-    show_linkage,
-    orient,
-    fuc_orient,
-    red_end,
-    edge_linewidth,
-    node_linewidth,
-    node_size,
-    colors
+    style$show_linkage,
+    style$orient,
+    style$fuc_orient,
+    style$red_end,
+    style$edge_linewidth,
+    style$node_linewidth,
+    style$node_size,
+    style$colors
   )
 }
 

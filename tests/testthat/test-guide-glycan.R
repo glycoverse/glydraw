@@ -23,7 +23,10 @@ test_that("guide_glycan replaces legend text with glycan cartoons", {
   ) +
     ggplot2::geom_col() +
     ggplot2::scale_fill_discrete(
-      guide = guide_glycan(size = 0.3, show_linkage = FALSE)
+      guide = guide_glycan(
+        size = 0.3,
+        style = glydraw_style(show_linkage = FALSE)
+      )
     )
 
   legend <- .glycan_legend_table(plot)

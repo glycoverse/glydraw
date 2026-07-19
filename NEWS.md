@@ -4,6 +4,7 @@ This version of glydraw introduced some `ggplot2` extensions.
 
 ## New features
 
+* New `glydraw_style()` stores reusable glycan rendering options for standalone cartoons, grobs, export, ggplot2 layers, guides, and glycan scales. Explicit rendering arguments override the style. (#55)
 * New `geom_glycan()` draws glycan cartoons for individual observations in ggplot2 plots, with support for size, rotation, justification, and cartoon appearance.
 * New `guide_glycan()` displays glycan cartoons in ggplot2 legends.
 * New `scale_x_glycan()` and `scale_y_glycan()` display glycan cartoons as discrete ggplot2 axis labels.

@@ -25,33 +25,63 @@ glycanGrob <- function(
   node_linewidth = 0.8,
   node_size = 1,
   colors = NULL,
-  highlight = NULL
+  highlight = NULL,
+  style = NULL
 ) {
-  checkmate::assert_number(edge_linewidth, lower = 0)
-  checkmate::assert_number(node_linewidth, lower = 0)
-  .validate_node_size(node_size)
-  colors <- .validate_custom_colors(colors)
-  fuc_orient <- rlang::arg_match(fuc_orient)
-  inputs <- .prepare_cartoon_inputs(structure, highlight, orient, red_end)
+  style <- .resolve_glydraw_style(
+    style = style,
+    show_linkage = show_linkage,
+    orient = orient,
+    fuc_orient = fuc_orient,
+    red_end = red_end,
+    edge_linewidth = edge_linewidth,
+    node_linewidth = node_linewidth,
+    node_size = node_size,
+    colors = colors,
+    .supplied = c(
+      show_linkage = !missing(show_linkage),
+      orient = !missing(orient),
+      fuc_orient = !missing(fuc_orient),
+      red_end = !missing(red_end),
+      edge_linewidth = !missing(edge_linewidth),
+      node_linewidth = !missing(node_linewidth),
+      node_size = !missing(node_size),
+      colors = !missing(colors)
+    )
+  )
+  inputs <- .prepare_cartoon_inputs(
+    structure,
+    highlight,
+    style$orient,
+    style$red_end
+  )
   structure <- inputs$structure
   coor <- inputs$coor
   highlight <- inputs$highlight
   orient <- inputs$orient
-  show_linkage <- .resolve_linkage_visibility(show_linkage, node_size)
+  show_linkage <- .resolve_linkage_visibility(
+    style$show_linkage,
+    style$node_size
+  )
 
-  gly_list <- .cartoon_residue_data(structure, coor, highlight, fuc_orient)
+  gly_list <- .cartoon_residue_data(
+    structure,
+    coor,
+    highlight,
+    style$fuc_orient
+  )
   polygon_coor <- .residue_polygon_data(
     gly_list,
-    .default_node_point_size * node_size
+    .default_node_point_size * style$node_size
   )
-  filled_color <- .resolve_residue_fill_colors(polygon_coor, colors)
+  filled_color <- .resolve_residue_fill_colors(polygon_coor, style$colors)
   annotation_data <- .cartoon_text_annotation_data(
     structure,
     coor,
     orient,
-    red_end,
+    style$red_end,
     highlight,
-    node_size = node_size
+    node_size = style$node_size
   )
   connect_df <- .cartoon_segment_data(
     structure,
@@ -70,8 +100,8 @@ glycanGrob <- function(
     filled_color = filled_color,
     annotation_data = annotation_data,
     show_linkage = show_linkage,
-    edge_linewidth = edge_linewidth,
-    node_linewidth = node_linewidth,
+    edge_linewidth = style$edge_linewidth,
+    node_linewidth = style$node_linewidth,
     cl = "glycanGrob"
   )
 }

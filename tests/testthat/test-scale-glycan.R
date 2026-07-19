@@ -472,11 +472,15 @@ test_that("glycan axis scales use plain cartoon parameters", {
     ggplot2::aes(x = .data$structure, y = .data$value)
   ) +
     ggplot2::geom_col() +
-    scale_x_glycan(size = 0.6, show_linkage = TRUE)
+    scale_x_glycan(
+      size = 0.6,
+      style = glydraw_style(show_linkage = TRUE, edge_linewidth = 1.1)
+    )
   label <- .axis_glycan_labels(plot, "axis-b")$children[[1]]
 
   expect_false("guide" %in% names(formals(scale_x_glycan)))
   expect_false("guide" %in% names(formals(scale_y_glycan)))
   expect_equal(label$glydraw_scale, 0.6)
   expect_true(label$show_linkage)
+  expect_equal(label$edge_linewidth, 1.1)
 })
