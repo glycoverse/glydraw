@@ -29,6 +29,8 @@
 #' @param node_size Node-size multiplier passed to [glycanGrob()].
 #' @param colors Optional named character vector of monosaccharide fill colors
 #'   passed to [glycanGrob()].
+#' @param style A `glydraw_style` object that supplies rendering options.
+#'   Explicitly supplied rendering arguments override it.
 #'
 #' @returns A ggplot2 legend guide that draws glycan cartoons in place of text
 #'   labels.

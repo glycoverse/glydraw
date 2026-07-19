@@ -92,6 +92,9 @@ for a wave, or another string to display that text. Defaults to \code{""}.}
 
 \item{colors}{Optional named character vector of monosaccharide fill colors
 passed to \code{\link[=glycanGrob]{glycanGrob()}}.}
+
+\item{style}{A \code{glydraw_style} object that supplies rendering options.
+Explicitly supplied rendering arguments override it.}
 }
 \value{
 A ggplot2 legend guide that draws glycan cartoons in place of text
