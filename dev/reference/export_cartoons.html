@@ -53,7 +53,8 @@
 <span>  edge_linewidth <span class="op">=</span> <span class="fl">0.8</span>,</span>
 <span>  node_linewidth <span class="op">=</span> <span class="fl">0.8</span>,</span>
 <span>  node_size <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  colors <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  colors <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  style <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -134,6 +135,11 @@ than <code>2</code> are rejected because residues overlap.</p></dd>
 colors. Names must be supported monosaccharide names, such as <code>"Gal"</code> or
 <code>"GlcNAc"</code>. User-provided colors overwrite the default SNFG colors, while
 unprovided monosaccharides keep their default colors. Defaults to <code>NULL</code>.</p></dd>
+
+
+<dt id="arg-style">style<a class="anchor" aria-label="anchor" href="#arg-style"></a></dt>
+<dd><p>A <code>glydraw_style</code> object that supplies rendering options.
+Explicitly supplied rendering arguments override it.</p></dd>
 
 </dl></div>
     <div class="section level2">

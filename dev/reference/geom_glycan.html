@@ -82,6 +82,7 @@ background.</p>
 <span>  node_size <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  colors <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  highlight <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  style <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -178,6 +179,11 @@ Note that for a <code><a href="https://glycoverse.github.io/glyrepr/reference/gl
 to the monosaccharides in its printed IUPAC nomenclature.
 For example, given <code>glyrepr::as_glycan_structure("Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-")</code>,
 setting <code>highlight = c(1, 3)</code> will highlight the "Gal" and "GalNAc" nodes.</p></dd>
+
+
+<dt id="arg-style">style<a class="anchor" aria-label="anchor" href="#arg-style"></a></dt>
+<dd><p>A <code>glydraw_style</code> object that supplies rendering options.
+Explicitly supplied rendering arguments override it.</p></dd>
 
 
 <dt id="arg-na-rm">na.rm<a class="anchor" aria-label="anchor" href="#arg-na-rm"></a></dt>

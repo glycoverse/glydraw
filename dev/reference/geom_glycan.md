@@ -32,6 +32,7 @@ geom_glycan(
   node_size = 1,
   colors = NULL,
   highlight = NULL,
+  style = NULL,
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE
@@ -135,6 +136,11 @@ geom_glycan(
   `glyrepr::as_glycan_structure("Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-")`,
   setting `highlight = c(1, 3)` will highlight the "Gal" and "GalNAc"
   nodes.
+
+- style:
+
+  A `glydraw_style` object that supplies rendering options. Explicitly
+  supplied rendering arguments override it.
 
 - na.rm:
 

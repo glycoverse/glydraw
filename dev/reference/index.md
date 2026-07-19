@@ -10,6 +10,8 @@
   : Draw glycans at ggplot2 positions
 - [`glycanGrob()`](https://glycoverse.github.io/glydraw/dev/reference/glycanGrob.md)
   : Construct a glycan grob
+- [`glydraw_style()`](https://glycoverse.github.io/glydraw/dev/reference/glydraw_style.md)
+  : Create a glycan drawing style
 - [`guide_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/guide_glycan.md)
   : Use glycan cartoons as legend labels
 - [`hjust_red_end()`](https://glycoverse.github.io/glydraw/dev/reference/hjust_red_end.md)

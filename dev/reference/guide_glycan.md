@@ -32,7 +32,8 @@ guide_glycan(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
-  colors = NULL
+  colors = NULL,
+  style = NULL
 )
 ```
 
@@ -152,6 +153,11 @@ guide_glycan(
   Optional named character vector of monosaccharide fill colors passed
   to
   [`glycanGrob()`](https://glycoverse.github.io/glydraw/dev/reference/glycanGrob.md).
+
+- style:
+
+  A `glydraw_style` object that supplies rendering options. Explicitly
+  supplied rendering arguments override it.
 
 ## Value
 
