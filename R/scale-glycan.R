@@ -82,8 +82,28 @@ scale_x_glycan <- function(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
-  colors = NULL
+  colors = NULL,
+  style = NULL
 ) {
+  style <- .resolve_glydraw_style(
+    style = style,
+    show_linkage = show_linkage,
+    fuc_orient = fuc_orient,
+    red_end = red_end,
+    edge_linewidth = edge_linewidth,
+    node_linewidth = node_linewidth,
+    node_size = node_size,
+    colors = colors,
+    .supplied = c(
+      show_linkage = !missing(show_linkage),
+      fuc_orient = !missing(fuc_orient),
+      red_end = !missing(red_end),
+      edge_linewidth = !missing(edge_linewidth),
+      node_linewidth = !missing(node_linewidth),
+      node_size = !missing(node_size),
+      colors = !missing(colors)
+    )
+  )
   guide <- .new_glycan_axis_guide(
     orient = "V",
     size = size,
@@ -92,13 +112,13 @@ scale_x_glycan <- function(
     vjust = vjust,
     nudge_x = nudge_x,
     nudge_y = nudge_y,
-    show_linkage = show_linkage,
-    red_end = red_end,
-    fuc_orient = fuc_orient,
-    edge_linewidth = edge_linewidth,
-    node_linewidth = node_linewidth,
-    node_size = node_size,
-    colors = colors
+    show_linkage = style$show_linkage,
+    red_end = style$red_end,
+    fuc_orient = style$fuc_orient,
+    edge_linewidth = style$edge_linewidth,
+    node_linewidth = style$node_linewidth,
+    node_size = style$node_size,
+    colors = style$colors
   )
 
   scale <- ggplot2::scale_x_discrete(
@@ -137,8 +157,28 @@ scale_y_glycan <- function(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
-  colors = NULL
+  colors = NULL,
+  style = NULL
 ) {
+  style <- .resolve_glydraw_style(
+    style = style,
+    show_linkage = show_linkage,
+    fuc_orient = fuc_orient,
+    red_end = red_end,
+    edge_linewidth = edge_linewidth,
+    node_linewidth = node_linewidth,
+    node_size = node_size,
+    colors = colors,
+    .supplied = c(
+      show_linkage = !missing(show_linkage),
+      fuc_orient = !missing(fuc_orient),
+      red_end = !missing(red_end),
+      edge_linewidth = !missing(edge_linewidth),
+      node_linewidth = !missing(node_linewidth),
+      node_size = !missing(node_size),
+      colors = !missing(colors)
+    )
+  )
   guide <- .new_glycan_axis_guide(
     orient = "H",
     size = size,
@@ -147,13 +187,13 @@ scale_y_glycan <- function(
     vjust = vjust,
     nudge_x = nudge_x,
     nudge_y = nudge_y,
-    show_linkage = show_linkage,
-    red_end = red_end,
-    fuc_orient = fuc_orient,
-    edge_linewidth = edge_linewidth,
-    node_linewidth = node_linewidth,
-    node_size = node_size,
-    colors = colors
+    show_linkage = style$show_linkage,
+    red_end = style$red_end,
+    fuc_orient = style$fuc_orient,
+    edge_linewidth = style$edge_linewidth,
+    node_linewidth = style$node_linewidth,
+    node_size = style$node_size,
+    colors = style$colors
   )
 
   scale <- ggplot2::scale_y_discrete(

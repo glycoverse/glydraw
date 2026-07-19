@@ -25,7 +25,8 @@ scale_x_glycan(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
-  colors = NULL
+  colors = NULL,
+  style = NULL
 )
 
 scale_y_glycan(
@@ -48,7 +49,8 @@ scale_y_glycan(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
-  colors = NULL
+  colors = NULL,
+  style = NULL
 )
 }
 \arguments{

@@ -157,20 +157,13 @@ geom_glycan <- function(
   node_size = 1,
   colors = NULL,
   highlight = NULL,
+  style = NULL,
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE
 ) {
-  checkmate::assert_number(edge_linewidth, lower = 0)
-  checkmate::assert_number(node_linewidth, lower = 0)
-  checkmate::assert_string(red_end, na.ok = FALSE)
-  .validate_node_size(node_size)
-  colors <- .validate_custom_colors(colors)
-  orient <- rlang::arg_match(orient)
-  fuc_orient <- rlang::arg_match(fuc_orient)
-  show_linkage <- .resolve_linkage_visibility(show_linkage, node_size)
-
-  params <- rlang::list2(
+  style <- .resolve_glydraw_style(
+    style = style,
     show_linkage = show_linkage,
     orient = orient,
     fuc_orient = fuc_orient,
@@ -178,7 +171,32 @@ geom_glycan <- function(
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
     node_size = node_size,
-    colours = colors,
+    colors = colors,
+    .supplied = c(
+      show_linkage = !missing(show_linkage),
+      orient = !missing(orient),
+      fuc_orient = !missing(fuc_orient),
+      red_end = !missing(red_end),
+      edge_linewidth = !missing(edge_linewidth),
+      node_linewidth = !missing(node_linewidth),
+      node_size = !missing(node_size),
+      colors = !missing(colors)
+    )
+  )
+  show_linkage <- .resolve_linkage_visibility(
+    style$show_linkage,
+    style$node_size
+  )
+
+  params <- rlang::list2(
+    show_linkage = show_linkage,
+    orient = style$orient,
+    fuc_orient = style$fuc_orient,
+    red_end = style$red_end,
+    edge_linewidth = style$edge_linewidth,
+    node_linewidth = style$node_linewidth,
+    node_size = style$node_size,
+    colours = style$colors,
     highlight = highlight,
     na.rm = na.rm,
     ...
@@ -189,7 +207,7 @@ geom_glycan <- function(
   .validate_red_end_justification_orientation(
     params$hjust,
     params$vjust,
-    orient
+    style$orient
   )
 
   ggplot2::layer(

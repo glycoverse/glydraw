@@ -27,6 +27,8 @@
 #'   colors. Names must be supported monosaccharide names, such as `"Gal"` or
 #'   `"GlcNAc"`. User-provided colors overwrite the default SNFG colors, while
 #'   unprovided monosaccharides keep their default colors. Defaults to `NULL`.
+#' @param style A `glydraw_style` object that supplies rendering options.
+#'   Explicitly supplied rendering arguments override it.
 #' @param highlight An integer vector specifying the node indices to highlight.
 #'   This argument is applicable only when `structure` is a [glyrepr::glycan_structure()].
 #'   Note that for a [glyrepr::glycan_structure()], the node indices correspond exactly
@@ -49,11 +51,11 @@ draw_cartoon <- function(
   node_linewidth = 0.8,
   node_size = 1,
   colors = NULL,
-  highlight = NULL
+  highlight = NULL,
+  style = NULL
 ) {
-  glycanGrob(
-    structure,
-    ...,
+  style <- .resolve_glydraw_style(
+    style = style,
     show_linkage = show_linkage,
     orient = orient,
     fuc_orient = fuc_orient,
@@ -62,6 +64,28 @@ draw_cartoon <- function(
     node_linewidth = node_linewidth,
     node_size = node_size,
     colors = colors,
+    .supplied = c(
+      show_linkage = !missing(show_linkage),
+      orient = !missing(orient),
+      fuc_orient = !missing(fuc_orient),
+      red_end = !missing(red_end),
+      edge_linewidth = !missing(edge_linewidth),
+      node_linewidth = !missing(node_linewidth),
+      node_size = !missing(node_size),
+      colors = !missing(colors)
+    )
+  )
+  glycanGrob(
+    structure,
+    ...,
+    show_linkage = style$show_linkage,
+    orient = style$orient,
+    fuc_orient = style$fuc_orient,
+    red_end = style$red_end,
+    edge_linewidth = style$edge_linewidth,
+    node_linewidth = style$node_linewidth,
+    node_size = style$node_size,
+    colors = style$colors,
     highlight = highlight
   ) |>
     .glycan_grob_to_plot()

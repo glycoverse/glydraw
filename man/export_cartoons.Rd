@@ -18,7 +18,8 @@ export_cartoons(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
-  colors = NULL
+  colors = NULL,
+  style = NULL
 )
 }
 \arguments{
@@ -68,6 +69,9 @@ than \code{2} are rejected because residues overlap.}
 colors. Names must be supported monosaccharide names, such as \code{"Gal"} or
 \code{"GlcNAc"}. User-provided colors overwrite the default SNFG colors, while
 unprovided monosaccharides keep their default colors. Defaults to \code{NULL}.}
+
+\item{style}{A \code{glydraw_style} object that supplies rendering options.
+Explicitly supplied rendering arguments override it.}
 }
 \value{
 The function returns the list of cartoons implicitly.

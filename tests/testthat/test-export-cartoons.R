@@ -55,8 +55,7 @@ test_that("export_cartoons forwards custom linewidths", {
     result <- export_cartoons(
       glycans,
       temp_dir,
-      edge_linewidth = 1.1,
-      node_linewidth = 0.3
+      style = glydraw_style(edge_linewidth = 1.1, node_linewidth = 0.3)
     )
   )
   layers <- ggplot2::ggplot_build(result[[1]])$data
@@ -75,7 +74,7 @@ test_that("export_cartoons forwards custom colors", {
     result <- export_cartoons(
       glycans,
       temp_dir,
-      colors = c(Gal = "#123456")
+      style = glydraw_style(colors = c(Gal = "#123456"))
     )
   )
   node_fill <- unique(ggplot2::ggplot_build(result[[1]])$data[[3]]$fill)

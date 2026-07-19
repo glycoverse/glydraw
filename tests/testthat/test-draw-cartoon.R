@@ -57,6 +57,30 @@ test_that("draw_cartoon applies custom monosaccharide colors over defaults", {
   expect_contains(node_fill, "#0072BC")
 })
 
+test_that("draw_cartoon accepts reusable glydraw styles", {
+  structure <- "Gal(b1-4)GlcNAc(b1-"
+  style <- glydraw_style(
+    show_linkage = FALSE,
+    orient = "V",
+    edge_linewidth = 1.2,
+    colors = c(Gal = "#123456")
+  )
+
+  styled_plot <- draw_cartoon(structure, style = style)
+  styled_layers <- ggplot2::ggplot_build(styled_plot)$data
+  override_plot <- draw_cartoon(
+    structure,
+    style = style,
+    edge_linewidth = 0.4
+  )
+  override_layers <- ggplot2::ggplot_build(override_plot)$data
+
+  expect_s3_class(style, "glydraw_style")
+  expect_equal(unique(styled_layers[[1]]$linewidth), 1.2)
+  expect_contains(unique(styled_layers[[3]]$fill), "#123456")
+  expect_equal(unique(override_layers[[1]]$linewidth), 0.4)
+})
+
 test_that("draw_cartoon rejects unsupported custom color names", {
   structure <- "Gal(b1-4)GlcNAc(b1-"
 

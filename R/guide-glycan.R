@@ -73,12 +73,34 @@ guide_glycan <- function(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
-  colors = NULL
+  colors = NULL,
+  style = NULL
 ) {
   hjust_is_missing <- missing(hjust)
   vjust_is_missing <- missing(vjust)
+  style <- .resolve_glydraw_style(
+    style = style,
+    show_linkage = show_linkage,
+    orient = orient,
+    fuc_orient = fuc_orient,
+    red_end = red_end,
+    edge_linewidth = edge_linewidth,
+    node_linewidth = node_linewidth,
+    node_size = node_size,
+    colors = colors,
+    .supplied = c(
+      show_linkage = !missing(show_linkage),
+      orient = !missing(orient),
+      fuc_orient = !missing(fuc_orient),
+      red_end = !missing(red_end),
+      edge_linewidth = !missing(edge_linewidth),
+      node_linewidth = !missing(node_linewidth),
+      node_size = !missing(node_size),
+      colors = !missing(colors)
+    )
+  )
   .validate_output_scale(size)
-  orient <- rlang::arg_match(orient)
+  orient <- style$orient
   if (hjust_is_missing && identical(orient, "V")) {
     hjust <- hjust_red_end()
   }
@@ -88,13 +110,10 @@ guide_glycan <- function(
   .validate_red_end_justification_orientation(hjust, vjust, orient)
   .validate_glycan_justification_scalar(hjust, "hjust")
   .validate_glycan_justification_scalar(vjust, "vjust")
-  fuc_orient <- rlang::arg_match(fuc_orient)
-  checkmate::assert_number(edge_linewidth, lower = 0)
-  checkmate::assert_number(node_linewidth, lower = 0)
-  checkmate::assert_string(red_end, na.ok = FALSE)
-  .validate_node_size(node_size)
-  colors <- .validate_custom_colors(colors)
-  show_linkage <- .resolve_linkage_visibility(show_linkage, node_size)
+  show_linkage <- .resolve_linkage_visibility(
+    style$show_linkage,
+    style$node_size
+  )
 
   if (!is.null(position)) {
     position <- rlang::arg_match(
@@ -126,12 +145,12 @@ guide_glycan <- function(
     glycan_hjust = hjust,
     glycan_vjust = vjust,
     glycan_show_linkage = show_linkage,
-    glycan_red_end = red_end,
-    glycan_fuc_orient = fuc_orient,
-    glycan_edge_linewidth = edge_linewidth,
-    glycan_node_linewidth = node_linewidth,
-    glycan_node_size = node_size,
-    glycan_colors = colors,
+    glycan_red_end = style$red_end,
+    glycan_fuc_orient = style$fuc_orient,
+    glycan_edge_linewidth = style$edge_linewidth,
+    glycan_node_linewidth = style$node_linewidth,
+    glycan_node_size = style$node_size,
+    glycan_colors = style$colors,
     available_aes = "any",
     name = "legend",
     super = GuideGlycan
