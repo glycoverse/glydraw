@@ -81,6 +81,16 @@ test_that("draw_cartoon accepts reusable glydraw styles", {
   expect_equal(unique(override_layers[[1]]$linewidth), 0.4)
 })
 
+test_that("draw_cartoon validates NULL style overrides", {
+  structure <- "Gal(b1-4)GlcNAc(b1-"
+  style <- glydraw_style(edge_linewidth = 1.2)
+
+  expect_error(
+    draw_cartoon(structure, style = style, edge_linewidth = NULL),
+    "edge_linewidth"
+  )
+})
+
 test_that("draw_cartoon rejects unsupported custom color names", {
   structure <- "Gal(b1-4)GlcNAc(b1-"
 

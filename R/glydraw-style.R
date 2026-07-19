@@ -76,5 +76,8 @@ glydraw_style <- function(
   }
 
   values <- values[.supplied]
-  do.call(glydraw_style, utils::modifyList(unclass(style), values))
+  do.call(
+    glydraw_style,
+    utils::modifyList(unclass(style), values, keep.null = TRUE)
+  )
 }
