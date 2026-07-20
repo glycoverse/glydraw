@@ -10,6 +10,10 @@ This version of glydraw introduced some `ggplot2` extensions.
 * New `scale_x_glycan()` and `scale_y_glycan()` display glycan cartoons as discrete ggplot2 axis labels.
 * New `hjust_red_end()` and `vjust_red_end()` anchor vertical and horizontal cartoons at their reducing ends in `geom_glycan()`, `scale_x_glycan()`, `scale_y_glycan()`, and `guide_glycan()`. `guide_glycan()` also gains `hjust` and `vjust` parameters. Reducing-end justification is the default for scale and guide cartoons along the axis perpendicular to their drawing orientation; `geom_glycan()` remains centered by default. (#54)
 
+## Minor improvements and bug fixes
+
+* `draw_cartoon()` now treats generic `dHex` residues as Fuc-like branches, using the same layout and `fuc_orient` behavior as Fuc. (#56)
+
 # glydraw 0.6.3
 
 * First release on CRAN.
