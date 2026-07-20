@@ -57,6 +57,9 @@ glycan_dict <- list(
   'IdoA' = c('HexA', 'glyBrown', 'glyWhite'),
 
   'dHex' = c('dHex', 'glyWhite'),
+  'dHexUp' = c('dHexUp', 'glyWhite'),
+  'dHexRight' = c('dHexRight', 'glyWhite'),
+  'dHexLeft' = c('dHexLeft', 'glyWhite'),
   'Qui' = c('dHex', 'glyBlue'),
   'Rha' = c('dHex', 'glyGreen'),
   '6dGul' = c('dHex', 'glyOrange'),
@@ -250,6 +253,7 @@ glycan_shape <- list(
 )
 
 .fucose_like_layout_monosaccharides <- c(
+  "dHex",
   "Fuc",
   "Qui",
   "Rha",
@@ -274,6 +278,7 @@ glycan_shape <- list(
 )
 
 .fucose_like_orient_monosaccharides <- c(
+  "dHex",
   "Fuc",
   "Qui",
   "Rha",

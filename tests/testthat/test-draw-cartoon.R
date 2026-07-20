@@ -170,6 +170,23 @@ test_that("left and right Fuc-like triangles align with rectangle borders", {
   })
 })
 
+test_that("dHex uses Fuc-like layout and orientation", {
+  structure <- "HexNAc(??-?)[dHex(??-?)]HexNAc(??-"
+  inputs <- .prepare_cartoon_inputs(structure, NULL, "H", "")
+  dhex <- which(igraph::V(inputs$structure)$mono == "dHex")
+
+  expect_equal(inputs$coor[dhex, ], c(x = 0, y = 1))
+  expect_equal(
+    .residue_glycoforms(inputs$structure, inputs$coor, "flex")[dhex],
+    "dHexUp"
+  )
+  expect_equal(
+    .residue_glycoforms(inputs$structure, inputs$coor, "up")[dhex],
+    "dHex"
+  )
+  expect_s3_class(draw_cartoon(structure), "glydraw_cartoon")
+})
+
 test_that("draw_cartoon left-aligns vertical substituent labels", {
   structure <- "Neu5Ac9Ac(a2-3)Gal6S(b1-"
 
