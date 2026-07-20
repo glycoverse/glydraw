@@ -43,6 +43,13 @@ This version of glydraw introduced some `ggplot2` extensions.
   remains centered by default.
   ([\#54](https://github.com/glycoverse/glydraw/issues/54))
 
+### Minor improvements and bug fixes
+
+- [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
+  now treats generic `dHex` residues as Fuc-like branches, using the
+  same layout and `fuc_orient` behavior as Fuc.
+  ([\#56](https://github.com/glycoverse/glydraw/issues/56))
+
 ## glydraw 0.6.3
 
 CRAN release: 2026-07-14
