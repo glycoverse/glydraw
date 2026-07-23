@@ -187,6 +187,31 @@ test_that("dHex uses Fuc-like layout and orientation", {
   expect_s3_class(draw_cartoon(structure), "glydraw_cartoon")
 })
 
+test_that("bisecting GlcNAc is centered without linkage information", {
+  structure <- paste0(
+    "Neu5Ac(??-?)Gal(??-?)GlcNAc(??-?)Man(??-?)",
+    "[Gal(??-?)GlcNAc(??-?)Man(??-?)]",
+    "[GlcNAc(??-?)]Man(??-?)GlcNAc(??-?)GlcNAc(??-"
+  )
+  inputs <- .prepare_cartoon_inputs(structure, NULL, "H", "")
+  graph <- inputs$structure
+  child_num <- purrr::map_int(
+    seq_along(igraph::V(graph)),
+    \(vertex) length(igraph::neighbors(graph, vertex, mode = "out"))
+  )
+  core <- which(igraph::V(graph)$mono == "Man" & child_num == 3)
+  children <- as.integer(igraph::neighbors(graph, core, mode = "out"))
+  bisecting <- children[igraph::V(graph)[children]$mono == "GlcNAc"]
+  arms <- children[igraph::V(graph)[children]$mono == "Man"]
+
+  expect_equal(unname(inputs$coor[bisecting, "y"]), 0)
+  expect_equal(sort(unname(inputs$coor[arms, "y"])), c(-1, 1))
+  expect_s3_class(
+    draw_cartoon(structure, show_linkage = FALSE),
+    "glydraw_cartoon"
+  )
+})
+
 test_that("draw_cartoon left-aligns vertical substituent labels", {
   structure <- "Neu5Ac9Ac(a2-3)Gal6S(b1-"
 
