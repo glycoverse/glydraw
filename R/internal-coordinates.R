@@ -177,8 +177,10 @@
 #' @param ver A single integer vertex index.
 #'
 #' @returns An igraph vertex sequence of neighbors for `ver`, excluding
-#'   Fuc-like neighbors. Numeric linkage positions are sorted decreasing;
-#'   unknown or compound linkage values are placed at the bottom.
+#'   Fuc-like neighbors. A GlcNAc flanked by two Man children is kept in the
+#'   middle so bisecting GlcNAc is recognized from topology. Otherwise, numeric
+#'   linkage positions are sorted decreasing; unknown or compound linkage
+#'   values are placed at the bottom.
 #'
 #' @noRd
 .order_child_vertices_by_linkage <- function(structure, ver) {
@@ -193,10 +195,29 @@
   if (!all(is.na(neigh_linkage))) {
     neigh_linkage[is.na(neigh_linkage)] <- -Inf # Set '?' or '3/6' type as bottom
     arrange_neigh_pos <- neigh_pos[order(neigh_linkage, decreasing = TRUE)]
-    return(arrange_neigh_pos)
   } else {
-    return(neigh_pos) # No sorting if all linkages are '?' or '3/6' type
+    arrange_neigh_pos <- neigh_pos # No sorting if all linkages are '?' or '3/6' type
   }
+
+  .center_bisecting_glcnac(arrange_neigh_pos)
+}
+
+#' Center a topologically identified bisecting GlcNAc
+#'
+#' @param child_pos An igraph vertex sequence of non-Fuc-like child residues in
+#'   their preferred branch order.
+#'
+#' @returns `child_pos`, with GlcNAc placed between two Man children when those
+#'   are the only three child residues.
+#' @noRd
+.center_bisecting_glcnac <- function(child_pos) {
+  is_man <- child_pos$mono == "Man"
+  is_glcnac <- child_pos$mono == "GlcNAc"
+  if (sum(is_man) != 2 || sum(is_glcnac) != 1 || length(child_pos) != 3) {
+    return(child_pos)
+  }
+
+  child_pos[c(which(is_man)[1], which(is_glcnac), which(is_man)[2])]
 }
 
 #' Spread two child subtrees around their parent
