@@ -187,6 +187,20 @@ test_that("dHex uses Fuc-like layout and orientation", {
   expect_s3_class(draw_cartoon(structure), "glydraw_cartoon")
 })
 
+test_that("double core Fuc without linkages uses opposite branch sides", {
+  structure <- "GlcNAc(??-?)[Fuc(??-?)][Fuc(??-?)]GlcNAc(??-"
+  inputs <- .prepare_cartoon_inputs(structure, NULL, "H", "")
+  graph <- inputs$structure
+  core <- length(graph)
+  fuc <- as.integer(igraph::neighbors(graph, core, mode = "out"))
+  fuc <- fuc[igraph::V(graph)[fuc]$mono == "Fuc"]
+
+  expect_equal(
+    sort(unname(inputs$coor[fuc, "y"] - inputs$coor[core, "y"])),
+    c(-1, 1)
+  )
+})
+
 test_that("bisecting GlcNAc is centered without linkage information", {
   structure <- paste0(
     "Neu5Ac(??-?)Gal(??-?)GlcNAc(??-?)Man(??-?)",
