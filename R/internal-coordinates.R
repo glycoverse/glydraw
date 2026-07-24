@@ -136,13 +136,33 @@
 #' @param fuc_pos An integer vector of Fuc-like vertex indices.
 #'
 #' @returns A numeric vector the same length as `fuc_pos`. Linkages ending in
-#'   `2` or `3` return `-1`; other linkage positions return `1`.
+#'   `2` or `3` return `-1`; other known linkage positions return `1`. A single
+#'   unknown linkage returns `1`, while unknown sibling linkages fill the side
+#'   with fewer Fuc-like branches.
 #' @noRd
 .fucose_branch_y_offsets <- function(structure, fuc_pos) {
   linkage_str <- igraph::E(structure)[fuc_pos]$linkage
   linkage_pos <- purrr::map_chr(strsplit(linkage_str, '-'), 2)
-  offset <- rep(1, length(linkage_pos))
-  offset[linkage_pos %in% c('2', '3')] <- -1
+  unknown <- linkage_pos == '?'
+  offset <- rep(NA_real_, length(linkage_pos))
+  offset[!unknown] <- ifelse(
+    linkage_pos[!unknown] %in% c('2', '3'),
+    -1,
+    1
+  )
+
+  for (i in which(unknown)) {
+    if (length(linkage_pos) == 1) {
+      offset[i] <- 1
+    } else if (
+      sum(offset == -1, na.rm = TRUE) <= sum(offset == 1, na.rm = TRUE)
+    ) {
+      offset[i] <- -1
+    } else {
+      offset[i] <- 1
+    }
+  }
+
   return(offset)
 }
 

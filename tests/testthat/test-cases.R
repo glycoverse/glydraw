@@ -45,6 +45,14 @@ test_that("Draw core Fuc branch sides", {
   vdiffr::expect_doppelganger("core Fuc branch sides", draw_cartoon(glycan))
 })
 
+test_that("Draw double core Fuc without linkages", {
+  glycan <- "GlcNAc(??-?)[Fuc(??-?)][Fuc(??-?)]GlcNAc(??-"
+  vdiffr::expect_doppelganger(
+    "double core Fuc without linkages",
+    draw_cartoon(glycan)
+  )
+})
+
 test_that("Draw three-way branch with two Fuc leaves", {
   glycan <- "Fuc(a1-3)[Fuc(a1-6)][GlcNAc(b1-4)]GlcNAc(b1-"
   vdiffr::expect_doppelganger(
