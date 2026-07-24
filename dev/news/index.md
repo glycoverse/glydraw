@@ -45,6 +45,12 @@ This version of glydraw introduced some `ggplot2` extensions.
 
 ### Minor improvements and bug fixes
 
+- [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
+  now places double core Fuc branches on opposite sides of the core
+  GlcNAc when linkage positions are unavailable, keeping both
+  connections visible.
+  ([\#59](https://github.com/glycoverse/glydraw/issues/59),
+  [\#60](https://github.com/glycoverse/glydraw/issues/60))
 - Recognize bisecting GlcNAc from N-glycan topology when linkage
   information is unavailable, keeping it centered between the two
   mannose arms.
