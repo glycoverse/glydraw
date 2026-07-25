@@ -6,9 +6,10 @@
   and
   [`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md)
   now prepare linkage annotations and repeated panel structures more
-  efficiently, improving rendering performance while preserving cartoon
-  layout and appearance.
-  ([\#64](https://github.com/glycoverse/glydraw/issues/64))
+  efficiently, and unscaled glycan grobs use native grid primitives for
+  faster rendering without changing cartoon layout or appearance.
+  ([\#64](https://github.com/glycoverse/glydraw/issues/64),
+  [\#65](https://github.com/glycoverse/glydraw/issues/65))
 
 ## glydraw 0.7.0
 
