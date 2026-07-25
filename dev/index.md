@@ -65,36 +65,46 @@ draw_cartoon(glycan, red_end = "PP-Dol")
 
 ### ggplot2 extension
 
-[`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md)
+[`scale_x_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md)
+and
+[`scale_y_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md)
 can add glycan cartoons to standard ggplot2 figures. For example, you
-can place cartoons above bars as follows:
+can use glycan cartoons as labels in a heatmap:
 
 ``` r
 
 library(ggplot2)
 library(glydraw)
+library(tibble)
 
-plot_data <- data.frame(
-  glycan = c("Gal(b1-3)GalNAc(a1-", "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"),
-  value = c(1, 2)
+set.seed(123)
+plot_data <- tibble(
+  `z-score` = rnorm(25),
+  branch = rep(c(
+    "GlcNAc(??-",
+    "Gal(??-?)GlcNAc(??-",
+    "Neu5Ac(??-?)Gal(??-?)GlcNAc(??-",
+    "Neu5Ac(??-?)Gal(??-?)[Fuc(??-?)]GlcNAc(??-",
+    "Gal(??-?)[Fuc(??-?)]GlcNAc(??-"
+  ), 5),
+  sample = rep(paste0("Sample ", 1:5), each = 5)
 )
 
-ggplot(plot_data, aes(glycan, value)) +
-  geom_col(fill = "grey70") +
-  geom_glycan(
-    aes(structure = glycan),
-    orient = "V",
-    size = 0.5,
-    vjust = 0,
-    position = position_nudge(y = 0.1)
+ggplot(plot_data, aes(branch, sample)) +
+  geom_tile(aes(fill = `z-score`), color = "white", linewidth = 1) +
+  scale_fill_viridis_c(option = "plasma") +
+  scale_x_glycan(
+    position = "top",
+    size = 0.2,
+    show_linkage = FALSE,
+    red_end = "~"
   ) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.4))) +
-  theme_classic() +
-  theme(
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank()
-  )
+  coord_equal() +
+  theme_void() +
+  theme(axis.text.y = element_text())
 ```
+
+![](reference/figures/README-ggplot2-extension-1.png)
 
 ### Gallery
 
