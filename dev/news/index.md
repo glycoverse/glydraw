@@ -2,14 +2,20 @@
 
 ## glydraw (development version)
 
-- [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
+- Glycan grobs used by
+  [`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md),
+  [`geom_node_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_node_glycan.md),
+  [`guide_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/guide_glycan.md),
+  [`scale_x_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md),
   and
-  [`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md)
-  now prepare linkage annotations and repeated panel structures more
-  efficiently, and unscaled glycan grobs use native grid primitives for
-  faster rendering without changing cartoon layout or appearance.
+  [`scale_y_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md)
+  now remain vector graphics at every size when exported to PDF or SVG;
+  [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
+  and repeated panel structures also render more efficiently with native
+  grid primitives without changing cartoon layout or appearance.
   ([\#64](https://github.com/glycoverse/glydraw/issues/64),
-  [\#65](https://github.com/glycoverse/glydraw/issues/65))
+  [\#65](https://github.com/glycoverse/glydraw/issues/65),
+  [\#66](https://github.com/glycoverse/glydraw/issues/66))
 
 ## glydraw 0.7.0
 
