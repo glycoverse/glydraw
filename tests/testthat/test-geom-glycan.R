@@ -100,6 +100,42 @@ test_that("geom_glycan draws one configured glycan grob per row", {
   expect_no_error(ggplot2::ggplotGrob(plot))
 })
 
+test_that("geom_glycan prepares repeated structures once per panel", {
+  structures <- c(
+    "Gal(b1-3)GalNAc(a1-",
+    "Gal(b1-3)GalNAc(a1-",
+    "Gal(b1-4)GlcNAc(b1-",
+    "Gal(b1-3)GalNAc(a1-"
+  )
+  data <- data.frame(
+    x = seq_along(structures),
+    y = 1,
+    structure = structures
+  )
+  call_count <- 0L
+  original_glycan_grob <- glycanGrob
+  testthat::local_mocked_bindings(
+    glycanGrob = function(...) {
+      call_count <<- call_count + 1L
+      original_glycan_grob(...)
+    }
+  )
+
+  plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(
+      x = .data$x,
+      y = .data$y,
+      structure = .data$structure
+    )
+  ) +
+    geom_glycan()
+  layer <- ggplot2::layer_grob(plot)
+
+  expect_equal(call_count, 2L)
+  expect_length(layer[[1]]$children, length(structures))
+})
+
 test_that("geom_glycan requires structure, x, and y aesthetics", {
   data <- data.frame(x = 1, y = 1)
   plot <- ggplot2::ggplot(

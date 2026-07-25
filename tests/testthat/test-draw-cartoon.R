@@ -257,6 +257,28 @@ test_that("draw_cartoon works with linkage hidden", {
   expect_s3_class(plot_no_linkage, "glydraw_cartoon")
 })
 
+test_that("linkage-hidden cartoons skip unused annotation construction", {
+  inputs <- .prepare_cartoon_inputs(
+    "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-",
+    NULL,
+    "H",
+    ""
+  )
+  testthat::local_mocked_bindings(
+    .linkage_annotation_data = function(...) {
+      stop("linkage annotations were constructed")
+    }
+  )
+
+  annotation <- .cartoon_text_annotation_data(
+    inputs$structure,
+    inputs$coor,
+    show_linkage = FALSE
+  )
+
+  expect_equal(nrow(annotation$show_without_linkage), 0)
+})
+
 test_that("draw_cartoon works with reducing-end O-Fuc glycans", {
   glycans <- c(
     "Fuc(a1-",
@@ -302,4 +324,36 @@ test_that("draw_cartoon preserves nested Xyl-Gal-Fuc side-chain order", {
   expect_true(all(
     gal_labels$y > coor[xyl, "y"] & gal_labels$y < coor[gal, "y"]
   ))
+})
+
+test_that("linkage annotations preserve row-wise topology calculations", {
+  structures <- c(
+    "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-",
+    paste0(
+      "Neu5Ac(a2-3)Gal(b1-3)[Fuc(a1-2)Gal(b1-3)[Fuc(a1-4)]",
+      "GlcNAc(b1-3)[Gal(b1-4)GlcNAc(b1-6)]Gal(b1-4)",
+      "GlcNAc(b1-6)]GalNAc(a1-"
+    )
+  )
+
+  purrr::walk(structures, function(structure) {
+    inputs <- .prepare_cartoon_inputs(structure, NULL, "H", "")
+    expected <- purrr::map_dfr(
+      seq_len(length(inputs$structure) - 1),
+      \(.vertex) {
+        .linkage_annotation_rows(
+          inputs$structure,
+          inputs$coor,
+          .vertex,
+          orient = "H"
+        )
+      }
+    )
+    expected$annot <- .normalize_linkage_labels(expected$annot)
+
+    expect_identical(
+      .linkage_annotation_data(inputs$structure, inputs$coor, orient = "H"),
+      expected
+    )
+  })
 })

@@ -270,9 +270,36 @@ geom_glycan <- function(
   .validate_glycan_justification(coordinates$hjust, "hjust")
   .validate_glycan_justification(coordinates$vjust, "vjust")
   .validate_glycan_angles(coordinates$angle)
+  structure_input <- coordinates$structure
+  if (
+    !is.null(highlight) &&
+      !glyrepr::is_glycan_structure(structure_input)
+  ) {
+    cli::cli_warn(
+      "{.arg highlight} can only be set when {.arg structure} is a {.fn glyrepr::glycan_structure}."
+    )
+    highlight <- NULL
+  }
+  structures <- .as_glycan_structure_input(structure_input)
+  unique_structures <- unique(structures)
+  structure_index <- match(structures, unique_structures)
+  grob_cache <- lapply(seq_along(unique_structures), function(index) {
+    glycanGrob(
+      unique_structures[[index]],
+      show_linkage = show_linkage,
+      orient = orient,
+      fuc_orient = fuc_orient,
+      red_end = red_end,
+      edge_linewidth = edge_linewidth,
+      node_linewidth = node_linewidth,
+      node_size = node_size,
+      colors = colours,
+      highlight = highlight
+    )
+  })
   grobs <- purrr::pmap(
     list(
-      structure = coordinates$structure,
+      grob = grob_cache[structure_index],
       x = coordinates$x,
       y = coordinates$y,
       size = coordinates$size,
@@ -281,20 +308,8 @@ geom_glycan <- function(
       angle = coordinates$angle,
       index = seq_len(nrow(coordinates))
     ),
-    function(structure, x, y, size, hjust, vjust, angle, index) {
-      glycanGrob(
-        structure,
-        show_linkage = show_linkage,
-        orient = orient,
-        fuc_orient = fuc_orient,
-        red_end = red_end,
-        edge_linewidth = edge_linewidth,
-        node_linewidth = node_linewidth,
-        node_size = node_size,
-        colors = colours,
-        highlight = highlight
-      ) |>
-        .position_glycan_grob(x, y, size, hjust, vjust, angle, index)
+    function(grob, x, y, size, hjust, vjust, angle, index) {
+      .position_glycan_grob(grob, x, y, size, hjust, vjust, angle, index)
     }
   )
 

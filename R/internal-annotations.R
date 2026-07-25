@@ -225,18 +225,60 @@
   }
   orient <- rlang::arg_match(orient)
 
-  annotation <- purrr::map_dfr(
-    seq_len(length(structure) - 1),
-    \(ver) {
-      .linkage_annotation_rows(
-        structure,
-        coor,
-        ver,
-        node_size = node_size,
-        orient = orient
-      )
-    }
+  child_vertices <- seq_len(length(structure) - 1)
+  parent_vertices <- .parent_vertices_for_annotations(structure)
+  linkage_labels <- strsplit(
+    igraph::E(structure)$linkage[child_vertices],
+    "-",
+    fixed = TRUE
   )
+  row_count <- 2L * length(child_vertices)
+  annotation <- data.frame(
+    vertice = rep(as.character(child_vertices), each = 2L),
+    annot = character(row_count),
+    x = numeric(row_count),
+    y = numeric(row_count),
+    segment_start_x = numeric(row_count),
+    segment_start_y = numeric(row_count),
+    segment_end_x = numeric(row_count),
+    segment_end_y = numeric(row_count),
+    stringsAsFactors = FALSE
+  )
+
+  for (ver in child_vertices) {
+    par_ver <- parent_vertices[[ver]]
+    offsets <- .linkage_label_offsets(
+      structure,
+      coor,
+      child_ver = ver,
+      parent_ver = par_ver,
+      orient = orient
+    )
+    label_positions <- .linkage_label_positions(
+      coor[ver, "x"],
+      coor[ver, "y"],
+      coor[par_ver, "x"],
+      coor[par_ver, "y"],
+      chil_offset = offsets[["child"]],
+      par_offset = offsets[["parent"]],
+      node_size = node_size
+    )
+    rows <- 2L * ver - c(1L, 0L)
+    annotation$annot[rows] <- linkage_labels[[ver]][1:2]
+    annotation$x[rows] <- c(
+      label_positions$chil[[1]] + coor[ver, "x"],
+      label_positions$par[[1]] + coor[par_ver, "x"]
+    )
+    annotation$y[rows] <- c(
+      label_positions$chil[[2]] + coor[ver, "y"],
+      label_positions$par[[2]] + coor[par_ver, "y"]
+    )
+    annotation$segment_start_x[rows] <- coor[ver, "x"]
+    annotation$segment_start_y[rows] <- coor[ver, "y"]
+    annotation$segment_end_x[rows] <- coor[par_ver, "x"]
+    annotation$segment_end_y[rows] <- coor[par_ver, "y"]
+  }
+
   annotation$annot <- .normalize_linkage_labels(annotation$annot)
   annotation
 }
@@ -337,6 +379,24 @@
     )$vpath[[1]]),
     -2
   )
+}
+
+#' Find parent vertices used for all linkage annotations
+#'
+#' @param structure An igraph glycan graph.
+#'
+#' @returns An integer vector with one parent vertex for each non-reducing
+#'   vertex, ordered by child vertex index.
+#' @noRd
+.parent_vertices_for_annotations <- function(structure) {
+  traversal <- igraph::bfs(
+    structure,
+    root = length(structure),
+    mode = "all",
+    unreachable = FALSE,
+    parent = TRUE
+  )
+  as.integer(traversal$parent[seq_len(length(structure) - 1)])
 }
 
 #' Calculate child-side and parent-side linkage label offsets

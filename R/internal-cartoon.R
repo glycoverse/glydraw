@@ -275,6 +275,8 @@
 #'   highlight.
 #' @param node_size Numeric scalar used as a multiplier for the default node
 #'   size.
+#' @param show_linkage Logical scalar indicating whether linkage annotations
+#'   will be drawn.
 #'
 #' @returns A list with `annotation`, the complete text annotation data frame;
 #'   `show_without_linkage`, substituent and custom reducing-end text rows that
@@ -288,16 +290,10 @@
   orient = c("H", "V"),
   red_end = "",
   highlight = NULL,
-  node_size = 1
+  node_size = 1,
+  show_linkage = TRUE
 ) {
   orient <- rlang::arg_match(orient)
-  linkage_annotation <- .linkage_annotation_data(
-    structure,
-    coor,
-    node_size = node_size,
-    orient = orient
-  ) |>
-    dplyr::mutate(show_without_linkage = FALSE)
   substituent_annotation <- .substituent_annotation_data(
     structure,
     coor,
@@ -310,10 +306,6 @@
   )
   substituent_annotation <- substituent_annotation |>
     dplyr::mutate(show_without_linkage = TRUE)
-  struc_annotation <- dplyr::bind_rows(
-    linkage_annotation,
-    substituent_annotation
-  )
   reducing_info <- .reducing_end_annotation_data(
     structure,
     coor,
@@ -322,6 +314,24 @@
   )
   reducing_annotation <- reducing_info$annotation |>
     dplyr::mutate(show_without_linkage = .data$is_red_end_text)
+  visible_without_linkage <- nrow(substituent_annotation) > 0 ||
+    any(reducing_annotation$show_without_linkage)
+  if (show_linkage || visible_without_linkage) {
+    linkage_annotation <- .linkage_annotation_data(
+      structure,
+      coor,
+      node_size = node_size,
+      orient = orient
+    ) |>
+      dplyr::mutate(show_without_linkage = FALSE)
+  } else {
+    linkage_annotation <- .empty_linkage_annotation_data() |>
+      dplyr::mutate(show_without_linkage = logical())
+  }
+  struc_annotation <- dplyr::bind_rows(
+    linkage_annotation,
+    substituent_annotation
+  )
   struc_annotation <- dplyr::bind_rows(
     struc_annotation,
     reducing_annotation

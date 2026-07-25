@@ -1,5 +1,7 @@
 # glydraw (development version)
 
+* `draw_cartoon()` and `geom_glycan()` now prepare linkage annotations and repeated panel structures more efficiently, improving rendering performance while preserving cartoon layout and appearance. (#64)
+
 # glydraw 0.7.0
 
 This version of glydraw introduced some `ggplot2` extensions.
