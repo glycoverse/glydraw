@@ -30,7 +30,7 @@ Imports:
     rlang,
     dplyr,
     ggplot2 (>= 4.0.0),
-    igraph,
+    igraph (>= 2.2.0),
     purrr,
     png,
     glyparse,
