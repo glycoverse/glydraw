@@ -257,6 +257,28 @@ test_that("draw_cartoon works with linkage hidden", {
   expect_s3_class(plot_no_linkage, "glydraw_cartoon")
 })
 
+test_that("linkage-hidden cartoons skip unused annotation construction", {
+  inputs <- .prepare_cartoon_inputs(
+    "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-",
+    NULL,
+    "H",
+    ""
+  )
+  testthat::local_mocked_bindings(
+    .linkage_annotation_data = function(...) {
+      stop("linkage annotations were constructed")
+    }
+  )
+
+  annotation <- .cartoon_text_annotation_data(
+    inputs$structure,
+    inputs$coor,
+    show_linkage = FALSE
+  )
+
+  expect_equal(nrow(annotation$show_without_linkage), 0)
+})
+
 test_that("draw_cartoon works with reducing-end O-Fuc glycans", {
   glycans <- c(
     "Fuc(a1-",

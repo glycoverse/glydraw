@@ -81,7 +81,8 @@ glycanGrob <- function(
     orient,
     style$red_end,
     highlight,
-    node_size = style$node_size
+    node_size = style$node_size,
+    show_linkage = show_linkage
   )
   connect_df <- .cartoon_segment_data(
     structure,
