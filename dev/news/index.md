@@ -18,6 +18,11 @@ This version of glydraw introduced some `ggplot2` extensions.
   with support for size, rotation, justification, and cartoon
   appearance.
 - New
+  [`geom_node_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_node_glycan.md)
+  draws glycan cartoons as nodes in ggraph network plots, with automatic
+  node positioning and filtering support.
+  ([\#61](https://github.com/glycoverse/glydraw/issues/61))
+- New
   [`guide_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/guide_glycan.md)
   displays glycan cartoons in ggplot2 legends.
 - New
