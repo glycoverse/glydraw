@@ -19,7 +19,8 @@ export_cartoons(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
-  colors = NULL
+  colors = NULL,
+  style = NULL
 )
 ```
 
@@ -105,6 +106,11 @@ export_cartoons(
   `"GlcNAc"`. User-provided colors overwrite the default SNFG colors,
   while unprovided monosaccharides keep their default colors. Defaults
   to `NULL`.
+
+- style:
+
+  A `glydraw_style` object that supplies rendering options. Explicitly
+  supplied rendering arguments override it.
 
 ## Value
 

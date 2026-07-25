@@ -48,6 +48,8 @@ remotes::install_github("glycoverse/glydraw")
 
 ## Example
 
+### Plot one glycan
+
 ``` r
 
 library(glydraw)
@@ -60,6 +62,51 @@ draw_cartoon(glycan, red_end = "PP-Dol")
 ```
 
 ![](reference/figures/README-unnamed-chunk-2-1.png)
+
+### ggplot2 extension
+
+[`scale_x_glycan()`](https://glycoverse.github.io/glydraw/reference/scale_x_glycan.md)
+and
+[`scale_y_glycan()`](https://glycoverse.github.io/glydraw/reference/scale_x_glycan.md)
+can add glycan cartoons to standard ggplot2 figures. For example, you
+can use glycan cartoons as labels in a heatmap:
+
+``` r
+
+library(ggplot2)
+library(glydraw)
+library(tibble)
+
+set.seed(123)
+plot_data <- tibble(
+  `z-score` = rnorm(25),
+  branch = rep(c(
+    "GlcNAc(??-",
+    "Gal(??-?)GlcNAc(??-",
+    "Neu5Ac(??-?)Gal(??-?)GlcNAc(??-",
+    "Neu5Ac(??-?)Gal(??-?)[Fuc(??-?)]GlcNAc(??-",
+    "Gal(??-?)[Fuc(??-?)]GlcNAc(??-"
+  ), 5),
+  sample = rep(paste0("Sample ", 1:5), each = 5)
+)
+
+ggplot(plot_data, aes(branch, sample)) +
+  geom_tile(aes(fill = `z-score`), color = "white", linewidth = 1) +
+  scale_fill_viridis_c(option = "plasma") +
+  scale_x_glycan(
+    position = "top",
+    size = 0.2,
+    show_linkage = FALSE,
+    red_end = "~"
+  ) +
+  coord_equal() +
+  theme_void() +
+  theme(axis.text.y = element_text())
+```
+
+![](reference/figures/README-ggplot2-extension-1.png)
+
+### Gallery
 
 ``` r
 

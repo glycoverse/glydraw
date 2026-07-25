@@ -1,8 +1,75 @@
 # Changelog
 
+## glydraw 0.7.0
+
+This version of glydraw introduced some `ggplot2` extensions.
+
+### New features
+
+- New
+  [`glydraw_style()`](https://glycoverse.github.io/glydraw/reference/glydraw_style.md)
+  stores reusable glycan rendering options for standalone cartoons,
+  grobs, export, ggplot2 layers, guides, and glycan scales. Explicit
+  rendering arguments override the style.
+  ([\#55](https://github.com/glycoverse/glydraw/issues/55))
+- New
+  [`geom_glycan()`](https://glycoverse.github.io/glydraw/reference/geom_glycan.md)
+  draws glycan cartoons for individual observations in ggplot2 plots,
+  with support for size, rotation, justification, and cartoon
+  appearance.
+- New
+  [`geom_node_glycan()`](https://glycoverse.github.io/glydraw/reference/geom_node_glycan.md)
+  draws glycan cartoons as nodes in ggraph network plots, with automatic
+  node positioning and filtering support.
+  ([\#61](https://github.com/glycoverse/glydraw/issues/61))
+- New
+  [`guide_glycan()`](https://glycoverse.github.io/glydraw/reference/guide_glycan.md)
+  displays glycan cartoons in ggplot2 legends.
+- New
+  [`scale_x_glycan()`](https://glycoverse.github.io/glydraw/reference/scale_x_glycan.md)
+  and
+  [`scale_y_glycan()`](https://glycoverse.github.io/glydraw/reference/scale_x_glycan.md)
+  display glycan cartoons as discrete ggplot2 axis labels.
+- New
+  [`hjust_red_end()`](https://glycoverse.github.io/glydraw/reference/hjust_red_end.md)
+  and
+  [`vjust_red_end()`](https://glycoverse.github.io/glydraw/reference/hjust_red_end.md)
+  anchor vertical and horizontal cartoons at their reducing ends in
+  [`geom_glycan()`](https://glycoverse.github.io/glydraw/reference/geom_glycan.md),
+  [`scale_x_glycan()`](https://glycoverse.github.io/glydraw/reference/scale_x_glycan.md),
+  [`scale_y_glycan()`](https://glycoverse.github.io/glydraw/reference/scale_x_glycan.md),
+  and
+  [`guide_glycan()`](https://glycoverse.github.io/glydraw/reference/guide_glycan.md).
+  [`guide_glycan()`](https://glycoverse.github.io/glydraw/reference/guide_glycan.md)
+  also gains `hjust` and `vjust` parameters. Reducing-end justification
+  is the default for scale and guide cartoons along the axis
+  perpendicular to their drawing orientation;
+  [`geom_glycan()`](https://glycoverse.github.io/glydraw/reference/geom_glycan.md)
+  remains centered by default.
+  ([\#54](https://github.com/glycoverse/glydraw/issues/54))
+
+### Minor improvements and bug fixes
+
+- [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md)
+  now places double core Fuc branches on opposite sides of the core
+  GlcNAc when linkage positions are unavailable, keeping both
+  connections visible.
+  ([\#59](https://github.com/glycoverse/glydraw/issues/59),
+  [\#60](https://github.com/glycoverse/glydraw/issues/60))
+- Recognize bisecting GlcNAc from N-glycan topology when linkage
+  information is unavailable, keeping it centered between the two
+  mannose arms.
+  ([\#58](https://github.com/glycoverse/glydraw/issues/58))
+- [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md)
+  now treats generic `dHex` residues as Fuc-like branches, using the
+  same layout and `fuc_orient` behavior as Fuc.
+  ([\#56](https://github.com/glycoverse/glydraw/issues/56))
+
 ## glydraw 0.6.3
 
 CRAN release: 2026-07-14
+
+- First release on CRAN.
 
 ## glydraw 0.6.2
 

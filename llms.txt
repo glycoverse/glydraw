@@ -48,6 +48,8 @@ remotes::install_github("glycoverse/glydraw")
 
 ## Example
 
+### Plot one glycan
+
 ``` r
 
 library(glydraw)
@@ -60,6 +62,51 @@ draw_cartoon(glycan, red_end = "PP-Dol")
 ```
 
 ![](reference/figures/README-unnamed-chunk-2-1.png)
+
+### ggplot2 extension
+
+[`scale_x_glycan()`](https://glycoverse.github.io/glydraw/reference/scale_x_glycan.md)
+and
+[`scale_y_glycan()`](https://glycoverse.github.io/glydraw/reference/scale_x_glycan.md)
+can add glycan cartoons to standard ggplot2 figures. For example, you
+can use glycan cartoons as labels in a heatmap:
+
+``` r
+
+library(ggplot2)
+library(glydraw)
+library(tibble)
+
+set.seed(123)
+plot_data <- tibble(
+  `z-score` = rnorm(25),
+  branch = rep(c(
+    "GlcNAc(??-",
+    "Gal(??-?)GlcNAc(??-",
+    "Neu5Ac(??-?)Gal(??-?)GlcNAc(??-",
+    "Neu5Ac(??-?)Gal(??-?)[Fuc(??-?)]GlcNAc(??-",
+    "Gal(??-?)[Fuc(??-?)]GlcNAc(??-"
+  ), 5),
+  sample = rep(paste0("Sample ", 1:5), each = 5)
+)
+
+ggplot(plot_data, aes(branch, sample)) +
+  geom_tile(aes(fill = `z-score`), color = "white", linewidth = 1) +
+  scale_fill_viridis_c(option = "plasma") +
+  scale_x_glycan(
+    position = "top",
+    size = 0.2,
+    show_linkage = FALSE,
+    red_end = "~"
+  ) +
+  coord_equal() +
+  theme_void() +
+  theme(axis.text.y = element_text())
+```
+
+![](reference/figures/README-ggplot2-extension-1.png)
+
+### Gallery
 
 ``` r
 
@@ -109,20 +156,44 @@ draw_cartoon(glycan, fuc_orient = "up")
 
 # Package index
 
-## All functions
+## Draw and export glycans
 
 - [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md)
   : Draw a Symbol Nomenclature For Glycan (SNFG)
-- [`export_cartoons()`](https://glycoverse.github.io/glydraw/reference/export_cartoons.md)
-  : Export all glycan structures to figures
 - [`print(`*`<glydraw_cartoon>`*`)`](https://glycoverse.github.io/glydraw/reference/print.glydraw_cartoon.md)
   : Print glycan cartoon
 - [`save_cartoon()`](https://glycoverse.github.io/glydraw/reference/save_cartoon.md)
   : Save fixed-size glycan cartoon image to local device.
+- [`export_cartoons()`](https://glycoverse.github.io/glydraw/reference/export_cartoons.md)
+  : Export all glycan structures to figures
+
+## Extend ggplot2 and ggraph
+
+- [`geom_glycan()`](https://glycoverse.github.io/glydraw/reference/geom_glycan.md)
+  : Draw glycans at ggplot2 positions
+- [`geom_node_glycan()`](https://glycoverse.github.io/glydraw/reference/geom_node_glycan.md)
+  : Draw glycans as ggraph nodes
+- [`guide_glycan()`](https://glycoverse.github.io/glydraw/reference/guide_glycan.md)
+  : Use glycan cartoons as legend labels
+- [`scale_x_glycan()`](https://glycoverse.github.io/glydraw/reference/scale_x_glycan.md)
+  [`scale_y_glycan()`](https://glycoverse.github.io/glydraw/reference/scale_x_glycan.md)
+  : Use glycan cartoons as axis labels
+
+## Reuse glycan graphics
+
+- [`glycanGrob()`](https://glycoverse.github.io/glydraw/reference/glycanGrob.md)
+  : Construct a glycan grob
+- [`glydraw_style()`](https://glycoverse.github.io/glydraw/reference/glydraw_style.md)
+  : Create a glycan drawing style
+- [`hjust_red_end()`](https://glycoverse.github.io/glydraw/reference/hjust_red_end.md)
+  [`vjust_red_end()`](https://glycoverse.github.io/glydraw/reference/hjust_red_end.md)
+  : Anchor glycan cartoons at their reducing ends
 
 # Articles
 
 ### All vignettes
 
+- [glydraw as a ggplot2
+  extension](https://glycoverse.github.io/glydraw/articles/ggplot2-extension.md):
 - [Get Started with
   glydraw](https://glycoverse.github.io/glydraw/articles/glydraw.md):

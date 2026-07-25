@@ -13,13 +13,13 @@ Source:
 [`DESCRIPTION`](https://github.com/glycoverse/glydraw/blob/main/DESCRIPTION)
 
 Fu B, Feng X (2026). *glydraw: Draw Beautiful Symbol Nomenclature for
-Glycans*. R package version 0.6.3,
+Glycans*. R package version 0.7.0,
 <https://glycoverse.github.io/glydraw/>.
 
     @Manual{,
       title = {glydraw: Draw Beautiful Symbol Nomenclature for Glycans},
       author = {Bin Fu and Xisong Feng},
       year = {2026},
-      note = {R package version 0.6.3},
+      note = {R package version 0.7.0},
       url = {https://glycoverse.github.io/glydraw/},
     }

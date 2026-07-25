@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glydraw</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -17,6 +17,10 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/glydraw.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/ggplot2-extension.html">glydraw as a ggplot2 extension</a></li>
+  </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -33,8 +37,30 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.6.3" id="glydraw-063">glydraw 0.6.3<a class="anchor" aria-label="anchor" href="#glydraw-063"></a></h2><p class="text-muted">CRAN release: 2026-07-14</p>
+<h2 class="pkg-version" data-toc-text="0.7.0" id="glydraw-070">glydraw 0.7.0<a class="anchor" aria-label="anchor" href="#glydraw-070"></a></h2>
+<p>This version of glydraw introduced some <code>ggplot2</code> extensions.</p>
+<div class="section level3">
+<h3 id="new-features-0-7-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-7-0"></a></h3>
+<ul><li>New <code><a href="../reference/glydraw_style.html">glydraw_style()</a></code> stores reusable glycan rendering options for standalone cartoons, grobs, export, ggplot2 layers, guides, and glycan scales. Explicit rendering arguments override the style. (<a href="https://github.com/glycoverse/glydraw/issues/55" class="external-link">#55</a>)</li>
+<li>New <code><a href="../reference/geom_glycan.html">geom_glycan()</a></code> draws glycan cartoons for individual observations in ggplot2 plots, with support for size, rotation, justification, and cartoon appearance.</li>
+<li>New <code><a href="../reference/geom_node_glycan.html">geom_node_glycan()</a></code> draws glycan cartoons as nodes in ggraph network plots, with automatic node positioning and filtering support. (<a href="https://github.com/glycoverse/glydraw/issues/61" class="external-link">#61</a>)</li>
+<li>New <code><a href="../reference/guide_glycan.html">guide_glycan()</a></code> displays glycan cartoons in ggplot2 legends.</li>
+<li>New <code><a href="../reference/scale_x_glycan.html">scale_x_glycan()</a></code> and <code><a href="../reference/scale_x_glycan.html">scale_y_glycan()</a></code> display glycan cartoons as discrete ggplot2 axis labels.</li>
+<li>New <code><a href="../reference/hjust_red_end.html">hjust_red_end()</a></code> and <code><a href="../reference/hjust_red_end.html">vjust_red_end()</a></code> anchor vertical and horizontal cartoons at their reducing ends in <code><a href="../reference/geom_glycan.html">geom_glycan()</a></code>, <code><a href="../reference/scale_x_glycan.html">scale_x_glycan()</a></code>, <code><a href="../reference/scale_x_glycan.html">scale_y_glycan()</a></code>, and <code><a href="../reference/guide_glycan.html">guide_glycan()</a></code>. <code><a href="../reference/guide_glycan.html">guide_glycan()</a></code> also gains <code>hjust</code> and <code>vjust</code> parameters. Reducing-end justification is the default for scale and guide cartoons along the axis perpendicular to their drawing orientation; <code><a href="../reference/geom_glycan.html">geom_glycan()</a></code> remains centered by default. (<a href="https://github.com/glycoverse/glydraw/issues/54" class="external-link">#54</a>)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="minor-improvements-and-bug-fixes-0-7-0">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-0-7-0"></a></h3>
+<ul><li>
+<code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> now places double core Fuc branches on opposite sides of the core GlcNAc when linkage positions are unavailable, keeping both connections visible. (<a href="https://github.com/glycoverse/glydraw/issues/59" class="external-link">#59</a>, <a href="https://github.com/glycoverse/glydraw/issues/60" class="external-link">#60</a>)</li>
+<li>Recognize bisecting GlcNAc from N-glycan topology when linkage information is unavailable, keeping it centered between the two mannose arms. (<a href="https://github.com/glycoverse/glydraw/issues/58" class="external-link">#58</a>)</li>
+<li>
+<code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> now treats generic <code>dHex</code> residues as Fuc-like branches, using the same layout and <code>fuc_orient</code> behavior as Fuc. (<a href="https://github.com/glycoverse/glydraw/issues/56" class="external-link">#56</a>)</li>
+</ul></div>
 </div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.3" id="glydraw-063">glydraw 0.6.3<a class="anchor" aria-label="anchor" href="#glydraw-063"></a></h2><p class="text-muted">CRAN release: 2026-07-14</p>
+<ul><li>First release on CRAN.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.6.2" id="glydraw-062">glydraw 0.6.2<a class="anchor" aria-label="anchor" href="#glydraw-062"></a></h2>
 <div class="section level3">
