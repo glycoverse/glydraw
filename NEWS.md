@@ -1,6 +1,6 @@
 # glydraw (development version)
 
-* `draw_cartoon()` and `geom_glycan()` now prepare linkage annotations and repeated panel structures more efficiently, improving rendering performance while preserving cartoon layout and appearance. (#64)
+* `draw_cartoon()` and `geom_glycan()` now prepare linkage annotations and repeated panel structures more efficiently, and unscaled glycan grobs use native grid primitives for faster rendering without changing cartoon layout or appearance. (#64, #65)
 
 # glydraw 0.7.0
 
