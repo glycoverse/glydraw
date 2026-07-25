@@ -1,4 +1,4 @@
-# glydraw (development version)
+# glydraw 0.7.0
 
 This version of glydraw introduced some `ggplot2` extensions.
 
