@@ -13,6 +13,8 @@
 
 ## glydraw 0.7.0
 
+CRAN release: 2026-07-25
+
 This version of glydraw introduced some `ggplot2` extensions.
 
 ### New features

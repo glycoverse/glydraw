@@ -18,32 +18,35 @@ this package and other core glycoverse packages.
 If you don’t want to install all glycoverse packages, you can only
 install glydraw.
 
-You can install the latest release of glydraw from CRAN:
+You can install the latest release of glydraw from
+[CRAN](https://CRAN.R-project.org/package=glydraw):
 
 ``` r
 
-install.packages("glydraw")
+pak::pkg_install("glydraw")
 ```
 
 Or from [r-universe](https://glycoverse.r-universe.dev/glydraw):
 
 ``` r
 
-install.packages('glydraw', repos = c('https://glycoverse.r-universe.dev', 'https://cloud.r-project.org'))
+pak::repo_add(glycoverse = "https://glycoverse.r-universe.dev")
+pak::pkg_install("glydraw")
 ```
 
-Or from [GitHub](https://github.com/glycoverse/glydraw):
+Or install the latest GitHub release:
 
 ``` r
 
-remotes::install_github("glycoverse/glydraw@*release")
+pak::pkg_install("glycoverse/glydraw@*release")
 ```
 
-Or install the development version:
+Or install the development version from
+[GitHub](https://github.com/glycoverse/glydraw):
 
 ``` r
 
-remotes::install_github("glycoverse/glydraw")
+pak::pkg_install("glycoverse/glydraw")
 ```
 
 ## Example
