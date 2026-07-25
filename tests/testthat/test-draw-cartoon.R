@@ -303,3 +303,35 @@ test_that("draw_cartoon preserves nested Xyl-Gal-Fuc side-chain order", {
     gal_labels$y > coor[xyl, "y"] & gal_labels$y < coor[gal, "y"]
   ))
 })
+
+test_that("linkage annotations preserve row-wise topology calculations", {
+  structures <- c(
+    "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-",
+    paste0(
+      "Neu5Ac(a2-3)Gal(b1-3)[Fuc(a1-2)Gal(b1-3)[Fuc(a1-4)]",
+      "GlcNAc(b1-3)[Gal(b1-4)GlcNAc(b1-6)]Gal(b1-4)",
+      "GlcNAc(b1-6)]GalNAc(a1-"
+    )
+  )
+
+  purrr::walk(structures, function(structure) {
+    inputs <- .prepare_cartoon_inputs(structure, NULL, "H", "")
+    expected <- purrr::map_dfr(
+      seq_len(length(inputs$structure) - 1),
+      \(.vertex) {
+        .linkage_annotation_rows(
+          inputs$structure,
+          inputs$coor,
+          .vertex,
+          orient = "H"
+        )
+      }
+    )
+    expected$annot <- .normalize_linkage_labels(expected$annot)
+
+    expect_identical(
+      .linkage_annotation_data(inputs$structure, inputs$coor, orient = "H"),
+      expected
+    )
+  })
+})
