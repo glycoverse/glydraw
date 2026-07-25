@@ -2,6 +2,14 @@
 
 ## glydraw (development version)
 
+- [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
+  and
+  [`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md)
+  now prepare linkage annotations and repeated panel structures more
+  efficiently, improving rendering performance while preserving cartoon
+  layout and appearance.
+  ([\#64](https://github.com/glycoverse/glydraw/issues/64))
+
 ## glydraw 0.7.0
 
 This version of glydraw introduced some `ggplot2` extensions.
