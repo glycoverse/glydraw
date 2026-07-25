@@ -7,7 +7,18 @@ test_that("glycanGrob constructs a drawable grid grob", {
 
   content <- grid::makeContent(grob)
   expect_length(content$children, 1)
-  expect_s3_class(content$children[[1]], "gtable")
+  expect_s3_class(content$children[[1]], "glycan_grid_grob")
+  expect_s3_class(content$children[[1]], "gTree")
+  primitives <- content$children[[1]]$children[[2]]$children
+  expect_named(
+    primitives,
+    c(
+      "glycan.edges",
+      "glycan.node.mask",
+      "glycan.node",
+      "glycan.annotations"
+    )
+  )
 })
 
 test_that("glycanGrob converts to the existing cartoon plot contract", {
@@ -27,4 +38,59 @@ test_that("glycanGrob converts to the existing cartoon plot contract", {
   expect_equal(unique(layers[[1]]$linewidth), 1.1)
   expect_equal(unique(layers[[3]]$linewidth), 0.3)
   expect_contains(unique(layers[[3]]$fill), "#123456")
+})
+
+test_that("native grid layout preserves the cartoon plot geometry", {
+  cases <- list(
+    list(
+      structure = "Gal(b1-3)GalNAc(a1-",
+      orient = "H",
+      red_end = "",
+      show_linkage = TRUE
+    ),
+    list(
+      structure = "Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-",
+      orient = "V",
+      red_end = "~",
+      show_linkage = TRUE
+    ),
+    list(
+      structure = "Gal6S(b1-4)GlcNAc(b1-",
+      orient = "H",
+      red_end = "Ser/Thr",
+      show_linkage = FALSE
+    )
+  )
+
+  purrr::walk(cases, function(case) {
+    grob <- glycanGrob(
+      case$structure,
+      orient = case$orient,
+      red_end = case$red_end,
+      show_linkage = case$show_linkage
+    )
+    grob$glydraw_border_px <- 0
+    grob$glydraw_background <- FALSE
+    layout <- .cartoon_grid_layout(grob)
+    cartoon <- .glycan_grob_to_plot(grob)
+    built <- ggplot2::ggplot_build(cartoon)
+
+    expect_equal(
+      layout$data_ranges$x,
+      built$layout$panel_scales_x[[1]]$range$range
+    )
+    expect_equal(
+      layout$data_ranges$y,
+      built$layout$panel_scales_y[[1]]$range$range
+    )
+    expect_equal(
+      layout$panel_ranges$x,
+      built$layout$panel_params[[1]]$x.range
+    )
+    expect_equal(
+      layout$panel_ranges$y,
+      built$layout$panel_params[[1]]$y.range
+    )
+    expect_equal(layout$size_px, attr(cartoon, "glydraw_size_px"))
+  })
 })
