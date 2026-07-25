@@ -212,9 +212,22 @@ test_that("geom_glycan exports scaled cartoons as vector graphics", {
     0
   )
 
-  skip_if_not(capabilities("cairo"))
   svg_file <- tempfile(fileext = ".svg")
-  grDevices::svg(svg_file)
+  current_device <- grDevices::dev.cur()
+  svg_available <- suppressWarnings(tryCatch(
+    {
+      grDevices::svg(svg_file)
+      grDevices::dev.cur() != current_device
+    },
+    error = \(...) FALSE
+  ))
+  skip_if_not(svg_available, "The SVG graphics device is unavailable.")
+  on.exit(
+    if (grDevices::dev.cur() != current_device) {
+      grDevices::dev.off()
+    },
+    add = TRUE
+  )
   print(plot)
   grDevices::dev.off()
   svg <- readLines(svg_file, warn = FALSE)
