@@ -172,13 +172,54 @@ test_that("geom_glycan uses size as a whole-cartoon scale multiplier", {
   layer <- ggplot2::layer_grob(plot)[[1]]
   scales <- purrr::map_dbl(layer$children, "glydraw_scale")
   content <- purrr::map(layer$children, grid::makeContent)
-  rasters <- purrr::map(content, ~ .x$children[[1]])
-  widths <- purrr::map_dbl(rasters, ~ as.numeric(.x$width))
-  heights <- purrr::map_dbl(rasters, ~ as.numeric(.x$height))
+  cartoons <- purrr::map(content, ~ .x$children[[1]])
+  widths <- purrr::map_dbl(cartoons, ~ as.numeric(.x$width))
+  heights <- purrr::map_dbl(cartoons, ~ as.numeric(.x$height))
   expect_equal(unname(scales), data$size)
-  purrr::walk(rasters, expect_s3_class, "rastergrob")
+  purrr::walk(cartoons, expect_s3_class, "glycan_grid_grob")
   expect_equal(widths[[2]] / widths[[1]], 3)
   expect_equal(heights[[2]] / heights[[1]], 3)
+})
+
+test_that("geom_glycan exports scaled cartoons as vector graphics", {
+  data <- data.frame(
+    x = 1,
+    y = 1,
+    structure = "Gal(b1-3)GalNAc(a1-"
+  )
+  plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(
+      x = .data$x,
+      y = .data$y,
+      structure = .data$structure
+    )
+  ) +
+    geom_glycan(size = 0.6)
+
+  pdf_file <- tempfile(fileext = ".pdf")
+  grDevices::pdf(pdf_file, compress = FALSE)
+  print(plot)
+  grDevices::dev.off()
+  pdf_raw <- readBin(
+    pdf_file,
+    "raw",
+    n = file.info(pdf_file)$size
+  )
+
+  expect_length(
+    grepRaw("/Subtype /Image", pdf_raw, fixed = TRUE, all = TRUE),
+    0
+  )
+
+  skip_if_not(capabilities("cairo"))
+  svg_file <- tempfile(fileext = ".svg")
+  grDevices::svg(svg_file)
+  print(plot)
+  grDevices::dev.off()
+  svg <- readLines(svg_file, warn = FALSE)
+
+  expect_equal(any(grepl("<image", svg, fixed = TRUE)), FALSE)
 })
 
 test_that("geom_glycan rejects non-positive size multipliers", {
