@@ -38,5 +38,7 @@ Imports:
     checkmate,
     scales,
     fs
+Depends: 
+    R (>= 4.1)
 VignetteBuilder: knitr
 BugReports: https://github.com/glycoverse/glydraw/issues
