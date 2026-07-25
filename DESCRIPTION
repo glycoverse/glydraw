@@ -14,6 +14,7 @@ Description: A 'ggplot2'-native plotting engine for drawing reproducible beautif
     specification described at <https://www.ncbi.nlm.nih.gov/glycans/snfg.html>.
 License: MIT + file LICENSE
 Suggests: 
+    ggraph,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
