@@ -140,7 +140,7 @@ glycanGrob <- function(
 #'
 #' @param x A `glycanGrob` object.
 #'
-#' @returns `x` with its ggplot-backed grid drawing added as a child grob.
+#' @returns `x` with its native grid drawing added as a child grob.
 #' @noRd
 #' @importFrom grid makeContent
 #' @export
@@ -162,24 +162,35 @@ makeContent.glycanGrob <- function(x) {
     reducing_end_coor <- c(x = 0, y = 0)
   }
 
-  plot <- .glycan_grob_to_plot(x)
-  size_px <- attr(plot, "glydraw_size_px")
   if (!isTRUE(all.equal(scale, 1))) {
+    plot <- .glycan_grob_to_plot(x)
+    size_px <- attr(plot, "glydraw_size_px")
     child <- .scaled_glycan_raster_grob(plot, scale, x$name)
+    child <- .justify_scaled_glycan_child(
+      child,
+      plot,
+      size_px,
+      scale,
+      hjust,
+      vjust,
+      reducing_end_coor
+    )
   } else {
-    child <- plot |>
-      .strip_cartoon_class() |>
-      ggplot2::ggplotGrob()
+    layout <- .cartoon_grid_layout(x)
+    child <- if (!layout$background && layout$border_px == 0) {
+      .cartoon_grid_gtable(x, layout, x$name)
+    } else {
+      .cartoon_grid_grob(x, layout, scale, x$name)
+    }
+    child <- .justify_glycan_child(
+      child,
+      layout,
+      scale,
+      hjust,
+      vjust,
+      reducing_end_coor
+    )
   }
-  child <- .justify_glycan_child(
-    child,
-    plot,
-    size_px,
-    scale,
-    hjust,
-    vjust,
-    reducing_end_coor
-  )
 
   grid::setChildren(x, grid::gList(child))
 }
@@ -212,22 +223,16 @@ makeContent.glycanGrob <- function(x) {
   )
 }
 
-#' Justify a rendered glycan child around its panel anchor
+#' Justify a scaled glycan raster around its panel anchor
 #'
-#' @param child Rendered grid grob containing one glycan cartoon.
+#' @param child Rendered raster grob containing one glycan cartoon.
 #' @param plot A `glydraw_cartoon` ggplot object.
-#' @param size_px Named numeric vector with the cartoon's natural `width` and
-#'   `height` in pixels.
-#' @param scale Positive numeric whole-cartoon scale multiplier.
-#' @param hjust Numeric horizontal justification.
-#' @param vjust Numeric vertical justification.
-#' @param reducing_end_coor Named numeric vector containing the reducing-end
-#'   residue's `x` and `y` coordinates.
+#' @param size_px Named numeric vector with the cartoon's natural dimensions.
+#' @inheritParams .justify_glycan_child
 #'
-#' @returns `child` with a viewport that offsets the complete cartoon from its
-#'   centered panel anchor. Centered cartoons are returned unchanged.
+#' @returns `child` with a viewport that offsets it from the centered anchor.
 #' @noRd
-.justify_glycan_child <- function(
+.justify_scaled_glycan_child <- function(
   child,
   plot,
   size_px,
@@ -259,6 +264,98 @@ makeContent.glycanGrob <- function(x) {
   )
   child$glydraw_justification_offset <- offset
   child
+}
+
+#' Justify a rendered glycan child around its panel anchor
+#'
+#' @param child Rendered grid grob containing one glycan cartoon.
+#' @param layout Grid layout metadata from `.cartoon_grid_layout()`.
+#' @param scale Positive numeric whole-cartoon scale multiplier.
+#' @param hjust Numeric horizontal justification.
+#' @param vjust Numeric vertical justification.
+#' @param reducing_end_coor Named numeric vector containing the reducing-end
+#'   residue's `x` and `y` coordinates.
+#'
+#' @returns `child` with a viewport that offsets the complete cartoon from its
+#'   centered panel anchor. Centered cartoons are returned unchanged.
+#' @noRd
+.justify_glycan_child <- function(
+  child,
+  layout,
+  scale,
+  hjust,
+  vjust,
+  reducing_end_coor
+) {
+  horizontally_centered <- isTRUE(all.equal(hjust, 0.5))
+  vertically_centered <- isTRUE(all.equal(vjust, 0.5))
+  if (horizontally_centered && vertically_centered) {
+    child$glydraw_justification_offset <- c(x = 0, y = 0)
+    return(child)
+  }
+
+  offset <- .cartoon_grid_justification_offset(
+    layout,
+    scale,
+    hjust,
+    vjust,
+    reducing_end_coor
+  )
+  child$vp <- grid::viewport(
+    x = grid::unit(0.5, "npc") +
+      grid::unit(offset[["x"]], "in"),
+    y = grid::unit(0.5, "npc") +
+      grid::unit(offset[["y"]], "in")
+  )
+  child$glydraw_justification_offset <- offset
+  child
+}
+
+#' Calculate a glycan justification offset from its unexpanded coordinates
+#'
+#' @param layout Grid layout metadata from `.cartoon_grid_layout()`.
+#' @param scale Positive numeric whole-cartoon scale multiplier.
+#' @param hjust Numeric horizontal justification.
+#' @param vjust Numeric vertical justification.
+#' @param reducing_end_coor Named numeric vector containing the reducing-end
+#'   residue's `x` and `y` coordinates.
+#'
+#' @returns A named numeric vector `c(x, y)` containing offsets in inches.
+#' @noRd
+.cartoon_grid_justification_offset <- function(
+  layout,
+  scale,
+  hjust,
+  vjust,
+  reducing_end_coor = c(x = 0, y = 0)
+) {
+  x_anchor <- .normalized_cartoon_anchor(
+    layout$data_ranges$x,
+    layout$panel_ranges$x,
+    hjust,
+    red_end_coordinate = if (.is_red_end_justification(hjust, "hjust")) {
+      reducing_end_coor[["x"]]
+    }
+  )
+  y_anchor <- .normalized_cartoon_anchor(
+    layout$data_ranges$y,
+    layout$panel_ranges$y,
+    vjust,
+    red_end_coordinate = if (.is_red_end_justification(vjust, "vjust")) {
+      reducing_end_coor[["y"]]
+    }
+  )
+
+  c(
+    x = (0.5 - x_anchor) *
+      layout$size_px[["width"]] /
+      .default_cartoon_dpi *
+      scale,
+    y = (0.5 - y_anchor) *
+      layout$size_px[["height"]] /
+      .default_cartoon_dpi *
+      scale
+  )
 }
 
 #' Calculate a glycan justification offset from its unexpanded coordinates
