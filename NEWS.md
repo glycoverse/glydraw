@@ -6,6 +6,7 @@ This version of glydraw introduced some `ggplot2` extensions.
 
 * New `glydraw_style()` stores reusable glycan rendering options for standalone cartoons, grobs, export, ggplot2 layers, guides, and glycan scales. Explicit rendering arguments override the style. (#55)
 * New `geom_glycan()` draws glycan cartoons for individual observations in ggplot2 plots, with support for size, rotation, justification, and cartoon appearance.
+* New `geom_node_glycan()` draws glycan cartoons as nodes in ggraph network plots, with automatic node positioning and filtering support.
 * New `guide_glycan()` displays glycan cartoons in ggplot2 legends.
 * New `scale_x_glycan()` and `scale_y_glycan()` display glycan cartoons as discrete ggplot2 axis labels.
 * New `hjust_red_end()` and `vjust_red_end()` anchor vertical and horizontal cartoons at their reducing ends in `geom_glycan()`, `scale_x_glycan()`, `scale_y_glycan()`, and `guide_glycan()`. `guide_glycan()` also gains `hjust` and `vjust` parameters. Reducing-end justification is the default for scale and guide cartoons along the axis perpendicular to their drawing orientation; `geom_glycan()` remains centered by default. (#54)

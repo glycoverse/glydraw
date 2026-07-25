@@ -4,3 +4,22 @@ template:
 
 development:
   mode: auto
+
+reference:
+  - title: Draw and export glycans
+    contents:
+      - draw_cartoon
+      - print.glydraw_cartoon
+      - save_cartoon
+      - export_cartoons
+  - title: Extend ggplot2 and ggraph
+    contents:
+      - geom_glycan
+      - geom_node_glycan
+      - guide_glycan
+      - scale_x_glycan
+  - title: Reuse glycan graphics
+    contents:
+      - glycanGrob
+      - glydraw_style
+      - hjust_red_end
