@@ -48,6 +48,8 @@ remotes::install_github("glycoverse/glydraw")
 
 ## Example
 
+### Plot one glycan
+
 ``` r
 
 library(glydraw)
@@ -60,6 +62,41 @@ draw_cartoon(glycan, red_end = "PP-Dol")
 ```
 
 ![](reference/figures/README-unnamed-chunk-2-1.png)
+
+### ggplot2 extension
+
+[`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md)
+can add glycan cartoons to standard ggplot2 figures. For example, you
+can place cartoons above bars as follows:
+
+``` r
+
+library(ggplot2)
+library(glydraw)
+
+plot_data <- data.frame(
+  glycan = c("Gal(b1-3)GalNAc(a1-", "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"),
+  value = c(1, 2)
+)
+
+ggplot(plot_data, aes(glycan, value)) +
+  geom_col(fill = "grey70") +
+  geom_glycan(
+    aes(structure = glycan),
+    orient = "V",
+    size = 0.5,
+    vjust = 0,
+    position = position_nudge(y = 0.1)
+  ) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.4))) +
+  theme_classic() +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank()
+  )
+```
+
+### Gallery
 
 ``` r
 
