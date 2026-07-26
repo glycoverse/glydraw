@@ -2,6 +2,13 @@
 
 ## glydraw (development version)
 
+- New
+  [`anno_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/anno_glycan.md)
+  uses glycan cartoons as row or column labels in ComplexHeatmap
+  heatmaps, with clustering-aware ordering and the sizing, anchoring,
+  rotation, nudging, and styling controls of glycan axis scales.
+  ([\#67](https://github.com/glycoverse/glydraw/issues/67))
+
 - Glycan grobs used by
   [`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md),
   [`geom_node_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_node_glycan.md),

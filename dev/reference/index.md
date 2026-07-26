@@ -25,6 +25,8 @@
 
 ## Reuse glycan graphics
 
+- [`anno_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/anno_glycan.md)
+  : Use glycan cartoons as ComplexHeatmap labels
 - [`glycanGrob()`](https://glycoverse.github.io/glydraw/dev/reference/glycanGrob.md)
   : Construct a glycan grob
 - [`glydraw_style()`](https://glycoverse.github.io/glydraw/dev/reference/glydraw_style.md)
