@@ -20,6 +20,7 @@ reference:
       - scale_x_glycan
   - title: Reuse glycan graphics
     contents:
+      - anno_glycan
       - glycanGrob
       - glydraw_style
       - hjust_red_end

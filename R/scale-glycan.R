@@ -248,6 +248,108 @@ scale_y_glycan <- function(
   node_size,
   colors
 ) {
+  options <- .validate_glycan_label_options(
+    orient = orient,
+    size = size,
+    angle = angle,
+    hjust = hjust,
+    vjust = vjust,
+    nudge_x = nudge_x,
+    nudge_y = nudge_y,
+    show_linkage = show_linkage,
+    red_end = red_end,
+    fuc_orient = fuc_orient,
+    edge_linewidth = edge_linewidth,
+    node_linewidth = node_linewidth,
+    node_size = node_size,
+    colors = colors
+  )
+
+  ggplot2::new_guide(
+    title = ggplot2::waiver(),
+    theme = NULL,
+    check.overlap = FALSE,
+    angle = ggplot2::waiver(),
+    n.dodge = 1,
+    minor.ticks = FALSE,
+    cap = "none",
+    glycan_orient = options$orient,
+    glycan_size = options$size,
+    glycan_angle = options$angle,
+    glycan_hjust = options$hjust,
+    glycan_vjust = options$vjust,
+    glycan_x_hjust = if (identical(options$orient, "V")) {
+      options$hjust
+    } else {
+      .hjust_red_end
+    },
+    glycan_x_vjust = if (identical(options$orient, "V")) {
+      options$vjust
+    } else {
+      0
+    },
+    glycan_y_hjust = if (identical(options$orient, "H")) {
+      options$hjust
+    } else {
+      1
+    },
+    glycan_y_vjust = if (identical(options$orient, "H")) {
+      options$vjust
+    } else {
+      .vjust_red_end
+    },
+    glycan_nudge_x = options$nudge_x,
+    glycan_nudge_y = options$nudge_y,
+    glycan_show_linkage = options$show_linkage,
+    glycan_red_end = options$red_end,
+    glycan_fuc_orient = options$fuc_orient,
+    glycan_edge_linewidth = options$edge_linewidth,
+    glycan_node_linewidth = options$node_linewidth,
+    glycan_node_size = options$node_size,
+    glycan_colors = options$colors,
+    available_aes = c("x", "y"),
+    order = 0,
+    position = ggplot2::waiver(),
+    name = "axis",
+    super = GuideGlycanAxis
+  )
+}
+
+#' Validate options shared by glycan label extensions
+#'
+#' @param orient Glycan drawing orientation.
+#' @param size Positive whole-cartoon scale multiplier.
+#' @param angle Rotation in degrees applied to each cartoon.
+#' @param hjust Horizontal glycan justification.
+#' @param vjust Vertical glycan justification.
+#' @param nudge_x Horizontal adjustment in millimetres.
+#' @param nudge_y Vertical adjustment in millimetres.
+#' @param show_linkage Whether to draw glycosidic linkage annotations.
+#' @param red_end Reducing-end annotation.
+#' @param fuc_orient Fuc-like triangle orientation.
+#' @param edge_linewidth Linkage linewidth.
+#' @param node_linewidth Node-border linewidth.
+#' @param node_size Node-size multiplier.
+#' @param colors Named monosaccharide fill-color overrides.
+#'
+#' @returns A validated list of glycan label options.
+#' @noRd
+.validate_glycan_label_options <- function(
+  orient,
+  size,
+  angle,
+  hjust,
+  vjust,
+  nudge_x,
+  nudge_y,
+  show_linkage,
+  red_end,
+  fuc_orient,
+  edge_linewidth,
+  node_linewidth,
+  node_size,
+  colors
+) {
   orient <- rlang::arg_match(orient, c("H", "V"))
   .validate_output_scale(size)
   checkmate::assert_number(angle, finite = TRUE)
@@ -264,37 +366,21 @@ scale_y_glycan <- function(
   fuc_orient <- rlang::arg_match(fuc_orient, c("flex", "up"))
   show_linkage <- .resolve_linkage_visibility(show_linkage, node_size)
 
-  ggplot2::new_guide(
-    title = ggplot2::waiver(),
-    theme = NULL,
-    check.overlap = FALSE,
-    angle = ggplot2::waiver(),
-    n.dodge = 1,
-    minor.ticks = FALSE,
-    cap = "none",
-    glycan_orient = orient,
-    glycan_size = size,
-    glycan_angle = angle,
-    glycan_hjust = hjust,
-    glycan_vjust = vjust,
-    glycan_x_hjust = if (identical(orient, "V")) hjust else .hjust_red_end,
-    glycan_x_vjust = if (identical(orient, "V")) vjust else 0,
-    glycan_y_hjust = if (identical(orient, "H")) hjust else 1,
-    glycan_y_vjust = if (identical(orient, "H")) vjust else .vjust_red_end,
-    glycan_nudge_x = nudge_x,
-    glycan_nudge_y = nudge_y,
-    glycan_show_linkage = show_linkage,
-    glycan_red_end = red_end,
-    glycan_fuc_orient = fuc_orient,
-    glycan_edge_linewidth = edge_linewidth,
-    glycan_node_linewidth = node_linewidth,
-    glycan_node_size = node_size,
-    glycan_colors = colors,
-    available_aes = c("x", "y"),
-    order = 0,
-    position = ggplot2::waiver(),
-    name = "axis",
-    super = GuideGlycanAxis
+  list(
+    orient = orient,
+    size = size,
+    angle = angle,
+    hjust = hjust,
+    vjust = vjust,
+    nudge_x = nudge_x,
+    nudge_y = nudge_y,
+    show_linkage = show_linkage,
+    red_end = red_end,
+    fuc_orient = fuc_orient,
+    edge_linewidth = edge_linewidth,
+    node_linewidth = node_linewidth,
+    node_size = node_size,
+    colors = colors
   )
 }
 
@@ -340,6 +426,23 @@ scale_y_glycan <- function(
 #' @returns A positioned, rendered `glycanGrob`.
 #' @noRd
 .new_glycan_axis_label <- function(structure, position, params) {
+  grob <- .new_glycan_label_grob(structure, params)
+  .position_glycan_label_grob(
+    grob,
+    position = position,
+    vertical = params$vertical,
+    side = params$position
+  )
+}
+
+#' Construct a rendered glycan label grob
+#'
+#' @param structure A glycan structure used as a label.
+#' @param params Glycan label parameters.
+#'
+#' @returns An unpositioned, rendered `glycanGrob`.
+#' @noRd
+.new_glycan_label_grob <- function(structure, params) {
   grob <- glycanGrob(
     structure,
     show_linkage = params$glycan_show_linkage,
@@ -362,16 +465,34 @@ scale_y_glycan <- function(
   grob$glydraw_background <- FALSE
   grob$glydraw_expand <- FALSE
   grob$glydraw_axis_vertical <- identical(params$glycan_orient, "V")
-  grob <- grid::makeContent(grob)
+  grid::makeContent(grob)
+}
+
+#' Position a glycan label grob
+#'
+#' @param grob A rendered `glycanGrob`.
+#' @param position Numeric position in the label viewport.
+#' @param vertical Whether labels are arranged vertically.
+#' @param side Side on which the labels are drawn.
+#'
+#' @returns `grob` positioned in its label viewport.
+#' @noRd
+.position_glycan_label_grob <- function(
+  grob,
+  position,
+  vertical,
+  side
+) {
+  grob$glydraw_axis_position <- side
   grob$vp <- .glycan_axis_label_viewport(
     position,
-    vertical = params$vertical,
-    axis_position = params$position,
-    angle = params$glycan_angle,
-    hjust = params$glycan_hjust,
-    vjust = params$glycan_vjust,
-    nudge_x = params$glycan_nudge_x,
-    nudge_y = params$glycan_nudge_y
+    vertical = vertical,
+    axis_position = side,
+    angle = grob$glydraw_angle,
+    hjust = grob$glydraw_hjust,
+    vjust = grob$glydraw_vjust,
+    nudge_x = grob$glydraw_nudge_x,
+    nudge_y = grob$glydraw_nudge_y
   )
   grob
 }
@@ -460,11 +581,22 @@ scale_y_glycan <- function(
 #' @returns A grid unit describing the largest label extent.
 #' @noRd
 .glycan_axis_label_extent <- function(x, dimension) {
-  if (length(x$children) == 0) {
+  .glycan_label_extent(x$children, dimension)
+}
+
+#' Calculate a collection of glycan label extents
+#'
+#' @param labels A list of positioned, rendered `glycanGrob` objects.
+#' @param dimension Either `"width"` or `"height"`.
+#'
+#' @returns A grid unit describing the largest label extent.
+#' @noRd
+.glycan_label_extent <- function(labels, dimension) {
+  if (length(labels) == 0) {
     return(grid::unit(0, "pt"))
   }
 
-  extents <- purrr::map(x$children, function(label) {
+  extents <- purrr::map(labels, function(label) {
     child <- label$children[[1]]
     angle <- label$glydraw_angle
     if (is.null(angle)) {
