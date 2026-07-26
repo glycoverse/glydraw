@@ -277,14 +277,21 @@ test_that("anno_glycan renders vector ComplexHeatmap labels", {
   structures <- .annotation_glycan_structures()
   matrix <- matrix(seq_len(9), nrow = 3)
   output <- tempfile(fileext = ".svg")
-  device <- try(
-    grDevices::svg(output, width = 5, height = 5),
-    silent = TRUE
+  current_device <- grDevices::dev.cur()
+  svg_available <- suppressWarnings(tryCatch(
+    {
+      grDevices::svg(output, width = 5, height = 5)
+      grDevices::dev.cur() != current_device
+    },
+    error = \(...) FALSE
+  ))
+  skip_if_not(svg_available, "The SVG graphics device is unavailable.")
+  on.exit(
+    if (grDevices::dev.cur() != current_device) {
+      grDevices::dev.off()
+    },
+    add = TRUE
   )
-  if (inherits(device, "try-error")) {
-    skip("grDevices::svg() is unavailable on this system.")
-  }
-  on.exit(grDevices::dev.off(), add = TRUE)
 
   heatmap <- ComplexHeatmap::Heatmap(
     matrix,
