@@ -23,6 +23,16 @@ glycanGrob <- function(
   style = style_glydraw()
 ) {
   orient <- rlang::arg_match(orient, error_call = NULL)
+  checkmate::assert_class(style, "glydraw_style")
+  style <- .make_glydraw_style(
+    fuc_orient = style$fuc_orient,
+    red_end = style$red_end,
+    edge_linewidth = style$edge_linewidth,
+    node_linewidth = style$node_linewidth,
+    node_size = style$node_size,
+    font_family = style$font_family,
+    colors = style$colors
+  )
   inputs <- .prepare_cartoon_inputs(
     structure,
     highlight,
