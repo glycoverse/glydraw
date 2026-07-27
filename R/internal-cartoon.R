@@ -4,7 +4,7 @@
 .default_node_point_size <- 0.215
 .default_cartoon_dpi <- 300
 .default_cartoon_border_px <- 50
-.node_size_linkage_threshold <- 1.2
+.node_size_linkage_threshold <- 1.4
 .node_size_upper_boundary <- 2
 
 #' Validate node-size input
