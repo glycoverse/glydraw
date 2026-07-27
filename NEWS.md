@@ -16,7 +16,7 @@
 
 ## Minor improvements and bug fixes
 
-* `red_end = NULL` now omits both the reducing-end line and its anomer annotation across glycan drawing interfaces.
+* `red_end = NULL` now omits both the reducing-end line and its anomer annotation across glycan drawing interfaces. (#71)
 
 * Move beta linkage annotations slightly away from horizontal and skewed edge lines while leaving labels beside vertical edges unchanged, including reducing-end annotations. (#70)
 
