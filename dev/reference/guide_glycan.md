@@ -27,14 +27,7 @@ guide_glycan(
   hjust = 0,
   vjust = vjust_red_end(),
   show_linkage = TRUE,
-  red_end = "",
-  fuc_orient = c("flex", "up"),
-  edge_linewidth = 0.8,
-  node_linewidth = 0.8,
-  node_size = 1,
-  font_family = "",
-  colors = glydraw_colors(),
-  style = NULL
+  style = style_glydraw()
 )
 ```
 
@@ -122,51 +115,11 @@ guide_glycan(
   Whether to show glycosidic linkage annotations inside the cartoons.
   Defaults to `TRUE`.
 
-- red_end:
-
-  Reducing-end annotation passed to
-  [`glycanGrob()`](https://glycoverse.github.io/glydraw/dev/reference/glycanGrob.md).
-  Use `"~"` for a wave, another string to display that text, or `NULL`
-  to omit the reducing-end line and anomer annotation. Defaults to `""`.
-
-- fuc_orient:
-
-  Fuc-like triangle orientation passed to
-  [`glycanGrob()`](https://glycoverse.github.io/glydraw/dev/reference/glycanGrob.md).
-
-- edge_linewidth:
-
-  Linkage linewidth passed to
-  [`glycanGrob()`](https://glycoverse.github.io/glydraw/dev/reference/glycanGrob.md).
-
-- node_linewidth:
-
-  Node-border linewidth passed to
-  [`glycanGrob()`](https://glycoverse.github.io/glydraw/dev/reference/glycanGrob.md).
-
-- node_size:
-
-  Node-size multiplier passed to
-  [`glycanGrob()`](https://glycoverse.github.io/glydraw/dev/reference/glycanGrob.md).
-
-- font_family:
-
-  A length-one character string naming the font family used for linkage,
-  substituent, and reducing-end text annotations. Portable choices are
-  `"sans"`, `"serif"`, and `"mono"`. Other family names, such as
-  installed system fonts, are graphics-device dependent. The default
-  `""` uses the graphics device's default font.
-
-- colors:
-
-  A named character vector of SNFG colors in the format returned by
-  [`glydraw_colors()`](https://glycoverse.github.io/glydraw/dev/reference/glydraw_colors.md).
-  Names must be complete and match that palette.
-
 - style:
 
-  A `glydraw_style` object that supplies rendering options. Explicitly
-  supplied rendering arguments override it.
+  A
+  [`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md)
+  object that controls the cartoons' visual appearance.
 
 ## Value
 

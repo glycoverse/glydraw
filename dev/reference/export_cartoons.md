@@ -14,14 +14,7 @@ export_cartoons(
   scale = 1,
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
-  fuc_orient = c("flex", "up"),
-  red_end = "",
-  edge_linewidth = 0.8,
-  node_linewidth = 0.8,
-  node_size = 1,
-  font_family = "",
-  colors = glydraw_colors(),
-  style = NULL
+  style = style_glydraw()
 )
 ```
 
@@ -69,56 +62,11 @@ export_cartoons(
   Direction in which the glycan extends from its reducing end: one of
   `"left"`, `"right"`, `"up"`, or `"down"`. Defaults to `"left"`.
 
-- fuc_orient:
-
-  Fuc-like triangle orientation. `"flex"` points non-reducing Fuc-like
-  residues toward their rendered linkage direction, while `"up"` draws
-  all Fuc-like triangles pointing upward. Reducing-end Fuc-like residues
-  always point upward. Defaults to `"flex"`.
-
-- red_end:
-
-  Reducing-end annotation. The default `""` keeps the current
-  reducing-end line. Use `"~"` to add a wavy reducing end, or any other
-  string to draw that string at the reducing end. Use `NULL` to omit the
-  reducing-end line and anomer annotation.
-
-- edge_linewidth:
-
-  Numeric scalar controlling the linewidth of linkage lines. Defaults to
-  the current value, `0.8`.
-
-- node_linewidth:
-
-  Numeric scalar controlling the linewidth of node borders. Defaults to
-  the current value, `0.8`.
-
-- node_size:
-
-  Numeric scalar used as a multiplier for the default node size.
-  Defaults to `1`, which keeps the current size. Linkage annotations are
-  moved farther from larger nodes, and are hidden with a warning when
-  `node_size` is too large to leave enough annotation space. Values
-  larger than `2` are rejected because residues overlap.
-
-- font_family:
-
-  A length-one character string naming the font family used for linkage,
-  substituent, and reducing-end text annotations. Portable choices are
-  `"sans"`, `"serif"`, and `"mono"`. Other family names, such as
-  installed system fonts, are graphics-device dependent. The default
-  `""` uses the graphics device's default font.
-
-- colors:
-
-  A named character vector of SNFG colors in the format returned by
-  [`glydraw_colors()`](https://glycoverse.github.io/glydraw/dev/reference/glydraw_colors.md).
-  Names must be complete and match that palette.
-
 - style:
 
-  A `glydraw_style` object that supplies rendering options. Explicitly
-  supplied rendering arguments override it.
+  A
+  [`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md)
+  object that controls the cartoon's visual appearance.
 
 ## Value
 

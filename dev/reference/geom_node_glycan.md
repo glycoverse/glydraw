@@ -46,7 +46,7 @@ geom_node_glycan(
 
   Arguments passed to
   [`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md),
-  including fixed aesthetics and glycan rendering options.
+  including fixed aesthetics, drawing controls, and `style`.
 
 ## Value
 

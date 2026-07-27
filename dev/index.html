@@ -105,7 +105,7 @@
 <span>  <span class="st">"Glc(a1-2)Glc(a1-3)Glc(a1-3)Man(a1-2)Man(a1-2)Man(a1-3)[Man(a1-2)Man(a1-3)"</span>,</span>
 <span>  <span class="st">"[Man(a1-2)Man(a1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(a1-"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="va">glycan</span>, red_end <span class="op">=</span> <span class="st">"PP-Dol"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="va">glycan</span>, style <span class="op">=</span> <span class="fu"><a href="reference/style_glydraw.html">style_glydraw</a></span><span class="op">(</span>red_end <span class="op">=</span> <span class="st">"PP-Dol"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-2-1.png" width="850"></p>
 </div>
 <div class="section level3">
@@ -137,7 +137,7 @@
 <span>    position <span class="op">=</span> <span class="st">"top"</span>,</span>
 <span>    size <span class="op">=</span> <span class="fl">0.2</span>,</span>
 <span>    show_linkage <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>    red_end <span class="op">=</span> <span class="st">"~"</span></span>
+<span>    style <span class="op">=</span> <span class="fu"><a href="reference/style_glydraw.html">style_glydraw</a></span><span class="op">(</span>red_end <span class="op">=</span> <span class="st">"~"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_void</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -152,15 +152,26 @@
 <span>  <span class="st">"Neu5Ac(a2-3)Gal(b1-3)[Fuc(a1-2)Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-3)"</span>,</span>
 <span>  <span class="st">"[Gal(b1-4)[Fuc(a1-3)]GlcNAc(b1-6)]Gal(b1-4)GlcNAc(b1-6)]GalNAc(a1-"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="va">glycan</span>, red_end <span class="op">=</span> <span class="st">"~"</span>, node_size <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span></span>
+<span>  <span class="va">glycan</span>,</span>
+<span>  style <span class="op">=</span> <span class="fu"><a href="reference/style_glydraw.html">style_glydraw</a></span><span class="op">(</span>red_end <span class="op">=</span> <span class="st">"~"</span>, node_size <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-3-1.png" width="443"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">glycan</span> <span class="op">&lt;-</span> <span class="st">"Gal(b1-3)[Neu5Ac(a2-3)Gal6S(b1-4)[Fuc(a1-3)]GlcNAc(b1-6)]GalNAc(a1-"</span></span>
-<span><span class="fu"><a href="reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="va">glycan</span>, orient <span class="op">=</span> <span class="st">"up"</span>, red_end <span class="op">=</span> <span class="st">"Ser/Thr"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span></span>
+<span>  <span class="va">glycan</span>,</span>
+<span>  orient <span class="op">=</span> <span class="st">"up"</span>,</span>
+<span>  style <span class="op">=</span> <span class="fu"><a href="reference/style_glydraw.html">style_glydraw</a></span><span class="op">(</span>red_end <span class="op">=</span> <span class="st">"Ser/Thr"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-4-1.png" width="269"></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">glycan</span> <span class="op">&lt;-</span> <span class="st">"Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-"</span></span>
-<span><span class="fu"><a href="reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="va">glycan</span>, orient <span class="op">=</span> <span class="st">"up"</span>, red_end <span class="op">=</span> <span class="st">"Asn"</span>, fuc_orient <span class="op">=</span> <span class="st">"up"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span></span>
+<span>  <span class="va">glycan</span>,</span>
+<span>  orient <span class="op">=</span> <span class="st">"up"</span>,</span>
+<span>  style <span class="op">=</span> <span class="fu"><a href="reference/style_glydraw.html">style_glydraw</a></span><span class="op">(</span>red_end <span class="op">=</span> <span class="st">"Asn"</span>, fuc_orient <span class="op">=</span> <span class="st">"up"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-5-1.png" width="232"></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">glycan</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
@@ -171,7 +182,7 @@
 <p><img src="reference/figures/README-unnamed-chunk-6-1.png" width="351"></p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">glycan</span> <span class="op">&lt;-</span> <span class="st">"Glc(b1-4)[Xyl(a1-6)][Xyl(a1-2)]Glc(b1-4)[Xyl(a1-6)]Glc(b1-4)[Fuc(a1-2)Gal(b1-2)Xyl(a1-6)]Glc(b1-4)Glc(b1-4)[Xyl(a1-6)]Glc(b1-"</span></span>
-<span><span class="fu"><a href="reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="va">glycan</span>, fuc_orient <span class="op">=</span> <span class="st">"up"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="va">glycan</span>, style <span class="op">=</span> <span class="fu"><a href="reference/style_glydraw.html">style_glydraw</a></span><span class="op">(</span>fuc_orient <span class="op">=</span> <span class="st">"up"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-7-1.png" width="523"></p>
 </div>
 </div>

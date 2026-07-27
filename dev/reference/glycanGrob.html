@@ -51,15 +51,8 @@ a grid grob. It is the low-level drawing primitive used by <code><a href="draw_c
 <span>  <span class="va">...</span>,</span>
 <span>  show_linkage <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  orient <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"left"</span>, <span class="st">"right"</span>, <span class="st">"up"</span>, <span class="st">"down"</span><span class="op">)</span>,</span>
-<span>  fuc_orient <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"flex"</span>, <span class="st">"up"</span><span class="op">)</span>,</span>
-<span>  red_end <span class="op">=</span> <span class="st">""</span>,</span>
-<span>  edge_linewidth <span class="op">=</span> <span class="fl">0.8</span>,</span>
-<span>  node_linewidth <span class="op">=</span> <span class="fl">0.8</span>,</span>
-<span>  node_size <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  font_family <span class="op">=</span> <span class="st">""</span>,</span>
-<span>  colors <span class="op">=</span> <span class="fu"><a href="glydraw_colors.html">glydraw_colors</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  highlight <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  style <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  style <span class="op">=</span> <span class="fu"><a href="style_glydraw.html">style_glydraw</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -86,51 +79,6 @@ TRUE. Substituent annotations are always shown.</p></dd>
 one of <code>"left"</code>, <code>"right"</code>, <code>"up"</code>, or <code>"down"</code>. Defaults to <code>"left"</code>.</p></dd>
 
 
-<dt id="arg-fuc-orient">fuc_orient<a class="anchor" aria-label="anchor" href="#arg-fuc-orient"></a></dt>
-<dd><p>Fuc-like triangle orientation. <code>"flex"</code> points
-non-reducing Fuc-like residues toward their rendered linkage direction,
-while <code>"up"</code> draws all Fuc-like triangles pointing upward. Reducing-end
-Fuc-like residues always point upward. Defaults to <code>"flex"</code>.</p></dd>
-
-
-<dt id="arg-red-end">red_end<a class="anchor" aria-label="anchor" href="#arg-red-end"></a></dt>
-<dd><p>Reducing-end annotation. The default <code>""</code> keeps the current
-reducing-end line. Use <code>"~"</code> to add a wavy reducing end, or any other
-string to draw that string at the reducing end. Use <code>NULL</code> to omit the
-reducing-end line and anomer annotation.</p></dd>
-
-
-<dt id="arg-edge-linewidth">edge_linewidth<a class="anchor" aria-label="anchor" href="#arg-edge-linewidth"></a></dt>
-<dd><p>Numeric scalar controlling the linewidth of linkage
-lines. Defaults to the current value, <code>0.8</code>.</p></dd>
-
-
-<dt id="arg-node-linewidth">node_linewidth<a class="anchor" aria-label="anchor" href="#arg-node-linewidth"></a></dt>
-<dd><p>Numeric scalar controlling the linewidth of node
-borders. Defaults to the current value, <code>0.8</code>.</p></dd>
-
-
-<dt id="arg-node-size">node_size<a class="anchor" aria-label="anchor" href="#arg-node-size"></a></dt>
-<dd><p>Numeric scalar used as a multiplier for the default node
-size. Defaults to <code>1</code>, which keeps the current size. Linkage annotations
-are moved farther from larger nodes, and are hidden with a warning when
-<code>node_size</code> is too large to leave enough annotation space. Values larger
-than <code>2</code> are rejected because residues overlap.</p></dd>
-
-
-<dt id="arg-font-family">font_family<a class="anchor" aria-label="anchor" href="#arg-font-family"></a></dt>
-<dd><p>A length-one character string naming the font family used
-for linkage, substituent, and reducing-end text annotations. Portable
-choices are <code>"sans"</code>, <code>"serif"</code>, and <code>"mono"</code>. Other family names, such as
-installed system fonts, are graphics-device dependent. The default <code>""</code>
-uses the graphics device's default font.</p></dd>
-
-
-<dt id="arg-colors">colors<a class="anchor" aria-label="anchor" href="#arg-colors"></a></dt>
-<dd><p>A named character vector of SNFG colors in the format returned
-by <code><a href="glydraw_colors.html">glydraw_colors()</a></code>. Names must be complete and match that palette.</p></dd>
-
-
 <dt id="arg-highlight">highlight<a class="anchor" aria-label="anchor" href="#arg-highlight"></a></dt>
 <dd><p>An integer vector specifying the node indices to highlight.
 This argument is applicable only when <code>structure</code> is a <code><a href="https://glycoverse.github.io/glyrepr/reference/glycan_structure.html" class="external-link">glyrepr::glycan_structure()</a></code>.
@@ -141,8 +89,8 @@ setting <code>highlight = c(1, 3)</code> will highlight the "Gal" and "GalNAc" n
 
 
 <dt id="arg-style">style<a class="anchor" aria-label="anchor" href="#arg-style"></a></dt>
-<dd><p>A <code>glydraw_style</code> object that supplies rendering options.
-Explicitly supplied rendering arguments override it.</p></dd>
+<dd><p>A <code><a href="style_glydraw.html">style_glydraw()</a></code> object that controls the cartoon's visual
+appearance.</p></dd>
 
 </dl></div>
     <div class="section level2">

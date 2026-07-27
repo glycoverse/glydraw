@@ -31,8 +31,11 @@
   : Construct a glycan grob
 - [`glydraw_colors()`](https://glycoverse.github.io/glydraw/dev/reference/glydraw_colors.md)
   : Default color palette in glydraw
-- [`glydraw_style()`](https://glycoverse.github.io/glydraw/dev/reference/glydraw_style.md)
-  : Create a glycan drawing style
+- [`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md)
+  [`style_glygen()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md)
+  [`style_snfg()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md)
+  [`style_glycoworkbench()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md)
+  : Glycan drawing styles
 - [`hjust_red_end()`](https://glycoverse.github.io/glydraw/dev/reference/hjust_red_end.md)
   [`vjust_red_end()`](https://glycoverse.github.io/glydraw/dev/reference/hjust_red_end.md)
   : Anchor glycan cartoons at their reducing ends

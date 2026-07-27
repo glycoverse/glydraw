@@ -195,7 +195,7 @@ ggplot(plot_data, aes(branch, sample)) +
     position = "top",
     size = 0.2,
     show_linkage = FALSE,
-    red_end = "~"
+    style = style_glydraw(red_end = "~")
   ) +
   # ==========================
   coord_equal() +

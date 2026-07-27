@@ -4,10 +4,31 @@
 
 ### Breaking changes
 
-- `colors` now accepts a complete SNFG palette in the format returned by
-  [`glydraw_colors()`](https://glycoverse.github.io/glydraw/dev/reference/glydraw_colors.md);
-  sparse monosaccharide overrides are no longer supported.
-  ([\#72](https://github.com/glycoverse/glydraw/issues/72))
+- `glydraw_style()` has been renamed to
+  [`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md)
+  and is no longer exported; replace calls to `glydraw_style()` with
+  [`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md).
+  ([\#73](https://github.com/glycoverse/glydraw/issues/73))
+
+- Cartoon appearance is now configured only with
+  `style = style_glydraw(...)` across
+  [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md),
+  [`glycanGrob()`](https://glycoverse.github.io/glydraw/dev/reference/glycanGrob.md),
+  [`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md),
+  [`guide_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/guide_glycan.md),
+  [`scale_x_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md),
+  [`scale_y_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md),
+  [`anno_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/anno_glycan.md),
+  and
+  [`export_cartoons()`](https://glycoverse.github.io/glydraw/dev/reference/export_cartoons.md);
+  calls that pass `fuc_orient`, `red_end`, `edge_linewidth`,
+  `node_linewidth`, `node_size`, `font_family`, or `colors` directly
+  should move those arguments into
+  [`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md),
+  while `show_linkage` and `orient` remain explicit arguments and are no
+  longer accepted by
+  [`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md).
+  ([\#73](https://github.com/glycoverse/glydraw/issues/73))
 
 - The shared `orient` argument no longer accepts `"H"` or `"V"`; calls
   using them now error and should replace `"H"` with `"left"` and `"V"`
@@ -15,11 +36,20 @@
 
 ### New features
 
-- New `font_family` argument controls the font used for text annotations
-  across glycan cartoons and reusable
-  [`glydraw_style()`](https://glycoverse.github.io/glydraw/dev/reference/glydraw_style.md)
-  objects, including alpha and beta anomer labels.
-  ([\#69](https://github.com/glycoverse/glydraw/issues/69))
+- [`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md)
+  replaces `glydraw_style()` as the single reusable interface for tuning
+  cartoon appearance; `show_linkage` and `orient` are explicit drawing
+  controls instead of style fields, while new
+  [`style_glygen()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md),
+  [`style_snfg()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md),
+  and
+  [`style_glycoworkbench()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md)
+  provide reusable presets for common glycan-drawing conventions.
+  ([\#73](https://github.com/glycoverse/glydraw/issues/73))
+
+- New `font_family` style option controls the font used for text
+  annotations across glycan cartoons, including alpha and beta anomer
+  labels. ([\#69](https://github.com/glycoverse/glydraw/issues/69))
 
 - The shared `orient` argument now accepts `"left"`, `"right"`, `"up"`,
   and `"down"` to draw glycans in any direction.
@@ -65,11 +95,9 @@ This version of glydraw introduced some `ggplot2` extensions.
 
 ### New features
 
-- New
-  [`glydraw_style()`](https://glycoverse.github.io/glydraw/dev/reference/glydraw_style.md)
-  stores reusable glycan rendering options for standalone cartoons,
-  grobs, export, ggplot2 layers, guides, and glycan scales. Explicit
-  rendering arguments override the style.
+- New `glydraw_style()` stores reusable glycan rendering options for
+  standalone cartoons, grobs, export, ggplot2 layers, guides, and glycan
+  scales. Explicit rendering arguments override the style.
   ([\#55](https://github.com/glycoverse/glydraw/issues/55))
 - New
   [`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md)

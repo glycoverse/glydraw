@@ -37,13 +37,16 @@ draw_cartoon(n_core)
 
 ![](glydraw_files/figure-html/basic-cartoon-1.png)
 
-## Drawing parameters
+## Drawing controls and styles
 
 [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
 returns a ggplot2 object with class `glydraw_cartoon`. You can print it
 directly, pass it to
 [`save_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/save_cartoon.md),
-or add normal ggplot2 layers when needed.
+or add normal ggplot2 layers when needed. Set `show_linkage` and
+`orient` directly; collect all visual options in
+[`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md)
+and pass the result through `style`.
 
 ### `show_linkage`
 
@@ -80,14 +83,14 @@ direction. Use `"up"` when every Fuc triangle should point upward.
 
 fucosylated <- "Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-"
 
-draw_cartoon(fucosylated, fuc_orient = "flex")
+draw_cartoon(fucosylated, style = style_glydraw(fuc_orient = "flex"))
 ```
 
 ![](glydraw_files/figure-html/fuc-orient-1.png)
 
 ``` r
 
-draw_cartoon(fucosylated, fuc_orient = "up")
+draw_cartoon(fucosylated, style = style_glydraw(fuc_orient = "up"))
 ```
 
 ![](glydraw_files/figure-html/fuc-orient-2.png)
@@ -100,14 +103,14 @@ pass any other string to draw that string at the reducing end.
 
 ``` r
 
-draw_cartoon(n_core, red_end = "~")
+draw_cartoon(n_core, style = style_glydraw(red_end = "~"))
 ```
 
 ![](glydraw_files/figure-html/red-end-1.png)
 
 ``` r
 
-draw_cartoon(n_core, red_end = "R")
+draw_cartoon(n_core, style = style_glydraw(red_end = "R"))
 ```
 
 ![](glydraw_files/figure-html/red-end-2.png)
@@ -121,8 +124,10 @@ the border width of residue symbols.
 
 draw_cartoon(
   n_core,
-  edge_linewidth = 1.4,
-  node_linewidth = 0.4
+  style = style_glydraw(
+    edge_linewidth = 1.4,
+    node_linewidth = 0.4
+  )
 )
 ```
 
@@ -136,14 +141,14 @@ larger symbols.
 
 ``` r
 
-draw_cartoon(n_core, node_size = 1.2)
+draw_cartoon(n_core, style = style_glydraw(node_size = 1.2))
 ```
 
 ![](glydraw_files/figure-html/node-size-1.png)
 
 ``` r
 
-draw_cartoon(n_core, node_size = 1.6)
+draw_cartoon(n_core, style = style_glydraw(node_size = 1.6))
 #> Warning: Linkage annotations are hidden because `node_size` is larger than 1.2.
 #> ℹ Set `show_linkage = FALSE` to silence this warning, or use a smaller
 #>   `node_size`.
@@ -157,15 +162,20 @@ size leaves too little annotation space.
 
 ### `colors`
 
-`colors` is a named character vector in the same format as
+`colors` is a complete named SNFG palette in the format returned by
 [`glydraw_colors()`](https://glycoverse.github.io/glydraw/dev/reference/glydraw_colors.md).
-Its names are fixed, and every palette color must be supplied.
+Modify entries in that palette to customize the corresponding residue
+colors.
 
 ``` r
 
 colors <- glydraw_colors()
 colors[c("glyGreen", "glyBlue")] <- c("#4DAF4A", "#377EB8")
-draw_cartoon(n_core, colors = colors)
+
+draw_cartoon(
+  n_core,
+  style = style_glydraw(colors = colors)
+)
 ```
 
 ![](glydraw_files/figure-html/colors-1.png)
@@ -197,12 +207,12 @@ when you already have one cartoon object.
 
 ``` r
 
-cartoon <- draw_cartoon(n_core, red_end = "~")
+cartoon <- draw_cartoon(n_core, style = style_glydraw(red_end = "~"))
 outfile <- file.path(tempdir(), "n-core.png")
 
 save_cartoon(cartoon, outfile, scale = 2)
 outfile
-#> [1] "/tmp/Rtmp8FNVwk/n-core.png"
+#> [1] "/tmp/Rtmpk0PPwk/n-core.png"
 ```
 
 `glydraw` does not expose separate `width` and `height` controls because
@@ -233,8 +243,7 @@ suppressMessages(
     outdir,
     file_ext = "png",
     scale = 1.5,
-    red_end = "~",
-    node_size = 1.1
+    style = style_glydraw(red_end = "~", node_size = 1.1)
   )
 )
 
