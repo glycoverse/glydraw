@@ -16,6 +16,7 @@ draw_cartoon(
   node_size = 1,
   colors = NULL,
   highlight = NULL,
+  font_family = "",
   style = NULL
 )
 }
@@ -63,6 +64,9 @@ Note that for a \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure(
 to the monosaccharides in its printed IUPAC nomenclature.
 For example, given \code{glyrepr::as_glycan_structure("Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-")},
 setting \code{highlight = c(1, 3)} will highlight the "Gal" and "GalNAc" nodes.}
+
+\item{font_family}{Font family used for text annotations. Defaults to \code{""},
+which uses the graphics device's default font.}
 
 \item{style}{A \code{glydraw_style} object that supplies rendering options.
 Explicitly supplied rendering arguments override it.}

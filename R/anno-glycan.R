@@ -46,6 +46,7 @@
 #' @param edge_linewidth Linkage linewidth passed to [glycanGrob()].
 #' @param node_linewidth Node-border linewidth passed to [glycanGrob()].
 #' @param node_size Node-size multiplier passed to [glycanGrob()].
+#' @param font_family Font family used for text annotations.
 #' @param colors Optional named character vector of monosaccharide fill colors
 #'   passed to [glycanGrob()].
 #' @param style A `glydraw_style` object that supplies rendering options. Its
@@ -104,6 +105,7 @@ anno_glycan <- function(
   node_linewidth = 0.8,
   node_size = 1,
   colors = NULL,
+  font_family = "",
   style = NULL,
   width = NULL,
   height = NULL,
@@ -134,6 +136,7 @@ anno_glycan <- function(
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
     node_size = node_size,
+    font_family = font_family,
     colors = colors,
     .supplied = c(
       show_linkage = !missing(show_linkage),
@@ -142,6 +145,7 @@ anno_glycan <- function(
       edge_linewidth = !missing(edge_linewidth),
       node_linewidth = !missing(node_linewidth),
       node_size = !missing(node_size),
+      font_family = !missing(font_family),
       colors = !missing(colors)
     )
   )
@@ -159,6 +163,7 @@ anno_glycan <- function(
     edge_linewidth = style$edge_linewidth,
     node_linewidth = style$node_linewidth,
     node_size = style$node_size,
+    font_family = style$font_family,
     colors = style$colors
   )
   params <- .glycan_annotation_label_params(options, side)
@@ -263,6 +268,7 @@ anno_glycan <- function(
     glycan_edge_linewidth = options$edge_linewidth,
     glycan_node_linewidth = options$node_linewidth,
     glycan_node_size = options$node_size,
+    glycan_font_family = options$font_family,
     glycan_colors = options$colors,
     position = side
   )

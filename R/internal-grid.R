@@ -432,7 +432,7 @@
     gp = grid::gpar(
       col = scales::alpha("black", annotation$transparency),
       fontsize = rep(6 * ggplot2::.pt * scale, nrow(annotation)),
-      fontfamily = rep("", nrow(annotation)),
+      fontfamily = rep(grob$font_family, nrow(annotation)),
       lineheight = rep(1.2, nrow(annotation)),
       font = rep(1, nrow(annotation))
     ),

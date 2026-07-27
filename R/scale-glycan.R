@@ -44,6 +44,7 @@
 #' @param edge_linewidth Linkage linewidth passed to [glycanGrob()].
 #' @param node_linewidth Node-border linewidth passed to [glycanGrob()].
 #' @param node_size Node-size multiplier passed to [glycanGrob()].
+#' @param font_family Font family used for text annotations.
 #' @param colors Optional named character vector of monosaccharide fill colors
 #'   passed to [glycanGrob()].
 #' @param style A `glydraw_style` object that supplies rendering options. Its
@@ -86,6 +87,7 @@ scale_x_glycan <- function(
   node_linewidth = 0.8,
   node_size = 1,
   colors = NULL,
+  font_family = "",
   style = NULL
 ) {
   style <- .resolve_glydraw_style(
@@ -96,6 +98,7 @@ scale_x_glycan <- function(
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
     node_size = node_size,
+    font_family = font_family,
     colors = colors,
     .supplied = c(
       show_linkage = !missing(show_linkage),
@@ -104,6 +107,7 @@ scale_x_glycan <- function(
       edge_linewidth = !missing(edge_linewidth),
       node_linewidth = !missing(node_linewidth),
       node_size = !missing(node_size),
+      font_family = !missing(font_family),
       colors = !missing(colors)
     )
   )
@@ -121,6 +125,7 @@ scale_x_glycan <- function(
     edge_linewidth = style$edge_linewidth,
     node_linewidth = style$node_linewidth,
     node_size = style$node_size,
+    font_family = style$font_family,
     colors = style$colors
   )
 
@@ -161,6 +166,7 @@ scale_y_glycan <- function(
   node_linewidth = 0.8,
   node_size = 1,
   colors = NULL,
+  font_family = "",
   style = NULL
 ) {
   style <- .resolve_glydraw_style(
@@ -171,6 +177,7 @@ scale_y_glycan <- function(
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
     node_size = node_size,
+    font_family = font_family,
     colors = colors,
     .supplied = c(
       show_linkage = !missing(show_linkage),
@@ -179,6 +186,7 @@ scale_y_glycan <- function(
       edge_linewidth = !missing(edge_linewidth),
       node_linewidth = !missing(node_linewidth),
       node_size = !missing(node_size),
+      font_family = !missing(font_family),
       colors = !missing(colors)
     )
   )
@@ -196,6 +204,7 @@ scale_y_glycan <- function(
     edge_linewidth = style$edge_linewidth,
     node_linewidth = style$node_linewidth,
     node_size = style$node_size,
+    font_family = style$font_family,
     colors = style$colors
   )
 
@@ -228,6 +237,7 @@ scale_y_glycan <- function(
 #' @param edge_linewidth Linkage linewidth.
 #' @param node_linewidth Node-border linewidth.
 #' @param node_size Node-size multiplier.
+#' @param font_family Font family used for text annotations.
 #' @param colors Named monosaccharide fill-color overrides.
 #'
 #' @returns A ggplot2 `GuideGlycanAxis` object.
@@ -246,6 +256,7 @@ scale_y_glycan <- function(
   edge_linewidth,
   node_linewidth,
   node_size,
+  font_family,
   colors
 ) {
   options <- .validate_glycan_label_options(
@@ -262,6 +273,7 @@ scale_y_glycan <- function(
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
     node_size = node_size,
+    font_family = font_family,
     colors = colors
   )
 
@@ -306,6 +318,7 @@ scale_y_glycan <- function(
     glycan_edge_linewidth = options$edge_linewidth,
     glycan_node_linewidth = options$node_linewidth,
     glycan_node_size = options$node_size,
+    glycan_font_family = options$font_family,
     glycan_colors = options$colors,
     available_aes = c("x", "y"),
     order = 0,
@@ -330,6 +343,7 @@ scale_y_glycan <- function(
 #' @param edge_linewidth Linkage linewidth.
 #' @param node_linewidth Node-border linewidth.
 #' @param node_size Node-size multiplier.
+#' @param font_family Font family used for text annotations.
 #' @param colors Named monosaccharide fill-color overrides.
 #'
 #' @returns A validated list of glycan label options.
@@ -348,6 +362,7 @@ scale_y_glycan <- function(
   edge_linewidth,
   node_linewidth,
   node_size,
+  font_family,
   colors
 ) {
   orient <- rlang::arg_match(orient, c("left", "right", "up", "down"))
@@ -361,6 +376,7 @@ scale_y_glycan <- function(
   checkmate::assert_number(edge_linewidth, lower = 0)
   checkmate::assert_number(node_linewidth, lower = 0)
   checkmate::assert_string(red_end, na.ok = FALSE)
+  checkmate::assert_string(font_family, na.ok = FALSE)
   .validate_node_size(node_size)
   colors <- .validate_custom_colors(colors)
   fuc_orient <- rlang::arg_match(fuc_orient, c("flex", "up"))
@@ -380,6 +396,7 @@ scale_y_glycan <- function(
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
     node_size = node_size,
+    font_family = font_family,
     colors = colors
   )
 }
@@ -452,6 +469,7 @@ scale_y_glycan <- function(
     edge_linewidth = params$glycan_edge_linewidth,
     node_linewidth = params$glycan_node_linewidth,
     node_size = params$glycan_node_size,
+    font_family = params$glycan_font_family,
     colors = params$glycan_colors
   )
   grob$glydraw_scale <- params$glycan_size
@@ -696,6 +714,7 @@ GuideGlycanAxis <- ggplot2::ggproto(
       glycan_edge_linewidth = 0.8,
       glycan_node_linewidth = 0.8,
       glycan_node_size = 1,
+      glycan_font_family = "",
       glycan_colors = character()
     )
   ),

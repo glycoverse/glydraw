@@ -23,6 +23,8 @@
 #'   are moved farther from larger nodes, and are hidden with a warning when
 #'   `node_size` is too large to leave enough annotation space. Values larger
 #'   than `2` are rejected because residues overlap.
+#' @param font_family Font family used for text annotations. Defaults to `""`,
+#'   which uses the graphics device's default font.
 #' @param colors Optional named character vector of custom monosaccharide fill
 #'   colors. Names must be supported monosaccharide names, such as `"Gal"` or
 #'   `"GlcNAc"`. User-provided colors overwrite the default SNFG colors, while
@@ -52,6 +54,7 @@ draw_cartoon <- function(
   node_size = 1,
   colors = NULL,
   highlight = NULL,
+  font_family = "",
   style = NULL
 ) {
   style <- .resolve_glydraw_style(
@@ -63,6 +66,7 @@ draw_cartoon <- function(
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
     node_size = node_size,
+    font_family = font_family,
     colors = colors,
     .supplied = c(
       show_linkage = !missing(show_linkage),
@@ -72,6 +76,7 @@ draw_cartoon <- function(
       edge_linewidth = !missing(edge_linewidth),
       node_linewidth = !missing(node_linewidth),
       node_size = !missing(node_size),
+      font_family = !missing(font_family),
       colors = !missing(colors)
     )
   )
@@ -85,6 +90,7 @@ draw_cartoon <- function(
     edge_linewidth = style$edge_linewidth,
     node_linewidth = style$node_linewidth,
     node_size = style$node_size,
+    font_family = style$font_family,
     colors = style$colors,
     highlight = highlight
   ) |>

@@ -26,6 +26,7 @@ glycanGrob <- function(
   node_size = 1,
   colors = NULL,
   highlight = NULL,
+  font_family = "",
   style = NULL
 ) {
   style <- .resolve_glydraw_style(
@@ -37,6 +38,7 @@ glycanGrob <- function(
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
     node_size = node_size,
+    font_family = font_family,
     colors = colors,
     .supplied = c(
       show_linkage = !missing(show_linkage),
@@ -46,6 +48,7 @@ glycanGrob <- function(
       edge_linewidth = !missing(edge_linewidth),
       node_linewidth = !missing(node_linewidth),
       node_size = !missing(node_size),
+      font_family = !missing(font_family),
       colors = !missing(colors)
     )
   )
@@ -103,6 +106,7 @@ glycanGrob <- function(
     show_linkage = show_linkage,
     edge_linewidth = style$edge_linewidth,
     node_linewidth = style$node_linewidth,
+    font_family = style$font_family,
     cl = "glycanGrob"
   )
 }
@@ -131,6 +135,7 @@ glycanGrob <- function(
     grob$show_linkage,
     grob$edge_linewidth,
     grob$node_linewidth,
+    grob$font_family,
     border_px = border_px,
     background = background
   )

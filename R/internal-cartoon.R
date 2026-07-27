@@ -529,6 +529,7 @@
 #'   should be drawn.
 #' @param edge_linewidth Numeric scalar used for linkage lines.
 #' @param node_linewidth Numeric scalar used for node borders.
+#' @param font_family Font family used for text annotations.
 #' @param border_px Numeric plot border size in pixels.
 #' @param background Logical scalar indicating whether the ggplot background
 #'   grob should be retained.
@@ -544,6 +545,7 @@
   show_linkage,
   edge_linewidth,
   node_linewidth,
+  font_family,
   border_px = .default_cartoon_border_px,
   background = TRUE
 ) {
@@ -557,7 +559,8 @@
   gly_graph <- .add_cartoon_text_layers(
     gly_graph,
     annotation_data,
-    show_linkage
+    show_linkage,
+    font_family
   )
   gly_graph <- .add_cartoon_text_bounds(gly_graph, annotation_data$bounds)
   gly_graph <- .add_reducing_end_layers(
@@ -628,19 +631,29 @@
 #' @param annotation_data A list returned by `.cartoon_text_annotation_data()`.
 #' @param show_linkage A logical scalar. `TRUE` draws all text; `FALSE` draws
 #'   only substituent and custom reducing-end text when present.
+#' @param font_family Font family used for text annotations.
 #'
 #' @returns A ggplot object with zero or one added text layer.
 #' @noRd
 .add_cartoon_text_layers <- function(
   plot,
   annotation_data,
-  show_linkage
+  show_linkage,
+  font_family
 ) {
   if (show_linkage) {
-    return(.add_plotmath_text_layer(plot, annotation_data$annotation))
+    return(.add_plotmath_text_layer(
+      plot,
+      annotation_data$annotation,
+      font_family
+    ))
   }
   if (nrow(annotation_data$show_without_linkage) > 0) {
-    return(.add_plotmath_text_layer(plot, annotation_data$show_without_linkage))
+    return(.add_plotmath_text_layer(
+      plot,
+      annotation_data$show_without_linkage,
+      font_family
+    ))
   }
   plot
 }
@@ -650,10 +663,11 @@
 #' @param plot A ggplot object.
 #' @param annotation A data frame with columns `x`, `y`, `annot_label`,
 #'   `hjust`, `vjust`, and `transparency`.
+#' @param font_family Font family used for text annotations.
 #'
 #' @returns A ggplot object with one `geom_text(parse = TRUE)` layer added.
 #' @noRd
-.add_plotmath_text_layer <- function(plot, annotation) {
+.add_plotmath_text_layer <- function(plot, annotation, font_family) {
   plot +
     ggplot2::geom_text(
       data = annotation,
@@ -667,6 +681,7 @@
       alpha = annotation$transparency,
       parse = TRUE,
       size = 6,
+      family = font_family,
     )
 }
 

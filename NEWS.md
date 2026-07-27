@@ -6,6 +6,9 @@
 
 ## New features
 
+* New `font_family` argument controls the font used for text annotations across
+  glycan cartoons and reusable `glydraw_style()` objects.
+
 * The shared `orient` argument now accepts `"left"`, `"right"`, `"up"`, and `"down"` to draw glycans in any direction.
 
 * New `anno_glycan()` uses glycan cartoons as row or column labels in ComplexHeatmap heatmaps, with clustering-aware ordering and the sizing, anchoring, rotation, nudging, and styling controls of glycan axis scales. (#67)

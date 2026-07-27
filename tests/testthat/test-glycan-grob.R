@@ -40,6 +40,18 @@ test_that("glycanGrob converts to the existing cartoon plot contract", {
   expect_contains(unique(layers[[3]]$fill), "#123456")
 })
 
+test_that("glycanGrob controls the text annotation font family", {
+  grob <- glycanGrob(
+    "Gal(b1-3)GalNAc(a1-",
+    font_family = "serif"
+  )
+  content <- grid::makeContent(grob)
+  annotations <-
+    content$children[[1]]$children[[2]]$children[["glycan.annotations"]]
+
+  expect_equal(unique(annotations$gp$fontfamily), "serif")
+})
+
 test_that("native grid layout preserves the cartoon plot geometry", {
   cases <- list(
     list(

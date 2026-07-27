@@ -47,6 +47,16 @@ test_that("draw_cartoon controls edge and node linewidths", {
   expect_equal(unique(custom_layers[[5]]$linewidth), 1.2)
 })
 
+test_that("draw_cartoon controls the text annotation font family", {
+  plot <- draw_cartoon(
+    "Gal(b1-3)GalNAc(a1-",
+    font_family = "serif"
+  )
+  layers <- ggplot2::ggplot_build(plot)$data
+
+  expect_equal(unique(layers[[4]]$family), "serif")
+})
+
 test_that("draw_cartoon applies custom monosaccharide colors over defaults", {
   structure <- "Gal(b1-4)GlcNAc(b1-"
 
@@ -63,6 +73,7 @@ test_that("draw_cartoon accepts reusable glydraw styles", {
     show_linkage = FALSE,
     orient = "up",
     edge_linewidth = 1.2,
+    font_family = "serif",
     colors = c(Gal = "#123456")
   )
 
@@ -76,6 +87,7 @@ test_that("draw_cartoon accepts reusable glydraw styles", {
   override_layers <- ggplot2::ggplot_build(override_plot)$data
 
   expect_s3_class(style, "glydraw_style")
+  expect_equal(style$font_family, "serif")
   expect_equal(unique(styled_layers[[1]]$linewidth), 1.2)
   expect_contains(unique(styled_layers[[3]]$fill), "#123456")
   expect_equal(unique(override_layers[[1]]$linewidth), 0.4)

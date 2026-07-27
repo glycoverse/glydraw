@@ -19,6 +19,7 @@ export_cartoons(
   node_linewidth = 0.8,
   node_size = 1,
   colors = NULL,
+  font_family = "",
   style = NULL
 )
 }
@@ -69,6 +70,9 @@ than \code{2} are rejected because residues overlap.}
 colors. Names must be supported monosaccharide names, such as \code{"Gal"} or
 \code{"GlcNAc"}. User-provided colors overwrite the default SNFG colors, while
 unprovided monosaccharides keep their default colors. Defaults to \code{NULL}.}
+
+\item{font_family}{Font family used for text annotations. Defaults to \code{""},
+which uses the graphics device's default font.}
 
 \item{style}{A \code{glydraw_style} object that supplies rendering options.
 Explicitly supplied rendering arguments override it.}
