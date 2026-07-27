@@ -41,6 +41,13 @@
   [\#65](https://github.com/glycoverse/glydraw/issues/65),
   [\#66](https://github.com/glycoverse/glydraw/issues/66))
 
+### Minor improvements and bug fixes
+
+- Move beta linkage annotations slightly away from horizontal and skewed
+  edge lines while leaving labels beside vertical edges unchanged,
+  including reducing-end annotations.
+  ([\#70](https://github.com/glycoverse/glydraw/issues/70))
+
 ## glydraw 0.7.0
 
 CRAN release: 2026-07-25
