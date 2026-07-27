@@ -408,9 +408,10 @@
   if (nrow(annotation) == 0) {
     return(grid::nullGrob())
   }
+  labels <- .font_family_annotation_labels(annotation, grob$font_family)
 
   grid::textGrob(
-    label = parse(text = annotation$annot_label),
+    label = parse(text = labels),
     x = grid::unit(
       .normalize_cartoon_grid_coordinates(
         annotation$x,

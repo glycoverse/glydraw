@@ -488,6 +488,28 @@
     )
 }
 
+#' Resolve plotmath labels for a text annotation font family
+#'
+#' Plotmath renders named Greek symbols with its symbol font, ignoring the
+#' selected text family. When a custom family is requested, quote alpha and beta
+#' as Unicode text so they use the same family as the other annotations.
+#'
+#' @param annotation A prepared annotation data frame with `annot` and
+#'   `annot_label` columns.
+#' @param font_family Font family used for text annotations.
+#'
+#' @returns A character vector of plotmath-safe labels.
+#' @noRd
+.font_family_annotation_labels <- function(annotation, font_family) {
+  labels <- annotation$annot_label
+  if (identical(font_family, "")) {
+    return(labels)
+  }
+  labels[annotation$annot == "alpha"] <- .quote_plotmath_text("\u03b1")
+  labels[annotation$annot == "beta"] <- .quote_plotmath_text("\u03b2")
+  labels
+}
+
 #' Build all line segments for a cartoon
 #'
 #' @param structure An igraph glycan graph.
@@ -668,6 +690,10 @@
 #' @returns A ggplot object with one `geom_text(parse = TRUE)` layer added.
 #' @noRd
 .add_plotmath_text_layer <- function(plot, annotation, font_family) {
+  annotation$annot_label <- .font_family_annotation_labels(
+    annotation,
+    font_family
+  )
   plot +
     ggplot2::geom_text(
       data = annotation,

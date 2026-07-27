@@ -55,6 +55,34 @@ test_that("draw_cartoon controls the text annotation font family", {
   layers <- ggplot2::ggplot_build(plot)$data
 
   expect_equal(unique(layers[[4]]$family), "serif")
+  expect_contains(layers[[4]]$label, '"\u03b1"')
+  expect_contains(layers[[4]]$label, '"\u03b2"')
+})
+
+test_that("Greek anomer annotations use the selected text family", {
+  annotation <- data.frame(
+    annot = c("alpha", "beta", "1"),
+    hjust = NA_real_,
+    vjust = NA_real_,
+    is_red_end_text = FALSE
+  )
+
+  prepared <- .prepare_plotmath_annotations(annotation)
+  family_labels <- .font_family_annotation_labels(prepared, "serif")
+  parsed <- parse(text = family_labels)
+
+  expect_equal(
+    family_labels,
+    c('"\u03b1"', '"\u03b2"', "1")
+  )
+  expect_equal(
+    vapply(parsed[1:2], typeof, character(1)),
+    c("character", "character")
+  )
+  expect_equal(
+    .font_family_annotation_labels(prepared, ""),
+    c("alpha", "beta", "1")
+  )
 })
 
 test_that("draw_cartoon applies custom monosaccharide colors over defaults", {
