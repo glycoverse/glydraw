@@ -6,7 +6,7 @@
 \usage{
 glydraw_style(
   show_linkage = TRUE,
-  orient = c("H", "V"),
+  orient = c("left", "right", "up", "down"),
   fuc_orient = c("flex", "up"),
   red_end = "",
   edge_linewidth = 0.8,
@@ -18,8 +18,8 @@ glydraw_style(
 \arguments{
 \item{show_linkage}{Whether to show glycosidic linkage annotations.}
 
-\item{orient}{Glycan drawing orientation: \code{"H"} for horizontal or \code{"V"} for
-vertical.}
+\item{orient}{Direction in which the glycan extends from its reducing end:
+one of \code{"left"}, \code{"right"}, \code{"up"}, or \code{"down"}. Defaults to \code{"left"}.}
 
 \item{fuc_orient}{Fuc-like triangle orientation: \code{"flex"} or \code{"up"}.}
 
@@ -44,6 +44,6 @@ Supply the result with \verb{style =} to reuse a visual specification. Explicit
 rendering arguments supplied to a drawing function override the style.
 }
 \examples{
-vertical_style <- glydraw_style(orient = "V", show_linkage = FALSE)
+vertical_style <- glydraw_style(orient = "up", show_linkage = FALSE)
 draw_cartoon("Gal(b1-3)GalNAc(a1-", style = vertical_style)
 }

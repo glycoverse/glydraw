@@ -8,12 +8,13 @@
 #' These helpers align the reducing end of every glycan cartoon with its anchor
 #' in [geom_glycan()], [scale_x_glycan()], [scale_y_glycan()], or
 #' [guide_glycan()]. Use `hjust_red_end()` for horizontal alignment when
-#' `orient = "V"`, and use `vjust_red_end()` for vertical alignment when
-#' `orient = "H"`. Because the required justification is calculated separately
-#' from each cartoon's rendered bounds, the helpers also work for collections
-#' of glycans with different asymmetric branches. Glycan scales and guides use
-#' reducing-end justification by default along the axis perpendicular to the
-#' drawing orientation; [geom_glycan()] remains centered by default.
+#' `orient` is `"up"` or `"down"`, and use `vjust_red_end()` for vertical
+#' alignment when `orient` is `"left"` or `"right"`. Because the required
+#' justification is calculated separately from each cartoon's rendered bounds,
+#' the helpers also work for collections of glycans with different asymmetric
+#' branches. Glycan scales and guides use reducing-end justification by default
+#' along the axis perpendicular to the drawing orientation; [geom_glycan()]
+#' remains centered by default.
 #'
 #' @returns A reducing-end justification marker accepted by the glycan layer,
 #'   scales, and guide.
@@ -29,13 +30,13 @@
 #'   glycan,
 #'   ggplot2::aes(x = .data$x, y = .data$y, structure = .data$structure)
 #' ) +
-#'   geom_glycan(orient = "V", hjust = hjust_red_end())
+#'   geom_glycan(orient = "up", hjust = hjust_red_end())
 #'
 #' ggplot2::ggplot(
 #'   glycan,
 #'   ggplot2::aes(x = .data$x, y = .data$y, structure = .data$structure)
 #' ) +
-#'   geom_glycan(orient = "H", vjust = vjust_red_end())
+#'   geom_glycan(orient = "left", vjust = vjust_red_end())
 #' @export
 hjust_red_end <- function() {
   .hjust_red_end
@@ -139,7 +140,7 @@ vjust_red_end <- function() {
 #'   glycans,
 #'   ggplot2::aes(x = .data$x, y = 1, structure = .data$structure)
 #' ) +
-#'   geom_glycan(orient = "V", vjust = 0)
+#'   geom_glycan(orient = "up", vjust = 0)
 #' @export
 geom_glycan <- function(
   mapping = NULL,
@@ -149,7 +150,7 @@ geom_glycan <- function(
   ...,
   angle = 0,
   show_linkage = TRUE,
-  orient = c("H", "V"),
+  orient = c("left", "right", "up", "down"),
   fuc_orient = c("flex", "up"),
   red_end = "",
   edge_linewidth = 0.8,
@@ -246,7 +247,7 @@ geom_glycan <- function(
   panel_params,
   coord,
   show_linkage = TRUE,
-  orient = "H",
+  orient = "left",
   fuc_orient = "flex",
   red_end = "",
   edge_linewidth = 0.8,
@@ -459,18 +460,24 @@ geom_glycan <- function(
 ) {
   if (
     any(.is_red_end_justification(hjust, "hjust")) &&
-      !identical(orient, "V")
+      !.is_vertical_glycan_orientation(orient)
   ) {
     cli::cli_abort(
-      "{.fn hjust_red_end} can only be used when {.code orient = \"V\"}."
+      paste0(
+        "{.fn hjust_red_end} can only be used when {.arg orient} is ",
+        "{.code \"up\"} or {.code \"down\"}."
+      )
     )
   }
   if (
     any(.is_red_end_justification(vjust, "vjust")) &&
-      !identical(orient, "H")
+      !.is_horizontal_glycan_orientation(orient)
   ) {
     cli::cli_abort(
-      "{.fn vjust_red_end} can only be used when {.code orient = \"H\"}."
+      paste0(
+        "{.fn vjust_red_end} can only be used when {.arg orient} is ",
+        "{.code \"left\"} or {.code \"right\"}."
+      )
     )
   }
   invisible(NULL)

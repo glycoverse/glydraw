@@ -151,7 +151,7 @@ test_that("guide_glycan draws scale labels as cartoons", {
     ggplot2::geom_col() +
     ggplot2::scale_fill_discrete(
       labels = structures,
-      guide = guide_glycan(orient = "V", colors = c(Gal = "#123456"))
+      guide = guide_glycan(orient = "up", colors = c(Gal = "#123456"))
     )
 
   legend <- .glycan_legend_table(plot)
@@ -163,7 +163,7 @@ test_that("guide_glycan draws scale labels as cartoons", {
   )
   expect_true(all(purrr::map_lgl(
     labels,
-    ~ .x$children[[1]]$glydraw_orient == "V"
+    ~ .x$children[[1]]$glydraw_orient == "up"
   )))
   expect_true(all(purrr::map_lgl(
     labels,
@@ -191,11 +191,11 @@ test_that("guide_glycan anchors labels at their reducing ends by default", {
     ggplot2::geom_col()
   vertical_plot <- base_plot +
     ggplot2::scale_fill_discrete(
-      guide = guide_glycan(orient = "V")
+      guide = guide_glycan(orient = "up")
     )
   horizontal_plot <- base_plot +
     ggplot2::scale_fill_discrete(
-      guide = guide_glycan(orient = "H")
+      guide = guide_glycan(orient = "left")
     )
 
   vertical_legend <- .glycan_legend_table(vertical_plot)
@@ -281,11 +281,11 @@ test_that("guide_glycan includes reducing-end offsets in label heights", {
 test_that("guide_glycan reducing-end helpers require matching orientations", {
   expect_snapshot(
     error = TRUE,
-    guide_glycan(orient = "H", hjust = hjust_red_end())
+    guide_glycan(orient = "left", hjust = hjust_red_end())
   )
   expect_snapshot(
     error = TRUE,
-    guide_glycan(orient = "V", vjust = vjust_red_end())
+    guide_glycan(orient = "up", vjust = vjust_red_end())
   )
 })
 

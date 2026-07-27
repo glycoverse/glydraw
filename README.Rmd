@@ -36,12 +36,12 @@ readme_cartoon_examples <- list(
   list(
     file = "man/figures/README-unnamed-chunk-4-1.png",
     glycan = "Gal(b1-3)[Neu5Ac(a2-3)Gal6S(b1-4)[Fuc(a1-3)]GlcNAc(b1-6)]GalNAc(a1-",
-    args = list(orient = "V", red_end = "Ser/Thr")
+    args = list(orient = "up", red_end = "Ser/Thr")
   ),
   list(
     file = "man/figures/README-unnamed-chunk-5-1.png",
     glycan = "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-",
-    args = list(orient = "V", red_end = "Asn", fuc_orient = "up")
+    args = list(orient = "up", red_end = "Asn", fuc_orient = "up")
   ),
   list(
     file = "man/figures/README-unnamed-chunk-6-1.png",
@@ -203,7 +203,7 @@ readme_img(2)
 
 ``` r
 glycan <- "Gal(b1-3)[Neu5Ac(a2-3)Gal6S(b1-4)[Fuc(a1-3)]GlcNAc(b1-6)]GalNAc(a1-"
-draw_cartoon(glycan, orient = "V", red_end = "Ser/Thr")
+draw_cartoon(glycan, orient = "up", red_end = "Ser/Thr")
 ```
 
 ```{r, echo = FALSE, results = "asis"}
@@ -212,7 +212,7 @@ readme_img(3)
 
 ``` r
 glycan <- "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-"
-draw_cartoon(glycan, orient = "V", red_end = "Asn", fuc_orient = "up")
+draw_cartoon(glycan, orient = "up", red_end = "Asn", fuc_orient = "up")
 ```
 
 ```{r, echo = FALSE, results = "asis"}

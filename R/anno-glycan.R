@@ -117,7 +117,7 @@ anno_glycan <- function(
   .validate_glycan_annotation_structures(structure)
   which <- rlang::arg_match(which)
   side <- .resolve_glycan_annotation_side(side, which)
-  orient <- switch(which, column = "V", row = "H")
+  orient <- switch(which, column = "up", row = "left")
   if (is.null(hjust)) {
     hjust <- switch(which, column = hjust_red_end(), row = 1)
   }

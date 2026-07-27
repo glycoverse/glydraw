@@ -1,5 +1,13 @@
 # glydraw (development version)
 
+## Breaking changes
+
+* The shared `orient` argument no longer accepts `"H"` or `"V"`; calls using them now error and should replace `"H"` with `"left"` and `"V"` with `"up"`. (#68)
+
+## New features
+
+* The shared `orient` argument now accepts `"left"`, `"right"`, `"up"`, and `"down"` to draw glycans in any direction.
+
 * New `anno_glycan()` uses glycan cartoons as row or column labels in ComplexHeatmap heatmaps, with clustering-aware ordering and the sizing, anchoring, rotation, nudging, and styling controls of glycan axis scales. (#67)
 
 * Glycan grobs used by `geom_glycan()`, `geom_node_glycan()`, `guide_glycan()`, `scale_x_glycan()`, and `scale_y_glycan()` now remain vector graphics at every size when exported to PDF or SVG; `draw_cartoon()` and repeated panel structures also render more efficiently with native grid primitives without changing cartoon layout or appearance. (#64, #65, #66)

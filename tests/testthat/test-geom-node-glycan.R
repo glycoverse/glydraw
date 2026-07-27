@@ -66,7 +66,7 @@ test_that("geom_node_glycan preserves explicit positions and rendering options",
         y = .data$shifted_y,
         structure = .data$structure
       ),
-      orient = "V",
+      orient = "up",
       show_linkage = FALSE
     )
   built <- ggplot2::ggplot_build(plot)
@@ -74,6 +74,6 @@ test_that("geom_node_glycan preserves explicit positions and rendering options",
 
   expect_equal(built$data[[1]]$x, data$shifted_x)
   expect_equal(built$data[[1]]$y, data$shifted_y)
-  expect_identical(plot$layers[[1]]$geom_params$orient, "V")
+  expect_identical(plot$layers[[1]]$geom_params$orient, "up")
   expect_identical(grob$show_linkage, FALSE)
 })

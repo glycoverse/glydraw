@@ -132,14 +132,14 @@ draw_cartoon(glycan, red_end = "~", node_size = 1.2)
 
 ``` r
 glycan <- "Gal(b1-3)[Neu5Ac(a2-3)Gal6S(b1-4)[Fuc(a1-3)]GlcNAc(b1-6)]GalNAc(a1-"
-draw_cartoon(glycan, orient = "V", red_end = "Ser/Thr")
+draw_cartoon(glycan, orient = "up", red_end = "Ser/Thr")
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="269" />
 
 ``` r
 glycan <- "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-"
-draw_cartoon(glycan, orient = "V", red_end = "Asn", fuc_orient = "up")
+draw_cartoon(glycan, orient = "up", red_end = "Asn", fuc_orient = "up")
 ```
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="232" />

@@ -20,4 +20,4 @@
       anno_glycan(structure, which = "row", hjust = hjust_red_end())
     Condition
       Error in `.validate_red_end_justification_orientation()`:
-      ! `hjust_red_end()` can only be used when `orient = "V"`.
+      ! `hjust_red_end()` can only be used when `orient` is `"up"` or `"down"`.

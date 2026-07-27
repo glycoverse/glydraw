@@ -6,8 +6,8 @@
 #' rendering arguments supplied to a drawing function override the style.
 #'
 #' @param show_linkage Whether to show glycosidic linkage annotations.
-#' @param orient Glycan drawing orientation: `"H"` for horizontal or `"V"` for
-#'   vertical.
+#' @param orient Direction in which the glycan extends from its reducing end:
+#'   one of `"left"`, `"right"`, `"up"`, or `"down"`. Defaults to `"left"`.
 #' @param fuc_orient Fuc-like triangle orientation: `"flex"` or `"up"`.
 #' @param red_end Reducing-end annotation. Use `"~"` for a wave.
 #' @param edge_linewidth Linewidth of glycosidic linkages.
@@ -19,12 +19,12 @@
 #' @returns A `glydraw_style` object.
 #'
 #' @examples
-#' vertical_style <- glydraw_style(orient = "V", show_linkage = FALSE)
+#' vertical_style <- glydraw_style(orient = "up", show_linkage = FALSE)
 #' draw_cartoon("Gal(b1-3)GalNAc(a1-", style = vertical_style)
 #' @export
 glydraw_style <- function(
   show_linkage = TRUE,
-  orient = c("H", "V"),
+  orient = c("left", "right", "up", "down"),
   fuc_orient = c("flex", "up"),
   red_end = "",
   edge_linewidth = 0.8,
