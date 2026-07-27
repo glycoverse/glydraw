@@ -24,7 +24,7 @@ geom_glycan(
   ...,
   angle = 0,
   show_linkage = TRUE,
-  orient = c("H", "V"),
+  orient = c("left", "right", "up", "down"),
   fuc_orient = c("flex", "up"),
   red_end = "",
   edge_linewidth = 0.8,
@@ -82,8 +82,8 @@ geom_glycan(
 
 - orient:
 
-  The orientation of glycan structure. "H" for horizontal, "V" for
-  vertical. Default is "H"
+  Direction in which the glycan extends from its reducing end: one of
+  `"left"`, `"right"`, `"up"`, or `"down"`. Defaults to `"left"`.
 
 - fuc_orient:
 
@@ -234,5 +234,5 @@ ggplot2::ggplot(
   glycans,
   ggplot2::aes(x = .data$x, y = 1, structure = .data$structure)
 ) +
-  geom_glycan(orient = "V", vjust = 0)
+  geom_glycan(orient = "up", vjust = 0)
 ```

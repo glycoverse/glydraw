@@ -23,7 +23,7 @@ guide_glycan(
   reverse = FALSE,
   order = 0,
   size = 0.4,
-  orient = c("H", "V"),
+  orient = c("left", "right", "up", "down"),
   hjust = 0,
   vjust = vjust_red_end(),
   show_linkage = TRUE,
@@ -97,8 +97,8 @@ guide_glycan(
 
 - orient:
 
-  Glycan drawing orientation, either `"H"` for horizontal or `"V"` for
-  vertical. Defaults to `"H"`.
+  Direction in which the glycan extends from its reducing end: one of
+  `"left"`, `"right"`, `"up"`, or `"down"`. Defaults to `"left"`.
 
 - hjust:
 

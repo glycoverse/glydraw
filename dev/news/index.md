@@ -2,6 +2,17 @@
 
 ## glydraw (development version)
 
+### Breaking changes
+
+- The shared `orient` argument no longer accepts `"H"` or `"V"`; calls
+  using them now error and should replace `"H"` with `"left"` and `"V"`
+  with `"up"`. ([\#68](https://github.com/glycoverse/glydraw/issues/68))
+
+### New features
+
+- The shared `orient` argument now accepts `"left"`, `"right"`, `"up"`,
+  and `"down"` to draw glycans in any direction.
+
 - New
   [`anno_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/anno_glycan.md)
   uses glycan cartoons as row or column labels in ComplexHeatmap

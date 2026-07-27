@@ -112,11 +112,12 @@ annotations are shown. Substituent annotations are always shown.</p>
 <h3 id="orient">
 <code>orient</code><a class="anchor" aria-label="anchor" href="#orient"></a>
 </h3>
-<p><code>orient</code> controls the overall direction of the cartoon.
-Use <code>"H"</code> for the default horizontal layout or
-<code>"V"</code> for a vertical layout.</p>
+<p><code>orient</code> controls the direction in which the glycan
+extends from its reducing end. Choose <code>"left"</code>,
+<code>"right"</code>, <code>"up"</code>, or <code>"down"</code>; the
+default is <code>"left"</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="va">n_core</span>, orient <span class="op">=</span> <span class="st">"V"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="va">n_core</span>, orient <span class="op">=</span> <span class="st">"up"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="glydraw_files/figure-html/orient-1.png" class="r-plt" alt="" width="161.6"></p>
 </div>
 <div class="section level3">
@@ -229,7 +230,7 @@ object.</p>
 <span></span>
 <span><span class="fu"><a href="../reference/save_cartoon.html">save_cartoon</a></span><span class="op">(</span><span class="va">cartoon</span>, <span class="va">outfile</span>, scale <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">outfile</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpDLU6Ij/n-core.png"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/tmp/RtmphBXOBF/n-core.png"</span></span></code></pre></div>
 <p><code>glydraw</code> does not expose separate <code>width</code> and
 <code>height</code> controls because each cartoon has a natural size
 calculated from its glycan structure. <code>scale</code> preserves the

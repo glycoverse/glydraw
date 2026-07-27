@@ -13,7 +13,7 @@ export_cartoons(
   dpi = 300,
   scale = 1,
   show_linkage = TRUE,
-  orient = c("H", "V"),
+  orient = c("left", "right", "up", "down"),
   fuc_orient = c("flex", "up"),
   red_end = "",
   edge_linewidth = 0.8,
@@ -65,8 +65,8 @@ export_cartoons(
 
 - orient:
 
-  The orientation of glycan structure. "H" for horizontal, "V" for
-  vertical. Default is "H"
+  Direction in which the glycan extends from its reducing end: one of
+  `"left"`, `"right"`, `"up"`, or `"down"`. Defaults to `"left"`.
 
 - fuc_orient:
 

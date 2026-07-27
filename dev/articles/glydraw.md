@@ -59,12 +59,13 @@ draw_cartoon(n_core, show_linkage = FALSE)
 
 ### `orient`
 
-`orient` controls the overall direction of the cartoon. Use `"H"` for
-the default horizontal layout or `"V"` for a vertical layout.
+`orient` controls the direction in which the glycan extends from its
+reducing end. Choose `"left"`, `"right"`, `"up"`, or `"down"`; the
+default is `"left"`.
 
 ``` r
 
-draw_cartoon(n_core, orient = "V")
+draw_cartoon(n_core, orient = "up")
 ```
 
 ![](glydraw_files/figure-html/orient-1.png)
@@ -203,7 +204,7 @@ outfile <- file.path(tempdir(), "n-core.png")
 
 save_cartoon(cartoon, outfile, scale = 2)
 outfile
-#> [1] "/tmp/RtmpDLU6Ij/n-core.png"
+#> [1] "/tmp/RtmphBXOBF/n-core.png"
 ```
 
 `glydraw` does not expose separate `width` and `height` controls because

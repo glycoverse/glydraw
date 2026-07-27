@@ -11,7 +11,7 @@ style.
 ``` r
 glydraw_style(
   show_linkage = TRUE,
-  orient = c("H", "V"),
+  orient = c("left", "right", "up", "down"),
   fuc_orient = c("flex", "up"),
   red_end = "",
   edge_linewidth = 0.8,
@@ -29,8 +29,8 @@ glydraw_style(
 
 - orient:
 
-  Glycan drawing orientation: `"H"` for horizontal or `"V"` for
-  vertical.
+  Direction in which the glycan extends from its reducing end: one of
+  `"left"`, `"right"`, `"up"`, or `"down"`. Defaults to `"left"`.
 
 - fuc_orient:
 
@@ -64,6 +64,6 @@ A `glydraw_style` object.
 ## Examples
 
 ``` r
-vertical_style <- glydraw_style(orient = "V", show_linkage = FALSE)
+vertical_style <- glydraw_style(orient = "up", show_linkage = FALSE)
 draw_cartoon("Gal(b1-3)GalNAc(a1-", style = vertical_style)
 ```
