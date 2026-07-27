@@ -20,7 +20,7 @@ scale_x_glycan(
   nudge_x = 0,
   nudge_y = 0,
   show_linkage = TRUE,
-  style = NULL
+  style = glydraw_style()
 )
 
 scale_y_glycan(
@@ -38,7 +38,7 @@ scale_y_glycan(
   nudge_x = 0,
   nudge_y = 0,
   show_linkage = TRUE,
-  style = NULL
+  style = glydraw_style()
 )
 }
 \arguments{

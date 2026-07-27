@@ -152,13 +152,11 @@ geom_glycan <- function(
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
   highlight = NULL,
-  style = NULL,
+  style = glydraw_style(),
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE
 ) {
-  .check_no_explicit_style_arguments(...)
-  style <- .resolve_glydraw_style(style)
   orient <- rlang::arg_match(orient)
   show_linkage <- .resolve_linkage_visibility(
     show_linkage,

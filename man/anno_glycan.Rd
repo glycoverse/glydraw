@@ -15,7 +15,7 @@ anno_glycan(
   nudge_x = 0,
   nudge_y = 0,
   show_linkage = TRUE,
-  style = NULL,
+  style = glydraw_style(),
   width = NULL,
   height = NULL,
   show_name = FALSE

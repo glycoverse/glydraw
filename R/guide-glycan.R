@@ -62,11 +62,10 @@ guide_glycan <- function(
   hjust = 0,
   vjust = vjust_red_end(),
   show_linkage = TRUE,
-  style = NULL
+  style = glydraw_style()
 ) {
   hjust_is_missing <- missing(hjust)
   vjust_is_missing <- missing(vjust)
-  style <- .resolve_glydraw_style(style)
   .validate_output_scale(size)
   orient <- rlang::arg_match(orient)
   if (hjust_is_missing && .is_vertical_glycan_orientation(orient)) {

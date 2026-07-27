@@ -41,9 +41,8 @@ export_cartoons <- function(
   scale = 1,
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
-  style = NULL
+  style = glydraw_style()
 ) {
-  .check_no_explicit_style_arguments(...)
   if (!missing(dpi)) {
     .warn_ignored_dpi()
   }
@@ -61,10 +60,8 @@ export_cartoons.character <- function(
   scale = 1,
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
-  style = NULL
+  style = glydraw_style()
 ) {
-  .check_no_explicit_style_arguments(...)
-  style <- .resolve_glydraw_style(style)
   .export_cartoon_list(
     unique(.as_glycan_structure_input(x)),
     dirname,
@@ -86,10 +83,8 @@ export_cartoons.glyrepr_structure <- function(
   scale = 1,
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
-  style = NULL
+  style = glydraw_style()
 ) {
-  .check_no_explicit_style_arguments(...)
-  style <- .resolve_glydraw_style(style)
   .export_cartoon_list(
     unique(x),
     dirname,
