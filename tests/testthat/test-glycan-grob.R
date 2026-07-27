@@ -44,6 +44,22 @@ test_that("glycanGrob converts to the existing cartoon plot contract", {
   expect_contains(unique(layers[[3]]$fill), "#123456")
 })
 
+test_that("glycanGrob revalidates reusable styles before drawing", {
+  style <- style_glydraw()
+  style$colors <- style$colors[-1]
+  expect_snapshot(
+    error = TRUE,
+    glycanGrob("Gal(b1-4)GlcNAc(b1-", style = style)
+  )
+
+  style <- style_glydraw()
+  style$node_size <- 2.1
+  expect_snapshot(
+    error = TRUE,
+    glycanGrob("Gal(b1-4)GlcNAc(b1-", style = style)
+  )
+})
+
 test_that("glycanGrob controls the text annotation font family", {
   grob <- glycanGrob(
     "Gal(b1-3)GalNAc(a1-",
