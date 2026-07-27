@@ -66,11 +66,11 @@ test_that("Draw Fuc triangle orientation controls", {
 
   vdiffr::expect_doppelganger(
     "flexible Fuc triangle orientation",
-    draw_cartoon(glycan, style = glydraw_style(fuc_orient = "flex"))
+    draw_cartoon(glycan, style = style_glydraw(fuc_orient = "flex"))
   )
   vdiffr::expect_doppelganger(
     "upward Fuc triangle orientation",
-    draw_cartoon(glycan, style = glydraw_style(fuc_orient = "up"))
+    draw_cartoon(glycan, style = style_glydraw(fuc_orient = "up"))
   )
 })
 
@@ -81,7 +81,7 @@ test_that("Draw vertical flexible Fuc triangles", {
     draw_cartoon(
       glycan,
       orient = "up",
-      style = glydraw_style(fuc_orient = "flex")
+      style = style_glydraw(fuc_orient = "flex")
     )
   )
 })
@@ -93,7 +93,7 @@ test_that("Draw vertical reducing-end Fuc triangle", {
     draw_cartoon(
       glycan,
       orient = "up",
-      style = glydraw_style(fuc_orient = "flex")
+      style = style_glydraw(fuc_orient = "flex")
     )
   )
 })
@@ -147,7 +147,7 @@ test_that("Draw custom node size", {
   glycan <- "Gal(b1-3)GalNAc(a1-"
   vdiffr::expect_doppelganger(
     "custom node size",
-    draw_cartoon(glycan, style = glydraw_style(node_size = 1.2))
+    draw_cartoon(glycan, style = style_glydraw(node_size = 1.2))
   )
 })
 
@@ -157,7 +157,7 @@ test_that("Draw oversized node size with linkage hidden", {
   expect_warning(
     plot <- draw_cartoon(
       glycan,
-      style = glydraw_style(node_size = 1.25, red_end = "Ser/Thr")
+      style = style_glydraw(node_size = 1.25, red_end = "Ser/Thr")
     ),
     "Linkage annotations are hidden"
   )
@@ -190,14 +190,14 @@ test_that("Draw reducing-end annotations", {
 
   vdiffr::expect_doppelganger(
     "custom reducing-end text",
-    draw_cartoon(glycan, style = glydraw_style(red_end = "Ser/Thr"))
+    draw_cartoon(glycan, style = style_glydraw(red_end = "Ser/Thr"))
   )
   vdiffr::expect_doppelganger(
     "custom reducing-end text without linkage",
     draw_cartoon(
       glycan,
       show_linkage = FALSE,
-      style = glydraw_style(red_end = "Ser/Thr")
+      style = style_glydraw(red_end = "Ser/Thr")
     )
   )
   vdiffr::expect_doppelganger(
@@ -205,12 +205,12 @@ test_that("Draw reducing-end annotations", {
     draw_cartoon(
       glycan,
       orient = "up",
-      style = glydraw_style(red_end = "Ser/Thr")
+      style = style_glydraw(red_end = "Ser/Thr")
     )
   )
   vdiffr::expect_doppelganger(
     "wavy reducing end",
-    draw_cartoon(glycan, style = glydraw_style(red_end = "~"))
+    draw_cartoon(glycan, style = style_glydraw(red_end = "~"))
   )
 })
 
@@ -265,7 +265,7 @@ test_that("Draw representative Fuc-like residues", {
     "upward Fuc-like triangle orientation FucNAc",
     draw_cartoon(
       "FucNAc(a1-3)[FucNAc(a1-6)]GlcNAc(b1-",
-      style = glydraw_style(fuc_orient = "up")
+      style = style_glydraw(fuc_orient = "up")
     )
   )
 })
@@ -288,7 +288,7 @@ test_that("Exported cartoons preserve Fuc orientation", {
     result <- export_cartoons(
       glycan,
       temp_dir,
-      style = glydraw_style(fuc_orient = "up")
+      style = style_glydraw(fuc_orient = "up")
     )
   )
 
@@ -308,7 +308,7 @@ test_that("Exported cartoons preserve custom node size", {
     result <- export_cartoons(
       glycan,
       temp_dir,
-      style = glydraw_style(node_size = 1.2)
+      style = style_glydraw(node_size = 1.2)
     )
   )
 

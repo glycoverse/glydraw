@@ -152,6 +152,8 @@ test_that("anno_glycan matches glycan scale sizing and anchoring", {
 
 test_that("anno_glycan supports scale label adjustments and styles", {
   skip_if_not_installed("ComplexHeatmap")
+  colors <- glydraw_colors()
+  colors["glyYellow"] <- "#123456"
   annotation <- anno_glycan(
     "Gal(b1-3)GalNAc(a1-",
     which = "row",
@@ -163,9 +165,9 @@ test_that("anno_glycan supports scale label adjustments and styles", {
     nudge_x = 2,
     nudge_y = -3,
     show_linkage = FALSE,
-    style = glydraw_style(
+    style = style_glydraw(
       red_end = "~",
-      colors = c(Gal = "#123456"),
+      colors = colors,
       edge_linewidth = 1.1,
       node_linewidth = 0.3
     )

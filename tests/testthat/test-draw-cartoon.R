@@ -35,7 +35,7 @@ test_that("draw_cartoon controls edge and node linewidths", {
 
   custom_plot <- draw_cartoon(
     structure,
-    style = glydraw_style(
+    style = style_glydraw(
       red_end = "~",
       edge_linewidth = 1.2,
       node_linewidth = 0.4
@@ -52,7 +52,7 @@ test_that("draw_cartoon controls edge and node linewidths", {
 test_that("draw_cartoon controls the text annotation font family", {
   plot <- draw_cartoon(
     "Gal(b1-3)GalNAc(a1-",
-    style = glydraw_style(font_family = "serif")
+    style = style_glydraw(font_family = "serif")
   )
   layers <- ggplot2::ggplot_build(plot)$data
 
@@ -214,12 +214,12 @@ test_that("reducing-end beta annotations follow the physical edge direction", {
 
 test_that("red_end = NULL omits the complete reducing end", {
   structure <- "Gal(b1-3)GalNAc(a1-"
-  style <- glydraw_style(red_end = NULL)
+  style <- style_glydraw(red_end = NULL)
   grob <- glycanGrob(structure, style = style)
   single_residue_grob <- glycanGrob("GlcNAc(b1-", style = style)
   reducing_info <- grob$annotation_data$reducing_info
 
-  expect_null(glydraw_style(red_end = NULL)$red_end)
+  expect_null(style_glydraw(red_end = NULL)$red_end)
   expect_equal(
     vapply(reducing_info, nrow, integer(1)),
     c(annotation = 0L, segment = 0L, wave = 0L, bounds = 0L)
@@ -229,12 +229,14 @@ test_that("red_end = NULL omits the complete reducing end", {
   expect_s3_class(draw_cartoon(structure, style = style), "glydraw_cartoon")
 })
 
-test_that("draw_cartoon applies custom monosaccharide colors over defaults", {
+test_that("draw_cartoon applies a complete custom SNFG palette", {
   structure <- "Gal(b1-4)GlcNAc(b1-"
+  colors <- glydraw_colors()
+  colors["glyYellow"] <- "#123456"
 
   plot <- draw_cartoon(
     structure,
-    style = glydraw_style(colors = c(Gal = "#123456"))
+    style = style_glydraw(colors = colors)
   )
   node_fill <- unique(ggplot2::ggplot_build(plot)$data[[3]]$fill)
 
@@ -244,10 +246,12 @@ test_that("draw_cartoon applies custom monosaccharide colors over defaults", {
 
 test_that("draw_cartoon accepts reusable glydraw styles", {
   structure <- "Gal(b1-4)GlcNAc(b1-"
-  style <- glydraw_style(
+  colors <- glydraw_colors()
+  colors["glyYellow"] <- "#123456"
+  style <- style_glydraw(
     edge_linewidth = 1.2,
     font_family = "serif",
-    colors = c(Gal = "#123456")
+    colors = colors
   )
 
   styled_plot <- draw_cartoon(
@@ -266,7 +270,14 @@ test_that("draw_cartoon accepts reusable glydraw styles", {
 })
 
 test_that("cartoon styling is available only through style", {
-  styling_arguments <- names(formals(glydraw_style))
+  expect_setequal(
+    intersect(
+      getNamespaceExports("glydraw"),
+      c("glydraw_style", "style_glydraw")
+    ),
+    "style_glydraw"
+  )
+  styling_arguments <- names(formals(style_glydraw))
   interfaces <- list(
     draw_cartoon = draw_cartoon,
     glycanGrob = glycanGrob,
@@ -306,19 +317,33 @@ test_that("cartoon styling is available only through style", {
   expect_true("show_linkage" %in% interface_arguments$anno_glycan)
   purrr::walk(
     interfaces,
-    ~ expect_identical(formals(.x)$style, quote(glydraw_style()))
+    ~ expect_identical(formals(.x)$style, quote(style_glydraw()))
   )
 })
 
-test_that("draw_cartoon rejects unsupported custom color names", {
+test_that("draw_cartoon requires the complete named SNFG palette", {
   structure <- "Gal(b1-4)GlcNAc(b1-"
+  colors <- glydraw_colors()
 
+  expect_identical(style_glydraw()$colors, glydraw_colors())
   expect_error(
-    draw_cartoon(
-      structure,
-      style = glydraw_style(colors = c(NotAMono = "#123456"))
-    ),
-    "supported monosaccharides"
+    draw_cartoon(structure, style = style_glydraw(colors = colors[-1])),
+    "exactly the names"
+  )
+  expect_error(
+    style_glydraw(colors = c(colors, extra = "#123456")),
+    "exactly the names"
+  )
+  names(colors)[2] <- names(colors)[1]
+  expect_error(
+    style_glydraw(colors = colors),
+    "exactly the names"
+  )
+  colors <- glydraw_colors()
+  colors["glyYellow"] <- "not-a-color"
+  expect_error(
+    style_glydraw(colors = colors),
+    "valid R colors"
   )
 })
 
@@ -328,7 +353,7 @@ test_that("draw_cartoon warns and hides linkage annotations for oversized nodes"
   expect_warning(
     draw_cartoon(
       structure,
-      style = glydraw_style(node_size = 1.25, red_end = "Ser/Thr")
+      style = style_glydraw(node_size = 1.25, red_end = "Ser/Thr")
     ),
     "Linkage annotations are hidden"
   )
@@ -338,12 +363,12 @@ test_that("draw_cartoon rejects node_size values that make residues overlap", {
   structure <- "Gal(b1-3)GalNAc(a1-"
 
   expect_error(
-    draw_cartoon(structure, style = glydraw_style(node_size = 2.1)),
+    draw_cartoon(structure, style = style_glydraw(node_size = 2.1)),
     "`node_size` must be no larger than 2"
   )
   expect_warning(
     expect_s3_class(
-      draw_cartoon(structure, style = glydraw_style(node_size = 2)),
+      draw_cartoon(structure, style = style_glydraw(node_size = 2)),
       "glydraw_cartoon"
     ),
     "Linkage annotations are hidden"
@@ -401,7 +426,7 @@ test_that("draw_cartoon supports four directional orientations", {
     plot <- draw_cartoon(
       structure,
       orient = orient,
-      style = glydraw_style(red_end = "Asn")
+      style = style_glydraw(red_end = "Asn")
     )
     expect_s3_class(plot, "glydraw_cartoon")
     expect_s3_class(plot, "ggplot")

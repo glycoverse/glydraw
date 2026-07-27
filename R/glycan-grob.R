@@ -20,7 +20,7 @@ glycanGrob <- function(
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
   highlight = NULL,
-  style = glydraw_style()
+  style = style_glydraw()
 ) {
   orient <- rlang::arg_match(orient, error_call = NULL)
   inputs <- .prepare_cartoon_inputs(

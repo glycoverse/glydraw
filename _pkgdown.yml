@@ -23,5 +23,5 @@ reference:
       - anno_glycan
       - glycanGrob
       - glydraw_colors
-      - glydraw_style
+      - style_glydraw
       - hjust_red_end

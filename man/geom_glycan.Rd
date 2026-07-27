@@ -14,7 +14,7 @@ geom_glycan(
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
   highlight = NULL,
-  style = glydraw_style(),
+  style = style_glydraw(),
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE
@@ -53,7 +53,7 @@ to the monosaccharides in its printed IUPAC nomenclature.
 For example, given \code{glyrepr::as_glycan_structure("Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-")},
 setting \code{highlight = c(1, 3)} will highlight the "Gal" and "GalNAc" nodes.}
 
-\item{style}{A \code{\link[=glydraw_style]{glydraw_style()}} object that controls the cartoon's visual
+\item{style}{A \code{\link[=style_glydraw]{style_glydraw()}} object that controls the cartoon's visual
 appearance.}
 
 \item{na.rm}{If \code{FALSE}, the default, missing values are removed with a
