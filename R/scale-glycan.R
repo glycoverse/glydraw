@@ -172,7 +172,7 @@ scale_y_glycan <- function(
 #' @param node_linewidth Node-border linewidth.
 #' @param node_size Node-size multiplier.
 #' @param font_family Font family used for text annotations.
-#' @param colors Named monosaccharide fill-color overrides.
+#' @param colors Named SNFG colors in the format returned by [glydraw_colors()].
 #'
 #' @returns A ggplot2 `GuideGlycanAxis` object.
 #' @noRd
@@ -312,7 +312,7 @@ scale_y_glycan <- function(
   checkmate::assert_string(red_end, na.ok = FALSE, null.ok = TRUE)
   checkmate::assert_string(font_family, na.ok = FALSE)
   .validate_node_size(node_size)
-  colors <- .validate_custom_colors(colors)
+  colors <- .validate_colors(colors)
   fuc_orient <- rlang::arg_match(fuc_orient, c("flex", "up"))
   show_linkage <- .resolve_linkage_visibility(show_linkage, node_size)
 

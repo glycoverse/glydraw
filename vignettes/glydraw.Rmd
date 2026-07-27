@@ -121,16 +121,17 @@ little annotation space.
 
 ### `colors`
 
-`colors` is an optional named character vector for overriding monosaccharide
-fill colors. Names must be supported monosaccharide names. Only the names you
-provide are changed; all other monosaccharides keep their default SNFG colors.
+`colors` is a complete named SNFG palette in the format returned by
+`glydraw_colors()`. Modify entries in that palette to customize the
+corresponding residue colors.
 
 ```{r colors, fig.width = 4.83, fig.height = 2.02}
+colors <- glydraw_colors()
+colors[c("glyGreen", "glyBlue")] <- c("#4DAF4A", "#377EB8")
+
 draw_cartoon(
   n_core,
-  style = style_glydraw(
-    colors = c(Man = "#4DAF4A", GlcNAc = "#377EB8")
-  )
+  style = style_glydraw(colors = colors)
 )
 ```
 
