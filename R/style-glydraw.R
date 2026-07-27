@@ -1,6 +1,6 @@
 #' Create a glycan drawing style
 #'
-#' `glydraw_style()` collects the rendering options shared by glydraw's
+#' `style_glydraw()` collects the rendering options shared by glydraw's
 #' standalone drawings, grobs, ggplot2 layers, guides, and glycan scales.
 #' Supply the result with `style =` to reuse a visual specification.
 #'
@@ -21,10 +21,10 @@
 #' @returns A `glydraw_style` object.
 #'
 #' @examples
-#' serif_style <- glydraw_style(font_family = "serif")
+#' serif_style <- style_glydraw(font_family = "serif")
 #' draw_cartoon("Gal(b1-3)GalNAc(a1-", style = serif_style)
 #' @export
-glydraw_style <- function(
+style_glydraw <- function(
   fuc_orient = c("flex", "up"),
   red_end = "",
   edge_linewidth = 0.8,

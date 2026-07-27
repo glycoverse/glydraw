@@ -40,7 +40,7 @@
 #'   values move cartoons upward. Defaults to `0`.
 #' @param show_linkage Whether to show glycosidic linkage annotations inside
 #'   the cartoons. Defaults to `TRUE`.
-#' @param style A [glydraw_style()] object that controls the cartoons' visual
+#' @param style A [style_glydraw()] object that controls the cartoons' visual
 #'   appearance.
 #' @param width Optional [grid::unit()] width for a row annotation. `NULL`
 #'   calculates the width from the rendered cartoons.
@@ -89,7 +89,7 @@ anno_glycan <- function(
   nudge_x = 0,
   nudge_y = 0,
   show_linkage = TRUE,
-  style = glydraw_style(),
+  style = style_glydraw(),
   width = NULL,
   height = NULL,
   show_name = FALSE

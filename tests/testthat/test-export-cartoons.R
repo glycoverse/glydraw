@@ -55,7 +55,7 @@ test_that("export_cartoons forwards custom linewidths", {
     result <- export_cartoons(
       glycans,
       temp_dir,
-      style = glydraw_style(edge_linewidth = 1.1, node_linewidth = 0.3)
+      style = style_glydraw(edge_linewidth = 1.1, node_linewidth = 0.3)
     )
   )
   layers <- ggplot2::ggplot_build(result[[1]])$data
@@ -76,7 +76,7 @@ test_that("export_cartoons forwards custom colors", {
     result <- export_cartoons(
       glycans,
       temp_dir,
-      style = glydraw_style(colors = colors)
+      style = style_glydraw(colors = colors)
     )
   )
   node_fill <- unique(ggplot2::ggplot_build(result[[1]])$data[[3]]$fill)
@@ -95,7 +95,7 @@ test_that("export_cartoons rejects node_size values that make residues overlap",
       export_cartoons(
         glycans,
         temp_dir,
-        style = glydraw_style(node_size = 2.1)
+        style = style_glydraw(node_size = 2.1)
       )
     ),
     "`node_size` must be no larger than 2"
@@ -263,7 +263,7 @@ test_that("export_cartoons preserves Greek labels in custom-font PDFs", {
         "Gal(b1-3)GalNAc(a1-",
         temp_dir,
         file_ext = "pdf",
-        style = glydraw_style(font_family = "serif")
+        style = style_glydraw(font_family = "serif")
       )
     )
   )

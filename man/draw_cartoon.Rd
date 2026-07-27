@@ -10,7 +10,7 @@ draw_cartoon(
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
   highlight = NULL,
-  style = glydraw_style()
+  style = style_glydraw()
 )
 }
 \arguments{
@@ -32,7 +32,7 @@ to the monosaccharides in its printed IUPAC nomenclature.
 For example, given \code{glyrepr::as_glycan_structure("Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-")},
 setting \code{highlight = c(1, 3)} will highlight the "Gal" and "GalNAc" nodes.}
 
-\item{style}{A \code{\link[=glydraw_style]{glydraw_style()}} object that controls the cartoon's visual
+\item{style}{A \code{\link[=style_glydraw]{style_glydraw()}} object that controls the cartoon's visual
 appearance.}
 }
 \value{
@@ -45,6 +45,6 @@ Draw a Symbol Nomenclature For Glycan (SNFG)
 draw_cartoon("Gal(b1-3)GalNAc(a1-")
 draw_cartoon(
   "Gal(b1-3)GalNAc(a1-",
-  style = glydraw_style(font_family = "serif")
+  style = style_glydraw(font_family = "serif")
 )
 }

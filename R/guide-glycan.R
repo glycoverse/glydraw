@@ -21,7 +21,7 @@
 #'   cartoons and `0.5` for vertical cartoons.
 #' @param show_linkage Whether to show glycosidic linkage annotations inside
 #'   the cartoons. Defaults to `TRUE`.
-#' @param style A [glydraw_style()] object that controls the cartoons' visual
+#' @param style A [style_glydraw()] object that controls the cartoons' visual
 #'   appearance.
 #'
 #' @returns A ggplot2 legend guide that draws glycan cartoons in place of text
@@ -62,7 +62,7 @@ guide_glycan <- function(
   hjust = 0,
   vjust = vjust_red_end(),
   show_linkage = TRUE,
-  style = glydraw_style()
+  style = style_glydraw()
 ) {
   hjust_is_missing <- missing(hjust)
   vjust_is_missing <- missing(vjust)
@@ -173,7 +173,7 @@ guide_glycan <- function(
     structure,
     show_linkage = params$glycan_show_linkage,
     orient = params$glycan_orient,
-    style = glydraw_style(
+    style = style_glydraw(
       red_end = params$glycan_red_end,
       fuc_orient = params$glycan_fuc_orient,
       edge_linewidth = params$glycan_edge_linewidth,

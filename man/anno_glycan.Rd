@@ -15,7 +15,7 @@ anno_glycan(
   nudge_x = 0,
   nudge_y = 0,
   show_linkage = TRUE,
-  style = glydraw_style(),
+  style = style_glydraw(),
   width = NULL,
   height = NULL,
   show_name = FALSE
@@ -54,7 +54,7 @@ values move cartoons upward. Defaults to \code{0}.}
 \item{show_linkage}{Whether to show glycosidic linkage annotations inside
 the cartoons. Defaults to \code{TRUE}.}
 
-\item{style}{A \code{\link[=glydraw_style]{glydraw_style()}} object that controls the cartoons' visual
+\item{style}{A \code{\link[=style_glydraw]{style_glydraw()}} object that controls the cartoons' visual
 appearance.}
 
 \item{width}{Optional \code{\link[grid:unit]{grid::unit()}} width for a row annotation. \code{NULL}

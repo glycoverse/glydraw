@@ -7,7 +7,7 @@
 #'   TRUE. Substituent annotations are always shown.
 #' @param orient Direction in which the glycan extends from its reducing end:
 #'   one of `"left"`, `"right"`, `"up"`, or `"down"`. Defaults to `"left"`.
-#' @param style A [glydraw_style()] object that controls the cartoon's visual
+#' @param style A [style_glydraw()] object that controls the cartoon's visual
 #'   appearance.
 #' @param highlight An integer vector specifying the node indices to highlight.
 #'   This argument is applicable only when `structure` is a [glyrepr::glycan_structure()].
@@ -21,7 +21,7 @@
 #' draw_cartoon("Gal(b1-3)GalNAc(a1-")
 #' draw_cartoon(
 #'   "Gal(b1-3)GalNAc(a1-",
-#'   style = glydraw_style(font_family = "serif")
+#'   style = style_glydraw(font_family = "serif")
 #' )
 #' @export
 draw_cartoon <- function(
@@ -30,7 +30,7 @@ draw_cartoon <- function(
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
   highlight = NULL,
-  style = glydraw_style()
+  style = style_glydraw()
 ) {
   glycanGrob(
     structure,

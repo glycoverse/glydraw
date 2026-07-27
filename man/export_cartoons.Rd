@@ -13,7 +13,7 @@ export_cartoons(
   scale = 1,
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
-  style = glydraw_style()
+  style = style_glydraw()
 )
 }
 \arguments{
@@ -38,7 +38,7 @@ TRUE. Substituent annotations are always shown.}
 \item{orient}{Direction in which the glycan extends from its reducing end:
 one of \code{"left"}, \code{"right"}, \code{"up"}, or \code{"down"}. Defaults to \code{"left"}.}
 
-\item{style}{A \code{\link[=glydraw_style]{glydraw_style()}} object that controls the cartoon's visual
+\item{style}{A \code{\link[=style_glydraw]{style_glydraw()}} object that controls the cartoon's visual
 appearance.}
 }
 \value{

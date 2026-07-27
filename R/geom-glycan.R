@@ -152,7 +152,7 @@ geom_glycan <- function(
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
   highlight = NULL,
-  style = glydraw_style(),
+  style = style_glydraw(),
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE
@@ -267,7 +267,7 @@ geom_glycan <- function(
       show_linkage = show_linkage,
       orient = orient,
       highlight = highlight,
-      style = glydraw_style(
+      style = style_glydraw(
         fuc_orient = fuc_orient,
         red_end = red_end,
         edge_linewidth = edge_linewidth,

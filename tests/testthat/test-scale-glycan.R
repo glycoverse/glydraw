@@ -442,19 +442,19 @@ test_that("glycan axis labels support reducing-end annotations", {
     ggplot2::aes(x = .data$structure, y = .data$value)
   ) +
     ggplot2::geom_col() +
-    scale_x_glycan(style = glydraw_style(red_end = "~"))
+    scale_x_glycan(style = style_glydraw(red_end = "~"))
   y_plot <- ggplot2::ggplot(
     data,
     ggplot2::aes(x = .data$value, y = .data$structure)
   ) +
     ggplot2::geom_col() +
-    scale_y_glycan(style = glydraw_style(red_end = "Reducing end"))
+    scale_y_glycan(style = style_glydraw(red_end = "Reducing end"))
   no_red_end_plot <- ggplot2::ggplot(
     data,
     ggplot2::aes(x = .data$structure, y = .data$value)
   ) +
     ggplot2::geom_col() +
-    scale_x_glycan(style = glydraw_style(red_end = NULL))
+    scale_x_glycan(style = style_glydraw(red_end = NULL))
   x_label <- .axis_glycan_labels(x_plot, "axis-b")$children[[1]]
   y_label <- .axis_glycan_labels(y_plot, "axis-l")$children[[1]]
   no_red_end_label <-
@@ -491,7 +491,7 @@ test_that("glycan axis scales use plain cartoon parameters", {
     scale_x_glycan(
       size = 0.6,
       show_linkage = TRUE,
-      style = glydraw_style(edge_linewidth = 1.1)
+      style = style_glydraw(edge_linewidth = 1.1)
     )
   label <- .axis_glycan_labels(plot, "axis-b")$children[[1]]
 

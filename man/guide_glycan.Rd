@@ -19,7 +19,7 @@ guide_glycan(
   hjust = 0,
   vjust = vjust_red_end(),
   show_linkage = TRUE,
-  style = glydraw_style()
+  style = style_glydraw()
 )
 }
 \arguments{
@@ -73,7 +73,7 @@ cartoons and \code{0.5} for vertical cartoons.}
 \item{show_linkage}{Whether to show glycosidic linkage annotations inside
 the cartoons. Defaults to \code{TRUE}.}
 
-\item{style}{A \code{\link[=glydraw_style]{glydraw_style()}} object that controls the cartoons' visual
+\item{style}{A \code{\link[=style_glydraw]{style_glydraw()}} object that controls the cartoons' visual
 appearance.}
 }
 \value{
