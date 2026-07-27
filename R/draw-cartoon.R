@@ -7,32 +7,8 @@
 #'   TRUE. Substituent annotations are always shown.
 #' @param orient Direction in which the glycan extends from its reducing end:
 #'   one of `"left"`, `"right"`, `"up"`, or `"down"`. Defaults to `"left"`.
-#' @param fuc_orient Fuc-like triangle orientation. `"flex"` points
-#'   non-reducing Fuc-like residues toward their rendered linkage direction,
-#'   while `"up"` draws all Fuc-like triangles pointing upward. Reducing-end
-#'   Fuc-like residues always point upward. Defaults to `"flex"`.
-#' @param red_end Reducing-end annotation. The default `""` keeps the current
-#'   reducing-end line. Use `"~"` to add a wavy reducing end, or any other
-#'   string to draw that string at the reducing end. Use `NULL` to omit the
-#'   reducing-end line and anomer annotation.
-#' @param edge_linewidth Numeric scalar controlling the linewidth of linkage
-#'   lines. Defaults to the current value, `0.8`.
-#' @param node_linewidth Numeric scalar controlling the linewidth of node
-#'   borders. Defaults to the current value, `0.8`.
-#' @param node_size Numeric scalar used as a multiplier for the default node
-#'   size. Defaults to `1`, which keeps the current size. Linkage annotations
-#'   are moved farther from larger nodes, and are hidden with a warning when
-#'   `node_size` is too large to leave enough annotation space. Values larger
-#'   than `2` are rejected because residues overlap.
-#' @param font_family A length-one character string naming the font family used
-#'   for linkage, substituent, and reducing-end text annotations. Portable
-#'   choices are `"sans"`, `"serif"`, and `"mono"`. Other family names, such as
-#'   installed system fonts, are graphics-device dependent. The default `""`
-#'   uses the graphics device's default font.
-#' @param colors A named character vector of SNFG colors in the format returned
-#'   by [glydraw_colors()]. Names must be complete and match that palette.
-#' @param style A `glydraw_style` object that supplies rendering options.
-#'   Explicitly supplied rendering arguments override it.
+#' @param style A [glydraw_style()] object that controls the cartoon's visual
+#'   appearance.
 #' @param highlight An integer vector specifying the node indices to highlight.
 #'   This argument is applicable only when `structure` is a [glyrepr::glycan_structure()].
 #'   Note that for a [glyrepr::glycan_structure()], the node indices correspond exactly
@@ -43,59 +19,27 @@
 #' @returns a ggplot2 object
 #' @examples
 #' draw_cartoon("Gal(b1-3)GalNAc(a1-")
-#' draw_cartoon("Gal(b1-3)GalNAc(a1-", font_family = "serif")
+#' draw_cartoon(
+#'   "Gal(b1-3)GalNAc(a1-",
+#'   style = glydraw_style(font_family = "serif")
+#' )
 #' @export
 draw_cartoon <- function(
   structure,
   ...,
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
-  fuc_orient = c("flex", "up"),
-  red_end = "",
-  edge_linewidth = 0.8,
-  node_linewidth = 0.8,
-  node_size = 1,
-  font_family = "",
-  colors = glydraw_colors(),
   highlight = NULL,
   style = NULL
 ) {
-  style <- .resolve_glydraw_style(
-    style = style,
-    show_linkage = show_linkage,
-    orient = orient,
-    fuc_orient = fuc_orient,
-    red_end = red_end,
-    edge_linewidth = edge_linewidth,
-    node_linewidth = node_linewidth,
-    node_size = node_size,
-    font_family = font_family,
-    colors = colors,
-    .supplied = c(
-      show_linkage = !missing(show_linkage),
-      orient = !missing(orient),
-      fuc_orient = !missing(fuc_orient),
-      red_end = !missing(red_end),
-      edge_linewidth = !missing(edge_linewidth),
-      node_linewidth = !missing(node_linewidth),
-      node_size = !missing(node_size),
-      font_family = !missing(font_family),
-      colors = !missing(colors)
-    )
-  )
+  .check_no_explicit_style_arguments(...)
   glycanGrob(
     structure,
     ...,
-    show_linkage = style$show_linkage,
-    orient = style$orient,
-    fuc_orient = style$fuc_orient,
-    red_end = style$red_end,
-    edge_linewidth = style$edge_linewidth,
-    node_linewidth = style$node_linewidth,
-    node_size = style$node_size,
-    font_family = style$font_family,
-    colors = style$colors,
-    highlight = highlight
+    show_linkage = show_linkage,
+    orient = orient,
+    highlight = highlight,
+    style = style
   ) |>
     .glycan_grob_to_plot()
 }

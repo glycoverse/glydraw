@@ -20,13 +20,6 @@ scale_x_glycan(
   nudge_x = 0,
   nudge_y = 0,
   show_linkage = TRUE,
-  red_end = "",
-  fuc_orient = c("flex", "up"),
-  edge_linewidth = 0.8,
-  node_linewidth = 0.8,
-  node_size = 1,
-  font_family = "",
-  colors = glydraw_colors(),
   style = NULL
 )
 
@@ -45,13 +38,6 @@ scale_y_glycan(
   nudge_x = 0,
   nudge_y = 0,
   show_linkage = TRUE,
-  red_end = "",
-  fuc_orient = c("flex", "up"),
-  edge_linewidth = 0.8,
-  node_linewidth = 0.8,
-  node_size = 1,
-  font_family = "",
-  colors = glydraw_colors(),
   style = NULL
 )
 }
@@ -98,30 +84,8 @@ to \code{0}.}
 \item{show_linkage}{Whether to show glycosidic linkage annotations inside
 the cartoons. Defaults to \code{TRUE}.}
 
-\item{red_end}{Reducing-end annotation passed to \code{\link[=glycanGrob]{glycanGrob()}}. Use \code{"~"}
-for a wave, another string to display that text, or \code{NULL} to omit the
-reducing-end line and anomer annotation. Defaults to \code{""}.}
-
-\item{fuc_orient}{Fuc-like triangle orientation passed to \code{\link[=glycanGrob]{glycanGrob()}}.}
-
-\item{edge_linewidth}{Linkage linewidth passed to \code{\link[=glycanGrob]{glycanGrob()}}.}
-
-\item{node_linewidth}{Node-border linewidth passed to \code{\link[=glycanGrob]{glycanGrob()}}.}
-
-\item{node_size}{Node-size multiplier passed to \code{\link[=glycanGrob]{glycanGrob()}}.}
-
-\item{font_family}{A length-one character string naming the font family used
-for linkage, substituent, and reducing-end text annotations. Portable
-choices are \code{"sans"}, \code{"serif"}, and \code{"mono"}. Other family names, such as
-installed system fonts, are graphics-device dependent. The default \code{""}
-uses the graphics device's default font.}
-
-\item{colors}{A named character vector of SNFG colors in the format returned
-by \code{\link[=glydraw_colors]{glydraw_colors()}}. Names must be complete and match that palette.}
-
-\item{style}{A \code{glydraw_style} object that supplies rendering options. Its
-orientation is ignored because each scale determines the axis direction.
-Explicitly supplied rendering arguments override it.}
+\item{style}{A \code{\link[=glydraw_style]{glydraw_style()}} object that controls the cartoons' visual
+appearance.}
 }
 \value{
 A ggplot2 discrete position scale.

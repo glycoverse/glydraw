@@ -78,8 +78,8 @@ test_that("geom_glycan draws one configured glycan grob per row", {
     )
   ) +
     geom_glycan(
+      show_linkage = FALSE,
       style = glydraw_style(
-        show_linkage = FALSE,
         edge_linewidth = 1.1,
         node_linewidth = 0.3,
         colors = colors

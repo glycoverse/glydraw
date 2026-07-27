@@ -22,13 +22,13 @@ test_that("glycanGrob constructs a drawable grid grob", {
 })
 
 test_that("glycanGrob converts to the existing cartoon plot contract", {
-  colors <- glydraw_colors()
-  colors["glyYellow"] <- "#123456"
   grob <- glycanGrob(
     "Gal(b1-4)GlcNAc(b1-",
-    colors = colors,
-    edge_linewidth = 1.1,
-    node_linewidth = 0.3
+    style = glydraw_style(
+      colors = c(Gal = "#123456"),
+      edge_linewidth = 1.1,
+      node_linewidth = 0.3
+    )
   )
 
   plot <- .glycan_grob_to_plot(grob)
@@ -45,7 +45,7 @@ test_that("glycanGrob converts to the existing cartoon plot contract", {
 test_that("glycanGrob controls the text annotation font family", {
   grob <- glycanGrob(
     "Gal(b1-3)GalNAc(a1-",
-    font_family = "serif"
+    style = glydraw_style(font_family = "serif")
   )
   content <- grid::makeContent(grob)
   annotations <-
@@ -91,8 +91,8 @@ test_that("native grid layout preserves the cartoon plot geometry", {
     grob <- glycanGrob(
       case$structure,
       orient = case$orient,
-      red_end = case$red_end,
-      show_linkage = case$show_linkage
+      show_linkage = case$show_linkage,
+      style = glydraw_style(red_end = case$red_end)
     )
     grob$glydraw_border_px <- 0
     grob$glydraw_background <- FALSE

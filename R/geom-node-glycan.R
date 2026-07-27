@@ -11,8 +11,8 @@
 #'   uses the node data calculated by [ggraph::ggraph()].
 #' @param position A position adjustment. Defaults to `"identity"`.
 #' @param show.legend Logical. Should this layer be included in legends?
-#' @param ... Arguments passed to [geom_glycan()], including fixed aesthetics
-#'   and glycan rendering options.
+#' @param ... Arguments passed to [geom_glycan()], including fixed aesthetics,
+#'   drawing controls, and `style`.
 #'
 #' @section Aesthetics:
 #' `geom_node_glycan()` understands the same aesthetics as [geom_glycan()].
