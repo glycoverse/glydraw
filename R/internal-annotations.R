@@ -131,7 +131,8 @@
 #'   of the linkage.
 #' @param role Either `"child"` or `"parent"`, naming which side of the linkage
 #'   the label belongs to.
-#' @param orient Drawing orientation, either `"H"` or `"V"`.
+#' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
+#'   `"down"`.
 #'
 #' @returns A numeric scalar offset distance from the anchor residue center.
 #' @noRd
@@ -143,7 +144,7 @@
   other_x,
   other_y,
   role = c("child", "parent"),
-  orient = c("H", "V")
+  orient = c("left", "right", "up", "down")
 ) {
   role <- rlang::arg_match(role)
   orient <- rlang::arg_match(orient)
@@ -175,7 +176,8 @@
 #'   of the linkage.
 #' @param role Either `"child"` or `"parent"`, naming which side of the linkage
 #'   the label belongs to.
-#' @param orient Drawing orientation, either `"H"` or `"V"`.
+#' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
+#'   `"down"`.
 #'
 #' @returns A logical scalar.
 #' @noRd
@@ -187,17 +189,22 @@
   role,
   orient
 ) {
-  if (orient == "H") {
-    if (role == "child") {
-      return(other_x > anchor_x && other_y < anchor_y)
-    }
-    return(other_x < anchor_x && other_y < anchor_y)
-  }
+  coor <- matrix(
+    c(anchor_x, anchor_y, other_x, other_y),
+    ncol = 2,
+    byrow = TRUE,
+    dimnames = list(c("anchor", "other"), c("x", "y"))
+  ) |>
+    .cartoon_coordinates_as_left(orient)
+  anchor_x <- coor["anchor", "x"]
+  anchor_y <- coor["anchor", "y"]
+  other_x <- coor["other", "x"]
+  other_y <- coor["other", "y"]
 
   if (role == "child") {
-    return(other_x < anchor_x && other_y < anchor_y)
+    return(other_x > anchor_x && other_y < anchor_y)
   }
-  other_x < anchor_x && other_y > anchor_y
+  other_x < anchor_x && other_y < anchor_y
 }
 
 #' Build linkage annotation rows for every glycosidic edge
@@ -207,7 +214,8 @@
 #'   per graph vertex.
 #' @param node_size Numeric node-size multiplier used to keep labels outside
 #'   scaled residue polygons.
-#' @param orient Drawing orientation, either `"H"` or `"V"`.
+#' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
+#'   `"down"`.
 #'
 #' @returns A data frame with one or two rows per edge and columns `vertice`,
 #'   `annot`, `x`, `y`, `segment_start_x`, `segment_start_y`, `segment_end_x`,
@@ -218,7 +226,7 @@
   structure,
   coor,
   node_size = 1,
-  orient = c("H", "V")
+  orient = c("left", "right", "up", "down")
 ) {
   if (igraph::ecount(structure) == 0) {
     return(.empty_linkage_annotation_data())
@@ -311,7 +319,8 @@
 #' @param ver A single integer child vertex index.
 #' @param node_size Numeric node-size multiplier used to keep labels outside
 #'   scaled residue polygons.
-#' @param orient Drawing orientation, either `"H"` or `"V"`.
+#' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
+#'   `"down"`.
 #'
 #' @returns A two-row data frame with linkage annotation columns. The first row
 #'   is the child-side anomer label and the second row is the parent-side
@@ -322,7 +331,7 @@
   coor,
   ver,
   node_size = 1,
-  orient = c("H", "V")
+  orient = c("left", "right", "up", "down")
 ) {
   orient <- rlang::arg_match(orient)
   par_ver <- .parent_vertex_for_annotation(structure, ver)
@@ -406,7 +415,8 @@
 #'   per graph vertex.
 #' @param child_ver A single integer child vertex index.
 #' @param parent_ver A single integer parent vertex index.
-#' @param orient Drawing orientation, either `"H"` or `"V"`.
+#' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
+#'   `"down"`.
 #'
 #' @returns A named numeric vector with values `child` and `parent`, giving the
 #'   distance from each residue center to its label.
@@ -416,7 +426,7 @@
   coor,
   child_ver,
   parent_ver,
-  orient = c("H", "V")
+  orient = c("left", "right", "up", "down")
 ) {
   orient <- rlang::arg_match(orient)
   c(
@@ -897,7 +907,8 @@
 #' @param structure An igraph glycan graph whose vertices may include `sub`.
 #' @param coor A numeric coordinate matrix with columns `x` and `y`, one row
 #'   per graph vertex.
-#' @param orient Drawing orientation, either `"H"` or `"V"`.
+#' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
+#'   `"down"`.
 #' @param node_size Numeric node-size multiplier used to keep labels outside
 #'   scaled residue polygons.
 #'
@@ -938,10 +949,23 @@
   }
 
   offset_distance <- .scaled_annotation_offset(0.28, node_size)
-  offset <- if (orient == "H") {
-    c(x = 0, y = offset_distance)
+  offset <- .rotate_cartoon_vector(
+    c(x = 0, y = offset_distance),
+    orient
+  )
+  hjust <- if (offset[["x"]] > 0) {
+    0
+  } else if (offset[["x"]] < 0) {
+    1
   } else {
-    c(x = offset_distance, y = 0)
+    0.5
+  }
+  vjust <- if (offset[["y"]] > 0) {
+    0
+  } else if (offset[["y"]] < 0) {
+    1
+  } else {
+    0.5
   }
 
   data.frame(
@@ -949,8 +973,8 @@
     annot = sub("^\\?+", "", sub[sub_pos]),
     x = as.numeric(coor[sub_pos, "x"] + offset["x"]),
     y = as.numeric(coor[sub_pos, "y"] + offset["y"]),
-    hjust = if (orient == "H") 0.5 else 0,
-    vjust = if (orient == "H") 0 else 0.5,
+    hjust = hjust,
+    vjust = vjust,
     stringsAsFactors = FALSE
   )
 }
@@ -959,27 +983,27 @@
 #'
 #' @param annotation A substituent annotation data frame returned by
 #'   `.substituent_annotation_data()`.
-#' @param orient Drawing orientation, either `"H"` or `"V"`.
+#' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
+#'   `"down"`.
 #'
 #' @returns A data frame with numeric columns `x` and `y`. Horizontal labels
 #'   return top bound points; vertical labels return right-side bound points.
 #' @noRd
-.substituent_annotation_bounds <- function(annotation, orient = c("H", "V")) {
+.substituent_annotation_bounds <- function(
+  annotation,
+  orient = c("left", "right", "up", "down")
+) {
   orient <- rlang::arg_match(orient)
   if (nrow(annotation) == 0) {
     return(data.frame(x = numeric(0), y = numeric(0)))
   }
 
-  if (orient == "H") {
-    return(data.frame(
-      x = annotation$x,
-      y = annotation$y + .substituent_label_height(annotation$annot)
-    ))
-  }
-
+  direction <- .rotate_cartoon_vector(c(x = 0, y = 1), orient)
   data.frame(
-    x = annotation$x + .substituent_label_width(annotation$annot),
-    y = annotation$y
+    x = annotation$x +
+      direction[["x"]] * .substituent_label_width(annotation$annot),
+    y = annotation$y +
+      direction[["y"]] * .substituent_label_height(annotation$annot)
   )
 }
 
@@ -1033,7 +1057,8 @@
 #'   supplies the reducing-end alpha/beta/unknown label.
 #' @param coor A numeric coordinate matrix with columns `x` and `y`, one row
 #'   per graph vertex.
-#' @param orient Drawing orientation, either `"H"` or `"V"`.
+#' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
+#'   `"down"`.
 #' @param red_end A string. `""` draws only the current reducing-end line,
 #'   `"~"` draws a wavy end, and any other string draws custom text.
 #'
@@ -1045,7 +1070,7 @@
 .reducing_end_annotation_data <- function(
   structure,
   coor,
-  orient = c("H", "V"),
+  orient = c("left", "right", "up", "down"),
   red_end = ""
 ) {
   orient <- rlang::arg_match(orient)
@@ -1157,7 +1182,8 @@
 #'
 #' @param root_coor A numeric vector with `x` and `y` coordinates for the
 #'   reducing-end residue.
-#' @param orient Drawing orientation, either `"H"` or `"V"`.
+#' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
+#'   `"down"`.
 #' @param line_length Numeric length of the reducing-end line segment.
 #' @param label_offset Numeric extra distance between the line length and the
 #'   anomer label anchor before rotation.
@@ -1189,17 +1215,14 @@
 
 #' Build an orientation-specific reducing-end line vector
 #'
-#' @param orient Drawing orientation, either `"H"` or `"V"`.
+#' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
+#'   `"down"`.
 #' @param length Numeric vector length in plot coordinate units.
 #'
-#' @returns A named numeric vector `c(x, y)`. Horizontal orientation points
-#'   right; vertical orientation points downward.
+#' @returns A named numeric vector `c(x, y)` pointing away from the glycan.
 #' @noRd
 .reducing_end_line_vector <- function(orient, length) {
-  if (orient == "H") {
-    return(c(x = length, y = 0))
-  }
-  c(x = 0, y = -length)
+  .rotate_cartoon_vector(c(x = length, y = 0), orient)
 }
 
 #' Rotate the reducing-end anomer label away from the line
@@ -1271,7 +1294,8 @@
 #'   endpoint.
 #' @param line_vec A named numeric vector `c(x, y)` for the reducing-end line
 #'   direction.
-#' @param orient Drawing orientation, either `"H"` or `"V"`.
+#' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
+#'   `"down"`.
 #' @param root Integer reducing-end vertex index.
 #'
 #' @returns A data frame with columns `vertice`, `annot`, `x`, `y`, `hjust`,
@@ -1299,8 +1323,20 @@
   line_unit <- line_vec / sqrt(sum(line_vec^2))
   text_offset <- 0.02
   text_coor <- line_end + line_unit * text_offset
-  hjust <- if (orient == "H") 0 else 0.5
-  vjust <- if (orient == "H") 0.5 else 1
+  hjust <- if (line_unit[["x"]] > 0) {
+    0
+  } else if (line_unit[["x"]] < 0) {
+    1
+  } else {
+    0.5
+  }
+  vjust <- if (line_unit[["y"]] > 0) {
+    0
+  } else if (line_unit[["y"]] < 0) {
+    1
+  } else {
+    0.5
+  }
   data.frame(
     vertice = as.character(root),
     annot = .quote_plotmath_text(red_end),
@@ -1319,7 +1355,8 @@
 #'   endpoint.
 #' @param line_vec A named numeric vector `c(x, y)` for the reducing-end line
 #'   direction.
-#' @param orient Drawing orientation, either `"H"` or `"V"`.
+#' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
+#'   `"down"`.
 #'
 #' @returns A data frame with numeric columns `x` and `y`. Horizontal text
 #'   returns one bound point; vertical text returns two bound points; `""` and
@@ -1332,7 +1369,7 @@
   line_unit <- line_vec / sqrt(sum(line_vec^2))
   text_offset <- 0.1
   text_width <- max(nchar(red_end), 1) * 0.12
-  if (orient == "H") {
+  if (.is_horizontal_glycan_orientation(orient)) {
     text_bound <- line_end + line_unit * (text_offset + text_width)
     return(data.frame(
       x = as.numeric(text_bound["x"]),
@@ -1343,7 +1380,9 @@
   text_height <- 0.36
   data.frame(
     x = as.numeric(text_coor["x"] + c(-1, 1) * text_width / 2),
-    y = as.numeric(text_coor["y"] + c(0, -text_height))
+    y = as.numeric(
+      text_coor["y"] + line_unit[["y"]] * c(0, text_height)
+    )
   )
 }
 

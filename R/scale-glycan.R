@@ -108,7 +108,7 @@ scale_x_glycan <- function(
     )
   )
   guide <- .new_glycan_axis_guide(
-    orient = "V",
+    orient = "up",
     size = size,
     angle = angle,
     hjust = hjust,
@@ -183,7 +183,7 @@ scale_y_glycan <- function(
     )
   )
   guide <- .new_glycan_axis_guide(
-    orient = "H",
+    orient = "left",
     size = size,
     angle = angle,
     hjust = hjust,
@@ -278,22 +278,22 @@ scale_y_glycan <- function(
     glycan_angle = options$angle,
     glycan_hjust = options$hjust,
     glycan_vjust = options$vjust,
-    glycan_x_hjust = if (identical(options$orient, "V")) {
+    glycan_x_hjust = if (.is_vertical_glycan_orientation(options$orient)) {
       options$hjust
     } else {
       .hjust_red_end
     },
-    glycan_x_vjust = if (identical(options$orient, "V")) {
+    glycan_x_vjust = if (.is_vertical_glycan_orientation(options$orient)) {
       options$vjust
     } else {
       0
     },
-    glycan_y_hjust = if (identical(options$orient, "H")) {
+    glycan_y_hjust = if (.is_horizontal_glycan_orientation(options$orient)) {
       options$hjust
     } else {
       1
     },
-    glycan_y_vjust = if (identical(options$orient, "H")) {
+    glycan_y_vjust = if (.is_horizontal_glycan_orientation(options$orient)) {
       options$vjust
     } else {
       .vjust_red_end
@@ -350,7 +350,7 @@ scale_y_glycan <- function(
   node_size,
   colors
 ) {
-  orient <- rlang::arg_match(orient, c("H", "V"))
+  orient <- rlang::arg_match(orient, c("left", "right", "up", "down"))
   .validate_output_scale(size)
   checkmate::assert_number(angle, finite = TRUE)
   .validate_red_end_justification_orientation(hjust, vjust, orient)
@@ -464,7 +464,9 @@ scale_y_glycan <- function(
   grob$glydraw_border_px <- 0
   grob$glydraw_background <- FALSE
   grob$glydraw_expand <- FALSE
-  grob$glydraw_axis_vertical <- identical(params$glycan_orient, "V")
+  grob$glydraw_axis_vertical <- .is_vertical_glycan_orientation(
+    params$glycan_orient
+  )
   grid::makeContent(grob)
 }
 
@@ -677,7 +679,7 @@ GuideGlycanAxis <- ggplot2::ggproto(
   params = c(
     ggplot2:::GuideAxis$params,
     list(
-      glycan_orient = "H",
+      glycan_orient = "left",
       glycan_size = 0.4,
       glycan_angle = 0,
       glycan_hjust = 0.5,
@@ -701,11 +703,11 @@ GuideGlycanAxis <- ggplot2::ggproto(
     params <- ggplot2:::GuideAxis$setup_params(params)
 
     if (params$vertical) {
-      params$glycan_orient <- "H"
+      params$glycan_orient <- "left"
       params$glycan_hjust <- params$glycan_y_hjust
       params$glycan_vjust <- params$glycan_y_vjust
     } else {
-      params$glycan_orient <- "V"
+      params$glycan_orient <- "up"
       params$glycan_hjust <- params$glycan_x_hjust
       params$glycan_vjust <- params$glycan_x_vjust
     }

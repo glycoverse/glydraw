@@ -5,8 +5,8 @@
 #' @param ... Ignored.
 #' @param show_linkage Show glycosidic linkage annotations or not. Default is
 #'   TRUE. Substituent annotations are always shown.
-#' @param orient The orientation of glycan structure. "H" for horizontal, "V" for vertical.
-#'   Default is "H"
+#' @param orient Direction in which the glycan extends from its reducing end:
+#'   one of `"left"`, `"right"`, `"up"`, or `"down"`. Defaults to `"left"`.
 #' @param fuc_orient Fuc-like triangle orientation. `"flex"` points
 #'   non-reducing Fuc-like residues toward their rendered linkage direction,
 #'   while `"up"` draws all Fuc-like triangles pointing upward. Reducing-end
@@ -44,7 +44,7 @@ draw_cartoon <- function(
   structure,
   ...,
   show_linkage = TRUE,
-  orient = c("H", "V"),
+  orient = c("left", "right", "up", "down"),
   fuc_orient = c("flex", "up"),
   red_end = "",
   edge_linewidth = 0.8,

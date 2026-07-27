@@ -291,7 +291,7 @@ test_that("geom_glycan maps hjust and vjust to whole-cartoon alignment", {
   purrr::walk(child_viewports, expect_s3_class, "viewport")
 })
 
-test_that("geom_glycan centers both orientations by default", {
+test_that("geom_glycan centers all orientations by default", {
   data <- data.frame(
     x = 1,
     y = 1,
@@ -301,12 +301,23 @@ test_that("geom_glycan centers both orientations by default", {
     data,
     ggplot2::aes(x = .data$x, y = .data$y, structure = .data$structure)
   )
-  horizontal <- ggplot2::layer_grob(plot + geom_glycan(orient = "H"))[[1]]
-  vertical <- ggplot2::layer_grob(plot + geom_glycan(orient = "V"))[[1]]
-  grobs <- c(horizontal$children, vertical$children)
+  grobs <- purrr::map(
+    c("left", "right", "up", "down"),
+    function(orient) {
+      ggplot2::layer_grob(
+        plot + geom_glycan(orient = orient)
+      )[[1]]$children[[1]]
+    }
+  )
 
-  expect_equal(unname(purrr::map_dbl(grobs, "glydraw_hjust")), c(0.5, 0.5))
-  expect_equal(unname(purrr::map_dbl(grobs, "glydraw_vjust")), c(0.5, 0.5))
+  expect_equal(
+    unname(purrr::map_dbl(grobs, "glydraw_hjust")),
+    rep(0.5, 4)
+  )
+  expect_equal(
+    unname(purrr::map_dbl(grobs, "glydraw_vjust")),
+    rep(0.5, 4)
+  )
 })
 
 test_that("geom_glycan anchors vertical glycans at their reducing ends", {
@@ -326,7 +337,7 @@ test_that("geom_glycan anchors vertical glycans at their reducing ends", {
     data,
     ggplot2::aes(x = .data$x, y = .data$y, structure = .data$structure)
   ) +
-    geom_glycan(orient = "V", hjust = hjust_red_end())
+    geom_glycan(orient = "up", hjust = hjust_red_end())
 
   grobs <- ggplot2::layer_grob(plot)[[1]]$children
   displacement <- purrr::map_dbl(grobs, .reducing_end_displacement, "x")
@@ -348,7 +359,7 @@ test_that("geom_glycan anchors horizontal glycans at their reducing ends", {
     data,
     ggplot2::aes(x = .data$x, y = .data$y, structure = .data$structure)
   ) +
-    geom_glycan(orient = "H", vjust = vjust_red_end())
+    geom_glycan(orient = "left", vjust = vjust_red_end())
 
   grobs <- ggplot2::layer_grob(plot)[[1]]$children
   displacement <- purrr::map_dbl(grobs, .reducing_end_displacement, "y")
@@ -359,11 +370,11 @@ test_that("geom_glycan anchors horizontal glycans at their reducing ends", {
 test_that("reducing-end justification helpers require matching orientations", {
   expect_snapshot(
     error = TRUE,
-    geom_glycan(orient = "H", hjust = hjust_red_end())
+    geom_glycan(orient = "left", hjust = hjust_red_end())
   )
   expect_snapshot(
     error = TRUE,
-    geom_glycan(orient = "V", vjust = vjust_red_end())
+    geom_glycan(orient = "up", vjust = vjust_red_end())
   )
 })
 
@@ -383,12 +394,12 @@ test_that("geom_glycan rotates cartoons independently of their orientation", {
       angle = .data$angle
     )
   ) +
-    geom_glycan(orient = "V")
+    geom_glycan(orient = "up")
   static_plot <- ggplot2::ggplot(
     data[1, c("x", "y", "structure")],
     ggplot2::aes(x = .data$x, y = .data$y, structure = .data$structure)
   ) +
-    geom_glycan(orient = "V", angle = 90)
+    geom_glycan(orient = "up", angle = 90)
 
   layer <- ggplot2::layer_grob(plot)[[1]]
   static_grob <- ggplot2::layer_grob(static_plot)[[1]]$children[[1]]
@@ -405,7 +416,7 @@ test_that("geom_glycan rotates cartoons independently of their orientation", {
     layer$children,
     ~ identical(
       .x$polygon_coor$shape,
-      glycanGrob(data$structure[[1]], orient = "V")$polygon_coor$shape
+      glycanGrob(data$structure[[1]], orient = "up")$polygon_coor$shape
     )
   )))
   expect_equal(static_grob$glydraw_angle, 90)
@@ -426,7 +437,7 @@ test_that("geom_glycan justifies content while preserving drawing allowance", {
       structure = .data$structure
     )
   ) +
-    geom_glycan(orient = "V", vjust = 0)
+    geom_glycan(orient = "up", vjust = 0)
 
   grob <- ggplot2::layer_grob(plot)[[1]]$children[[1]]
   geom_cartoon <- .glycan_grob_to_plot(grob)
@@ -437,7 +448,7 @@ test_that("geom_glycan justifies content while preserving drawing allowance", {
   geom_y_panel_range <- geom_built$layout$panel_params[[1]]$y.range
   geom_size <- attr(geom_cartoon, "glydraw_size_px")
   geom_panel_size <- attr(geom_cartoon, "glydraw_panel_size_px")
-  standalone_cartoon <- draw_cartoon(data$structure, orient = "V")
+  standalone_cartoon <- draw_cartoon(data$structure, orient = "up")
   standalone_data_range <- ggplot2::get_panel_scales(
     standalone_cartoon
   )$y$range$range

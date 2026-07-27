@@ -167,7 +167,8 @@
 #' @param highlight `NULL` or a numeric vector of 1-based vertex indices to
 #'   highlight. Values are only honored when `structure` is already a
 #'   glycan-structure object.
-#' @param orient Drawing orientation, either `"H"` or `"V"`.
+#' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
+#'   `"down"`.
 #' @param red_end A non-missing string reducing-end annotation.
 #'
 #' @returns A list with `structure`, an igraph glycan graph; `coor`, a numeric
@@ -177,7 +178,7 @@
 .prepare_cartoon_inputs <- function(
   structure,
   highlight,
-  orient = c("H", "V"),
+  orient = c("left", "right", "up", "down"),
   red_end = ""
 ) {
   checkmate::assert_string(red_end, na.ok = FALSE)
@@ -204,23 +205,107 @@
 #' Rotate residue coordinates for the requested orientation
 #'
 #' @param structure An igraph glycan graph.
-#' @param orient Drawing orientation, either `"H"` or `"V"`.
+#' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
+#'   `"down"`.
 #'
-#' @returns A numeric matrix with columns `x` and `y`. Horizontal orientation
-#'   returns `.calculate_residue_coordinates()` unchanged; vertical orientation
-#'   swaps axes and negates the old `x` coordinate.
+#' @returns A numeric matrix with columns `x` and `y`. `"left"` returns
+#'   `.calculate_residue_coordinates()` unchanged; the other orientations
+#'   rotate those coordinates around the reducing end.
 #' @noRd
-.oriented_cartoon_coordinates <- function(structure, orient = c("H", "V")) {
+.oriented_cartoon_coordinates <- function(
+  structure,
+  orient = c("left", "right", "up", "down")
+) {
   orient <- rlang::arg_match(orient)
   coor <- .calculate_residue_coordinates(structure)
-  if (orient == "H") {
-    return(coor)
+  .rotate_cartoon_coordinates(coor, orient)
+}
+
+#' Rotate coordinates from the canonical left orientation
+#'
+#' @param coor A numeric matrix with columns `x` and `y`.
+#' @param orient Glycan drawing orientation.
+#'
+#' @returns A numeric matrix with the same dimensions and dimnames as `coor`.
+#' @noRd
+.rotate_cartoon_coordinates <- function(coor, orient) {
+  orient <- rlang::arg_match(
+    orient,
+    c("left", "right", "up", "down")
+  )
+  rotated <- coor
+  if (orient == "left") {
+    return(rotated)
+  }
+  if (orient == "right") {
+    rotated[, "x"] <- -coor[, "x"]
+    rotated[, "y"] <- -coor[, "y"]
+    return(rotated)
+  }
+  if (orient == "up") {
+    rotated[, "x"] <- coor[, "y"]
+    rotated[, "y"] <- -coor[, "x"]
+    return(rotated)
   }
 
-  rotated <- coor
-  rotated[, 1] <- coor[, 2]
-  rotated[, 2] <- -coor[, 1]
+  rotated[, "x"] <- -coor[, "y"]
+  rotated[, "y"] <- coor[, "x"]
   rotated
+}
+
+#' Rotate a vector from the canonical left orientation
+#'
+#' @param vector A named numeric vector with elements `x` and `y`.
+#' @param orient Glycan drawing orientation.
+#'
+#' @returns A named numeric vector with elements `x` and `y`.
+#' @noRd
+.rotate_cartoon_vector <- function(vector, orient) {
+  vector <- matrix(
+    c(vector[["x"]], vector[["y"]]),
+    nrow = 1,
+    dimnames = list(NULL, c("x", "y"))
+  )
+  as.vector(.rotate_cartoon_coordinates(vector, orient)[1, ]) |>
+    stats::setNames(c("x", "y"))
+}
+
+#' Express oriented coordinates in the canonical left orientation
+#'
+#' @param coor A numeric matrix with columns `x` and `y`.
+#' @param orient Glycan drawing orientation.
+#'
+#' @returns A numeric matrix with the same dimensions and dimnames as `coor`.
+#' @noRd
+.cartoon_coordinates_as_left <- function(coor, orient) {
+  inverse <- switch(
+    orient,
+    left = "left",
+    right = "right",
+    up = "down",
+    down = "up"
+  )
+  .rotate_cartoon_coordinates(coor, inverse)
+}
+
+#' Check whether a glycan orientation is horizontal
+#'
+#' @param orient Glycan drawing orientation.
+#'
+#' @returns A logical scalar.
+#' @noRd
+.is_horizontal_glycan_orientation <- function(orient) {
+  orient %in% c("left", "right")
+}
+
+#' Check whether a glycan orientation is vertical
+#'
+#' @param orient Glycan drawing orientation.
+#'
+#' @returns A logical scalar.
+#' @noRd
+.is_vertical_glycan_orientation <- function(orient) {
+  orient %in% c("up", "down")
 }
 
 #' Build residue center data for polygon drawing
@@ -269,7 +354,8 @@
 #'
 #' @param structure An igraph glycan graph.
 #' @param coor A numeric coordinate matrix with columns `x` and `y`.
-#' @param orient Drawing orientation, either `"H"` or `"V"`.
+#' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
+#'   `"down"`.
 #' @param red_end A string reducing-end annotation.
 #' @param highlight `NULL` or a numeric vector of 1-based vertex indices to
 #'   highlight.
@@ -287,7 +373,7 @@
 .cartoon_text_annotation_data <- function(
   structure,
   coor,
-  orient = c("H", "V"),
+  orient = c("left", "right", "up", "down"),
   red_end = "",
   highlight = NULL,
   node_size = 1,

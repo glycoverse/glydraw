@@ -15,7 +15,7 @@ guide_glycan(
   reverse = FALSE,
   order = 0,
   size = 0.4,
-  orient = c("H", "V"),
+  orient = c("left", "right", "up", "down"),
   hjust = 0,
   vjust = vjust_red_end(),
   show_linkage = TRUE,
@@ -65,8 +65,8 @@ If 0 (default), the order is determined by a secret algorithm.}
 \item{size}{Positive scalar that uniformly scales each legend-label cartoon.
 Defaults to \code{0.4}.}
 
-\item{orient}{Glycan drawing orientation, either \code{"H"} for horizontal or
-\code{"V"} for vertical. Defaults to \code{"H"}.}
+\item{orient}{Direction in which the glycan extends from its reducing end:
+one of \code{"left"}, \code{"right"}, \code{"up"}, or \code{"down"}. Defaults to \code{"left"}.}
 
 \item{hjust}{Horizontal cartoon justification between \code{0} and \code{1}, or
 \code{\link[=hjust_red_end]{hjust_red_end()}}. It defaults to \code{0} for horizontal cartoons and

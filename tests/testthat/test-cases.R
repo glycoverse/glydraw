@@ -78,7 +78,7 @@ test_that("Draw vertical flexible Fuc triangles", {
   glycan <- "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-4)GlcNAc(b1-"
   vdiffr::expect_doppelganger(
     "vertical flexible Fuc triangles",
-    draw_cartoon(glycan, orient = "V", fuc_orient = "flex")
+    draw_cartoon(glycan, orient = "up", fuc_orient = "flex")
   )
 })
 
@@ -86,7 +86,7 @@ test_that("Draw vertical reducing-end Fuc triangle", {
   glycan <- "GlcNAc(b1-3)Fuc(a1-"
   vdiffr::expect_doppelganger(
     "vertical reducing-end Fuc triangle",
-    draw_cartoon(glycan, orient = "V", fuc_orient = "flex")
+    draw_cartoon(glycan, orient = "up", fuc_orient = "flex")
   )
 })
 
@@ -153,16 +153,24 @@ test_that("Draw oversized node size with linkage hidden", {
   vdiffr::expect_doppelganger("oversized node size hides linkage", plot)
 })
 
-test_that("Draw orientation-specific HexNAc linkage labels", {
+test_that("Draw directional HexNAc linkage labels", {
   glycan <- "GalNAc(b1-3)[GalNAc(b1-6)]GalNAc(a1-"
 
   vdiffr::expect_doppelganger(
     "horizontal HexNAc linkage labels",
-    draw_cartoon(glycan, orient = "H")
+    draw_cartoon(glycan, orient = "left")
+  )
+  vdiffr::expect_doppelganger(
+    "rightward HexNAc linkage labels",
+    draw_cartoon(glycan, orient = "right")
   )
   vdiffr::expect_doppelganger(
     "vertical HexNAc linkage labels",
-    draw_cartoon(glycan, orient = "V")
+    draw_cartoon(glycan, orient = "up")
+  )
+  vdiffr::expect_doppelganger(
+    "downward HexNAc linkage labels",
+    draw_cartoon(glycan, orient = "down")
   )
 })
 
@@ -179,7 +187,7 @@ test_that("Draw reducing-end annotations", {
   )
   vdiffr::expect_doppelganger(
     "vertical custom reducing-end text",
-    draw_cartoon(glycan, orient = "V", red_end = "Ser/Thr")
+    draw_cartoon(glycan, orient = "up", red_end = "Ser/Thr")
   )
   vdiffr::expect_doppelganger(
     "wavy reducing end",
@@ -206,11 +214,11 @@ test_that("Draw substituent annotations", {
   )
   vdiffr::expect_doppelganger(
     "horizontal substituent annotation",
-    draw_cartoon(oriented, orient = "H")
+    draw_cartoon(oriented, orient = "left")
   )
   vdiffr::expect_doppelganger(
     "vertical substituent annotation",
-    draw_cartoon(oriented, orient = "V")
+    draw_cartoon(oriented, orient = "up")
   )
   vdiffr::expect_doppelganger(
     "unknown substituent linkage annotation",
@@ -353,7 +361,7 @@ test_that("Justify vertical ggplot2 glycan annotations", {
   ) +
     ggplot2::geom_hline(yintercept = 1, colour = "grey80") +
     ggplot2::geom_point() +
-    geom_glycan(orient = "V", vjust = 0, hjust = 0.5) +
+    geom_glycan(orient = "up", vjust = 0, hjust = 0.5) +
     ggplot2::coord_cartesian(
       xlim = c(0, 6),
       ylim = c(0, 5),

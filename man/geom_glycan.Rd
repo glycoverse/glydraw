@@ -12,7 +12,7 @@ geom_glycan(
   ...,
   angle = 0,
   show_linkage = TRUE,
-  orient = c("H", "V"),
+  orient = c("left", "right", "up", "down"),
   fuc_orient = c("flex", "up"),
   red_end = "",
   edge_linewidth = 0.8,
@@ -49,8 +49,8 @@ cartoon around its mapped position independently of \code{orient}. Defaults to
 \item{show_linkage}{Show glycosidic linkage annotations or not. Default is
 TRUE. Substituent annotations are always shown.}
 
-\item{orient}{The orientation of glycan structure. "H" for horizontal, "V" for vertical.
-Default is "H"}
+\item{orient}{Direction in which the glycan extends from its reducing end:
+one of \code{"left"}, \code{"right"}, \code{"up"}, or \code{"down"}. Defaults to \code{"left"}.}
 
 \item{fuc_orient}{Fuc-like triangle orientation. \code{"flex"} points
 non-reducing Fuc-like residues toward their rendered linkage direction,
@@ -171,5 +171,5 @@ ggplot2::ggplot(
   glycans,
   ggplot2::aes(x = .data$x, y = 1, structure = .data$structure)
 ) +
-  geom_glycan(orient = "V", vjust = 0)
+  geom_glycan(orient = "up", vjust = 0)
 }

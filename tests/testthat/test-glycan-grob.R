@@ -44,19 +44,19 @@ test_that("native grid layout preserves the cartoon plot geometry", {
   cases <- list(
     list(
       structure = "Gal(b1-3)GalNAc(a1-",
-      orient = "H",
+      orient = "left",
       red_end = "",
       show_linkage = TRUE
     ),
     list(
       structure = "Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-",
-      orient = "V",
+      orient = "up",
       red_end = "~",
       show_linkage = TRUE
     ),
     list(
       structure = "Gal6S(b1-4)GlcNAc(b1-",
-      orient = "H",
+      orient = "left",
       red_end = "Ser/Thr",
       show_linkage = FALSE
     )

@@ -17,12 +17,13 @@ scales, and guide.
 These helpers align the reducing end of every glycan cartoon with its anchor
 in \code{\link[=geom_glycan]{geom_glycan()}}, \code{\link[=scale_x_glycan]{scale_x_glycan()}}, \code{\link[=scale_y_glycan]{scale_y_glycan()}}, or
 \code{\link[=guide_glycan]{guide_glycan()}}. Use \code{hjust_red_end()} for horizontal alignment when
-\code{orient = "V"}, and use \code{vjust_red_end()} for vertical alignment when
-\code{orient = "H"}. Because the required justification is calculated separately
-from each cartoon's rendered bounds, the helpers also work for collections
-of glycans with different asymmetric branches. Glycan scales and guides use
-reducing-end justification by default along the axis perpendicular to the
-drawing orientation; \code{\link[=geom_glycan]{geom_glycan()}} remains centered by default.
+\code{orient} is \code{"up"} or \code{"down"}, and use \code{vjust_red_end()} for vertical
+alignment when \code{orient} is \code{"left"} or \code{"right"}. Because the required
+justification is calculated separately from each cartoon's rendered bounds,
+the helpers also work for collections of glycans with different asymmetric
+branches. Glycan scales and guides use reducing-end justification by default
+along the axis perpendicular to the drawing orientation; \code{\link[=geom_glycan]{geom_glycan()}}
+remains centered by default.
 }
 \examples{
 glycan <- data.frame(
@@ -35,11 +36,11 @@ ggplot2::ggplot(
   glycan,
   ggplot2::aes(x = .data$x, y = .data$y, structure = .data$structure)
 ) +
-  geom_glycan(orient = "V", hjust = hjust_red_end())
+  geom_glycan(orient = "up", hjust = hjust_red_end())
 
 ggplot2::ggplot(
   glycan,
   ggplot2::aes(x = .data$x, y = .data$y, structure = .data$structure)
 ) +
-  geom_glycan(orient = "H", vjust = vjust_red_end())
+  geom_glycan(orient = "left", vjust = vjust_red_end())
 }

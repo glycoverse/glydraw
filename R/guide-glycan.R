@@ -11,8 +11,8 @@
 #' @inheritParams ggplot2::guide_legend
 #' @param size Positive scalar that uniformly scales each legend-label cartoon.
 #'   Defaults to `0.4`.
-#' @param orient Glycan drawing orientation, either `"H"` for horizontal or
-#'   `"V"` for vertical. Defaults to `"H"`.
+#' @param orient Direction in which the glycan extends from its reducing end:
+#'   one of `"left"`, `"right"`, `"up"`, or `"down"`. Defaults to `"left"`.
 #' @param hjust Horizontal cartoon justification between `0` and `1`, or
 #'   [hjust_red_end()]. It defaults to `0` for horizontal cartoons and
 #'   [hjust_red_end()] for vertical cartoons.
@@ -66,7 +66,7 @@ guide_glycan <- function(
   reverse = FALSE,
   order = 0,
   size = 0.4,
-  orient = c("H", "V"),
+  orient = c("left", "right", "up", "down"),
   hjust = 0,
   vjust = vjust_red_end(),
   show_linkage = TRUE,
@@ -103,10 +103,10 @@ guide_glycan <- function(
   )
   .validate_output_scale(size)
   orient <- style$orient
-  if (hjust_is_missing && identical(orient, "V")) {
+  if (hjust_is_missing && .is_vertical_glycan_orientation(orient)) {
     hjust <- hjust_red_end()
   }
-  if (vjust_is_missing && identical(orient, "V")) {
+  if (vjust_is_missing && .is_vertical_glycan_orientation(orient)) {
     vjust <- 0.5
   }
   .validate_red_end_justification_orientation(hjust, vjust, orient)
@@ -397,7 +397,7 @@ GuideGlycan <- ggplot2::ggproto(
     ggplot2::GuideLegend$params,
     list(
       glycan_size = 0.4,
-      glycan_orient = "H",
+      glycan_orient = "left",
       glycan_hjust = 0,
       glycan_vjust = .vjust_red_end,
       glycan_show_linkage = TRUE,

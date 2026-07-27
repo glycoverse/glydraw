@@ -58,11 +58,11 @@ draw_cartoon(n_core, show_linkage = FALSE)
 
 ### `orient`
 
-`orient` controls the overall direction of the cartoon. Use `"H"` for the
-default horizontal layout or `"V"` for a vertical layout.
+`orient` controls the direction in which the glycan extends from its reducing
+end. Choose `"left"`, `"right"`, `"up"`, or `"down"`; the default is `"left"`.
 
 ```{r orient, fig.width = 2.02, fig.height = 4.83}
-draw_cartoon(n_core, orient = "V")
+draw_cartoon(n_core, orient = "up")
 ```
 
 ### `fuc_orient`

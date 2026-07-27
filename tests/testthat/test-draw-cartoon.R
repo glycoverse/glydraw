@@ -61,7 +61,7 @@ test_that("draw_cartoon accepts reusable glydraw styles", {
   structure <- "Gal(b1-4)GlcNAc(b1-"
   style <- glydraw_style(
     show_linkage = FALSE,
-    orient = "V",
+    orient = "up",
     edge_linewidth = 1.2,
     colors = c(Gal = "#123456")
   )
@@ -147,12 +147,59 @@ test_that("print.glydraw_cartoon rasterizes fixed-size cartoon for display", {
   expect_equal(as.numeric(plot$theme$panel.widths), original_width)
 })
 
-test_that("draw_cartoon works with vertical orientation", {
+test_that("draw_cartoon supports four directional orientations", {
   structure <- "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
+  orientations <- c("left", "right", "up", "down")
+  inputs <- purrr::map(
+    orientations,
+    ~ .prepare_cartoon_inputs(structure, NULL, .x, "")
+  ) |>
+    stats::setNames(orientations)
+  left <- inputs$left$coor
 
-  v_plot <- draw_cartoon(structure, orient = "V")
-  expect_s3_class(v_plot, "glydraw_cartoon")
-  expect_s3_class(v_plot, "ggplot")
+  expect_equal(
+    inputs$right$coor,
+    cbind(x = -left[, "x"], y = -left[, "y"])
+  )
+  expect_equal(
+    inputs$up$coor,
+    cbind(x = left[, "y"], y = -left[, "x"])
+  )
+  expect_equal(
+    inputs$down$coor,
+    cbind(x = -left[, "y"], y = left[, "x"])
+  )
+  purrr::walk(orientations, function(orient) {
+    plot <- draw_cartoon(
+      structure,
+      orient = orient,
+      red_end = "Asn"
+    )
+    expect_s3_class(plot, "glydraw_cartoon")
+    expect_s3_class(plot, "ggplot")
+  })
+})
+
+test_that("reducing ends point away from each directional orientation", {
+  orientations <- c("left", "right", "up", "down")
+  vectors <- purrr::map(
+    orientations,
+    .reducing_end_line_vector,
+    length = 1
+  ) |>
+    stats::setNames(orientations)
+
+  expect_equal(vectors$left, c(x = 1, y = 0))
+  expect_equal(vectors$right, c(x = -1, y = 0))
+  expect_equal(vectors$up, c(x = 0, y = -1))
+  expect_equal(vectors$down, c(x = 0, y = 1))
+})
+
+test_that("draw_cartoon rejects the previous orientation abbreviations", {
+  expect_snapshot(
+    error = TRUE,
+    draw_cartoon("Gal(b1-3)GalNAc(a1-", orient = "H")
+  )
 })
 
 test_that("left and right Fuc-like triangles align with rectangle borders", {
@@ -172,7 +219,7 @@ test_that("left and right Fuc-like triangles align with rectangle borders", {
 
 test_that("dHex uses Fuc-like layout and orientation", {
   structure <- "HexNAc(??-?)[dHex(??-?)]HexNAc(??-"
-  inputs <- .prepare_cartoon_inputs(structure, NULL, "H", "")
+  inputs <- .prepare_cartoon_inputs(structure, NULL, "left", "")
   dhex <- which(igraph::V(inputs$structure)$mono == "dHex")
 
   expect_equal(inputs$coor[dhex, ], c(x = 0, y = 1))
@@ -189,7 +236,7 @@ test_that("dHex uses Fuc-like layout and orientation", {
 
 test_that("double core Fuc without linkages uses opposite branch sides", {
   structure <- "GlcNAc(??-?)[Fuc(??-?)][Fuc(??-?)]GlcNAc(??-"
-  inputs <- .prepare_cartoon_inputs(structure, NULL, "H", "")
+  inputs <- .prepare_cartoon_inputs(structure, NULL, "left", "")
   graph <- inputs$structure
   core <- length(graph)
   fuc <- as.integer(igraph::neighbors(graph, core, mode = "out"))
@@ -207,7 +254,7 @@ test_that("bisecting GlcNAc is centered without linkage information", {
     "[Gal(??-?)GlcNAc(??-?)Man(??-?)]",
     "[GlcNAc(??-?)]Man(??-?)GlcNAc(??-?)GlcNAc(??-"
   )
-  inputs <- .prepare_cartoon_inputs(structure, NULL, "H", "")
+  inputs <- .prepare_cartoon_inputs(structure, NULL, "left", "")
   graph <- inputs$structure
   child_num <- purrr::map_int(
     seq_along(igraph::V(graph)),
@@ -229,7 +276,7 @@ test_that("bisecting GlcNAc is centered without linkage information", {
 test_that("draw_cartoon left-aligns vertical substituent labels", {
   structure <- "Neu5Ac9Ac(a2-3)Gal6S(b1-"
 
-  plot <- draw_cartoon(structure, orient = "V")
+  plot <- draw_cartoon(structure, orient = "up")
   annotation <- ggplot2::ggplot_build(plot)$data[[4]]
   substituent <- dplyr::filter(annotation, .data$label == '"9Ac"')
   x_range <- ggplot2::get_panel_scales(plot)$x$range$range
@@ -241,13 +288,36 @@ test_that("draw_cartoon left-aligns vertical substituent labels", {
 test_that("draw_cartoon bottom-aligns horizontal substituent labels", {
   structure <- "Neu5Ac9Ac(a2-3)Gal6S(b1-"
 
-  plot <- draw_cartoon(structure, orient = "H")
+  plot <- draw_cartoon(structure, orient = "left")
   annotation <- ggplot2::ggplot_build(plot)$data[[4]]
   substituent <- dplyr::filter(annotation, .data$label == '"9Ac"')
   y_range <- ggplot2::get_panel_scales(plot)$y$range$range
 
   expect_equal(substituent$vjust, 0)
   expect_gt(y_range[[2]], substituent$y + 0.3)
+})
+
+test_that("draw_cartoon aligns substituent labels in new directions", {
+  structure <- "Neu5Ac9Ac(a2-3)Gal6S(b1-"
+  right <- draw_cartoon(structure, orient = "right")
+  right_annotation <- ggplot2::ggplot_build(right)$data[[4]]
+  right_substituent <- dplyr::filter(
+    right_annotation,
+    .data$label == '"9Ac"'
+  )
+  right_y_range <- ggplot2::get_panel_scales(right)$y$range$range
+  down <- draw_cartoon(structure, orient = "down")
+  down_annotation <- ggplot2::ggplot_build(down)$data[[4]]
+  down_substituent <- dplyr::filter(
+    down_annotation,
+    .data$label == '"9Ac"'
+  )
+  down_x_range <- ggplot2::get_panel_scales(down)$x$range$range
+
+  expect_equal(right_substituent$vjust, 1)
+  expect_lt(right_y_range[[1]], right_substituent$y - 0.3)
+  expect_equal(down_substituent$hjust, 1)
+  expect_lt(down_x_range[[1]], down_substituent$x - 0.5)
 })
 
 test_that("draw_cartoon works with linkage hidden", {
@@ -261,7 +331,7 @@ test_that("linkage-hidden cartoons skip unused annotation construction", {
   inputs <- .prepare_cartoon_inputs(
     "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-",
     NULL,
-    "H",
+    "left",
     ""
   )
   testthat::local_mocked_bindings(
@@ -293,7 +363,7 @@ test_that("draw_cartoon works with reducing-end O-Fuc glycans", {
 test_that("draw_cartoon preserves nested Xyl-Gal-Fuc side-chain order", {
   structure <- "Glc(b1-4)[Fuc(a1-2)Gal(b1-2)Xyl(a1-6)]Glc(b1-4)Glc(b1-"
 
-  inputs <- .prepare_cartoon_inputs(structure, NULL, "H", "")
+  inputs <- .prepare_cartoon_inputs(structure, NULL, "left", "")
   graph <- inputs$structure
   coor <- inputs$coor
   mono <- igraph::V(graph)$mono
@@ -311,7 +381,7 @@ test_that("draw_cartoon preserves nested Xyl-Gal-Fuc side-chain order", {
   annotation <- .cartoon_text_annotation_data(
     graph,
     coor,
-    "H",
+    "left",
     "",
     NULL
   )$annotation
@@ -337,7 +407,7 @@ test_that("linkage annotations preserve row-wise topology calculations", {
   )
 
   purrr::walk(structures, function(structure) {
-    inputs <- .prepare_cartoon_inputs(structure, NULL, "H", "")
+    inputs <- .prepare_cartoon_inputs(structure, NULL, "left", "")
     expected <- purrr::map_dfr(
       seq_len(length(inputs$structure) - 1),
       \(.vertex) {
@@ -345,14 +415,14 @@ test_that("linkage annotations preserve row-wise topology calculations", {
           inputs$structure,
           inputs$coor,
           .vertex,
-          orient = "H"
+          orient = "left"
         )
       }
     )
     expected$annot <- .normalize_linkage_labels(expected$annot)
 
     expect_identical(
-      .linkage_annotation_data(inputs$structure, inputs$coor, orient = "H"),
+      .linkage_annotation_data(inputs$structure, inputs$coor, orient = "left"),
       expected
     )
   })
