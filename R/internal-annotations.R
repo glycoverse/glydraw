@@ -11,6 +11,8 @@
 #'   child-side linkage label.
 #' @param par_offset Numeric distance from the parent residue center to the
 #'   parent-side linkage label.
+#' @param chil_perpendicular_nudge Numeric distance to move the child-side
+#'   label perpendicular to and away from the linkage segment.
 #' @param node_size Numeric node-size multiplier used to push labels along the
 #'   linkage segment away from scaled residue polygons.
 #'
@@ -25,6 +27,7 @@
   par_glyy,
   chil_offset = 0.4,
   par_offset = 0.4,
+  chil_perpendicular_nudge = 0,
   node_size = 1
 ) {
   chil_direction <- matrix(
@@ -64,6 +67,11 @@
   )
   chil_annot_loc <- chil_rotate_matrix %*% chil_location
   par_annot_loc <- par_rotate_matrix %*% par_location
+  chil_annot_loc <- .nudge_child_label_perpendicular(
+    label_offset = chil_annot_loc,
+    direction = chil_direction,
+    nudge = chil_perpendicular_nudge
+  )
   extra_offset <- .annotation_extra_offset(node_size)
   chil_annot_loc <- .push_label_position_along_segment(
     label_offset = chil_annot_loc,
@@ -79,6 +87,32 @@
   )
   annot_loc <- list("chil" = chil_annot_loc, "par" = par_annot_loc)
   return(annot_loc)
+}
+
+.beta_annotation_perpendicular_nudge <- 0.05
+
+#' Nudge a child-side label perpendicular to its linkage segment
+#'
+#' @param label_offset A two-row matrix giving the current label offset from
+#'   the child residue.
+#' @param direction A two-row matrix pointing from the child residue to the
+#'   parent residue.
+#' @param nudge Numeric perpendicular distance to add.
+#'
+#' @returns A two-row matrix with the adjusted label offset.
+#' @noRd
+.nudge_child_label_perpendicular <- function(
+  label_offset,
+  direction,
+  nudge
+) {
+  direction_norm <- norm(direction, type = "2")
+  if (nudge <= 0 || direction_norm <= .Machine$double.eps) {
+    return(label_offset)
+  }
+
+  clockwise_normal <- matrix(c(direction[[2]], -direction[[1]]), ncol = 1)
+  label_offset + nudge * clockwise_normal / direction_norm
 }
 
 #' Calculate the extra annotation clearance for scaled nodes
@@ -269,6 +303,13 @@
       coor[par_ver, "y"],
       chil_offset = offsets[["child"]],
       par_offset = offsets[["parent"]],
+      chil_perpendicular_nudge = if (
+        .normalize_linkage_labels(linkage_labels[[ver]][[1]]) == "beta"
+      ) {
+        .beta_annotation_perpendicular_nudge
+      } else {
+        0
+      },
       node_size = node_size
     )
     rows <- 2L * ver - c(1L, 0L)
@@ -350,6 +391,13 @@
     coor[par_ver, "y"],
     chil_offset = offsets[["child"]],
     par_offset = offsets[["parent"]],
+    chil_perpendicular_nudge = if (
+      .normalize_linkage_labels(labels[[1]]) == "beta"
+    ) {
+      .beta_annotation_perpendicular_nudge
+    } else {
+      0
+    },
     node_size = node_size
   )
 

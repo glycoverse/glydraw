@@ -43,7 +43,7 @@
 <polygon points='187.13,406.37 187.13,373.16 220.34,373.16 220.34,406.37 187.13,406.37 ' style='stroke-width: 1.71; stroke: #FFFFFF; stroke-linecap: butt; fill: #FFFFFF;' />
 <polygon points='143.10,389.77 142.97,387.64 142.56,385.56 141.89,383.54 140.97,381.62 139.80,379.84 138.43,378.22 136.85,376.79 135.11,375.57 133.22,374.58 131.22,373.85 129.15,373.38 127.03,373.17 124.90,373.24 122.80,373.58 120.76,374.18 118.82,375.05 117.00,376.15 115.33,377.48 113.85,379.00 112.58,380.71 111.54,382.56 110.74,384.54 110.20,386.59 109.93,388.70 109.93,390.83 110.20,392.94 110.74,395.00 111.54,396.97 112.58,398.83 113.85,400.53 115.33,402.06 117.00,403.39 118.82,404.49 120.76,405.35 122.80,405.96 124.90,406.30 127.03,406.37 129.15,406.16 131.22,405.69 133.22,404.95 135.11,403.97 136.85,402.75 138.43,401.32 139.80,399.70 140.97,397.92 141.89,396.00 142.56,393.98 142.97,391.89 143.10,389.77 ' style='stroke-width: 1.71; stroke-linecap: butt; fill: #FFD400;' />
 <polygon points='187.13,406.37 187.13,373.16 220.34,373.16 220.34,406.37 187.13,406.37 ' style='stroke-width: 1.71; stroke-linecap: butt; fill: #FFD400;' />
-<text x='151.92' y='403.70' style='font-size: 17.07px; font-family: sans;' textLength='7.92px' lengthAdjust='spacingAndGlyphs'>β</text>
+<text x='151.92' y='407.56' style='font-size: 17.07px; font-family: sans;' textLength='7.92px' lengthAdjust='spacingAndGlyphs'>β</text>
 <text x='169.60' y='405.19' style='font-size: 17.07px; font-family: sans;' textLength='9.50px' lengthAdjust='spacingAndGlyphs'>3</text>
 <text x='229.46' y='403.63' style='font-size: 17.07px; font-family: sans;' textLength='10.24px' lengthAdjust='spacingAndGlyphs'>α</text>
 </g>
@@ -155,7 +155,7 @@
 <text x='498.36' y='231.09' style='font-size: 17.07px; font-family: sans;' textLength='9.50px' lengthAdjust='spacingAndGlyphs'>3</text>
 <text x='464.77' y='190.43' style='font-size: 17.07px; font-family: sans;' textLength='10.24px' lengthAdjust='spacingAndGlyphs'>α</text>
 <text x='489.82' y='204.81' style='font-size: 17.07px; font-family: sans;' textLength='9.50px' lengthAdjust='spacingAndGlyphs'>6</text>
-<text x='550.54' y='217.47' style='font-size: 17.07px; font-family: sans;' textLength='7.92px' lengthAdjust='spacingAndGlyphs'>β</text>
+<text x='550.54' y='221.33' style='font-size: 17.07px; font-family: sans;' textLength='7.92px' lengthAdjust='spacingAndGlyphs'>β</text>
 <text x='568.22' y='218.96' style='font-size: 17.07px; font-family: sans;' textLength='9.50px' lengthAdjust='spacingAndGlyphs'>4</text>
 <text x='629.24' y='217.94' style='font-size: 17.07px; font-family: sans;' textLength='7.92px' lengthAdjust='spacingAndGlyphs'>β</text>
 </g>

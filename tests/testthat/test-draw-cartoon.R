@@ -86,6 +86,58 @@ test_that("Greek anomer annotations use the selected text family", {
   )
 })
 
+test_that("beta annotations are nudged perpendicular to linkage lines", {
+  purrr::walk(c("left", "right", "up", "down"), function(orient) {
+    beta_inputs <- .prepare_cartoon_inputs(
+      "Gal(b1-3)GalNAc(a1-",
+      NULL,
+      orient,
+      ""
+    )
+    alpha_inputs <- .prepare_cartoon_inputs(
+      "Gal(a1-3)GalNAc(a1-",
+      NULL,
+      orient,
+      ""
+    )
+    beta <- .linkage_annotation_data(
+      beta_inputs$structure,
+      beta_inputs$coor,
+      orient = orient
+    )[1, ]
+    alpha <- .linkage_annotation_data(
+      alpha_inputs$structure,
+      alpha_inputs$coor,
+      orient = orient
+    )[1, ]
+    direction <- c(
+      beta$segment_end_x - beta$segment_start_x,
+      beta$segment_end_y - beta$segment_start_y
+    )
+    nudge <- c(beta$x - alpha$x, beta$y - alpha$y)
+    clockwise_normal <- c(direction[[2]], -direction[[1]]) /
+      sqrt(sum(direction^2))
+    beta_offset <- c(
+      beta$x - beta$segment_start_x,
+      beta$y - beta$segment_start_y
+    )
+    alpha_offset <- c(
+      alpha$x - alpha$segment_start_x,
+      alpha$y - alpha$segment_start_y
+    )
+
+    expect_equal(sum(nudge * direction), 0, tolerance = 1e-12)
+    expect_equal(
+      sqrt(sum(nudge^2)),
+      .beta_annotation_perpendicular_nudge
+    )
+    expect_gt(
+      sum(beta_offset * clockwise_normal),
+      sum(alpha_offset * clockwise_normal)
+    )
+  })
+})
+
 test_that("draw_cartoon applies custom monosaccharide colors over defaults", {
   structure <- "Gal(b1-4)GlcNAc(b1-"
 

@@ -34,7 +34,7 @@
 <polygon points='184.28,306.62 184.28,286.69 204.20,286.69 204.20,306.62 184.28,306.62 ' style='stroke-width: 1.02; stroke: #FFFFFF; stroke-linecap: butt; fill: #FFFFFF;' />
 <polygon points='157.86,296.65 157.78,295.38 157.54,294.12 157.13,292.91 156.58,291.76 155.88,290.69 155.06,289.72 154.11,288.86 153.06,288.13 151.93,287.54 150.73,287.10 149.49,286.82 148.22,286.69 146.94,286.73 145.68,286.94 144.46,287.30 143.29,287.82 142.20,288.48 141.20,289.28 140.31,290.19 139.55,291.22 138.92,292.33 138.44,293.51 138.12,294.75 137.96,296.01 137.96,297.29 138.12,298.56 138.44,299.79 138.92,300.98 139.55,302.09 140.31,303.11 141.20,304.03 142.20,304.82 143.29,305.49 144.46,306.00 145.68,306.37 146.94,306.57 148.22,306.61 149.49,306.49 150.73,306.20 151.93,305.76 153.06,305.17 154.11,304.44 155.06,303.58 155.88,302.61 156.58,301.54 157.13,300.39 157.54,299.18 157.78,297.93 157.86,296.65 ' style='stroke-width: 1.02; stroke-linecap: butt; fill: #FFD400;' />
 <polygon points='184.28,306.62 184.28,286.69 204.20,286.69 204.20,306.62 184.28,306.62 ' style='stroke-width: 1.02; stroke-linecap: butt; fill: #FFD400;' />
-<text x='163.15' y='305.01' style='font-size: 10.24px; font-family: sans;' textLength='4.75px' lengthAdjust='spacingAndGlyphs'>β</text>
+<text x='163.15' y='307.33' style='font-size: 10.24px; font-family: sans;' textLength='4.75px' lengthAdjust='spacingAndGlyphs'>β</text>
 <text x='173.76' y='305.91' style='font-size: 10.24px; font-family: sans;' textLength='5.70px' lengthAdjust='spacingAndGlyphs'>3</text>
 <text x='209.68' y='304.97' style='font-size: 10.24px; font-family: sans;' textLength='6.15px' lengthAdjust='spacingAndGlyphs'>α</text>
 </g>
@@ -47,7 +47,7 @@
 <polygon points='549.98,319.90 549.98,273.40 596.47,273.40 596.47,319.90 549.98,319.90 ' style='stroke-width: 2.39; stroke: #FFFFFF; stroke-linecap: butt; fill: #FFFFFF;' />
 <polygon points='488.34,296.65 488.15,293.68 487.58,290.76 486.64,287.93 485.35,285.24 483.73,282.75 481.80,280.48 479.59,278.48 477.15,276.77 474.51,275.39 471.71,274.36 468.81,273.70 465.84,273.42 462.86,273.51 459.92,273.99 457.07,274.83 454.34,276.04 451.79,277.58 449.47,279.44 447.39,281.58 445.61,283.97 444.15,286.57 443.03,289.33 442.28,292.21 441.90,295.16 441.90,298.14 442.28,301.10 443.03,303.98 444.15,306.74 445.61,309.33 447.39,311.72 449.47,313.86 451.79,315.72 454.34,317.26 457.07,318.47 459.92,319.32 462.86,319.79 465.84,319.89 468.81,319.60 471.71,318.94 474.51,317.91 477.15,316.53 479.59,314.83 481.80,312.83 483.73,310.56 485.35,308.06 486.64,305.38 487.58,302.55 488.15,299.62 488.34,296.65 ' style='stroke-width: 2.39; stroke-linecap: butt; fill: #FFD400;' />
 <polygon points='549.98,319.90 549.98,273.40 596.47,273.40 596.47,319.90 549.98,319.90 ' style='stroke-width: 2.39; stroke-linecap: butt; fill: #FFD400;' />
-<text x='500.69' y='316.16' style='font-size: 23.90px; font-family: sans;' textLength='11.08px' lengthAdjust='spacingAndGlyphs'>β</text>
+<text x='500.69' y='321.56' style='font-size: 23.90px; font-family: sans;' textLength='11.08px' lengthAdjust='spacingAndGlyphs'>β</text>
 <text x='525.44' y='318.25' style='font-size: 23.90px; font-family: sans;' textLength='13.29px' lengthAdjust='spacingAndGlyphs'>3</text>
 <text x='609.25' y='316.06' style='font-size: 23.90px; font-family: sans;' textLength='14.34px' lengthAdjust='spacingAndGlyphs'>α</text>
 </g>
