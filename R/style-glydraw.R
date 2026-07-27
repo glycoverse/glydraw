@@ -1,8 +1,10 @@
-#' Create a glycan drawing style
+#' Glycan drawing styles
 #'
-#' `style_glydraw()` collects the rendering options shared by glydraw's
+#' Style constructors collect the rendering options shared by glydraw's
 #' standalone drawings, grobs, ggplot2 layers, guides, and glycan scales.
-#' Supply the result with `style =` to reuse a visual specification.
+#' `style_glydraw()` provides glydraw's default appearance, while the other
+#' constructors provide presets matching common glycan-drawing conventions.
+#' Supply a returned style with `style =` to reuse its visual specification.
 #'
 #' @param fuc_orient Fuc-like triangle orientation: `"flex"` or `"up"`.
 #' @param red_end Reducing-end annotation. Use `"~"` for a wave or `NULL` to
@@ -23,9 +25,14 @@
 #' @examples
 #' serif_style <- style_glydraw(font_family = "serif")
 #' draw_cartoon("Gal(b1-3)GalNAc(a1-", style = serif_style)
+#'
+#' draw_cartoon("Gal(b1-3)GalNAc(a1-", style = style_glygen())
+#' draw_cartoon("Gal(b1-3)GalNAc(a1-", style = style_snfg())
+#' draw_cartoon("Gal(b1-3)GalNAc(a1-", style = style_glycoworkbench())
+#' @describeIn style_glydraw Use glydraw's default style.
 #' @export
 style_glydraw <- function(
-  fuc_orient = c("flex", "up"),
+  fuc_orient = "flex",
   red_end = "",
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
@@ -33,7 +40,104 @@ style_glydraw <- function(
   font_family = "",
   colors = glydraw_colors()
 ) {
-  fuc_orient <- rlang::arg_match(fuc_orient)
+  .make_glydraw_style(
+    fuc_orient = fuc_orient,
+    red_end = red_end,
+    edge_linewidth = edge_linewidth,
+    node_linewidth = node_linewidth,
+    node_size = node_size,
+    font_family = font_family,
+    colors = colors
+  )
+}
+
+#' @describeIn style_glydraw Use a GlyGen-style preset.
+#' @export
+style_glygen <- function(
+  fuc_orient = "flex",
+  red_end = "~",
+  edge_linewidth = 0.8,
+  node_linewidth = 0.8,
+  node_size = 1,
+  font_family = "arial",
+  colors = glydraw_colors()
+) {
+  .make_glydraw_style(
+    fuc_orient = fuc_orient,
+    red_end = red_end,
+    edge_linewidth = edge_linewidth,
+    node_linewidth = node_linewidth,
+    node_size = node_size,
+    font_family = font_family,
+    colors = colors
+  )
+}
+
+#' @describeIn style_glydraw Use a Symbol Nomenclature for Glycans preset.
+#' @export
+style_snfg <- function(
+  fuc_orient = "up",
+  red_end = "",
+  edge_linewidth = 1.5,
+  node_linewidth = 0.8,
+  node_size = 1.15,
+  font_family = "arial",
+  colors = glydraw_colors()
+) {
+  .make_glydraw_style(
+    fuc_orient = fuc_orient,
+    red_end = red_end,
+    edge_linewidth = edge_linewidth,
+    node_linewidth = node_linewidth,
+    node_size = node_size,
+    font_family = font_family,
+    colors = colors
+  )
+}
+
+#' @describeIn style_glydraw Use a GlycoWorkbench-style preset.
+#' @export
+style_glycoworkbench <- function(
+  fuc_orient = "flex",
+  red_end = "~",
+  edge_linewidth = 0.8,
+  node_linewidth = 0.8,
+  node_size = 1,
+  font_family = "arial",
+  colors = c(
+    glyWhite = "#FFFFFF",
+    glyBlue = "#0000F0",
+    glyGreen = "#5AC54B",
+    glyYellow = "#FFFF54",
+    glyOrange = "#F7EAD7",
+    glyPink = "#FFFFFF",
+    glyPurple = "#B726C1",
+    glyLightBlue = "#EDFEFF",
+    glyBrown = "#8F663B",
+    glyRed = "#E53222"
+  )
+) {
+  .make_glydraw_style(
+    fuc_orient = fuc_orient,
+    red_end = red_end,
+    edge_linewidth = edge_linewidth,
+    node_linewidth = node_linewidth,
+    node_size = node_size,
+    font_family = font_family,
+    colors = colors
+  )
+}
+
+.make_glydraw_style <- function(
+  fuc_orient,
+  red_end,
+  edge_linewidth,
+  node_linewidth,
+  node_size,
+  font_family,
+  colors
+) {
+  checkmate::assert_choice(fuc_orient, c("flex", "up"))
   checkmate::assert_string(red_end, na.ok = FALSE, null.ok = TRUE)
   checkmate::assert_number(edge_linewidth, lower = 0)
   checkmate::assert_number(node_linewidth, lower = 0)

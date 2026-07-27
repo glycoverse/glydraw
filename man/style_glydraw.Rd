@@ -2,16 +2,51 @@
 % Please edit documentation in R/style-glydraw.R
 \name{style_glydraw}
 \alias{style_glydraw}
-\title{Create a glycan drawing style}
+\alias{style_glygen}
+\alias{style_snfg}
+\alias{style_glycoworkbench}
+\title{Glycan drawing styles}
 \usage{
 style_glydraw(
-  fuc_orient = c("flex", "up"),
+  fuc_orient = "flex",
   red_end = "",
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "",
   colors = glydraw_colors()
+)
+
+style_glygen(
+  fuc_orient = "flex",
+  red_end = "~",
+  edge_linewidth = 0.8,
+  node_linewidth = 0.8,
+  node_size = 1,
+  font_family = "arial",
+  colors = glydraw_colors()
+)
+
+style_snfg(
+  fuc_orient = "up",
+  red_end = "",
+  edge_linewidth = 1.5,
+  node_linewidth = 0.8,
+  node_size = 1.15,
+  font_family = "arial",
+  colors = glydraw_colors()
+)
+
+style_glycoworkbench(
+  fuc_orient = "flex",
+  red_end = "~",
+  edge_linewidth = 0.8,
+  node_linewidth = 0.8,
+  node_size = 1,
+  font_family = "arial",
+  colors = c(glyWhite = "#FFFFFF", glyBlue = "#0000F0", glyGreen = "#5AC54B", glyYellow =
+    "#FFFF54", glyOrange = "#F7EAD7", glyPink = "#FFFFFF", glyPurple = "#B726C1",
+    glyLightBlue = "#EDFEFF", glyBrown = "#8F663B", glyRed = "#E53222")
 )
 }
 \arguments{
@@ -39,11 +74,28 @@ by \code{\link[=glydraw_colors]{glydraw_colors()}}. Names must be complete and m
 A \code{glydraw_style} object.
 }
 \description{
-\code{style_glydraw()} collects the rendering options shared by glydraw's
+Style constructors collect the rendering options shared by glydraw's
 standalone drawings, grobs, ggplot2 layers, guides, and glycan scales.
-Supply the result with \verb{style =} to reuse a visual specification.
+\code{style_glydraw()} provides glydraw's default appearance, while the other
+constructors provide presets matching common glycan-drawing conventions.
+Supply a returned style with \verb{style =} to reuse its visual specification.
 }
+\section{Functions}{
+\itemize{
+\item \code{style_glydraw()}: Use glydraw's default style.
+
+\item \code{style_glygen()}: Use a GlyGen-style preset.
+
+\item \code{style_snfg()}: Use a Symbol Nomenclature for Glycans preset.
+
+\item \code{style_glycoworkbench()}: Use a GlycoWorkbench-style preset.
+
+}}
 \examples{
 serif_style <- style_glydraw(font_family = "serif")
 draw_cartoon("Gal(b1-3)GalNAc(a1-", style = serif_style)
+
+draw_cartoon("Gal(b1-3)GalNAc(a1-", style = style_glygen())
+draw_cartoon("Gal(b1-3)GalNAc(a1-", style = style_snfg())
+draw_cartoon("Gal(b1-3)GalNAc(a1-", style = style_glycoworkbench())
 }
