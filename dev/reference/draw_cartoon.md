@@ -15,6 +15,7 @@ draw_cartoon(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
+  font_family = "",
   colors = NULL,
   highlight = NULL,
   style = NULL
@@ -76,6 +77,14 @@ draw_cartoon(
   `node_size` is too large to leave enough annotation space. Values
   larger than `2` are rejected because residues overlap.
 
+- font_family:
+
+  A length-one character string naming the font family used for linkage,
+  substituent, and reducing-end text annotations. Portable choices are
+  `"sans"`, `"serif"`, and `"mono"`. Other family names, such as
+  installed system fonts, are graphics-device dependent. The default
+  `""` uses the graphics device's default font.
+
 - colors:
 
   Optional named character vector of custom monosaccharide fill colors.
@@ -110,4 +119,6 @@ a ggplot2 object
 
 ``` r
 draw_cartoon("Gal(b1-3)GalNAc(a1-")
+
+draw_cartoon("Gal(b1-3)GalNAc(a1-", font_family = "serif")
 ```

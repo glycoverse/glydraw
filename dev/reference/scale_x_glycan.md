@@ -36,6 +36,7 @@ scale_x_glycan(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
+  font_family = "",
   colors = NULL,
   style = NULL
 )
@@ -60,6 +61,7 @@ scale_y_glycan(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
+  font_family = "",
   colors = NULL,
   style = NULL
 )
@@ -167,6 +169,14 @@ scale_y_glycan(
 
   Node-size multiplier passed to
   [`glycanGrob()`](https://glycoverse.github.io/glydraw/dev/reference/glycanGrob.md).
+
+- font_family:
+
+  A length-one character string naming the font family used for linkage,
+  substituent, and reducing-end text annotations. Portable choices are
+  `"sans"`, `"serif"`, and `"mono"`. Other family names, such as
+  installed system fonts, are graphics-device dependent. The default
+  `""` uses the graphics device's default font.
 
 - colors:
 

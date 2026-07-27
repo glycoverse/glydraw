@@ -10,6 +10,12 @@
 
 ### New features
 
+- New `font_family` argument controls the font used for text annotations
+  across glycan cartoons and reusable
+  [`glydraw_style()`](https://glycoverse.github.io/glydraw/dev/reference/glydraw_style.md)
+  objects, including alpha and beta anomer labels.
+  ([\#69](https://github.com/glycoverse/glydraw/issues/69))
+
 - The shared `orient` argument now accepts `"left"`, `"right"`, `"up"`,
   and `"down"` to draw glycans in any direction.
 
