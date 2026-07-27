@@ -13,6 +13,11 @@
 #' @param edge_linewidth Linewidth of glycosidic linkages.
 #' @param node_linewidth Linewidth of node borders.
 #' @param node_size Multiplier for the default node size.
+#' @param font_family A length-one character string naming the font family used
+#'   for linkage, substituent, and reducing-end text annotations. Portable
+#'   choices are `"sans"`, `"serif"`, and `"mono"`. Other family names, such as
+#'   installed system fonts, are graphics-device dependent. The default `""`
+#'   uses the graphics device's default font.
 #' @param colors Optional named character vector of monosaccharide fill-color
 #'   overrides.
 #'
@@ -30,6 +35,7 @@ glydraw_style <- function(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
+  font_family = "",
   colors = NULL
 ) {
   checkmate::assert_flag(show_linkage)
@@ -39,6 +45,7 @@ glydraw_style <- function(
   checkmate::assert_number(edge_linewidth, lower = 0)
   checkmate::assert_number(node_linewidth, lower = 0)
   .validate_node_size(node_size)
+  checkmate::assert_string(font_family, na.ok = FALSE)
   colors <- .validate_custom_colors(colors)
 
   structure(
@@ -50,6 +57,7 @@ glydraw_style <- function(
       edge_linewidth = edge_linewidth,
       node_linewidth = node_linewidth,
       node_size = node_size,
+      font_family = font_family,
       colors = colors
     ),
     class = "glydraw_style"

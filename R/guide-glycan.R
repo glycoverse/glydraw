@@ -27,6 +27,11 @@
 #' @param edge_linewidth Linkage linewidth passed to [glycanGrob()].
 #' @param node_linewidth Node-border linewidth passed to [glycanGrob()].
 #' @param node_size Node-size multiplier passed to [glycanGrob()].
+#' @param font_family A length-one character string naming the font family used
+#'   for linkage, substituent, and reducing-end text annotations. Portable
+#'   choices are `"sans"`, `"serif"`, and `"mono"`. Other family names, such as
+#'   installed system fonts, are graphics-device dependent. The default `""`
+#'   uses the graphics device's default font.
 #' @param colors Optional named character vector of monosaccharide fill colors
 #'   passed to [glycanGrob()].
 #' @param style A `glydraw_style` object that supplies rendering options.
@@ -75,6 +80,7 @@ guide_glycan <- function(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
+  font_family = "",
   colors = NULL,
   style = NULL
 ) {
@@ -89,6 +95,7 @@ guide_glycan <- function(
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
     node_size = node_size,
+    font_family = font_family,
     colors = colors,
     .supplied = c(
       show_linkage = !missing(show_linkage),
@@ -98,6 +105,7 @@ guide_glycan <- function(
       edge_linewidth = !missing(edge_linewidth),
       node_linewidth = !missing(node_linewidth),
       node_size = !missing(node_size),
+      font_family = !missing(font_family),
       colors = !missing(colors)
     )
   )
@@ -152,6 +160,7 @@ guide_glycan <- function(
     glycan_edge_linewidth = style$edge_linewidth,
     glycan_node_linewidth = style$node_linewidth,
     glycan_node_size = style$node_size,
+    glycan_font_family = style$font_family,
     glycan_colors = style$colors,
     available_aes = "any",
     name = "legend",
@@ -212,6 +221,7 @@ guide_glycan <- function(
     edge_linewidth = params$glycan_edge_linewidth,
     node_linewidth = params$glycan_node_linewidth,
     node_size = params$glycan_node_size,
+    font_family = params$glycan_font_family,
     colors = params$glycan_colors
   )
   grob$name <- "guide.glycan.label"
@@ -406,6 +416,7 @@ GuideGlycan <- ggplot2::ggproto(
       glycan_edge_linewidth = 0.8,
       glycan_node_linewidth = 0.8,
       glycan_node_size = 1,
+      glycan_font_family = "",
       glycan_colors = character()
     )
   ),

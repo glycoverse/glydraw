@@ -408,9 +408,10 @@
   if (nrow(annotation) == 0) {
     return(grid::nullGrob())
   }
+  labels <- .font_family_annotation_labels(annotation, grob$font_family)
 
   grid::textGrob(
-    label = parse(text = annotation$annot_label),
+    label = parse(text = labels),
     x = grid::unit(
       .normalize_cartoon_grid_coordinates(
         annotation$x,
@@ -432,7 +433,7 @@
     gp = grid::gpar(
       col = scales::alpha("black", annotation$transparency),
       fontsize = rep(6 * ggplot2::.pt * scale, nrow(annotation)),
-      fontfamily = rep("", nrow(annotation)),
+      fontfamily = rep(grob$font_family, nrow(annotation)),
       lineheight = rep(1.2, nrow(annotation)),
       font = rep(1, nrow(annotation))
     ),

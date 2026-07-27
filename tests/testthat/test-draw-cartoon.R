@@ -47,6 +47,45 @@ test_that("draw_cartoon controls edge and node linewidths", {
   expect_equal(unique(custom_layers[[5]]$linewidth), 1.2)
 })
 
+test_that("draw_cartoon controls the text annotation font family", {
+  plot <- draw_cartoon(
+    "Gal(b1-3)GalNAc(a1-",
+    font_family = "serif"
+  )
+  layers <- ggplot2::ggplot_build(plot)$data
+
+  expect_equal(unique(layers[[4]]$family), "serif")
+  expect_contains(layers[[4]]$label, '"\u03b1"')
+  expect_contains(layers[[4]]$label, '"\u03b2"')
+  expect_equal(attr(plot, "glydraw_font_family"), "serif")
+})
+
+test_that("Greek anomer annotations use the selected text family", {
+  annotation <- data.frame(
+    annot = c("alpha", "beta", "1"),
+    hjust = NA_real_,
+    vjust = NA_real_,
+    is_red_end_text = FALSE
+  )
+
+  prepared <- .prepare_plotmath_annotations(annotation)
+  family_labels <- .font_family_annotation_labels(prepared, "serif")
+  parsed <- parse(text = family_labels)
+
+  expect_equal(
+    family_labels,
+    c('"\u03b1"', '"\u03b2"', "1")
+  )
+  expect_equal(
+    vapply(parsed[1:2], typeof, character(1)),
+    c("character", "character")
+  )
+  expect_equal(
+    .font_family_annotation_labels(prepared, ""),
+    c("alpha", "beta", "1")
+  )
+})
+
 test_that("draw_cartoon applies custom monosaccharide colors over defaults", {
   structure <- "Gal(b1-4)GlcNAc(b1-"
 
@@ -63,6 +102,7 @@ test_that("draw_cartoon accepts reusable glydraw styles", {
     show_linkage = FALSE,
     orient = "up",
     edge_linewidth = 1.2,
+    font_family = "serif",
     colors = c(Gal = "#123456")
   )
 
@@ -76,6 +116,7 @@ test_that("draw_cartoon accepts reusable glydraw styles", {
   override_layers <- ggplot2::ggplot_build(override_plot)$data
 
   expect_s3_class(style, "glydraw_style")
+  expect_equal(style$font_family, "serif")
   expect_equal(unique(styled_layers[[1]]$linewidth), 1.2)
   expect_contains(unique(styled_layers[[3]]$fill), "#123456")
   expect_equal(unique(override_layers[[1]]$linewidth), 0.4)

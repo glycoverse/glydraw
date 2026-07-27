@@ -156,6 +156,7 @@ geom_glycan <- function(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
+  font_family = "",
   colors = NULL,
   highlight = NULL,
   style = NULL,
@@ -172,6 +173,7 @@ geom_glycan <- function(
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
     node_size = node_size,
+    font_family = font_family,
     colors = colors,
     .supplied = c(
       show_linkage = !missing(show_linkage),
@@ -181,6 +183,7 @@ geom_glycan <- function(
       edge_linewidth = !missing(edge_linewidth),
       node_linewidth = !missing(node_linewidth),
       node_size = !missing(node_size),
+      font_family = !missing(font_family),
       colors = !missing(colors)
     )
   )
@@ -197,6 +200,7 @@ geom_glycan <- function(
     edge_linewidth = style$edge_linewidth,
     node_linewidth = style$node_linewidth,
     node_size = style$node_size,
+    font_family = style$font_family,
     colours = style$colors,
     highlight = highlight,
     na.rm = na.rm,
@@ -236,6 +240,7 @@ geom_glycan <- function(
 #' @param edge_linewidth Linkage linewidth passed to [glycanGrob()].
 #' @param node_linewidth Node-border linewidth passed to [glycanGrob()].
 #' @param node_size Node-size multiplier passed to [glycanGrob()].
+#' @param font_family Font family passed to [glycanGrob()].
 #' @param colours Custom monosaccharide colors passed to [glycanGrob()].
 #' @param highlight Highlight indices passed to [glycanGrob()].
 #' @param na.rm Logical scalar handled by ggplot2 before panel drawing.
@@ -253,6 +258,7 @@ geom_glycan <- function(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
+  font_family = "",
   colours = NULL,
   highlight = NULL,
   na.rm = FALSE
@@ -294,6 +300,7 @@ geom_glycan <- function(
       edge_linewidth = edge_linewidth,
       node_linewidth = node_linewidth,
       node_size = node_size,
+      font_family = font_family,
       colors = colours,
       highlight = highlight
     )

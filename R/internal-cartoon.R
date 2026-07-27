@@ -488,6 +488,28 @@
     )
 }
 
+#' Resolve plotmath labels for a text annotation font family
+#'
+#' Plotmath renders named Greek symbols with its symbol font, ignoring the
+#' selected text family. When a custom family is requested, quote alpha and beta
+#' as Unicode text so they use the same family as the other annotations.
+#'
+#' @param annotation A prepared annotation data frame with `annot` and
+#'   `annot_label` columns.
+#' @param font_family Font family used for text annotations.
+#'
+#' @returns A character vector of plotmath-safe labels.
+#' @noRd
+.font_family_annotation_labels <- function(annotation, font_family) {
+  labels <- annotation$annot_label
+  if (identical(font_family, "")) {
+    return(labels)
+  }
+  labels[annotation$annot == "alpha"] <- .quote_plotmath_text("\u03b1")
+  labels[annotation$annot == "beta"] <- .quote_plotmath_text("\u03b2")
+  labels
+}
+
 #' Build all line segments for a cartoon
 #'
 #' @param structure An igraph glycan graph.
@@ -529,6 +551,7 @@
 #'   should be drawn.
 #' @param edge_linewidth Numeric scalar used for linkage lines.
 #' @param node_linewidth Numeric scalar used for node borders.
+#' @param font_family Font family used for text annotations.
 #' @param border_px Numeric plot border size in pixels.
 #' @param background Logical scalar indicating whether the ggplot background
 #'   grob should be retained.
@@ -544,6 +567,7 @@
   show_linkage,
   edge_linewidth,
   node_linewidth,
+  font_family,
   border_px = .default_cartoon_border_px,
   background = TRUE
 ) {
@@ -557,7 +581,8 @@
   gly_graph <- .add_cartoon_text_layers(
     gly_graph,
     annotation_data,
-    show_linkage
+    show_linkage,
+    font_family
   )
   gly_graph <- .add_cartoon_text_bounds(gly_graph, annotation_data$bounds)
   gly_graph <- .add_reducing_end_layers(
@@ -568,7 +593,9 @@
   if (!background) {
     gly_graph <- .remove_cartoon_background(gly_graph)
   }
-  .finalize_cartoon_size(gly_graph, border_px = border_px)
+  gly_graph <- .finalize_cartoon_size(gly_graph, border_px = border_px)
+  attr(gly_graph, "glydraw_font_family") <- font_family
+  gly_graph
 }
 
 #' Build segment and residue polygon layers
@@ -628,19 +655,29 @@
 #' @param annotation_data A list returned by `.cartoon_text_annotation_data()`.
 #' @param show_linkage A logical scalar. `TRUE` draws all text; `FALSE` draws
 #'   only substituent and custom reducing-end text when present.
+#' @param font_family Font family used for text annotations.
 #'
 #' @returns A ggplot object with zero or one added text layer.
 #' @noRd
 .add_cartoon_text_layers <- function(
   plot,
   annotation_data,
-  show_linkage
+  show_linkage,
+  font_family
 ) {
   if (show_linkage) {
-    return(.add_plotmath_text_layer(plot, annotation_data$annotation))
+    return(.add_plotmath_text_layer(
+      plot,
+      annotation_data$annotation,
+      font_family
+    ))
   }
   if (nrow(annotation_data$show_without_linkage) > 0) {
-    return(.add_plotmath_text_layer(plot, annotation_data$show_without_linkage))
+    return(.add_plotmath_text_layer(
+      plot,
+      annotation_data$show_without_linkage,
+      font_family
+    ))
   }
   plot
 }
@@ -650,10 +687,15 @@
 #' @param plot A ggplot object.
 #' @param annotation A data frame with columns `x`, `y`, `annot_label`,
 #'   `hjust`, `vjust`, and `transparency`.
+#' @param font_family Font family used for text annotations.
 #'
 #' @returns A ggplot object with one `geom_text(parse = TRUE)` layer added.
 #' @noRd
-.add_plotmath_text_layer <- function(plot, annotation) {
+.add_plotmath_text_layer <- function(plot, annotation, font_family) {
+  annotation$annot_label <- .font_family_annotation_labels(
+    annotation,
+    font_family
+  )
   plot +
     ggplot2::geom_text(
       data = annotation,
@@ -667,6 +709,7 @@
       alpha = annotation$transparency,
       parse = TRUE,
       size = 6,
+      family = font_family,
     )
 }
 

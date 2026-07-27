@@ -58,6 +58,8 @@ save_cartoon <- function(cartoon, file, ..., dpi = 300, scale = 1) {
   )
   border_px <- (size - panel_size) / 2
   render_dpi <- .default_cartoon_dpi
+  font_family <- attr(cartoon, "glydraw_font_family")
+  device <- .cartoon_save_device(file_ext, font_family)
   cartoon <- cartoon |>
     .add_plot_border(border_px[["width"]] / render_dpi * 72) |>
     .set_fixed_panel_size(panel_size, dpi = render_dpi) |>
@@ -70,6 +72,33 @@ save_cartoon <- function(cartoon, file, ..., dpi = 300, scale = 1) {
     height = size[["height"]] * scale,
     units = "px",
     dpi = render_dpi * scale,
-    bg = bg_color
+    bg = bg_color,
+    device = device
+  )
+}
+
+.cartoon_save_device <- function(file_ext, font_family) {
+  if (
+    is.null(font_family) ||
+      identical(font_family, "") ||
+      !capabilities("cairo")
+  ) {
+    return(NULL)
+  }
+
+  switch(
+    tolower(file_ext),
+    pdf = grDevices::cairo_pdf,
+    eps = .cartoon_cairo_ps,
+    ps = .cartoon_cairo_ps,
+    NULL
+  )
+}
+
+.cartoon_cairo_ps <- function(filename, ...) {
+  grDevices::cairo_ps(
+    filename = filename,
+    ...,
+    onefile = FALSE
   )
 }

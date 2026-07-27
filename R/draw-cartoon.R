@@ -23,6 +23,11 @@
 #'   are moved farther from larger nodes, and are hidden with a warning when
 #'   `node_size` is too large to leave enough annotation space. Values larger
 #'   than `2` are rejected because residues overlap.
+#' @param font_family A length-one character string naming the font family used
+#'   for linkage, substituent, and reducing-end text annotations. Portable
+#'   choices are `"sans"`, `"serif"`, and `"mono"`. Other family names, such as
+#'   installed system fonts, are graphics-device dependent. The default `""`
+#'   uses the graphics device's default font.
 #' @param colors Optional named character vector of custom monosaccharide fill
 #'   colors. Names must be supported monosaccharide names, such as `"Gal"` or
 #'   `"GlcNAc"`. User-provided colors overwrite the default SNFG colors, while
@@ -39,6 +44,7 @@
 #' @returns a ggplot2 object
 #' @examples
 #' draw_cartoon("Gal(b1-3)GalNAc(a1-")
+#' draw_cartoon("Gal(b1-3)GalNAc(a1-", font_family = "serif")
 #' @export
 draw_cartoon <- function(
   structure,
@@ -50,6 +56,7 @@ draw_cartoon <- function(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
+  font_family = "",
   colors = NULL,
   highlight = NULL,
   style = NULL
@@ -63,6 +70,7 @@ draw_cartoon <- function(
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
     node_size = node_size,
+    font_family = font_family,
     colors = colors,
     .supplied = c(
       show_linkage = !missing(show_linkage),
@@ -72,6 +80,7 @@ draw_cartoon <- function(
       edge_linewidth = !missing(edge_linewidth),
       node_linewidth = !missing(node_linewidth),
       node_size = !missing(node_size),
+      font_family = !missing(font_family),
       colors = !missing(colors)
     )
   )
@@ -85,6 +94,7 @@ draw_cartoon <- function(
     edge_linewidth = style$edge_linewidth,
     node_linewidth = style$node_linewidth,
     node_size = style$node_size,
+    font_family = style$font_family,
     colors = style$colors,
     highlight = highlight
   ) |>

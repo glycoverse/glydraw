@@ -14,6 +14,7 @@ glycanGrob(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
+  font_family = "",
   colors = NULL,
   highlight = NULL,
   style = NULL
@@ -51,6 +52,12 @@ size. Defaults to \code{1}, which keeps the current size. Linkage annotations
 are moved farther from larger nodes, and are hidden with a warning when
 \code{node_size} is too large to leave enough annotation space. Values larger
 than \code{2} are rejected because residues overlap.}
+
+\item{font_family}{A length-one character string naming the font family used
+for linkage, substituent, and reducing-end text annotations. Portable
+choices are \code{"sans"}, \code{"serif"}, and \code{"mono"}. Other family names, such as
+installed system fonts, are graphics-device dependent. The default \code{""}
+uses the graphics device's default font.}
 
 \item{colors}{Optional named character vector of custom monosaccharide fill
 colors. Names must be supported monosaccharide names, such as \code{"Gal"} or

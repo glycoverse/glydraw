@@ -46,6 +46,7 @@ export_cartoons <- function(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
+  font_family = "",
   colors = NULL,
   style = NULL
 ) {
@@ -71,6 +72,7 @@ export_cartoons.character <- function(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
+  font_family = "",
   colors = NULL,
   style = NULL
 ) {
@@ -83,6 +85,7 @@ export_cartoons.character <- function(
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
     node_size = node_size,
+    font_family = font_family,
     colors = colors,
     .supplied = c(
       show_linkage = !missing(show_linkage),
@@ -92,6 +95,7 @@ export_cartoons.character <- function(
       edge_linewidth = !missing(edge_linewidth),
       node_linewidth = !missing(node_linewidth),
       node_size = !missing(node_size),
+      font_family = !missing(font_family),
       colors = !missing(colors)
     )
   )
@@ -107,6 +111,7 @@ export_cartoons.character <- function(
     style$edge_linewidth,
     style$node_linewidth,
     style$node_size,
+    style$font_family,
     style$colors
   )
 }
@@ -126,6 +131,7 @@ export_cartoons.glyrepr_structure <- function(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
+  font_family = "",
   colors = NULL,
   style = NULL
 ) {
@@ -138,6 +144,7 @@ export_cartoons.glyrepr_structure <- function(
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
     node_size = node_size,
+    font_family = font_family,
     colors = colors,
     .supplied = c(
       show_linkage = !missing(show_linkage),
@@ -147,6 +154,7 @@ export_cartoons.glyrepr_structure <- function(
       edge_linewidth = !missing(edge_linewidth),
       node_linewidth = !missing(node_linewidth),
       node_size = !missing(node_size),
+      font_family = !missing(font_family),
       colors = !missing(colors)
     )
   )
@@ -162,6 +170,7 @@ export_cartoons.glyrepr_structure <- function(
     style$edge_linewidth,
     style$node_linewidth,
     style$node_size,
+    style$font_family,
     style$colors
   )
 }
@@ -178,6 +187,7 @@ export_cartoons.glyrepr_structure <- function(
   edge_linewidth,
   node_linewidth,
   node_size,
+  font_family,
   colors
 ) {
   .validate_node_size(node_size)
@@ -196,6 +206,7 @@ export_cartoons.glyrepr_structure <- function(
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
     node_size = node_size,
+    font_family = font_family,
     colors = colors
   )
   filenames <- fs::path(
