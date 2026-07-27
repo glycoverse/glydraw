@@ -149,7 +149,7 @@ draw_cartoon(n_core, style = style_glydraw(node_size = 1.2))
 ``` r
 
 draw_cartoon(n_core, style = style_glydraw(node_size = 1.6))
-#> Warning: Linkage annotations are hidden because `node_size` is larger than 1.2.
+#> Warning: Linkage annotations are hidden because `node_size` is larger than 1.4.
 #> ℹ Set `show_linkage = FALSE` to silence this warning, or use a smaller
 #>   `node_size`.
 ```
@@ -212,7 +212,7 @@ outfile <- file.path(tempdir(), "n-core.png")
 
 save_cartoon(cartoon, outfile, scale = 2)
 outfile
-#> [1] "/tmp/Rtmpk0PPwk/n-core.png"
+#> [1] "/tmp/RtmpqmkLMo/n-core.png"
 ```
 
 `glydraw` does not expose separate `width` and `height` controls because
