@@ -57,6 +57,7 @@ test_that("draw_cartoon controls the text annotation font family", {
   expect_equal(unique(layers[[4]]$family), "serif")
   expect_contains(layers[[4]]$label, '"\u03b1"')
   expect_contains(layers[[4]]$label, '"\u03b2"')
+  expect_equal(attr(plot, "glydraw_font_family"), "serif")
 })
 
 test_that("Greek anomer annotations use the selected text family", {

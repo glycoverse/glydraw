@@ -593,7 +593,9 @@
   if (!background) {
     gly_graph <- .remove_cartoon_background(gly_graph)
   }
-  .finalize_cartoon_size(gly_graph, border_px = border_px)
+  gly_graph <- .finalize_cartoon_size(gly_graph, border_px = border_px)
+  attr(gly_graph, "glydraw_font_family") <- font_family
+  gly_graph
 }
 
 #' Build segment and residue polygon layers

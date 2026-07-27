@@ -243,3 +243,23 @@ test_that("export_cartoons works with jpeg extension", {
   files <- fs::dir_ls(temp_dir, glob = "*.jpg")
   expect_length(files, 1)
 })
+
+test_that("export_cartoons preserves Greek labels in custom-font PDFs", {
+  skip_if_not(capabilities("cairo"), "Cairo graphics are unavailable.")
+  temp_dir <- tempfile()
+  on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
+
+  expect_no_warning(
+    suppressMessages(
+      export_cartoons(
+        "Gal(b1-3)GalNAc(a1-",
+        temp_dir,
+        file_ext = "pdf",
+        font_family = "serif"
+      )
+    )
+  )
+  files <- fs::dir_ls(temp_dir, glob = "*.pdf")
+  expect_length(files, 1)
+  expect_gt(file.size(files), 0)
+})
