@@ -50,8 +50,6 @@ test_that("export_cartoons forwards custom linewidths", {
   temp_dir <- tempfile()
   on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
   fs::dir_create(temp_dir)
-  colors <- glydraw_colors()
-  colors["glyYellow"] <- "#123456"
 
   suppressMessages(
     result <- export_cartoons(
