@@ -194,6 +194,63 @@ test_that("larger nodes shorten all three linkage annotation gaps", {
   )
 })
 
+test_that("labels on one linkage do not collide with each other", {
+  inputs <- .prepare_cartoon_inputs(
+    "Gal(b1-3)GalNAc(a1-",
+    NULL,
+    "left",
+    "~"
+  )
+  annotation <- .linkage_annotation_data(
+    inputs$structure,
+    inputs$coor,
+    node_size = 1.3,
+    orient = "left"
+  )
+
+  separated <- .separate_overlapping_annotations(annotation)
+
+  expect_equal(separated[, c("x", "y")], annotation[, c("x", "y")])
+})
+
+test_that("overlapping labels on different linkages reflect as a group", {
+  glycan <- paste0(
+    "Neu5Ac(a2-3)Gal(b1-3)[Neu5Ac(a2-3)Gal(b1-4)",
+    "[Fuc(a1-3)]GlcNAc(b1-6)]GalNAc(a1-"
+  )
+  inputs <- .prepare_cartoon_inputs(glycan, NULL, "left", "~")
+  annotation <- .linkage_annotation_data(
+    inputs$structure,
+    inputs$coor,
+    orient = "left"
+  )
+  reflected_rows <- which(
+    annotation$vertice == "4" &
+      annotation$annot %in% c("beta", "6")
+  )
+  segment <- as.matrix(annotation[, c(
+    "segment_start_x",
+    "segment_start_y",
+    "segment_end_x",
+    "segment_end_y"
+  )])
+  reflected <- .reflected_annotation_coordinates(
+    as.matrix(annotation[, c("x", "y")]),
+    segment
+  )
+
+  separated <- .separate_overlapping_annotations(annotation)
+
+  expect_equal(
+    unname(as.matrix(separated[reflected_rows, c("x", "y")])),
+    unname(reflected[reflected_rows, ])
+  )
+  expect_equal(
+    separated[-reflected_rows, c("x", "y")],
+    annotation[-reflected_rows, c("x", "y")]
+  )
+})
+
 test_that("reducing-end beta annotations follow the physical edge direction", {
   purrr::walk(c("left", "right", "up", "down"), function(orient) {
     beta_inputs <- .prepare_cartoon_inputs(
