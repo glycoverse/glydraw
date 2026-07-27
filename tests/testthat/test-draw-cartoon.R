@@ -957,6 +957,75 @@ test_that("bisecting GlcNAc is centered without linkage information", {
   )
 })
 
+test_that("draw_cartoon lays out normalized floating WURCS parts", {
+  cartoons <- purrr::map(floating_wurcs_examples(), draw_cartoon)
+
+  purrr::walk(cartoons, expect_s3_class, "glydraw_cartoon")
+  purrr::walk(cartoons, function(cartoon) {
+    built <- ggplot2::ggplot_build(cartoon)
+    finite_coordinates <- purrr::map_lgl(
+      built$data,
+      function(layer) {
+        coordinates <- unlist(
+          layer[intersect(names(layer), c("x", "y", "xend", "yend"))]
+        )
+        all(is.finite(coordinates))
+      }
+    )
+    expect_equal(finite_coordinates, rep(TRUE, length(finite_coordinates)))
+  })
+})
+
+test_that("floating brackets span the whole main glycan", {
+  inputs <- .prepare_cartoon_inputs(
+    floating_wurcs_examples()[["multiple_parts"]],
+    NULL,
+    "H",
+    ""
+  )
+  main_y <- inputs$coor[inputs$floating$main_nodes, "y"]
+  vertical_bracket <- dplyr::filter(
+    inputs$floating$bracket_segments,
+    .data$start_x == .data$end_x
+  )
+
+  expect_equal(
+    c(vertical_bracket$start_y, vertical_bracket$end_y),
+    range(main_y) + c(-0.5, 0.5)
+  )
+})
+
+test_that("SNFG drawing ignores floating candidate scope", {
+  structures <- glyrepr::as_glycan_structure(c(
+    implicit = "{Fuc(?1-?)}Gal(?1-?)GlcNAc(?1-",
+    explicit = "{Fuc(?1-?)|1,2}Gal(?1-?)GlcNAc(?1-"
+  ))
+  implicit <- glycanGrob(structures[[1]])
+  explicit <- glycanGrob(structures[[2]])
+
+  expect_equal(implicit$connect_df, explicit$connect_df)
+  expect_equal(implicit$polygon_coor, explicit$polygon_coor)
+  expect_equal(
+    implicit$annotation_data$annotation,
+    explicit$annotation_data$annotation
+  )
+})
+
+test_that("identical floating cartoons are merged with a count", {
+  grob <- glycanGrob(floating_wurcs_examples()[["repeated_part"]])
+  count <- dplyr::filter(
+    grob$annotation_data$annotation,
+    .data$annotation_type == "floating_count"
+  )
+  virtual <- dplyr::filter(
+    grob$connect_df,
+    .data$segment_type == "floating_attachment"
+  )
+
+  expect_equal(count$annot, "3x")
+  expect_equal(nrow(virtual), 1)
+})
+
 test_that("draw_cartoon left-aligns vertical substituent labels", {
   structure <- "Neu5Ac9Ac(a2-3)Gal6S(b1-"
 

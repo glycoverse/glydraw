@@ -45,6 +45,7 @@ glycanGrob <- function(
   )
   structure <- inputs$structure
   coor <- inputs$coor
+  floating <- inputs$floating
   highlight <- inputs$highlight
   orient <- inputs$orient
   show_linkage <- .resolve_linkage_visibility(
@@ -56,7 +57,12 @@ glycanGrob <- function(
     structure,
     coor,
     highlight,
-    style$fuc_orient
+    style$fuc_orient,
+    visible_vertices = if (is.null(floating)) {
+      seq_len(length(structure))
+    } else {
+      floating$visible_vertices
+    }
   )
   polygon_coor <- .residue_polygon_data(
     gly_list,
@@ -73,13 +79,15 @@ glycanGrob <- function(
     show_linkage = show_linkage,
     red_end_length = style$red_end_length,
     red_end_size = style$red_end_size,
-    font_family = style$font_family
+    font_family = style$font_family,
+    floating = floating
   )
   connect_df <- .cartoon_segment_data(
     structure,
     coor,
     annotation_data$reducing_info$segment,
-    gly_list
+    gly_list,
+    floating
   )
 
   grid::gTree(
@@ -91,6 +99,7 @@ glycanGrob <- function(
     ),
     filled_color = filled_color,
     annotation_data = annotation_data,
+    floating = floating,
     show_linkage = show_linkage,
     edge_linewidth = style$edge_linewidth,
     node_linewidth = style$node_linewidth,
