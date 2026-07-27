@@ -2,7 +2,7 @@
 # the main glycan without exposing WURCS-specific attachment semantics.
 
 .floating_bracket_offset <- 0.65
-.floating_bracket_padding <- 0.5
+.floating_bracket_padding <- 0.25
 .floating_bracket_tick_length <- 0.25
 .floating_bracket_gap <- 0.25
 .floating_attachment_length <- 1

@@ -991,7 +991,7 @@ test_that("floating brackets span the whole main glycan", {
 
   expect_equal(
     c(vertical_bracket$start_y, vertical_bracket$end_y),
-    range(main_y) + c(-0.5, 0.5)
+    range(main_y) + c(-0.25, 0.25)
   )
 })
 
