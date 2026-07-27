@@ -46,8 +46,8 @@ export_cartoons <- function(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
-  colors = NULL,
   font_family = "",
+  colors = NULL,
   style = NULL
 ) {
   if (!missing(dpi)) {
@@ -72,8 +72,8 @@ export_cartoons.character <- function(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
-  colors = NULL,
   font_family = "",
+  colors = NULL,
   style = NULL
 ) {
   style <- .resolve_glydraw_style(
@@ -131,8 +131,8 @@ export_cartoons.glyrepr_structure <- function(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
-  colors = NULL,
   font_family = "",
+  colors = NULL,
   style = NULL
 ) {
   style <- .resolve_glydraw_style(

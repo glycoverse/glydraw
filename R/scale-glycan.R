@@ -90,8 +90,8 @@ scale_x_glycan <- function(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
-  colors = NULL,
   font_family = "",
+  colors = NULL,
   style = NULL
 ) {
   style <- .resolve_glydraw_style(
@@ -169,8 +169,8 @@ scale_y_glycan <- function(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
-  colors = NULL,
   font_family = "",
+  colors = NULL,
   style = NULL
 ) {
   style <- .resolve_glydraw_style(

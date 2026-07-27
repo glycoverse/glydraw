@@ -80,8 +80,8 @@ guide_glycan <- function(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
-  colors = NULL,
   font_family = "",
+  colors = NULL,
   style = NULL
 ) {
   hjust_is_missing <- missing(hjust)

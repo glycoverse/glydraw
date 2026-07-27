@@ -25,8 +25,8 @@ scale_x_glycan(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
-  colors = NULL,
   font_family = "",
+  colors = NULL,
   style = NULL
 )
 
@@ -50,8 +50,8 @@ scale_y_glycan(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
-  colors = NULL,
   font_family = "",
+  colors = NULL,
   style = NULL
 )
 }
@@ -109,14 +109,14 @@ for a wave, or another string to display that text. Defaults to \code{""}.}
 
 \item{node_size}{Node-size multiplier passed to \code{\link[=glycanGrob]{glycanGrob()}}.}
 
-\item{colors}{Optional named character vector of monosaccharide fill colors
-passed to \code{\link[=glycanGrob]{glycanGrob()}}.}
-
 \item{font_family}{A length-one character string naming the font family used
 for linkage, substituent, and reducing-end text annotations. Portable
 choices are \code{"sans"}, \code{"serif"}, and \code{"mono"}. Other family names, such as
 installed system fonts, are graphics-device dependent. The default \code{""}
 uses the graphics device's default font.}
+
+\item{colors}{Optional named character vector of monosaccharide fill colors
+passed to \code{\link[=glycanGrob]{glycanGrob()}}.}
 
 \item{style}{A \code{glydraw_style} object that supplies rendering options. Its
 orientation is ignored because each scale determines the axis direction.

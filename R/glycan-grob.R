@@ -24,9 +24,9 @@ glycanGrob <- function(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
+  font_family = "",
   colors = NULL,
   highlight = NULL,
-  font_family = "",
   style = NULL
 ) {
   style <- .resolve_glydraw_style(

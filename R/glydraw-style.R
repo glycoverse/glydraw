@@ -35,8 +35,8 @@ glydraw_style <- function(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
-  colors = NULL,
-  font_family = ""
+  font_family = "",
+  colors = NULL
 ) {
   checkmate::assert_flag(show_linkage)
   orient <- rlang::arg_match(orient)

@@ -18,9 +18,9 @@ geom_glycan(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
+  font_family = "",
   colors = NULL,
   highlight = NULL,
-  font_family = "",
   style = NULL,
   na.rm = FALSE,
   show.legend = NA,
@@ -74,6 +74,12 @@ are moved farther from larger nodes, and are hidden with a warning when
 \code{node_size} is too large to leave enough annotation space. Values larger
 than \code{2} are rejected because residues overlap.}
 
+\item{font_family}{A length-one character string naming the font family used
+for linkage, substituent, and reducing-end text annotations. Portable
+choices are \code{"sans"}, \code{"serif"}, and \code{"mono"}. Other family names, such as
+installed system fonts, are graphics-device dependent. The default \code{""}
+uses the graphics device's default font.}
+
 \item{colors}{Optional named character vector of custom monosaccharide fill
 colors. Names must be supported monosaccharide names, such as \code{"Gal"} or
 \code{"GlcNAc"}. User-provided colors overwrite the default SNFG colors, while
@@ -85,12 +91,6 @@ Note that for a \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure(
 to the monosaccharides in its printed IUPAC nomenclature.
 For example, given \code{glyrepr::as_glycan_structure("Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-")},
 setting \code{highlight = c(1, 3)} will highlight the "Gal" and "GalNAc" nodes.}
-
-\item{font_family}{A length-one character string naming the font family used
-for linkage, substituent, and reducing-end text annotations. Portable
-choices are \code{"sans"}, \code{"serif"}, and \code{"mono"}. Other family names, such as
-installed system fonts, are graphics-device dependent. The default \code{""}
-uses the graphics device's default font.}
 
 \item{style}{A \code{glydraw_style} object that supplies rendering options.
 Explicitly supplied rendering arguments override it.}

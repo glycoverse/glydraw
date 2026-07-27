@@ -12,8 +12,8 @@ glydraw_style(
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
-  colors = NULL,
-  font_family = ""
+  font_family = "",
+  colors = NULL
 )
 }
 \arguments{
@@ -32,14 +32,14 @@ one of \code{"left"}, \code{"right"}, \code{"up"}, or \code{"down"}. Defaults to
 
 \item{node_size}{Multiplier for the default node size.}
 
-\item{colors}{Optional named character vector of monosaccharide fill-color
-overrides.}
-
 \item{font_family}{A length-one character string naming the font family used
 for linkage, substituent, and reducing-end text annotations. Portable
 choices are \code{"sans"}, \code{"serif"}, and \code{"mono"}. Other family names, such as
 installed system fonts, are graphics-device dependent. The default \code{""}
 uses the graphics device's default font.}
+
+\item{colors}{Optional named character vector of monosaccharide fill-color
+overrides.}
 }
 \value{
 A \code{glydraw_style} object.
