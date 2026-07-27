@@ -71,8 +71,11 @@ colors. Names must be supported monosaccharide names, such as \code{"Gal"} or
 \code{"GlcNAc"}. User-provided colors overwrite the default SNFG colors, while
 unprovided monosaccharides keep their default colors. Defaults to \code{NULL}.}
 
-\item{font_family}{Font family used for text annotations. Defaults to \code{""},
-which uses the graphics device's default font.}
+\item{font_family}{A length-one character string naming the font family used
+for linkage, substituent, and reducing-end text annotations. Portable
+choices are \code{"sans"}, \code{"serif"}, and \code{"mono"}. Other family names, such as
+installed system fonts, are graphics-device dependent. The default \code{""}
+uses the graphics device's default font.}
 
 \item{style}{A \code{glydraw_style} object that supplies rendering options.
 Explicitly supplied rendering arguments override it.}

@@ -46,7 +46,11 @@
 #' @param edge_linewidth Linkage linewidth passed to [glycanGrob()].
 #' @param node_linewidth Node-border linewidth passed to [glycanGrob()].
 #' @param node_size Node-size multiplier passed to [glycanGrob()].
-#' @param font_family Font family used for text annotations.
+#' @param font_family A length-one character string naming the font family used
+#'   for linkage, substituent, and reducing-end text annotations. Portable
+#'   choices are `"sans"`, `"serif"`, and `"mono"`. Other family names, such as
+#'   installed system fonts, are graphics-device dependent. The default `""`
+#'   uses the graphics device's default font.
 #' @param colors Optional named character vector of monosaccharide fill colors
 #'   passed to [glycanGrob()].
 #' @param style A `glydraw_style` object that supplies rendering options. Its

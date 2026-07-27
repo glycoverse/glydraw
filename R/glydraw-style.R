@@ -13,8 +13,11 @@
 #' @param edge_linewidth Linewidth of glycosidic linkages.
 #' @param node_linewidth Linewidth of node borders.
 #' @param node_size Multiplier for the default node size.
-#' @param font_family Font family used for text annotations. Defaults to `""`,
-#'   which uses the graphics device's default font.
+#' @param font_family A length-one character string naming the font family used
+#'   for linkage, substituent, and reducing-end text annotations. Portable
+#'   choices are `"sans"`, `"serif"`, and `"mono"`. Other family names, such as
+#'   installed system fonts, are graphics-device dependent. The default `""`
+#'   uses the graphics device's default font.
 #' @param colors Optional named character vector of monosaccharide fill-color
 #'   overrides.
 #'
