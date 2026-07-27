@@ -449,8 +449,16 @@ test_that("glycan axis labels support reducing-end annotations", {
   ) +
     ggplot2::geom_col() +
     scale_y_glycan(red_end = "Reducing end")
+  no_red_end_plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(x = .data$structure, y = .data$value)
+  ) +
+    ggplot2::geom_col() +
+    scale_x_glycan(red_end = NULL)
   x_label <- .axis_glycan_labels(x_plot, "axis-b")$children[[1]]
   y_label <- .axis_glycan_labels(y_plot, "axis-l")$children[[1]]
+  no_red_end_label <-
+    .axis_glycan_labels(no_red_end_plot, "axis-b")$children[[1]]
 
   expect_gt(nrow(x_label$annotation_data$reducing_info$wave), 0)
   expect_true(any(
@@ -459,6 +467,14 @@ test_that("glycan axis labels support reducing-end annotations", {
   expect_match(
     y_label$annotation_data$reducing_info$annotation$annot[[2]],
     "Reducing end"
+  )
+  expect_equal(
+    vapply(
+      no_red_end_label$annotation_data$reducing_info,
+      nrow,
+      integer(1)
+    ),
+    c(annotation = 0L, segment = 0L, wave = 0L, bounds = 0L)
   )
 })
 

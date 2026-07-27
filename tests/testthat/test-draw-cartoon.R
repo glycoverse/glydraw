@@ -210,6 +210,22 @@ test_that("reducing-end beta annotations follow the physical edge direction", {
   })
 })
 
+test_that("red_end = NULL omits the complete reducing end", {
+  structure <- "Gal(b1-3)GalNAc(a1-"
+  grob <- glycanGrob(structure, red_end = NULL)
+  single_residue_grob <- glycanGrob("GlcNAc(b1-", red_end = NULL)
+  reducing_info <- grob$annotation_data$reducing_info
+
+  expect_null(glydraw_style(red_end = NULL)$red_end)
+  expect_equal(
+    vapply(reducing_info, nrow, integer(1)),
+    c(annotation = 0L, segment = 0L, wave = 0L, bounds = 0L)
+  )
+  expect_equal(nrow(grob$connect_df), 1)
+  expect_equal(nrow(single_residue_grob$connect_df), 0)
+  expect_s3_class(draw_cartoon(structure, red_end = NULL), "glydraw_cartoon")
+})
+
 test_that("draw_cartoon applies custom monosaccharide colors over defaults", {
   structure <- "Gal(b1-4)GlcNAc(b1-"
 

@@ -16,6 +16,8 @@
 
 ## Minor improvements and bug fixes
 
+* `red_end = NULL` now omits both the reducing-end line and its anomer annotation across glycan drawing interfaces.
+
 * Move beta linkage annotations slightly away from horizontal and skewed edge lines while leaving labels beside vertical edges unchanged, including reducing-end annotations. (#70)
 
 # glydraw 0.7.0

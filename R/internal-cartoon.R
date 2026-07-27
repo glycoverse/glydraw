@@ -169,7 +169,7 @@
 #'   glycan-structure object.
 #' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
 #'   `"down"`.
-#' @param red_end A non-missing string reducing-end annotation.
+#' @param red_end A non-missing string reducing-end annotation or `NULL`.
 #'
 #' @returns A list with `structure`, an igraph glycan graph; `coor`, a numeric
 #'   coordinate matrix with columns `x` and `y`; `highlight`, the validated or
@@ -181,7 +181,7 @@
   orient = c("left", "right", "up", "down"),
   red_end = ""
 ) {
-  checkmate::assert_string(red_end, na.ok = FALSE)
+  checkmate::assert_string(red_end, na.ok = FALSE, null.ok = TRUE)
   if (!is.null(highlight) && !glyrepr::is_glycan_structure(structure)) {
     cli::cli_warn(
       "{.arg highlight} can only be set when {.arg structure} is a {.fn glyrepr::glycan_structure}."
@@ -452,7 +452,7 @@
 #' @noRd
 .apply_highlight_to_annotations <- function(annotation, highlight = NULL) {
   if (is.null(highlight)) {
-    annotation$transparency <- 1
+    annotation$transparency <- rep(1, nrow(annotation))
   } else {
     annotation$transparency <- (annotation$vertice %in% highlight) * 0.7 + 0.3
   }
@@ -536,7 +536,7 @@
     end_y = gly_connect$end_y
   )
   connect_df <- dplyr::bind_rows(connect_df, reducing_segment)
-  connect_df$transparency <- gly_list$transparency
+  connect_df$transparency <- gly_list$transparency[seq_len(nrow(connect_df))]
   connect_df
 }
 

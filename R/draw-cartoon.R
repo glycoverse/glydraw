@@ -13,7 +13,8 @@
 #'   Fuc-like residues always point upward. Defaults to `"flex"`.
 #' @param red_end Reducing-end annotation. The default `""` keeps the current
 #'   reducing-end line. Use `"~"` to add a wavy reducing end, or any other
-#'   string to draw that string at the reducing end.
+#'   string to draw that string at the reducing end. Use `NULL` to omit the
+#'   reducing-end line and anomer annotation.
 #' @param edge_linewidth Numeric scalar controlling the linewidth of linkage
 #'   lines. Defaults to the current value, `0.8`.
 #' @param node_linewidth Numeric scalar controlling the linewidth of node

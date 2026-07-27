@@ -62,7 +62,8 @@ values move cartoons upward. Defaults to \code{0}.}
 the cartoons. Defaults to \code{TRUE}.}
 
 \item{red_end}{Reducing-end annotation passed to \code{\link[=glycanGrob]{glycanGrob()}}. Use \code{"~"}
-for a wave, or another string to display that text. Defaults to \code{""}.}
+for a wave, another string to display that text, or \code{NULL} to omit the
+reducing-end line and anomer annotation. Defaults to \code{""}.}
 
 \item{fuc_orient}{Fuc-like triangle orientation passed to \code{\link[=glycanGrob]{glycanGrob()}}.}
 
