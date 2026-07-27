@@ -378,7 +378,7 @@ test_that("draw_cartoon warns and hides linkage annotations for oversized nodes"
   expect_warning(
     draw_cartoon(
       structure,
-      style = style_glydraw(node_size = 1.25, red_end = "Ser/Thr")
+      style = style_glydraw(node_size = 1.5, red_end = "Ser/Thr")
     ),
     "Linkage annotations are hidden"
   )
