@@ -39,7 +39,8 @@ glydraw_style(
 
 - red_end:
 
-  Reducing-end annotation. Use `"~"` for a wave.
+  Reducing-end annotation. Use `"~"` for a wave or `NULL` to omit the
+  reducing-end line and anomer annotation.
 
 - edge_linewidth:
 

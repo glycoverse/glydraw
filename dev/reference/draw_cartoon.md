@@ -57,7 +57,8 @@ draw_cartoon(
 
   Reducing-end annotation. The default `""` keeps the current
   reducing-end line. Use `"~"` to add a wavy reducing end, or any other
-  string to draw that string at the reducing end.
+  string to draw that string at the reducing end. Use `NULL` to omit the
+  reducing-end line and anomer annotation.
 
 - edge_linewidth:
 

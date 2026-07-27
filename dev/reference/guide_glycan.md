@@ -126,8 +126,8 @@ guide_glycan(
 
   Reducing-end annotation passed to
   [`glycanGrob()`](https://glycoverse.github.io/glydraw/dev/reference/glycanGrob.md).
-  Use `"~"` for a wave, or another string to display that text. Defaults
-  to `""`.
+  Use `"~"` for a wave, another string to display that text, or `NULL`
+  to omit the reducing-end line and anomer annotation. Defaults to `""`.
 
 - fuc_orient:
 
