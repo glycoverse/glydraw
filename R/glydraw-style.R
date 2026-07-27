@@ -19,8 +19,8 @@
 #'   choices are `"sans"`, `"serif"`, and `"mono"`. Other family names, such as
 #'   installed system fonts, are graphics-device dependent. The default `""`
 #'   uses the graphics device's default font.
-#' @param colors Optional named character vector of monosaccharide fill-color
-#'   overrides.
+#' @param colors A named character vector of SNFG colors in the format returned
+#'   by [glydraw_colors()]. Names must be complete and match that palette.
 #'
 #' @returns A `glydraw_style` object.
 #'
@@ -37,7 +37,7 @@ glydraw_style <- function(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "",
-  colors = NULL
+  colors = glydraw_colors()
 ) {
   checkmate::assert_flag(show_linkage)
   orient <- rlang::arg_match(orient)
@@ -47,7 +47,7 @@ glydraw_style <- function(
   checkmate::assert_number(node_linewidth, lower = 0)
   .validate_node_size(node_size)
   checkmate::assert_string(font_family, na.ok = FALSE)
-  colors <- .validate_custom_colors(colors)
+  colors <- .validate_colors(colors)
 
   structure(
     list(

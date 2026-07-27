@@ -144,6 +144,8 @@ test_that("guide_glycan draws scale labels as cartoons", {
     B = "Gal(b1-4)GlcNAc(b1-"
   )
   data <- data.frame(group = names(structures), value = c(1, 2))
+  colors <- glydraw_colors()
+  colors["glyYellow"] <- "#123456"
   plot <- ggplot2::ggplot(
     data,
     ggplot2::aes(x = .data$group, y = .data$value, fill = .data$group)
@@ -151,7 +153,7 @@ test_that("guide_glycan draws scale labels as cartoons", {
     ggplot2::geom_col() +
     ggplot2::scale_fill_discrete(
       labels = structures,
-      guide = guide_glycan(orient = "up", colors = c(Gal = "#123456"))
+      guide = guide_glycan(orient = "up", colors = colors)
     )
 
   legend <- .glycan_legend_table(plot)

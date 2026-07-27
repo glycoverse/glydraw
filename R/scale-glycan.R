@@ -50,8 +50,8 @@
 #'   choices are `"sans"`, `"serif"`, and `"mono"`. Other family names, such as
 #'   installed system fonts, are graphics-device dependent. The default `""`
 #'   uses the graphics device's default font.
-#' @param colors Optional named character vector of monosaccharide fill colors
-#'   passed to [glycanGrob()].
+#' @param colors A named character vector of SNFG colors in the format returned
+#'   by [glydraw_colors()]. Names must be complete and match that palette.
 #' @param style A `glydraw_style` object that supplies rendering options. Its
 #'   orientation is ignored because each scale determines the axis direction.
 #'   Explicitly supplied rendering arguments override it.
@@ -92,7 +92,7 @@ scale_x_glycan <- function(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "",
-  colors = NULL,
+  colors = glydraw_colors(),
   style = NULL
 ) {
   style <- .resolve_glydraw_style(
@@ -171,7 +171,7 @@ scale_y_glycan <- function(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "",
-  colors = NULL,
+  colors = glydraw_colors(),
   style = NULL
 ) {
   style <- .resolve_glydraw_style(
@@ -243,7 +243,7 @@ scale_y_glycan <- function(
 #' @param node_linewidth Node-border linewidth.
 #' @param node_size Node-size multiplier.
 #' @param font_family Font family used for text annotations.
-#' @param colors Named monosaccharide fill-color overrides.
+#' @param colors Named SNFG colors in the format returned by [glydraw_colors()].
 #'
 #' @returns A ggplot2 `GuideGlycanAxis` object.
 #' @noRd
@@ -349,7 +349,7 @@ scale_y_glycan <- function(
 #' @param node_linewidth Node-border linewidth.
 #' @param node_size Node-size multiplier.
 #' @param font_family Font family used for text annotations.
-#' @param colors Named monosaccharide fill-color overrides.
+#' @param colors Named SNFG colors in the format returned by [glydraw_colors()].
 #'
 #' @returns A validated list of glycan label options.
 #' @noRd
@@ -383,7 +383,7 @@ scale_y_glycan <- function(
   checkmate::assert_string(red_end, na.ok = FALSE, null.ok = TRUE)
   checkmate::assert_string(font_family, na.ok = FALSE)
   .validate_node_size(node_size)
-  colors <- .validate_custom_colors(colors)
+  colors <- .validate_colors(colors)
   fuc_orient <- rlang::arg_match(fuc_orient, c("flex", "up"))
   show_linkage <- .resolve_linkage_visibility(show_linkage, node_size)
 

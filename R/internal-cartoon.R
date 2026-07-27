@@ -45,72 +45,54 @@
   FALSE
 }
 
-#' Validate custom monosaccharide colors
+#' Validate SNFG colors
 #'
-#' @param colors `NULL` or a named character vector of color values.
+#' @param colors A named character vector of SNFG color values.
 #'
-#' @returns A named character vector of custom colors.
+#' @returns A named character vector of SNFG colors.
 #' @noRd
-.validate_custom_colors <- function(colors = NULL) {
-  if (is.null(colors)) {
-    return(character())
-  }
-
+.validate_colors <- function(colors = glydraw_colors()) {
   checkmate::assert_character(colors, any.missing = FALSE)
-  if (length(colors) == 0) {
-    return(character())
-  }
-
   color_names <- names(colors)
+  expected_names <- names(glydraw_colors())
   if (
     is.null(color_names) ||
-      anyNA(color_names) ||
-      any(color_names == "") ||
-      anyDuplicated(color_names)
+      length(color_names) != length(expected_names) ||
+      anyDuplicated(color_names) ||
+      !setequal(color_names, expected_names)
   ) {
     cli::cli_abort(
-      "{.arg colors} must be a character vector with unique, non-empty names."
+      "{.arg colors} must have exactly the names returned by {.fn glydraw_colors}."
     )
   }
 
-  supported_monosaccharides <- .supported_color_monosaccharides()
-  invalid_names <- setdiff(color_names, supported_monosaccharides)
-  if (length(invalid_names) > 0) {
-    cli::cli_abort(c(
-      "{.arg colors} must be named with supported monosaccharides.",
-      "x" = "Unsupported {cli::qty(invalid_names)} name{?s}: {.val {invalid_names}}."
-    ))
+  valid_colors <- vapply(
+    colors,
+    function(color) {
+      !inherits(try(grDevices::col2rgb(color), silent = TRUE), "try-error")
+    },
+    logical(1)
+  )
+  if (any(!valid_colors)) {
+    cli::cli_abort("{.arg colors} must contain only valid R colors.")
   }
 
   invisible(colors)
 }
 
-#' Get monosaccharide names accepted by custom colors
-#'
-#' @returns A character vector of supported public monosaccharide names.
-#' @noRd
-.supported_color_monosaccharides <- function() {
-  setdiff(names(glycan_dict), .directional_fucose_like_glycoforms())
-}
-
 #' Resolve polygon fill colors
 #'
 #' @param polygon_coor A data frame returned by `.residue_polygon_data()`.
-#' @param colors A named character vector returned by `.validate_custom_colors()`.
+#' @param colors A named character vector returned by `.validate_colors()`.
 #'
 #' @returns A character vector of polygon fill colors, one value per row in
 #'   `polygon_coor`.
 #' @noRd
-.resolve_residue_fill_colors <- function(polygon_coor, colors = character()) {
-  default_colors <- glycan_color[as.character(polygon_coor$color)]
-  if (length(colors) == 0) {
-    return(unname(default_colors))
-  }
-
-  custom_colors <- colors[as.character(polygon_coor$mono)]
-  has_custom_color <- !is.na(custom_colors)
-  default_colors[has_custom_color] <- custom_colors[has_custom_color]
-  unname(default_colors)
+.resolve_residue_fill_colors <- function(
+  polygon_coor,
+  colors = glydraw_colors()
+) {
+  unname(colors[as.character(polygon_coor$color)])
 }
 
 #' Convert residue centers to polygon vertices

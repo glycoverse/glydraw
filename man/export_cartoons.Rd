@@ -19,7 +19,7 @@ export_cartoons(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "",
-  colors = NULL,
+  colors = glydraw_colors(),
   style = NULL
 )
 }
@@ -73,10 +73,8 @@ choices are \code{"sans"}, \code{"serif"}, and \code{"mono"}. Other family names
 installed system fonts, are graphics-device dependent. The default \code{""}
 uses the graphics device's default font.}
 
-\item{colors}{Optional named character vector of custom monosaccharide fill
-colors. Names must be supported monosaccharide names, such as \code{"Gal"} or
-\code{"GlcNAc"}. User-provided colors overwrite the default SNFG colors, while
-unprovided monosaccharides keep their default colors. Defaults to \code{NULL}.}
+\item{colors}{A named character vector of SNFG colors in the format returned
+by \code{\link[=glydraw_colors]{glydraw_colors()}}. Names must be complete and match that palette.}
 
 \item{style}{A \code{glydraw_style} object that supplies rendering options.
 Explicitly supplied rendering arguments override it.}

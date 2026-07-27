@@ -29,10 +29,8 @@
 #'   choices are `"sans"`, `"serif"`, and `"mono"`. Other family names, such as
 #'   installed system fonts, are graphics-device dependent. The default `""`
 #'   uses the graphics device's default font.
-#' @param colors Optional named character vector of custom monosaccharide fill
-#'   colors. Names must be supported monosaccharide names, such as `"Gal"` or
-#'   `"GlcNAc"`. User-provided colors overwrite the default SNFG colors, while
-#'   unprovided monosaccharides keep their default colors. Defaults to `NULL`.
+#' @param colors A named character vector of SNFG colors in the format returned
+#'   by [glydraw_colors()]. Names must be complete and match that palette.
 #' @param style A `glydraw_style` object that supplies rendering options.
 #'   Explicitly supplied rendering arguments override it.
 #' @param highlight An integer vector specifying the node indices to highlight.
@@ -58,7 +56,7 @@ draw_cartoon <- function(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "",
-  colors = NULL,
+  colors = glydraw_colors(),
   highlight = NULL,
   style = NULL
 ) {

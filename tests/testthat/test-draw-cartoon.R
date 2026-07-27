@@ -226,10 +226,12 @@ test_that("red_end = NULL omits the complete reducing end", {
   expect_s3_class(draw_cartoon(structure, red_end = NULL), "glydraw_cartoon")
 })
 
-test_that("draw_cartoon applies custom monosaccharide colors over defaults", {
+test_that("draw_cartoon applies a complete custom SNFG palette", {
   structure <- "Gal(b1-4)GlcNAc(b1-"
+  colors <- glydraw_colors()
+  colors["glyYellow"] <- "#123456"
 
-  plot <- draw_cartoon(structure, colors = c(Gal = "#123456"))
+  plot <- draw_cartoon(structure, colors = colors)
   node_fill <- unique(ggplot2::ggplot_build(plot)$data[[3]]$fill)
 
   expect_contains(node_fill, "#123456")
@@ -238,12 +240,14 @@ test_that("draw_cartoon applies custom monosaccharide colors over defaults", {
 
 test_that("draw_cartoon accepts reusable glydraw styles", {
   structure <- "Gal(b1-4)GlcNAc(b1-"
+  colors <- glydraw_colors()
+  colors["glyYellow"] <- "#123456"
   style <- glydraw_style(
     show_linkage = FALSE,
     orient = "up",
     edge_linewidth = 1.2,
     font_family = "serif",
-    colors = c(Gal = "#123456")
+    colors = colors
   )
 
   styled_plot <- draw_cartoon(structure, style = style)
@@ -272,12 +276,29 @@ test_that("draw_cartoon validates NULL style overrides", {
   )
 })
 
-test_that("draw_cartoon rejects unsupported custom color names", {
+test_that("draw_cartoon requires the complete named SNFG palette", {
   structure <- "Gal(b1-4)GlcNAc(b1-"
+  colors <- glydraw_colors()
 
+  expect_identical(glydraw_style()$colors, glydraw_colors())
   expect_error(
-    draw_cartoon(structure, colors = c(NotAMono = "#123456")),
-    "supported monosaccharides"
+    draw_cartoon(structure, colors = colors[-1]),
+    "exactly the names"
+  )
+  expect_error(
+    draw_cartoon(structure, colors = c(colors, extra = "#123456")),
+    "exactly the names"
+  )
+  names(colors)[2] <- names(colors)[1]
+  expect_error(
+    draw_cartoon(structure, colors = colors),
+    "exactly the names"
+  )
+  colors <- glydraw_colors()
+  colors["glyYellow"] <- "not-a-color"
+  expect_error(
+    draw_cartoon(structure, colors = colors),
+    "valid R colors"
   )
 })
 
