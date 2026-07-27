@@ -47,7 +47,7 @@ export_cartoons <- function(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "",
-  colors = NULL,
+  colors = glydraw_colors(),
   style = NULL
 ) {
   if (!missing(dpi)) {
@@ -73,7 +73,7 @@ export_cartoons.character <- function(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "",
-  colors = NULL,
+  colors = glydraw_colors(),
   style = NULL
 ) {
   style <- .resolve_glydraw_style(
@@ -132,7 +132,7 @@ export_cartoons.glyrepr_structure <- function(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "",
-  colors = NULL,
+  colors = glydraw_colors(),
   style = NULL
 ) {
   style <- .resolve_glydraw_style(
@@ -191,7 +191,7 @@ export_cartoons.glyrepr_structure <- function(
   colors
 ) {
   .validate_node_size(node_size)
-  colors <- .validate_custom_colors(colors)
+  colors <- .validate_colors(colors)
   fuc_orient <- rlang::arg_match(fuc_orient, c("flex", "up"))
   cli::cli_alert_info("Exporting {.val {length(glycans)}} glycan cartoons.")
   fs::dir_create(dirname)

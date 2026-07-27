@@ -22,9 +22,11 @@ test_that("glycanGrob constructs a drawable grid grob", {
 })
 
 test_that("glycanGrob converts to the existing cartoon plot contract", {
+  colors <- glydraw_colors()
+  colors["glyYellow"] <- "#123456"
   grob <- glycanGrob(
     "Gal(b1-4)GlcNAc(b1-",
-    colors = c(Gal = "#123456"),
+    colors = colors,
     edge_linewidth = 1.1,
     node_linewidth = 0.3
   )

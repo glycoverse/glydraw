@@ -25,7 +25,7 @@ glycanGrob <- function(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "",
-  colors = NULL,
+  colors = glydraw_colors(),
   highlight = NULL,
   style = NULL
 ) {

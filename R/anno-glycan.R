@@ -52,8 +52,8 @@
 #'   choices are `"sans"`, `"serif"`, and `"mono"`. Other family names, such as
 #'   installed system fonts, are graphics-device dependent. The default `""`
 #'   uses the graphics device's default font.
-#' @param colors Optional named character vector of monosaccharide fill colors
-#'   passed to [glycanGrob()].
+#' @param colors A named character vector of SNFG colors in the format returned
+#'   by [glydraw_colors()]. Names must be complete and match that palette.
 #' @param style A `glydraw_style` object that supplies rendering options. Its
 #'   orientation is ignored because `which` determines the label direction.
 #'   Explicitly supplied rendering arguments override it.
@@ -110,7 +110,7 @@ anno_glycan <- function(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "",
-  colors = NULL,
+  colors = glydraw_colors(),
   style = NULL,
   width = NULL,
   height = NULL,

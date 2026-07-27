@@ -50,6 +50,8 @@ test_that("export_cartoons forwards custom linewidths", {
   temp_dir <- tempfile()
   on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
   fs::dir_create(temp_dir)
+  colors <- glydraw_colors()
+  colors["glyYellow"] <- "#123456"
 
   suppressMessages(
     result <- export_cartoons(
@@ -69,12 +71,14 @@ test_that("export_cartoons forwards custom colors", {
   temp_dir <- tempfile()
   on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
   fs::dir_create(temp_dir)
+  colors <- glydraw_colors()
+  colors["glyYellow"] <- "#123456"
 
   suppressMessages(
     result <- export_cartoons(
       glycans,
       temp_dir,
-      style = glydraw_style(colors = c(Gal = "#123456"))
+      style = glydraw_style(colors = colors)
     )
   )
   node_fill <- unique(ggplot2::ggplot_build(result[[1]])$data[[3]]$fill)

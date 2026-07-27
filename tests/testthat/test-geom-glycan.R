@@ -67,6 +67,8 @@ test_that("geom_glycan draws one configured glycan grob per row", {
       "Gal(b1-4)GlcNAc(b1-"
     )
   )
+  colors <- glydraw_colors()
+  colors["glyYellow"] <- "#123456"
   plot <- ggplot2::ggplot(
     data,
     ggplot2::aes(
@@ -80,7 +82,7 @@ test_that("geom_glycan draws one configured glycan grob per row", {
         show_linkage = FALSE,
         edge_linewidth = 1.1,
         node_linewidth = 0.3,
-        colors = c(Gal = "#123456")
+        colors = colors
       )
     )
 

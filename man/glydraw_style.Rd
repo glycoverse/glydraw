@@ -13,7 +13,7 @@ glydraw_style(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "",
-  colors = NULL
+  colors = glydraw_colors()
 )
 }
 \arguments{
@@ -39,8 +39,8 @@ choices are \code{"sans"}, \code{"serif"}, and \code{"mono"}. Other family names
 installed system fonts, are graphics-device dependent. The default \code{""}
 uses the graphics device's default font.}
 
-\item{colors}{Optional named character vector of monosaccharide fill-color
-overrides.}
+\item{colors}{A named character vector of SNFG colors in the format returned
+by \code{\link[=glydraw_colors]{glydraw_colors()}}. Names must be complete and match that palette.}
 }
 \value{
 A \code{glydraw_style} object.

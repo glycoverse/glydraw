@@ -26,7 +26,7 @@ scale_x_glycan(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "",
-  colors = NULL,
+  colors = glydraw_colors(),
   style = NULL
 )
 
@@ -51,7 +51,7 @@ scale_y_glycan(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "",
-  colors = NULL,
+  colors = glydraw_colors(),
   style = NULL
 )
 }
@@ -116,8 +116,8 @@ choices are \code{"sans"}, \code{"serif"}, and \code{"mono"}. Other family names
 installed system fonts, are graphics-device dependent. The default \code{""}
 uses the graphics device's default font.}
 
-\item{colors}{Optional named character vector of monosaccharide fill colors
-passed to \code{\link[=glycanGrob]{glycanGrob()}}.}
+\item{colors}{A named character vector of SNFG colors in the format returned
+by \code{\link[=glydraw_colors]{glydraw_colors()}}. Names must be complete and match that palette.}
 
 \item{style}{A \code{glydraw_style} object that supplies rendering options. Its
 orientation is ignored because each scale determines the axis direction.
