@@ -54,38 +54,3 @@ glydraw_style <- function(
     class = "glydraw_style"
   )
 }
-
-#' Resolve rendering arguments against an optional drawing style
-#'
-#' @param style A `glydraw_style` object or `NULL`.
-#' @returns A validated `glydraw_style` object.
-#' @noRd
-.resolve_glydraw_style <- function(style = NULL) {
-  if (is.null(style)) {
-    return(glydraw_style())
-  }
-  if (!inherits(style, "glydraw_style")) {
-    cli::cli_abort("{.arg style} must be a {.cls glydraw_style} object.")
-  }
-  do.call(glydraw_style, unclass(style))
-}
-
-#' Reject cartoon style options supplied outside `style`
-#'
-#' @param ... Arguments to inspect.
-#'
-#' @returns `NULL`, invisibly.
-#' @noRd
-.check_no_explicit_style_arguments <- function(...) {
-  arguments <- intersect(
-    names(rlang::list2(...)),
-    names(formals(glydraw_style))
-  )
-  if (length(arguments) > 0L) {
-    cli::cli_abort(c(
-      "Cartoon styling arguments must be supplied through {.arg style}.",
-      "i" = "Move {cli::qty(arguments)} {.arg {arguments}} argument{?s} into {.fn glydraw_style}."
-    ))
-  }
-  invisible(NULL)
-}

@@ -89,7 +89,7 @@ anno_glycan <- function(
   nudge_x = 0,
   nudge_y = 0,
   show_linkage = TRUE,
-  style = NULL,
+  style = glydraw_style(),
   width = NULL,
   height = NULL,
   show_name = FALSE
@@ -111,7 +111,6 @@ anno_glycan <- function(
   }
   checkmate::assert_flag(show_name)
 
-  style <- .resolve_glydraw_style(style)
   options <- .validate_glycan_label_options(
     orient = orient,
     size = size,

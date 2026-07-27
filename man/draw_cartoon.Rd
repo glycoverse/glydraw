@@ -10,7 +10,7 @@ draw_cartoon(
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
   highlight = NULL,
-  style = NULL
+  style = glydraw_style()
 )
 }
 \arguments{

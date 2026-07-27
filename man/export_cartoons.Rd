@@ -13,7 +13,7 @@ export_cartoons(
   scale = 1,
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
-  style = NULL
+  style = glydraw_style()
 )
 }
 \arguments{

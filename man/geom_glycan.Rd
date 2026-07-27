@@ -14,7 +14,7 @@ geom_glycan(
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
   highlight = NULL,
-  style = NULL,
+  style = glydraw_style(),
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE

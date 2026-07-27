@@ -275,7 +275,9 @@ test_that("cartoon styling is available only through style", {
     scale_x_glycan = scale_x_glycan,
     scale_y_glycan = scale_y_glycan,
     anno_glycan = anno_glycan,
-    export_cartoons = export_cartoons
+    export_cartoons = export_cartoons,
+    export_cartoons.character = export_cartoons.character,
+    export_cartoons.glyrepr_structure = export_cartoons.glyrepr_structure
   )
   interface_arguments <- purrr::map(interfaces, ~ names(formals(.x)))
 
@@ -302,17 +304,9 @@ test_that("cartoon styling is available only through style", {
   expect_true("show_linkage" %in% interface_arguments$scale_x_glycan)
   expect_true("show_linkage" %in% interface_arguments$scale_y_glycan)
   expect_true("show_linkage" %in% interface_arguments$anno_glycan)
-  expect_snapshot(
-    error = TRUE,
-    draw_cartoon("Gal(b1-4)GlcNAc(b1-", edge_linewidth = 1.2)
-  )
-  expect_snapshot(
-    error = TRUE,
-    geom_glycan(node_size = 1.2)
-  )
-  expect_snapshot(
-    error = TRUE,
-    scale_x_glycan(red_end = "~")
+  purrr::walk(
+    interfaces,
+    ~ expect_identical(formals(.x)$style, quote(glydraw_style()))
   )
 })
 

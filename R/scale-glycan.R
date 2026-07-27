@@ -71,10 +71,8 @@ scale_x_glycan <- function(
   nudge_x = 0,
   nudge_y = 0,
   show_linkage = TRUE,
-  style = NULL
+  style = glydraw_style()
 ) {
-  .check_no_explicit_style_arguments(...)
-  style <- .resolve_glydraw_style(style)
   guide <- .new_glycan_axis_guide(
     orient = "up",
     size = size,
@@ -124,10 +122,8 @@ scale_y_glycan <- function(
   nudge_x = 0,
   nudge_y = 0,
   show_linkage = TRUE,
-  style = NULL
+  style = glydraw_style()
 ) {
-  .check_no_explicit_style_arguments(...)
-  style <- .resolve_glydraw_style(style)
   guide <- .new_glycan_axis_guide(
     orient = "left",
     size = size,

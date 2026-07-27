@@ -19,7 +19,7 @@ guide_glycan(
   hjust = 0,
   vjust = vjust_red_end(),
   show_linkage = TRUE,
-  style = NULL
+  style = glydraw_style()
 )
 }
 \arguments{

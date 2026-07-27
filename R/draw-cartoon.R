@@ -30,9 +30,8 @@ draw_cartoon <- function(
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
   highlight = NULL,
-  style = NULL
+  style = glydraw_style()
 ) {
-  .check_no_explicit_style_arguments(...)
   glycanGrob(
     structure,
     ...,
