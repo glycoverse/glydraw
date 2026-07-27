@@ -9,7 +9,8 @@
 #' @param orient Direction in which the glycan extends from its reducing end:
 #'   one of `"left"`, `"right"`, `"up"`, or `"down"`. Defaults to `"left"`.
 #' @param fuc_orient Fuc-like triangle orientation: `"flex"` or `"up"`.
-#' @param red_end Reducing-end annotation. Use `"~"` for a wave.
+#' @param red_end Reducing-end annotation. Use `"~"` for a wave or `NULL` to
+#'   omit the reducing-end line and anomer annotation.
 #' @param edge_linewidth Linewidth of glycosidic linkages.
 #' @param node_linewidth Linewidth of node borders.
 #' @param node_size Multiplier for the default node size.
@@ -41,7 +42,7 @@ glydraw_style <- function(
   checkmate::assert_flag(show_linkage)
   orient <- rlang::arg_match(orient)
   fuc_orient <- rlang::arg_match(fuc_orient)
-  checkmate::assert_string(red_end, na.ok = FALSE)
+  checkmate::assert_string(red_end, na.ok = FALSE, null.ok = TRUE)
   checkmate::assert_number(edge_linewidth, lower = 0)
   checkmate::assert_number(node_linewidth, lower = 0)
   .validate_node_size(node_size)

@@ -24,7 +24,8 @@ one of \code{"left"}, \code{"right"}, \code{"up"}, or \code{"down"}. Defaults to
 
 \item{fuc_orient}{Fuc-like triangle orientation: \code{"flex"} or \code{"up"}.}
 
-\item{red_end}{Reducing-end annotation. Use \code{"~"} for a wave.}
+\item{red_end}{Reducing-end annotation. Use \code{"~"} for a wave or \code{NULL} to
+omit the reducing-end line and anomer annotation.}
 
 \item{edge_linewidth}{Linewidth of glycosidic linkages.}
 

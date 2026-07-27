@@ -22,7 +22,8 @@
 #' @param show_linkage Whether to show glycosidic linkage annotations inside
 #'   the cartoons. Defaults to `TRUE`.
 #' @param red_end Reducing-end annotation passed to [glycanGrob()]. Use `"~"`
-#'   for a wave, or another string to display that text. Defaults to `""`.
+#'   for a wave, another string to display that text, or `NULL` to omit the
+#'   reducing-end line and anomer annotation. Defaults to `""`.
 #' @param fuc_orient Fuc-like triangle orientation passed to [glycanGrob()].
 #' @param edge_linewidth Linkage linewidth passed to [glycanGrob()].
 #' @param node_linewidth Node-border linewidth passed to [glycanGrob()].

@@ -39,7 +39,8 @@
 #' @param show_linkage Whether to show glycosidic linkage annotations inside
 #'   the cartoons. Defaults to `TRUE`.
 #' @param red_end Reducing-end annotation passed to [glycanGrob()]. Use `"~"`
-#'   for a wave, or another string to display that text. Defaults to `""`.
+#'   for a wave, another string to display that text, or `NULL` to omit the
+#'   reducing-end line and anomer annotation. Defaults to `""`.
 #' @param fuc_orient Fuc-like triangle orientation passed to [glycanGrob()].
 #' @param edge_linewidth Linkage linewidth passed to [glycanGrob()].
 #' @param node_linewidth Node-border linewidth passed to [glycanGrob()].
@@ -379,7 +380,7 @@ scale_y_glycan <- function(
   checkmate::assert_number(nudge_y, finite = TRUE)
   checkmate::assert_number(edge_linewidth, lower = 0)
   checkmate::assert_number(node_linewidth, lower = 0)
-  checkmate::assert_string(red_end, na.ok = FALSE)
+  checkmate::assert_string(red_end, na.ok = FALSE, null.ok = TRUE)
   checkmate::assert_string(font_family, na.ok = FALSE)
   .validate_node_size(node_size)
   colors <- .validate_custom_colors(colors)

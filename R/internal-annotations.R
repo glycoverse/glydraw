@@ -1124,8 +1124,9 @@
 #'   per graph vertex.
 #' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
 #'   `"down"`.
-#' @param red_end A string. `""` draws only the current reducing-end line,
-#'   `"~"` draws a wavy end, and any other string draws custom text.
+#' @param red_end A string or `NULL`. `NULL` omits the reducing end, `""`
+#'   draws only the current reducing-end line, `"~"` draws a wavy end, and any
+#'   other string draws custom text.
 #'
 #' @returns A list with data frames `annotation`, `segment`, `wave`, and
 #'   `bounds`. `annotation` contains text rows; `segment` contains one line
@@ -1139,6 +1140,9 @@
   red_end = ""
 ) {
   orient <- rlang::arg_match(orient)
+  if (is.null(red_end)) {
+    return(.empty_reducing_end_annotation_data())
+  }
   anomer <- igraph::graph_attr(structure, "anomer")
   if (.has_no_reducing_end_anomer(anomer)) {
     return(.empty_reducing_end_annotation_data())

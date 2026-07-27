@@ -39,7 +39,8 @@ Fuc-like residues always point upward. Defaults to \code{"flex"}.}
 
 \item{red_end}{Reducing-end annotation. The default \code{""} keeps the current
 reducing-end line. Use \code{"~"} to add a wavy reducing end, or any other
-string to draw that string at the reducing end.}
+string to draw that string at the reducing end. Use \code{NULL} to omit the
+reducing-end line and anomer annotation.}
 
 \item{edge_linewidth}{Numeric scalar controlling the linewidth of linkage
 lines. Defaults to the current value, \code{0.8}.}
