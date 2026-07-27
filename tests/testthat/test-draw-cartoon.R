@@ -167,6 +167,49 @@ test_that("beta annotations are nudged perpendicular to linkage lines", {
   expect_equal(.beta_perpendicular_nudge_for_linkage("a1", 0, 1), 0)
 })
 
+test_that("reducing-end beta annotations follow the physical edge direction", {
+  purrr::walk(c("left", "right", "up", "down"), function(orient) {
+    beta_inputs <- .prepare_cartoon_inputs(
+      "Gal(b1-3)GalNAc(b1-",
+      NULL,
+      orient,
+      ""
+    )
+    alpha_inputs <- .prepare_cartoon_inputs(
+      "Gal(b1-3)GalNAc(a1-",
+      NULL,
+      orient,
+      ""
+    )
+    beta <- .reducing_end_annotation_data(
+      beta_inputs$structure,
+      beta_inputs$coor,
+      orient
+    )
+    alpha <- .reducing_end_annotation_data(
+      alpha_inputs$structure,
+      alpha_inputs$coor,
+      orient
+    )
+    direction <- c(
+      beta$segment$end_x - beta$segment$start_x,
+      beta$segment$end_y - beta$segment$start_y
+    )
+    nudge <- c(
+      beta$annotation$x[[1]] - alpha$annotation$x[[1]],
+      beta$annotation$y[[1]] - alpha$annotation$y[[1]]
+    )
+    expected_nudge <- .beta_perpendicular_nudge_for_linkage(
+      "beta",
+      beta$segment$start_x,
+      beta$segment$end_x
+    )
+
+    expect_equal(sum(nudge * direction), 0, tolerance = 1e-12)
+    expect_equal(sqrt(sum(nudge^2)), expected_nudge)
+  })
+})
+
 test_that("draw_cartoon applies custom monosaccharide colors over defaults", {
   structure <- "Gal(b1-4)GlcNAc(b1-"
 

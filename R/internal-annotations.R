@@ -1146,7 +1146,7 @@
 
   label <- .reducing_end_anomer_label(anomer)
   root <- length(structure)
-  geometry <- .reducing_end_geometry(coor[root, ], orient)
+  geometry <- .reducing_end_geometry(coor[root, ], orient, label = label)
   red_end_annotation <- .reducing_end_text_data(
     red_end,
     geometry$line_end,
@@ -1249,6 +1249,7 @@
 #'   reducing-end residue.
 #' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
 #'   `"down"`.
+#' @param label The reducing-end anomer label.
 #' @param line_length Numeric length of the reducing-end line segment.
 #' @param label_offset Numeric extra distance between the line length and the
 #'   anomer label anchor before rotation.
@@ -1259,6 +1260,7 @@
 .reducing_end_geometry <- function(
   root_coor,
   orient,
+  label = "",
   line_length = 0.6,
   label_offset = 0.1
 ) {
@@ -1268,7 +1270,24 @@
   )
   line_vec <- .reducing_end_line_vector(orient, line_length)
   label_vec <- .reducing_end_line_vector(orient, line_length + label_offset)
-  label_coor <- root_coor + .rotated_reducing_end_label_vector(label_vec)
+  label_position_offset <- matrix(
+    .rotated_reducing_end_label_vector(label_vec),
+    ncol = 1
+  )
+  label_position_offset <- .nudge_child_label_perpendicular(
+    label_offset = label_position_offset,
+    direction = matrix(line_vec, ncol = 1),
+    nudge = .beta_perpendicular_nudge_for_linkage(
+      label,
+      root_coor[["x"]],
+      root_coor[["x"]] + line_vec[["x"]]
+    )
+  )
+  label_coor <- root_coor +
+    c(
+      x = as.numeric(label_position_offset[1, 1]),
+      y = as.numeric(label_position_offset[2, 1])
+    )
 
   list(
     root_coor = root_coor,
