@@ -86,6 +86,130 @@ test_that("Greek anomer annotations use the selected text family", {
   )
 })
 
+test_that("beta annotations are nudged perpendicular to linkage lines", {
+  purrr::walk(c("left", "right", "up", "down"), function(orient) {
+    beta_inputs <- .prepare_cartoon_inputs(
+      "Gal(b1-3)GalNAc(a1-",
+      NULL,
+      orient,
+      ""
+    )
+    alpha_inputs <- .prepare_cartoon_inputs(
+      "Gal(a1-3)GalNAc(a1-",
+      NULL,
+      orient,
+      ""
+    )
+    beta <- .linkage_annotation_data(
+      beta_inputs$structure,
+      beta_inputs$coor,
+      orient = orient
+    )[1, ]
+    alpha <- .linkage_annotation_data(
+      alpha_inputs$structure,
+      alpha_inputs$coor,
+      orient = orient
+    )[1, ]
+    direction <- c(
+      beta$segment_end_x - beta$segment_start_x,
+      beta$segment_end_y - beta$segment_start_y
+    )
+    nudge <- c(beta$x - alpha$x, beta$y - alpha$y)
+    clockwise_normal <- c(direction[[2]], -direction[[1]]) /
+      sqrt(sum(direction^2))
+    beta_offset <- c(
+      beta$x - beta$segment_start_x,
+      beta$y - beta$segment_start_y
+    )
+    alpha_offset <- c(
+      alpha$x - alpha$segment_start_x,
+      alpha$y - alpha$segment_start_y
+    )
+    expected_nudge <- .beta_perpendicular_nudge_for_linkage(
+      "b1",
+      beta$segment_start_x,
+      beta$segment_end_x
+    )
+
+    expect_equal(sum(nudge * direction), 0, tolerance = 1e-12)
+    expect_equal(sqrt(sum(nudge^2)), expected_nudge)
+    if (expected_nudge > 0) {
+      expect_gt(
+        sum(beta_offset * clockwise_normal),
+        sum(alpha_offset * clockwise_normal)
+      )
+    } else {
+      expect_equal(beta_offset, alpha_offset)
+    }
+  })
+
+  skewed <- .linkage_label_positions(0, 0, 1, 0.5)
+  skewed_nudged <- .linkage_label_positions(
+    0,
+    0,
+    1,
+    0.5,
+    chil_perpendicular_nudge = .beta_perpendicular_nudge_for_linkage(
+      "b1",
+      0,
+      1
+    )
+  )
+  skewed_direction <- c(1, 0.5)
+  skewed_delta <- as.vector(skewed_nudged$chil - skewed$chil)
+
+  expect_equal(sum(skewed_delta * skewed_direction), 0, tolerance = 1e-12)
+  expect_equal(
+    sqrt(sum(skewed_delta^2)),
+    .beta_annotation_perpendicular_nudge
+  )
+  expect_equal(.beta_perpendicular_nudge_for_linkage("b1", 0, 0), 0)
+  expect_equal(.beta_perpendicular_nudge_for_linkage("a1", 0, 1), 0)
+})
+
+test_that("reducing-end beta annotations follow the physical edge direction", {
+  purrr::walk(c("left", "right", "up", "down"), function(orient) {
+    beta_inputs <- .prepare_cartoon_inputs(
+      "Gal(b1-3)GalNAc(b1-",
+      NULL,
+      orient,
+      ""
+    )
+    alpha_inputs <- .prepare_cartoon_inputs(
+      "Gal(b1-3)GalNAc(a1-",
+      NULL,
+      orient,
+      ""
+    )
+    beta <- .reducing_end_annotation_data(
+      beta_inputs$structure,
+      beta_inputs$coor,
+      orient
+    )
+    alpha <- .reducing_end_annotation_data(
+      alpha_inputs$structure,
+      alpha_inputs$coor,
+      orient
+    )
+    direction <- c(
+      beta$segment$end_x - beta$segment$start_x,
+      beta$segment$end_y - beta$segment$start_y
+    )
+    nudge <- c(
+      beta$annotation$x[[1]] - alpha$annotation$x[[1]],
+      beta$annotation$y[[1]] - alpha$annotation$y[[1]]
+    )
+    expected_nudge <- .beta_perpendicular_nudge_for_linkage(
+      "beta",
+      beta$segment$start_x,
+      beta$segment$end_x
+    )
+
+    expect_equal(sum(nudge * direction), 0, tolerance = 1e-12)
+    expect_equal(sqrt(sum(nudge^2)), expected_nudge)
+  })
+})
+
 test_that("draw_cartoon applies custom monosaccharide colors over defaults", {
   structure <- "Gal(b1-4)GlcNAc(b1-"
 

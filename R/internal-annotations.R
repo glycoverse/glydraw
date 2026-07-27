@@ -11,6 +11,8 @@
 #'   child-side linkage label.
 #' @param par_offset Numeric distance from the parent residue center to the
 #'   parent-side linkage label.
+#' @param chil_perpendicular_nudge Numeric distance to move the child-side
+#'   label perpendicular to and away from the linkage segment.
 #' @param node_size Numeric node-size multiplier used to push labels along the
 #'   linkage segment away from scaled residue polygons.
 #'
@@ -25,6 +27,7 @@
   par_glyy,
   chil_offset = 0.4,
   par_offset = 0.4,
+  chil_perpendicular_nudge = 0,
   node_size = 1
 ) {
   chil_direction <- matrix(
@@ -64,6 +67,11 @@
   )
   chil_annot_loc <- chil_rotate_matrix %*% chil_location
   par_annot_loc <- par_rotate_matrix %*% par_location
+  chil_annot_loc <- .nudge_child_label_perpendicular(
+    label_offset = chil_annot_loc,
+    direction = chil_direction,
+    nudge = chil_perpendicular_nudge
+  )
   extra_offset <- .annotation_extra_offset(node_size)
   chil_annot_loc <- .push_label_position_along_segment(
     label_offset = chil_annot_loc,
@@ -79,6 +87,53 @@
   )
   annot_loc <- list("chil" = chil_annot_loc, "par" = par_annot_loc)
   return(annot_loc)
+}
+
+.beta_annotation_perpendicular_nudge <- 0.025
+
+#' Resolve the perpendicular nudge for a beta linkage label
+#'
+#' @param label A child-side linkage label.
+#' @param child_x,parent_x Numeric horizontal coordinates of the child and
+#'   parent residues.
+#'
+#' @returns The beta nudge for a non-vertical linkage, otherwise zero.
+#' @noRd
+.beta_perpendicular_nudge_for_linkage <- function(
+  label,
+  child_x,
+  parent_x
+) {
+  is_beta <- .normalize_linkage_labels(label) == "beta"
+  is_vertical <- isTRUE(all.equal(child_x, parent_x))
+  if (is_beta && !is_vertical) {
+    return(.beta_annotation_perpendicular_nudge)
+  }
+  0
+}
+
+#' Nudge a child-side label perpendicular to its linkage segment
+#'
+#' @param label_offset A two-row matrix giving the current label offset from
+#'   the child residue.
+#' @param direction A two-row matrix pointing from the child residue to the
+#'   parent residue.
+#' @param nudge Numeric perpendicular distance to add.
+#'
+#' @returns A two-row matrix with the adjusted label offset.
+#' @noRd
+.nudge_child_label_perpendicular <- function(
+  label_offset,
+  direction,
+  nudge
+) {
+  direction_norm <- norm(direction, type = "2")
+  if (nudge <= 0 || direction_norm <= .Machine$double.eps) {
+    return(label_offset)
+  }
+
+  clockwise_normal <- matrix(c(direction[[2]], -direction[[1]]), ncol = 1)
+  label_offset + nudge * clockwise_normal / direction_norm
 }
 
 #' Calculate the extra annotation clearance for scaled nodes
@@ -269,6 +324,11 @@
       coor[par_ver, "y"],
       chil_offset = offsets[["child"]],
       par_offset = offsets[["parent"]],
+      chil_perpendicular_nudge = .beta_perpendicular_nudge_for_linkage(
+        linkage_labels[[ver]][[1]],
+        coor[ver, "x"],
+        coor[par_ver, "x"]
+      ),
       node_size = node_size
     )
     rows <- 2L * ver - c(1L, 0L)
@@ -350,6 +410,11 @@
     coor[par_ver, "y"],
     chil_offset = offsets[["child"]],
     par_offset = offsets[["parent"]],
+    chil_perpendicular_nudge = .beta_perpendicular_nudge_for_linkage(
+      labels[[1]],
+      coor[ver, "x"],
+      coor[par_ver, "x"]
+    ),
     node_size = node_size
   )
 
@@ -1081,7 +1146,7 @@
 
   label <- .reducing_end_anomer_label(anomer)
   root <- length(structure)
-  geometry <- .reducing_end_geometry(coor[root, ], orient)
+  geometry <- .reducing_end_geometry(coor[root, ], orient, label = label)
   red_end_annotation <- .reducing_end_text_data(
     red_end,
     geometry$line_end,
@@ -1184,6 +1249,7 @@
 #'   reducing-end residue.
 #' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
 #'   `"down"`.
+#' @param label The reducing-end anomer label.
 #' @param line_length Numeric length of the reducing-end line segment.
 #' @param label_offset Numeric extra distance between the line length and the
 #'   anomer label anchor before rotation.
@@ -1194,6 +1260,7 @@
 .reducing_end_geometry <- function(
   root_coor,
   orient,
+  label = "",
   line_length = 0.6,
   label_offset = 0.1
 ) {
@@ -1203,7 +1270,24 @@
   )
   line_vec <- .reducing_end_line_vector(orient, line_length)
   label_vec <- .reducing_end_line_vector(orient, line_length + label_offset)
-  label_coor <- root_coor + .rotated_reducing_end_label_vector(label_vec)
+  label_position_offset <- matrix(
+    .rotated_reducing_end_label_vector(label_vec),
+    ncol = 1
+  )
+  label_position_offset <- .nudge_child_label_perpendicular(
+    label_offset = label_position_offset,
+    direction = matrix(line_vec, ncol = 1),
+    nudge = .beta_perpendicular_nudge_for_linkage(
+      label,
+      root_coor[["x"]],
+      root_coor[["x"]] + line_vec[["x"]]
+    )
+  )
+  label_coor <- root_coor +
+    c(
+      x = as.numeric(label_position_offset[1, 1]),
+      y = as.numeric(label_position_offset[2, 1])
+    )
 
   list(
     root_coor = root_coor,

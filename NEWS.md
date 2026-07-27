@@ -14,6 +14,10 @@
 
 * Glycan grobs used by `geom_glycan()`, `geom_node_glycan()`, `guide_glycan()`, `scale_x_glycan()`, and `scale_y_glycan()` now remain vector graphics at every size when exported to PDF or SVG; `draw_cartoon()` and repeated panel structures also render more efficiently with native grid primitives without changing cartoon layout or appearance. (#64, #65, #66)
 
+## Minor improvements and bug fixes
+
+* Move beta linkage annotations slightly away from horizontal and skewed edge lines while leaving labels beside vertical edges unchanged, including reducing-end annotations. (#70)
+
 # glydraw 0.7.0
 
 This version of glydraw introduced some `ggplot2` extensions.
