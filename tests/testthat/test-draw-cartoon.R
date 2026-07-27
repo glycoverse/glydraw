@@ -169,6 +169,31 @@ test_that("beta annotations are nudged perpendicular to linkage lines", {
   expect_equal(.beta_perpendicular_nudge_for_linkage("a1", 0, 1), 0)
 })
 
+test_that("larger nodes shorten all three linkage annotation gaps", {
+  default <- .linkage_label_positions(0, 0, 1, 0)
+  enlarged <- .linkage_label_positions(0, 0, 1, 0, node_size = 1.2)
+  default_radius <- .default_node_point_size
+  enlarged_radius <- .default_node_point_size * 1.2
+  default_x <- c(default$chil[[1]], default$par[[1]])
+  enlarged_x <- c(enlarged$chil[[1]], enlarged$par[[1]])
+  default_gaps <- c(
+    default_x[[1]] - default_radius,
+    default_x[[2]] - default_x[[1]],
+    1 - default_radius - default_x[[2]]
+  )
+  enlarged_gaps <- c(
+    enlarged_x[[1]] - enlarged_radius,
+    enlarged_x[[2]] - enlarged_x[[1]],
+    1 - enlarged_radius - enlarged_x[[2]]
+  )
+
+  expect_lt(max(enlarged_gaps - default_gaps), 0)
+  expect_equal(
+    default_gaps - enlarged_gaps,
+    rep(.annotation_extra_offset(1.2) * 2 / 3, 3)
+  )
+})
+
 test_that("reducing-end beta annotations follow the physical edge direction", {
   purrr::walk(c("left", "right", "up", "down"), function(orient) {
     beta_inputs <- .prepare_cartoon_inputs(
