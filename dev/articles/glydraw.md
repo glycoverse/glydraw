@@ -157,17 +157,15 @@ size leaves too little annotation space.
 
 ### `colors`
 
-`colors` is an optional named character vector for overriding
-monosaccharide fill colors. Names must be supported monosaccharide
-names. Only the names you provide are changed; all other monosaccharides
-keep their default SNFG colors.
+`colors` is a named character vector in the same format as
+[`glydraw_colors()`](https://glycoverse.github.io/glydraw/dev/reference/glydraw_colors.md).
+Its names are fixed, and every palette color must be supplied.
 
 ``` r
 
-draw_cartoon(
-  n_core,
-  colors = c(Man = "#4DAF4A", GlcNAc = "#377EB8")
-)
+colors <- glydraw_colors()
+colors[c("glyGreen", "glyBlue")] <- c("#4DAF4A", "#377EB8")
+draw_cartoon(n_core, colors = colors)
 ```
 
 ![](glydraw_files/figure-html/colors-1.png)
@@ -204,7 +202,7 @@ outfile <- file.path(tempdir(), "n-core.png")
 
 save_cartoon(cartoon, outfile, scale = 2)
 outfile
-#> [1] "/tmp/Rtmp8wl3Kj/n-core.png"
+#> [1] "/tmp/Rtmp8FNVwk/n-core.png"
 ```
 
 `glydraw` does not expose separate `width` and `height` controls because

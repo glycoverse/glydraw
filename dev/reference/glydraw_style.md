@@ -18,7 +18,7 @@ glydraw_style(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "",
-  colors = NULL
+  colors = glydraw_colors()
 )
 ```
 
@@ -64,8 +64,9 @@ glydraw_style(
 
 - colors:
 
-  Optional named character vector of monosaccharide fill-color
-  overrides.
+  A named character vector of SNFG colors in the format returned by
+  [`glydraw_colors()`](https://glycoverse.github.io/glydraw/dev/reference/glydraw_colors.md).
+  Names must be complete and match that palette.
 
 ## Value
 

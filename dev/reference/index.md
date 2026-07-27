@@ -29,6 +29,8 @@
   : Use glycan cartoons as ComplexHeatmap labels
 - [`glycanGrob()`](https://glycoverse.github.io/glydraw/dev/reference/glycanGrob.md)
   : Construct a glycan grob
+- [`glydraw_colors()`](https://glycoverse.github.io/glydraw/dev/reference/glydraw_colors.md)
+  : Default color palette in glydraw
 - [`glydraw_style()`](https://glycoverse.github.io/glydraw/dev/reference/glydraw_style.md)
   : Create a glycan drawing style
 - [`hjust_red_end()`](https://glycoverse.github.io/glydraw/dev/reference/hjust_red_end.md)

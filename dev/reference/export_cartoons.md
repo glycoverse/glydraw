@@ -20,7 +20,7 @@ export_cartoons(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "",
-  colors = NULL,
+  colors = glydraw_colors(),
   style = NULL
 )
 ```
@@ -111,11 +111,9 @@ export_cartoons(
 
 - colors:
 
-  Optional named character vector of custom monosaccharide fill colors.
-  Names must be supported monosaccharide names, such as `"Gal"` or
-  `"GlcNAc"`. User-provided colors overwrite the default SNFG colors,
-  while unprovided monosaccharides keep their default colors. Defaults
-  to `NULL`.
+  A named character vector of SNFG colors in the format returned by
+  [`glydraw_colors()`](https://glycoverse.github.io/glydraw/dev/reference/glydraw_colors.md).
+  Names must be complete and match that palette.
 
 - style:
 

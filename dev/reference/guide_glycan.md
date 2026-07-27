@@ -33,7 +33,7 @@ guide_glycan(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "",
-  colors = NULL,
+  colors = glydraw_colors(),
   style = NULL
 )
 ```
@@ -159,9 +159,9 @@ guide_glycan(
 
 - colors:
 
-  Optional named character vector of monosaccharide fill colors passed
-  to
-  [`glycanGrob()`](https://glycoverse.github.io/glydraw/dev/reference/glycanGrob.md).
+  A named character vector of SNFG colors in the format returned by
+  [`glydraw_colors()`](https://glycoverse.github.io/glydraw/dev/reference/glydraw_colors.md).
+  Names must be complete and match that palette.
 
 - style:
 
