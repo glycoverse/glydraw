@@ -36,7 +36,7 @@ test_that("save_cartoon preserves Greek labels in custom-font vector files", {
   skip_if_not(capabilities("cairo"), "Cairo graphics are unavailable.")
   cartoon <- draw_cartoon(
     "Gal(b1-3)GalNAc(a1-",
-    font_family = "serif"
+    style = glydraw_style(font_family = "serif")
   )
   files <- tempfile(fileext = c(".pdf", ".eps", ".ps"))
   on.exit(unlink(files), add = TRUE)

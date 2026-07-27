@@ -24,8 +24,8 @@ uses the node data calculated by \code{\link[ggraph:ggraph]{ggraph::ggraph()}}.}
 
 \item{show.legend}{Logical. Should this layer be included in legends?}
 
-\item{...}{Arguments passed to \code{\link[=geom_glycan]{geom_glycan()}}, including fixed aesthetics
-and glycan rendering options.}
+\item{...}{Arguments passed to \code{\link[=geom_glycan]{geom_glycan()}}, including fixed aesthetics,
+drawing controls, and \code{style}.}
 }
 \value{
 A ggplot2 layer that can be added to a \code{\link[ggraph:ggraph]{ggraph::ggraph()}} plot.

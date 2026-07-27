@@ -2,12 +2,8 @@
 #'
 #' `glydraw_style()` collects the rendering options shared by glydraw's
 #' standalone drawings, grobs, ggplot2 layers, guides, and glycan scales.
-#' Supply the result with `style =` to reuse a visual specification. Explicit
-#' rendering arguments supplied to a drawing function override the style.
+#' Supply the result with `style =` to reuse a visual specification.
 #'
-#' @param show_linkage Whether to show glycosidic linkage annotations.
-#' @param orient Direction in which the glycan extends from its reducing end:
-#'   one of `"left"`, `"right"`, `"up"`, or `"down"`. Defaults to `"left"`.
 #' @param fuc_orient Fuc-like triangle orientation: `"flex"` or `"up"`.
 #' @param red_end Reducing-end annotation. Use `"~"` for a wave or `NULL` to
 #'   omit the reducing-end line and anomer annotation.
@@ -25,12 +21,10 @@
 #' @returns A `glydraw_style` object.
 #'
 #' @examples
-#' vertical_style <- glydraw_style(orient = "up", show_linkage = FALSE)
-#' draw_cartoon("Gal(b1-3)GalNAc(a1-", style = vertical_style)
+#' serif_style <- glydraw_style(font_family = "serif")
+#' draw_cartoon("Gal(b1-3)GalNAc(a1-", style = serif_style)
 #' @export
 glydraw_style <- function(
-  show_linkage = TRUE,
-  orient = c("left", "right", "up", "down"),
   fuc_orient = c("flex", "up"),
   red_end = "",
   edge_linewidth = 0.8,
@@ -39,8 +33,6 @@ glydraw_style <- function(
   font_family = "",
   colors = glydraw_colors()
 ) {
-  checkmate::assert_flag(show_linkage)
-  orient <- rlang::arg_match(orient)
   fuc_orient <- rlang::arg_match(fuc_orient)
   checkmate::assert_string(red_end, na.ok = FALSE, null.ok = TRUE)
   checkmate::assert_number(edge_linewidth, lower = 0)
@@ -51,8 +43,6 @@ glydraw_style <- function(
 
   structure(
     list(
-      show_linkage = show_linkage,
-      orient = orient,
       fuc_orient = fuc_orient,
       red_end = red_end,
       edge_linewidth = edge_linewidth,
@@ -68,25 +58,34 @@ glydraw_style <- function(
 #' Resolve rendering arguments against an optional drawing style
 #'
 #' @param style A `glydraw_style` object or `NULL`.
-#' @param .supplied Named logical vector indicating explicitly supplied values.
-#' @param ... Rendering values.
-#'
 #' @returns A validated `glydraw_style` object.
 #' @noRd
-.resolve_glydraw_style <- function(style = NULL, ..., .supplied) {
-  values <- rlang::list2(...)
-  if (!is.null(style)) {
-    if (!inherits(style, "glydraw_style")) {
-      cli::cli_abort("{.arg style} must be a {.cls glydraw_style} object.")
-    }
-    style <- do.call(glydraw_style, unclass(style))
-  } else {
-    style <- glydraw_style()
+.resolve_glydraw_style <- function(style = NULL) {
+  if (is.null(style)) {
+    return(glydraw_style())
   }
+  if (!inherits(style, "glydraw_style")) {
+    cli::cli_abort("{.arg style} must be a {.cls glydraw_style} object.")
+  }
+  do.call(glydraw_style, unclass(style))
+}
 
-  values <- values[.supplied]
-  do.call(
-    glydraw_style,
-    utils::modifyList(unclass(style), values, keep.null = TRUE)
+#' Reject cartoon style options supplied outside `style`
+#'
+#' @param ... Arguments to inspect.
+#'
+#' @returns `NULL`, invisibly.
+#' @noRd
+.check_no_explicit_style_arguments <- function(...) {
+  arguments <- intersect(
+    names(rlang::list2(...)),
+    names(formals(glydraw_style))
   )
+  if (length(arguments) > 0L) {
+    cli::cli_abort(c(
+      "Cartoon styling arguments must be supplied through {.arg style}.",
+      "i" = "Move {cli::qty(arguments)} {.arg {arguments}} argument{?s} into {.fn glydraw_style}."
+    ))
+  }
+  invisible(NULL)
 }

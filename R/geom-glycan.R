@@ -151,50 +151,23 @@ geom_glycan <- function(
   angle = 0,
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
-  fuc_orient = c("flex", "up"),
-  red_end = "",
-  edge_linewidth = 0.8,
-  node_linewidth = 0.8,
-  node_size = 1,
-  font_family = "",
-  colors = glydraw_colors(),
   highlight = NULL,
   style = NULL,
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE
 ) {
-  style <- .resolve_glydraw_style(
-    style = style,
-    show_linkage = show_linkage,
-    orient = orient,
-    fuc_orient = fuc_orient,
-    red_end = red_end,
-    edge_linewidth = edge_linewidth,
-    node_linewidth = node_linewidth,
-    node_size = node_size,
-    font_family = font_family,
-    colors = colors,
-    .supplied = c(
-      show_linkage = !missing(show_linkage),
-      orient = !missing(orient),
-      fuc_orient = !missing(fuc_orient),
-      red_end = !missing(red_end),
-      edge_linewidth = !missing(edge_linewidth),
-      node_linewidth = !missing(node_linewidth),
-      node_size = !missing(node_size),
-      font_family = !missing(font_family),
-      colors = !missing(colors)
-    )
-  )
+  .check_no_explicit_style_arguments(...)
+  style <- .resolve_glydraw_style(style)
+  orient <- rlang::arg_match(orient)
   show_linkage <- .resolve_linkage_visibility(
-    style$show_linkage,
+    show_linkage,
     style$node_size
   )
 
   params <- rlang::list2(
     show_linkage = show_linkage,
-    orient = style$orient,
+    orient = orient,
     fuc_orient = style$fuc_orient,
     red_end = style$red_end,
     edge_linewidth = style$edge_linewidth,
@@ -212,7 +185,7 @@ geom_glycan <- function(
   .validate_red_end_justification_orientation(
     params$hjust,
     params$vjust,
-    style$orient
+    orient
   )
 
   ggplot2::layer(
@@ -295,14 +268,16 @@ geom_glycan <- function(
       unique_structures[[index]],
       show_linkage = show_linkage,
       orient = orient,
-      fuc_orient = fuc_orient,
-      red_end = red_end,
-      edge_linewidth = edge_linewidth,
-      node_linewidth = node_linewidth,
-      node_size = node_size,
-      font_family = font_family,
-      colors = colours,
-      highlight = highlight
+      highlight = highlight,
+      style = glydraw_style(
+        fuc_orient = fuc_orient,
+        red_end = red_end,
+        edge_linewidth = edge_linewidth,
+        node_linewidth = node_linewidth,
+        node_size = node_size,
+        font_family = font_family,
+        colors = colours
+      )
     )
   })
   grobs <- purrr::pmap(

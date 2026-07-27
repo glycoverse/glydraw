@@ -5,8 +5,6 @@
 \title{Create a glycan drawing style}
 \usage{
 glydraw_style(
-  show_linkage = TRUE,
-  orient = c("left", "right", "up", "down"),
   fuc_orient = c("flex", "up"),
   red_end = "",
   edge_linewidth = 0.8,
@@ -17,11 +15,6 @@ glydraw_style(
 )
 }
 \arguments{
-\item{show_linkage}{Whether to show glycosidic linkage annotations.}
-
-\item{orient}{Direction in which the glycan extends from its reducing end:
-one of \code{"left"}, \code{"right"}, \code{"up"}, or \code{"down"}. Defaults to \code{"left"}.}
-
 \item{fuc_orient}{Fuc-like triangle orientation: \code{"flex"} or \code{"up"}.}
 
 \item{red_end}{Reducing-end annotation. Use \code{"~"} for a wave or \code{NULL} to
@@ -48,10 +41,9 @@ A \code{glydraw_style} object.
 \description{
 \code{glydraw_style()} collects the rendering options shared by glydraw's
 standalone drawings, grobs, ggplot2 layers, guides, and glycan scales.
-Supply the result with \verb{style =} to reuse a visual specification. Explicit
-rendering arguments supplied to a drawing function override the style.
+Supply the result with \verb{style =} to reuse a visual specification.
 }
 \examples{
-vertical_style <- glydraw_style(orient = "up", show_linkage = FALSE)
-draw_cartoon("Gal(b1-3)GalNAc(a1-", style = vertical_style)
+serif_style <- glydraw_style(font_family = "serif")
+draw_cartoon("Gal(b1-3)GalNAc(a1-", style = serif_style)
 }

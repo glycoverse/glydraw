@@ -21,22 +21,8 @@
 #'   cartoons and `0.5` for vertical cartoons.
 #' @param show_linkage Whether to show glycosidic linkage annotations inside
 #'   the cartoons. Defaults to `TRUE`.
-#' @param red_end Reducing-end annotation passed to [glycanGrob()]. Use `"~"`
-#'   for a wave, another string to display that text, or `NULL` to omit the
-#'   reducing-end line and anomer annotation. Defaults to `""`.
-#' @param fuc_orient Fuc-like triangle orientation passed to [glycanGrob()].
-#' @param edge_linewidth Linkage linewidth passed to [glycanGrob()].
-#' @param node_linewidth Node-border linewidth passed to [glycanGrob()].
-#' @param node_size Node-size multiplier passed to [glycanGrob()].
-#' @param font_family A length-one character string naming the font family used
-#'   for linkage, substituent, and reducing-end text annotations. Portable
-#'   choices are `"sans"`, `"serif"`, and `"mono"`. Other family names, such as
-#'   installed system fonts, are graphics-device dependent. The default `""`
-#'   uses the graphics device's default font.
-#' @param colors A named character vector of SNFG colors in the format returned
-#'   by [glydraw_colors()]. Names must be complete and match that palette.
-#' @param style A `glydraw_style` object that supplies rendering options.
-#'   Explicitly supplied rendering arguments override it.
+#' @param style A [glydraw_style()] object that controls the cartoons' visual
+#'   appearance.
 #'
 #' @returns A ggplot2 legend guide that draws glycan cartoons in place of text
 #'   labels.
@@ -76,42 +62,13 @@ guide_glycan <- function(
   hjust = 0,
   vjust = vjust_red_end(),
   show_linkage = TRUE,
-  red_end = "",
-  fuc_orient = c("flex", "up"),
-  edge_linewidth = 0.8,
-  node_linewidth = 0.8,
-  node_size = 1,
-  font_family = "",
-  colors = glydraw_colors(),
   style = NULL
 ) {
   hjust_is_missing <- missing(hjust)
   vjust_is_missing <- missing(vjust)
-  style <- .resolve_glydraw_style(
-    style = style,
-    show_linkage = show_linkage,
-    orient = orient,
-    fuc_orient = fuc_orient,
-    red_end = red_end,
-    edge_linewidth = edge_linewidth,
-    node_linewidth = node_linewidth,
-    node_size = node_size,
-    font_family = font_family,
-    colors = colors,
-    .supplied = c(
-      show_linkage = !missing(show_linkage),
-      orient = !missing(orient),
-      fuc_orient = !missing(fuc_orient),
-      red_end = !missing(red_end),
-      edge_linewidth = !missing(edge_linewidth),
-      node_linewidth = !missing(node_linewidth),
-      node_size = !missing(node_size),
-      font_family = !missing(font_family),
-      colors = !missing(colors)
-    )
-  )
+  style <- .resolve_glydraw_style(style)
   .validate_output_scale(size)
-  orient <- style$orient
+  orient <- rlang::arg_match(orient)
   if (hjust_is_missing && .is_vertical_glycan_orientation(orient)) {
     hjust <- hjust_red_end()
   }
@@ -122,7 +79,7 @@ guide_glycan <- function(
   .validate_glycan_justification_scalar(hjust, "hjust")
   .validate_glycan_justification_scalar(vjust, "vjust")
   show_linkage <- .resolve_linkage_visibility(
-    style$show_linkage,
+    show_linkage,
     style$node_size
   )
 
@@ -217,13 +174,15 @@ guide_glycan <- function(
     structure,
     show_linkage = params$glycan_show_linkage,
     orient = params$glycan_orient,
-    red_end = params$glycan_red_end,
-    fuc_orient = params$glycan_fuc_orient,
-    edge_linewidth = params$glycan_edge_linewidth,
-    node_linewidth = params$glycan_node_linewidth,
-    node_size = params$glycan_node_size,
-    font_family = params$glycan_font_family,
-    colors = params$glycan_colors
+    style = glydraw_style(
+      red_end = params$glycan_red_end,
+      fuc_orient = params$glycan_fuc_orient,
+      edge_linewidth = params$glycan_edge_linewidth,
+      node_linewidth = params$glycan_node_linewidth,
+      node_size = params$glycan_node_size,
+      font_family = params$glycan_font_family,
+      colors = params$glycan_colors
+    )
   )
   grob$name <- "guide.glycan.label"
   grob$glydraw_scale <- params$glycan_size

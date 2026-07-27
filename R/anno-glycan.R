@@ -40,23 +40,8 @@
 #'   values move cartoons upward. Defaults to `0`.
 #' @param show_linkage Whether to show glycosidic linkage annotations inside
 #'   the cartoons. Defaults to `TRUE`.
-#' @param red_end Reducing-end annotation passed to [glycanGrob()]. Use `"~"`
-#'   for a wave, another string to display that text, or `NULL` to omit the
-#'   reducing-end line and anomer annotation. Defaults to `""`.
-#' @param fuc_orient Fuc-like triangle orientation passed to [glycanGrob()].
-#' @param edge_linewidth Linkage linewidth passed to [glycanGrob()].
-#' @param node_linewidth Node-border linewidth passed to [glycanGrob()].
-#' @param node_size Node-size multiplier passed to [glycanGrob()].
-#' @param font_family A length-one character string naming the font family used
-#'   for linkage, substituent, and reducing-end text annotations. Portable
-#'   choices are `"sans"`, `"serif"`, and `"mono"`. Other family names, such as
-#'   installed system fonts, are graphics-device dependent. The default `""`
-#'   uses the graphics device's default font.
-#' @param colors A named character vector of SNFG colors in the format returned
-#'   by [glydraw_colors()]. Names must be complete and match that palette.
-#' @param style A `glydraw_style` object that supplies rendering options. Its
-#'   orientation is ignored because `which` determines the label direction.
-#'   Explicitly supplied rendering arguments override it.
+#' @param style A [glydraw_style()] object that controls the cartoons' visual
+#'   appearance.
 #' @param width Optional [grid::unit()] width for a row annotation. `NULL`
 #'   calculates the width from the rendered cartoons.
 #' @param height Optional [grid::unit()] height for a column annotation. `NULL`
@@ -104,13 +89,6 @@ anno_glycan <- function(
   nudge_x = 0,
   nudge_y = 0,
   show_linkage = TRUE,
-  red_end = "",
-  fuc_orient = c("flex", "up"),
-  edge_linewidth = 0.8,
-  node_linewidth = 0.8,
-  node_size = 1,
-  font_family = "",
-  colors = glydraw_colors(),
   style = NULL,
   width = NULL,
   height = NULL,
@@ -133,27 +111,7 @@ anno_glycan <- function(
   }
   checkmate::assert_flag(show_name)
 
-  style <- .resolve_glydraw_style(
-    style = style,
-    show_linkage = show_linkage,
-    fuc_orient = fuc_orient,
-    red_end = red_end,
-    edge_linewidth = edge_linewidth,
-    node_linewidth = node_linewidth,
-    node_size = node_size,
-    font_family = font_family,
-    colors = colors,
-    .supplied = c(
-      show_linkage = !missing(show_linkage),
-      fuc_orient = !missing(fuc_orient),
-      red_end = !missing(red_end),
-      edge_linewidth = !missing(edge_linewidth),
-      node_linewidth = !missing(node_linewidth),
-      node_size = !missing(node_size),
-      font_family = !missing(font_family),
-      colors = !missing(colors)
-    )
-  )
+  style <- .resolve_glydraw_style(style)
   options <- .validate_glycan_label_options(
     orient = orient,
     size = size,
@@ -162,7 +120,7 @@ anno_glycan <- function(
     vjust = vjust,
     nudge_x = nudge_x,
     nudge_y = nudge_y,
-    show_linkage = style$show_linkage,
+    show_linkage = show_linkage,
     red_end = style$red_end,
     fuc_orient = style$fuc_orient,
     edge_linewidth = style$edge_linewidth,

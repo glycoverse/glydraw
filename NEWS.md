@@ -2,13 +2,15 @@
 
 ## Breaking changes
 
-* `colors` now accepts a complete SNFG palette in the format returned by `glydraw_colors()`; sparse monosaccharide overrides are no longer supported. (#72)
+* Cartoon appearance is now configured only with `style = glydraw_style(...)` across `draw_cartoon()`, `glycanGrob()`, `geom_glycan()`, `guide_glycan()`, `scale_x_glycan()`, `scale_y_glycan()`, `anno_glycan()`, and `export_cartoons()`; calls that pass `fuc_orient`, `red_end`, `edge_linewidth`, `node_linewidth`, `node_size`, `font_family`, or `colors` directly should move those arguments into `glydraw_style()`, while `show_linkage` and `orient` remain explicit arguments and are no longer accepted by `glydraw_style()`.
 
 * The shared `orient` argument no longer accepts `"H"` or `"V"`; calls using them now error and should replace `"H"` with `"left"` and `"V"` with `"up"`. (#68)
 
 ## New features
 
-* New `font_family` argument controls the font used for text annotations across glycan cartoons and reusable `glydraw_style()` objects, including alpha and beta anomer labels. (#69)
+* `glydraw_style()` is now the single reusable interface for tuning cartoon appearance; `show_linkage` and `orient` are explicit drawing controls instead of style fields.
+
+* New `font_family` style option controls the font used for text annotations across glycan cartoons, including alpha and beta anomer labels. (#69)
 
 * The shared `orient` argument now accepts `"left"`, `"right"`, `"up"`, and `"down"` to draw glycans in any direction.
 

@@ -9,13 +9,6 @@ glycanGrob(
   ...,
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
-  fuc_orient = c("flex", "up"),
-  red_end = "",
-  edge_linewidth = 0.8,
-  node_linewidth = 0.8,
-  node_size = 1,
-  font_family = "",
-  colors = glydraw_colors(),
   highlight = NULL,
   style = NULL
 )
@@ -32,37 +25,6 @@ TRUE. Substituent annotations are always shown.}
 \item{orient}{Direction in which the glycan extends from its reducing end:
 one of \code{"left"}, \code{"right"}, \code{"up"}, or \code{"down"}. Defaults to \code{"left"}.}
 
-\item{fuc_orient}{Fuc-like triangle orientation. \code{"flex"} points
-non-reducing Fuc-like residues toward their rendered linkage direction,
-while \code{"up"} draws all Fuc-like triangles pointing upward. Reducing-end
-Fuc-like residues always point upward. Defaults to \code{"flex"}.}
-
-\item{red_end}{Reducing-end annotation. The default \code{""} keeps the current
-reducing-end line. Use \code{"~"} to add a wavy reducing end, or any other
-string to draw that string at the reducing end. Use \code{NULL} to omit the
-reducing-end line and anomer annotation.}
-
-\item{edge_linewidth}{Numeric scalar controlling the linewidth of linkage
-lines. Defaults to the current value, \code{0.8}.}
-
-\item{node_linewidth}{Numeric scalar controlling the linewidth of node
-borders. Defaults to the current value, \code{0.8}.}
-
-\item{node_size}{Numeric scalar used as a multiplier for the default node
-size. Defaults to \code{1}, which keeps the current size. Linkage annotations
-are moved farther from larger nodes, and are hidden with a warning when
-\code{node_size} is too large to leave enough annotation space. Values larger
-than \code{2} are rejected because residues overlap.}
-
-\item{font_family}{A length-one character string naming the font family used
-for linkage, substituent, and reducing-end text annotations. Portable
-choices are \code{"sans"}, \code{"serif"}, and \code{"mono"}. Other family names, such as
-installed system fonts, are graphics-device dependent. The default \code{""}
-uses the graphics device's default font.}
-
-\item{colors}{A named character vector of SNFG colors in the format returned
-by \code{\link[=glydraw_colors]{glydraw_colors()}}. Names must be complete and match that palette.}
-
 \item{highlight}{An integer vector specifying the node indices to highlight.
 This argument is applicable only when \code{structure} is a \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}}.
 Note that for a \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}}, the node indices correspond exactly
@@ -70,8 +32,8 @@ to the monosaccharides in its printed IUPAC nomenclature.
 For example, given \code{glyrepr::as_glycan_structure("Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-")},
 setting \code{highlight = c(1, 3)} will highlight the "Gal" and "GalNAc" nodes.}
 
-\item{style}{A \code{glydraw_style} object that supplies rendering options.
-Explicitly supplied rendering arguments override it.}
+\item{style}{A \code{\link[=glydraw_style]{glydraw_style()}} object that controls the cartoon's visual
+appearance.}
 }
 \value{
 A \code{glycanGrob} object inheriting from \code{\link[grid:grid.grob]{grid::gTree()}}.

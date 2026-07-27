@@ -19,43 +19,16 @@ glycanGrob <- function(
   ...,
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
-  fuc_orient = c("flex", "up"),
-  red_end = "",
-  edge_linewidth = 0.8,
-  node_linewidth = 0.8,
-  node_size = 1,
-  font_family = "",
-  colors = glydraw_colors(),
   highlight = NULL,
   style = NULL
 ) {
-  style <- .resolve_glydraw_style(
-    style = style,
-    show_linkage = show_linkage,
-    orient = orient,
-    fuc_orient = fuc_orient,
-    red_end = red_end,
-    edge_linewidth = edge_linewidth,
-    node_linewidth = node_linewidth,
-    node_size = node_size,
-    font_family = font_family,
-    colors = colors,
-    .supplied = c(
-      show_linkage = !missing(show_linkage),
-      orient = !missing(orient),
-      fuc_orient = !missing(fuc_orient),
-      red_end = !missing(red_end),
-      edge_linewidth = !missing(edge_linewidth),
-      node_linewidth = !missing(node_linewidth),
-      node_size = !missing(node_size),
-      font_family = !missing(font_family),
-      colors = !missing(colors)
-    )
-  )
+  .check_no_explicit_style_arguments(...)
+  style <- .resolve_glydraw_style(style)
+  orient <- rlang::arg_match(orient, error_call = NULL)
   inputs <- .prepare_cartoon_inputs(
     structure,
     highlight,
-    style$orient,
+    orient,
     style$red_end
   )
   structure <- inputs$structure
@@ -63,7 +36,7 @@ glycanGrob <- function(
   highlight <- inputs$highlight
   orient <- inputs$orient
   show_linkage <- .resolve_linkage_visibility(
-    style$show_linkage,
+    show_linkage,
     style$node_size
   )
 

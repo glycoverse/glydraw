@@ -91,7 +91,13 @@ test_that("export_cartoons rejects node_size values that make residues overlap",
   on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
 
   expect_error(
-    suppressMessages(export_cartoons(glycans, temp_dir, node_size = 2.1)),
+    suppressMessages(
+      export_cartoons(
+        glycans,
+        temp_dir,
+        style = glydraw_style(node_size = 2.1)
+      )
+    ),
     "`node_size` must be no larger than 2"
   )
 })
@@ -257,7 +263,7 @@ test_that("export_cartoons preserves Greek labels in custom-font PDFs", {
         "Gal(b1-3)GalNAc(a1-",
         temp_dir,
         file_ext = "pdf",
-        font_family = "serif"
+        style = glydraw_style(font_family = "serif")
       )
     )
   )

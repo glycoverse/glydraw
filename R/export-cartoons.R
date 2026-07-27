@@ -41,15 +41,9 @@ export_cartoons <- function(
   scale = 1,
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
-  fuc_orient = c("flex", "up"),
-  red_end = "",
-  edge_linewidth = 0.8,
-  node_linewidth = 0.8,
-  node_size = 1,
-  font_family = "",
-  colors = glydraw_colors(),
   style = NULL
 ) {
+  .check_no_explicit_style_arguments(...)
   if (!missing(dpi)) {
     .warn_ignored_dpi()
   }
@@ -67,52 +61,18 @@ export_cartoons.character <- function(
   scale = 1,
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
-  fuc_orient = c("flex", "up"),
-  red_end = "",
-  edge_linewidth = 0.8,
-  node_linewidth = 0.8,
-  node_size = 1,
-  font_family = "",
-  colors = glydraw_colors(),
   style = NULL
 ) {
-  style <- .resolve_glydraw_style(
-    style = style,
-    show_linkage = show_linkage,
-    orient = orient,
-    fuc_orient = fuc_orient,
-    red_end = red_end,
-    edge_linewidth = edge_linewidth,
-    node_linewidth = node_linewidth,
-    node_size = node_size,
-    font_family = font_family,
-    colors = colors,
-    .supplied = c(
-      show_linkage = !missing(show_linkage),
-      orient = !missing(orient),
-      fuc_orient = !missing(fuc_orient),
-      red_end = !missing(red_end),
-      edge_linewidth = !missing(edge_linewidth),
-      node_linewidth = !missing(node_linewidth),
-      node_size = !missing(node_size),
-      font_family = !missing(font_family),
-      colors = !missing(colors)
-    )
-  )
+  .check_no_explicit_style_arguments(...)
+  style <- .resolve_glydraw_style(style)
   .export_cartoon_list(
     unique(.as_glycan_structure_input(x)),
     dirname,
     file_ext,
     scale,
-    style$show_linkage,
-    style$orient,
-    style$fuc_orient,
-    style$red_end,
-    style$edge_linewidth,
-    style$node_linewidth,
-    style$node_size,
-    style$font_family,
-    style$colors
+    show_linkage,
+    orient,
+    style
   )
 }
 
@@ -126,52 +86,18 @@ export_cartoons.glyrepr_structure <- function(
   scale = 1,
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
-  fuc_orient = c("flex", "up"),
-  red_end = "",
-  edge_linewidth = 0.8,
-  node_linewidth = 0.8,
-  node_size = 1,
-  font_family = "",
-  colors = glydraw_colors(),
   style = NULL
 ) {
-  style <- .resolve_glydraw_style(
-    style = style,
-    show_linkage = show_linkage,
-    orient = orient,
-    fuc_orient = fuc_orient,
-    red_end = red_end,
-    edge_linewidth = edge_linewidth,
-    node_linewidth = node_linewidth,
-    node_size = node_size,
-    font_family = font_family,
-    colors = colors,
-    .supplied = c(
-      show_linkage = !missing(show_linkage),
-      orient = !missing(orient),
-      fuc_orient = !missing(fuc_orient),
-      red_end = !missing(red_end),
-      edge_linewidth = !missing(edge_linewidth),
-      node_linewidth = !missing(node_linewidth),
-      node_size = !missing(node_size),
-      font_family = !missing(font_family),
-      colors = !missing(colors)
-    )
-  )
+  .check_no_explicit_style_arguments(...)
+  style <- .resolve_glydraw_style(style)
   .export_cartoon_list(
     unique(x),
     dirname,
     file_ext,
     scale,
-    style$show_linkage,
-    style$orient,
-    style$fuc_orient,
-    style$red_end,
-    style$edge_linewidth,
-    style$node_linewidth,
-    style$node_size,
-    style$font_family,
-    style$colors
+    show_linkage,
+    orient,
+    style
   )
 }
 
@@ -182,17 +108,8 @@ export_cartoons.glyrepr_structure <- function(
   scale,
   show_linkage,
   orient,
-  fuc_orient,
-  red_end,
-  edge_linewidth,
-  node_linewidth,
-  node_size,
-  font_family,
-  colors
+  style
 ) {
-  .validate_node_size(node_size)
-  colors <- .validate_colors(colors)
-  fuc_orient <- rlang::arg_match(fuc_orient, c("flex", "up"))
   cli::cli_alert_info("Exporting {.val {length(glycans)}} glycan cartoons.")
   fs::dir_create(dirname)
   glycan_list <- purrr::map(seq_along(glycans), ~ glycans[[.x]])
@@ -201,13 +118,7 @@ export_cartoons.glyrepr_structure <- function(
     draw_cartoon,
     show_linkage = show_linkage,
     orient = orient,
-    fuc_orient = fuc_orient,
-    red_end = red_end,
-    edge_linewidth = edge_linewidth,
-    node_linewidth = node_linewidth,
-    node_size = node_size,
-    font_family = font_family,
-    colors = colors
+    style = style
   )
   filenames <- fs::path(
     dirname,
