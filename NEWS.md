@@ -2,15 +2,15 @@
 
 ## Breaking changes
 
-* `glydraw_style()` has been renamed to `style_glydraw()` and is no longer exported; replace calls to `glydraw_style()` with `style_glydraw()`.
+* `glydraw_style()` has been renamed to `style_glydraw()` and is no longer exported; replace calls to `glydraw_style()` with `style_glydraw()`. (#73)
 
-* Cartoon appearance is now configured only with `style = style_glydraw(...)` across `draw_cartoon()`, `glycanGrob()`, `geom_glycan()`, `guide_glycan()`, `scale_x_glycan()`, `scale_y_glycan()`, `anno_glycan()`, and `export_cartoons()`; calls that pass `fuc_orient`, `red_end`, `edge_linewidth`, `node_linewidth`, `node_size`, `font_family`, or `colors` directly should move those arguments into `style_glydraw()`, while `show_linkage` and `orient` remain explicit arguments and are no longer accepted by `style_glydraw()`.
+* Cartoon appearance is now configured only with `style = style_glydraw(...)` across `draw_cartoon()`, `glycanGrob()`, `geom_glycan()`, `guide_glycan()`, `scale_x_glycan()`, `scale_y_glycan()`, `anno_glycan()`, and `export_cartoons()`; calls that pass `fuc_orient`, `red_end`, `edge_linewidth`, `node_linewidth`, `node_size`, `font_family`, or `colors` directly should move those arguments into `style_glydraw()`, while `show_linkage` and `orient` remain explicit arguments and are no longer accepted by `style_glydraw()`. (#73)
 
 * The shared `orient` argument no longer accepts `"H"` or `"V"`; calls using them now error and should replace `"H"` with `"left"` and `"V"` with `"up"`. (#68)
 
 ## New features
 
-* `style_glydraw()` replaces `glydraw_style()` as the single reusable interface for tuning cartoon appearance; `show_linkage` and `orient` are explicit drawing controls instead of style fields.
+* `style_glydraw()` replaces `glydraw_style()` as the single reusable interface for tuning cartoon appearance; `show_linkage` and `orient` are explicit drawing controls instead of style fields, while new `style_glygen()`, `style_snfg()`, and `style_glycoworkbench()` provide reusable presets for common glycan-drawing conventions. (#73)
 
 * New `font_family` style option controls the font used for text annotations across glycan cartoons, including alpha and beta anomer labels. (#69)
 
