@@ -72,7 +72,7 @@
     direction = chil_direction,
     nudge = chil_perpendicular_nudge
   )
-  extra_offset <- .annotation_extra_offset(node_size)
+  extra_offset <- .linkage_annotation_extra_offset(node_size)
   chil_annot_loc <- .push_label_position_along_segment(
     label_offset = chil_annot_loc,
     anchor = c(x = chil_glyx, y = chil_glyy),
@@ -144,6 +144,21 @@
 #' @noRd
 .annotation_extra_offset <- function(node_size) {
   .default_node_point_size * pmax(node_size - 1, 0)
+}
+
+#' Calculate the inward shift for linkage labels beside scaled nodes
+#'
+#' The extra node radius reduces three clearances along a linkage: the two
+#' node-to-label gaps and the gap between the labels. Shifting each label by
+#' one-third of the extra radius distributes that reduction evenly instead of
+#' concentrating it between the labels.
+#'
+#' @param node_size Numeric node-size multiplier.
+#'
+#' @returns A non-negative numeric scalar.
+#' @noRd
+.linkage_annotation_extra_offset <- function(node_size) {
+  .annotation_extra_offset(node_size) / 3
 }
 
 #' Push a linkage label offset along its linkage segment

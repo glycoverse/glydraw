@@ -22,6 +22,8 @@
 
 ## Minor improvements and bug fixes
 
+* `style_glydraw(node_size = ...)` now distributes linkage-annotation spacing adjustments across the node-to-label and label-to-label gaps, keeping linkage notation readable with enlarged nodes. (#74)
+
 * `red_end = NULL` now omits both the reducing-end line and its anomer annotation across glycan drawing interfaces. (#71)
 
 * Move beta linkage annotations slightly away from horizontal and skewed edge lines while leaving labels beside vertical edges unchanged, including reducing-end annotations. (#70)

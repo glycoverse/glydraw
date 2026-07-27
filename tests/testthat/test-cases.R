@@ -157,7 +157,7 @@ test_that("Draw oversized node size with linkage hidden", {
   expect_warning(
     plot <- draw_cartoon(
       glycan,
-      style = style_glydraw(node_size = 1.25, red_end = "Ser/Thr")
+      style = style_glydraw(node_size = 1.5, red_end = "Ser/Thr")
     ),
     "Linkage annotations are hidden"
   )
