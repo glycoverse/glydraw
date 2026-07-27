@@ -2,6 +2,8 @@
 
 ## Breaking changes
 
+* `colors` now accepts a complete SNFG palette in the format returned by `glydraw_colors()`; sparse monosaccharide overrides are no longer supported. (#72)
+
 * The shared `orient` argument no longer accepts `"H"` or `"V"`; calls using them now error and should replace `"H"` with `"left"` and `"V"` with `"up"`. (#68)
 
 ## New features
