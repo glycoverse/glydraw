@@ -50,7 +50,7 @@
 <polygon points='213.85,546.03 213.85,532.75 227.14,532.75 227.14,546.03 213.85,546.03 ' style='stroke-width: 0.68; stroke: #FFFFFF; stroke-linecap: butt; fill: #FFFFFF;' />
 <polygon points='227.14,508.50 227.08,507.65 226.92,506.81 226.65,506.00 226.28,505.24 225.82,504.52 225.27,503.87 224.64,503.30 223.94,502.82 223.19,502.42 222.39,502.13 221.56,501.94 220.71,501.86 219.86,501.88 219.02,502.02 218.20,502.26 217.42,502.61 216.70,503.05 216.03,503.58 215.44,504.19 214.93,504.87 214.51,505.61 214.19,506.40 213.98,507.23 213.87,508.07 213.87,508.92 213.98,509.77 214.19,510.59 214.51,511.38 214.93,512.12 215.44,512.80 216.03,513.41 216.70,513.94 217.42,514.38 218.20,514.73 219.02,514.97 219.86,515.11 220.71,515.13 221.56,515.05 222.39,514.86 223.19,514.57 223.94,514.18 224.64,513.69 225.27,513.12 225.82,512.47 226.28,511.76 226.65,510.99 226.92,510.18 227.08,509.35 227.14,508.50 ' style='stroke-width: 0.68; stroke-linecap: butt; fill: #FFD400;' />
 <polygon points='213.85,546.03 213.85,532.75 227.14,532.75 227.14,546.03 213.85,546.03 ' style='stroke-width: 0.68; stroke-linecap: butt; fill: #FFD400;' />
-<text x='213.55' y='522.00' style='font-size: 6.83px; font-family: sans;' textLength='3.17px' lengthAdjust='spacingAndGlyphs'>β</text>
+<text x='215.09' y='522.00' style='font-size: 6.83px; font-family: sans;' textLength='3.17px' lengthAdjust='spacingAndGlyphs'>β</text>
 <text x='214.78' y='529.99' style='font-size: 6.83px; font-family: sans;' textLength='3.80px' lengthAdjust='spacingAndGlyphs'>3</text>
 <text x='214.44' y='553.27' style='font-size: 6.83px; font-family: sans;' textLength='4.10px' lengthAdjust='spacingAndGlyphs'>α</text>
 <line x1='529.26' y1='508.50' x2='513.81' y2='477.60' style='stroke-width: 0.68; stroke-linecap: butt;' />
@@ -69,7 +69,7 @@
 <text x='518.69' y='502.04' style='font-size: 6.83px; font-family: sans;' textLength='3.80px' lengthAdjust='spacingAndGlyphs'>3</text>
 <text x='533.99' y='487.94' style='font-size: 6.83px; font-family: sans;' textLength='4.10px' lengthAdjust='spacingAndGlyphs'>α</text>
 <text x='529.20' y='498.63' style='font-size: 6.83px; font-family: sans;' textLength='3.80px' lengthAdjust='spacingAndGlyphs'>6</text>
-<text x='522.31' y='522.00' style='font-size: 6.83px; font-family: sans;' textLength='3.17px' lengthAdjust='spacingAndGlyphs'>β</text>
+<text x='523.86' y='522.00' style='font-size: 6.83px; font-family: sans;' textLength='3.17px' lengthAdjust='spacingAndGlyphs'>β</text>
 <text x='523.54' y='529.99' style='font-size: 6.83px; font-family: sans;' textLength='3.80px' lengthAdjust='spacingAndGlyphs'>4</text>
 <text x='523.67' y='553.48' style='font-size: 6.83px; font-family: sans;' textLength='3.17px' lengthAdjust='spacingAndGlyphs'>β</text>
 <text x='374.88' y='568.24' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='42.80px' lengthAdjust='spacingAndGlyphs'>structure</text>

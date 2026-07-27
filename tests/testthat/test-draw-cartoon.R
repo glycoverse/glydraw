@@ -125,17 +125,46 @@ test_that("beta annotations are nudged perpendicular to linkage lines", {
       alpha$x - alpha$segment_start_x,
       alpha$y - alpha$segment_start_y
     )
+    expected_nudge <- .beta_perpendicular_nudge_for_linkage(
+      "b1",
+      beta$segment_start_x,
+      beta$segment_end_x
+    )
 
     expect_equal(sum(nudge * direction), 0, tolerance = 1e-12)
-    expect_equal(
-      sqrt(sum(nudge^2)),
-      .beta_annotation_perpendicular_nudge
-    )
-    expect_gt(
-      sum(beta_offset * clockwise_normal),
-      sum(alpha_offset * clockwise_normal)
-    )
+    expect_equal(sqrt(sum(nudge^2)), expected_nudge)
+    if (expected_nudge > 0) {
+      expect_gt(
+        sum(beta_offset * clockwise_normal),
+        sum(alpha_offset * clockwise_normal)
+      )
+    } else {
+      expect_equal(beta_offset, alpha_offset)
+    }
   })
+
+  skewed <- .linkage_label_positions(0, 0, 1, 0.5)
+  skewed_nudged <- .linkage_label_positions(
+    0,
+    0,
+    1,
+    0.5,
+    chil_perpendicular_nudge = .beta_perpendicular_nudge_for_linkage(
+      "b1",
+      0,
+      1
+    )
+  )
+  skewed_direction <- c(1, 0.5)
+  skewed_delta <- as.vector(skewed_nudged$chil - skewed$chil)
+
+  expect_equal(sum(skewed_delta * skewed_direction), 0, tolerance = 1e-12)
+  expect_equal(
+    sqrt(sum(skewed_delta^2)),
+    .beta_annotation_perpendicular_nudge
+  )
+  expect_equal(.beta_perpendicular_nudge_for_linkage("b1", 0, 0), 0)
+  expect_equal(.beta_perpendicular_nudge_for_linkage("a1", 0, 1), 0)
 })
 
 test_that("draw_cartoon applies custom monosaccharide colors over defaults", {

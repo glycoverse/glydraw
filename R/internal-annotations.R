@@ -89,7 +89,28 @@
   return(annot_loc)
 }
 
-.beta_annotation_perpendicular_nudge <- 0.05
+.beta_annotation_perpendicular_nudge <- 0.025
+
+#' Resolve the perpendicular nudge for a beta linkage label
+#'
+#' @param label A child-side linkage label.
+#' @param child_x,parent_x Numeric horizontal coordinates of the child and
+#'   parent residues.
+#'
+#' @returns The beta nudge for a non-vertical linkage, otherwise zero.
+#' @noRd
+.beta_perpendicular_nudge_for_linkage <- function(
+  label,
+  child_x,
+  parent_x
+) {
+  is_beta <- .normalize_linkage_labels(label) == "beta"
+  is_vertical <- isTRUE(all.equal(child_x, parent_x))
+  if (is_beta && !is_vertical) {
+    return(.beta_annotation_perpendicular_nudge)
+  }
+  0
+}
 
 #' Nudge a child-side label perpendicular to its linkage segment
 #'
@@ -303,13 +324,11 @@
       coor[par_ver, "y"],
       chil_offset = offsets[["child"]],
       par_offset = offsets[["parent"]],
-      chil_perpendicular_nudge = if (
-        .normalize_linkage_labels(linkage_labels[[ver]][[1]]) == "beta"
-      ) {
-        .beta_annotation_perpendicular_nudge
-      } else {
-        0
-      },
+      chil_perpendicular_nudge = .beta_perpendicular_nudge_for_linkage(
+        linkage_labels[[ver]][[1]],
+        coor[ver, "x"],
+        coor[par_ver, "x"]
+      ),
       node_size = node_size
     )
     rows <- 2L * ver - c(1L, 0L)
@@ -391,13 +410,11 @@
     coor[par_ver, "y"],
     chil_offset = offsets[["child"]],
     par_offset = offsets[["parent"]],
-    chil_perpendicular_nudge = if (
-      .normalize_linkage_labels(labels[[1]]) == "beta"
-    ) {
-      .beta_annotation_perpendicular_nudge
-    } else {
-      0
-    },
+    chil_perpendicular_nudge = .beta_perpendicular_nudge_for_linkage(
+      labels[[1]],
+      coor[ver, "x"],
+      coor[par_ver, "x"]
+    ),
     node_size = node_size
   )
 
