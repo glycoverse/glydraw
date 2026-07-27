@@ -2,7 +2,7 @@
 
 ## Breaking changes
 
-* The shared `orient` argument no longer accepts `"H"` or `"V"`; calls using them now error and should replace `"H"` with `"left"` and `"V"` with `"up"`.
+* The shared `orient` argument no longer accepts `"H"` or `"V"`; calls using them now error and should replace `"H"` with `"left"` and `"V"` with `"up"`. (#68)
 
 ## New features
 
