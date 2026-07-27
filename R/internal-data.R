@@ -1,6 +1,19 @@
 # Internal SNFG constants: residue-to-shape mappings, fill colors, and polygon
 # templates used by cartoon drawing helpers.
 
+#' Default color palette in glydraw
+#'
+#' This palette uses the SNFG standard defined in
+#' https://www.ncbi.nlm.nih.gov/glycans/snfg.html.
+#'
+#' @returns A named character vector of colors.
+#' @examples
+#' glydraw_colors()
+#' @export
+glydraw_colors <- function() {
+  glycan_color
+}
+
 # glycan mapping
 glycan_color <- c(
   'glyWhite' = '#FFFFFF',
