@@ -54,7 +54,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="minor-improvements-and-bug-fixes-development-version">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-development-version"></a></h3>
-<ul><li><p>Linkage-annotation collision handling now ignores the two labels belonging to the same edge, preventing enlarged nodes from unnecessarily reflecting an otherwise collision-free linkage. (<a href="https://github.com/glycoverse/glydraw/issues/75" class="external-link">#75</a>)</p></li>
+<ul><li><p><code>Hex</code> residues now render as smooth, device-native circles across standalone cartoons and embedded glycan grobs. (<a href="https://github.com/glycoverse/glydraw/issues/76" class="external-link">#76</a>)</p></li>
+<li><p>Linkage-annotation collision handling now ignores the two labels belonging to the same edge, preventing enlarged nodes from unnecessarily reflecting an otherwise collision-free linkage. (<a href="https://github.com/glycoverse/glydraw/issues/75" class="external-link">#75</a>)</p></li>
 <li><p><code>style_glydraw(node_size = ...)</code> now distributes linkage-annotation spacing adjustments across the node-to-label and label-to-label gaps, keeping linkage notation readable with enlarged nodes. (<a href="https://github.com/glycoverse/glydraw/issues/74" class="external-link">#74</a>)</p></li>
 <li><p><code>red_end = NULL</code> now omits both the reducing-end line and its anomer annotation across glycan drawing interfaces. (<a href="https://github.com/glycoverse/glydraw/issues/71" class="external-link">#71</a>)</p></li>
 <li><p>Move beta linkage annotations slightly away from horizontal and skewed edge lines while leaving labels beside vertical edges unchanged, including reducing-end annotations. (<a href="https://github.com/glycoverse/glydraw/issues/70" class="external-link">#70</a>)</p></li>
