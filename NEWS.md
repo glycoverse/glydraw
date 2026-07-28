@@ -4,7 +4,7 @@
 
 * `glydraw_style()` has been renamed to `style_glydraw()` and is no longer exported; replace calls to `glydraw_style()` with `style_glydraw()`. (#73)
 
-* Cartoon appearance is now configured only with `style = style_glydraw(...)` across `draw_cartoon()`, `glycanGrob()`, `geom_glycan()`, `guide_glycan()`, `scale_x_glycan()`, `scale_y_glycan()`, `anno_glycan()`, and `export_cartoons()`; calls that pass `fuc_orient`, `red_end`, `edge_linewidth`, `node_linewidth`, `node_size`, `font_family`, or `colors` directly should move those arguments into `style_glydraw()`, while `show_linkage` and `orient` remain explicit arguments and are no longer accepted by `style_glydraw()`. (#73)
+* Cartoon appearance is now configured with `style = style_glydraw(...)` across `draw_cartoon()`, `glycanGrob()`, `geom_glycan()`, `guide_glycan()`, `scale_x_glycan()`, `scale_y_glycan()`, `anno_glycan()`, and `export_cartoons()`; calls that pass `fuc_orient`, `edge_linewidth`, `node_linewidth`, `node_size`, `font_family`, or `colors` directly should move those arguments into `style_glydraw()`. `show_linkage` and `orient` remain explicit arguments and are no longer accepted by `style_glydraw()`, while explicit `red_end` overrides the reusable style value. (#73)
 
 * The shared `orient` argument no longer accepts `"H"` or `"V"`; calls using them now error and should replace `"H"` with `"left"` and `"V"` with `"up"`. (#68)
 
@@ -12,7 +12,7 @@
 
 * New `draw_cartoon_sketch()` draws hand-sketched glycan cartoons with reproducible rough strokes, patterned residue fills, optional drawing media, and the same layout, annotation, orientation, highlighting, styling, sizing, and saving behavior as `draw_cartoon()`. (#77)
 
-* `style_glydraw()` replaces `glydraw_style()` as the single reusable interface for tuning cartoon appearance; `show_linkage` and `orient` are explicit drawing controls instead of style fields, while new `style_glygen()`, `style_snfg()`, and `style_glycoworkbench()` provide reusable presets for common glycan-drawing conventions. (#73)
+* `style_glydraw()` replaces `glydraw_style()` as the single reusable interface for tuning cartoon appearance; `show_linkage` and `orient` are explicit drawing controls instead of style fields, and explicit `red_end = NULL` inherits the style value. New `style_glygen()`, `style_snfg()`, and `style_glycoworkbench()` provide reusable presets for common glycan-drawing conventions. (#73)
 
 * New `font_family` style option controls the font used for text annotations across glycan cartoons, including alpha and beta anomer labels. (#69)
 
@@ -30,7 +30,7 @@
 
 * `style_glydraw(node_size = ...)` now distributes linkage-annotation spacing adjustments across the node-to-label and label-to-label gaps, keeping linkage notation readable with enlarged nodes. (#74)
 
-* `red_end = NULL` now omits both the reducing-end line and its anomer annotation across glycan drawing interfaces. (#71)
+* `style_glydraw(red_end = NULL)` now omits both the reducing-end line and its anomer annotation across glycan drawing interfaces. (#71)
 
 * Move beta linkage annotations slightly away from horizontal and skewed edge lines while leaving labels beside vertical edges unchanged, including reducing-end annotations. (#70)
 

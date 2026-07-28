@@ -41,7 +41,8 @@ export_cartoons <- function(
   scale = 1,
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
-  style = style_glydraw()
+  style = style_glydraw(),
+  red_end = NULL
 ) {
   if (!missing(dpi)) {
     .warn_ignored_dpi()
@@ -60,7 +61,8 @@ export_cartoons.character <- function(
   scale = 1,
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
-  style = style_glydraw()
+  style = style_glydraw(),
+  red_end = NULL
 ) {
   .export_cartoon_list(
     unique(.as_glycan_structure_input(x)),
@@ -69,7 +71,8 @@ export_cartoons.character <- function(
     scale,
     show_linkage,
     orient,
-    style
+    style,
+    red_end
   )
 }
 
@@ -83,7 +86,8 @@ export_cartoons.glyrepr_structure <- function(
   scale = 1,
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
-  style = style_glydraw()
+  style = style_glydraw(),
+  red_end = NULL
 ) {
   .export_cartoon_list(
     unique(x),
@@ -92,7 +96,8 @@ export_cartoons.glyrepr_structure <- function(
     scale,
     show_linkage,
     orient,
-    style
+    style,
+    red_end
   )
 }
 
@@ -103,7 +108,8 @@ export_cartoons.glyrepr_structure <- function(
   scale,
   show_linkage,
   orient,
-  style
+  style,
+  red_end
 ) {
   cli::cli_alert_info("Exporting {.val {length(glycans)}} glycan cartoons.")
   fs::dir_create(dirname)
@@ -113,7 +119,8 @@ export_cartoons.glyrepr_structure <- function(
     draw_cartoon,
     show_linkage = show_linkage,
     orient = orient,
-    style = style
+    style = style,
+    red_end = red_end
   )
   filenames <- fs::path(
     dirname,

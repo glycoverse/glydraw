@@ -51,7 +51,8 @@ draw_cartoon_sketch <- function(
   hachure_angle = 45,
   hachure_gap = 0.03,
   fill_weight = 0.5,
-  medium = NULL
+  medium = NULL,
+  red_end = NULL
 ) {
   rlang::check_installed(
     "ggsketch",
@@ -64,7 +65,8 @@ draw_cartoon_sketch <- function(
     show_linkage = show_linkage,
     orient = orient,
     highlight = highlight,
-    style = style
+    style = style,
+    red_end = red_end
   )
   sketch <- list(
     roughness = roughness,

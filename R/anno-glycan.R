@@ -42,6 +42,8 @@
 #'   the cartoons. Defaults to `TRUE`.
 #' @param style A [style_glydraw()] object that controls the cartoons' visual
 #'   appearance.
+#' @param red_end Reducing-end annotation. `NULL`, the default, uses `red_end`
+#'   from `style`. A non-`NULL` value overrides `style$red_end`.
 #' @param width Optional [grid::unit()] width for a row annotation. `NULL`
 #'   calculates the width from the rendered cartoons.
 #' @param height Optional [grid::unit()] height for a column annotation. `NULL`
@@ -92,7 +94,8 @@ anno_glycan <- function(
   style = style_glydraw(),
   width = NULL,
   height = NULL,
-  show_name = FALSE
+  show_name = FALSE,
+  red_end = NULL
 ) {
   if (!requireNamespace("ComplexHeatmap", quietly = TRUE)) {
     cli::cli_abort(
@@ -110,6 +113,7 @@ anno_glycan <- function(
     vjust <- switch(which, column = 0, row = vjust_red_end())
   }
   checkmate::assert_flag(show_name)
+  red_end <- .resolve_red_end(red_end, style)
 
   options <- .validate_glycan_label_options(
     orient = orient,
@@ -120,7 +124,7 @@ anno_glycan <- function(
     nudge_x = nudge_x,
     nudge_y = nudge_y,
     show_linkage = show_linkage,
-    red_end = style$red_end,
+    red_end = red_end,
     fuc_orient = style$fuc_orient,
     edge_linewidth = style$edge_linewidth,
     node_linewidth = style$node_linewidth,

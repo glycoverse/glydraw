@@ -23,6 +23,8 @@
 #'   the cartoons. Defaults to `TRUE`.
 #' @param style A [style_glydraw()] object that controls the cartoons' visual
 #'   appearance.
+#' @param red_end Reducing-end annotation. `NULL`, the default, uses `red_end`
+#'   from `style`. A non-`NULL` value overrides `style$red_end`.
 #'
 #' @returns A ggplot2 legend guide that draws glycan cartoons in place of text
 #'   labels.
@@ -62,7 +64,8 @@ guide_glycan <- function(
   hjust = 0,
   vjust = vjust_red_end(),
   show_linkage = TRUE,
-  style = style_glydraw()
+  style = style_glydraw(),
+  red_end = NULL
 ) {
   hjust_is_missing <- missing(hjust)
   vjust_is_missing <- missing(vjust)
@@ -77,6 +80,7 @@ guide_glycan <- function(
   .validate_red_end_justification_orientation(hjust, vjust, orient)
   .validate_glycan_justification_scalar(hjust, "hjust")
   .validate_glycan_justification_scalar(vjust, "vjust")
+  red_end <- .resolve_red_end(red_end, style)
   show_linkage <- .resolve_linkage_visibility(
     show_linkage,
     style$node_size
@@ -112,7 +116,7 @@ guide_glycan <- function(
     glycan_hjust = hjust,
     glycan_vjust = vjust,
     glycan_show_linkage = show_linkage,
-    glycan_red_end = style$red_end,
+    glycan_red_end = red_end,
     glycan_fuc_orient = style$fuc_orient,
     glycan_edge_linewidth = style$edge_linewidth,
     glycan_node_linewidth = style$node_linewidth,

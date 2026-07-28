@@ -478,6 +478,29 @@ test_that("glycan axis labels support reducing-end annotations", {
   )
 })
 
+test_that("glycan scales red_end overrides their styles", {
+  style <- style_glydraw(red_end = "~")
+
+  expect_identical(
+    scale_x_glycan(style = style)$guide$params$glycan_red_end,
+    "~"
+  )
+  expect_identical(
+    scale_x_glycan(
+      style = style,
+      red_end = "Reducing end"
+    )$guide$params$glycan_red_end,
+    "Reducing end"
+  )
+  expect_identical(
+    scale_y_glycan(
+      style = style,
+      red_end = "Reducing end"
+    )$guide$params$glycan_red_end,
+    "Reducing end"
+  )
+})
+
 test_that("glycan axis scales use plain cartoon parameters", {
   data <- data.frame(
     structure = "Gal(b1-3)GalNAc(a1-",

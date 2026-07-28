@@ -17,7 +17,8 @@ geom_glycan(
   style = style_glydraw(),
   na.rm = FALSE,
   show.legend = NA,
-  inherit.aes = TRUE
+  inherit.aes = TRUE,
+  red_end = NULL
 )
 }
 \arguments{
@@ -63,6 +64,9 @@ warning. If \code{TRUE}, missing values are silently removed.}
 
 \item{inherit.aes}{If \code{FALSE}, overrides the default aesthetics rather than
 combining with them.}
+
+\item{red_end}{Reducing-end annotation. \code{NULL}, the default, uses \code{red_end}
+from \code{style}. A non-\code{NULL} value overrides \code{style$red_end}.}
 }
 \value{
 A ggplot2 layer that can be added to a \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object.

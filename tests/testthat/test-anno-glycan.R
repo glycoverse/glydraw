@@ -195,6 +195,19 @@ test_that("anno_glycan supports scale label adjustments and styles", {
   expect_equal(positioned$vp$angle, -45)
 })
 
+test_that("anno_glycan red_end overrides its style", {
+  skip_if_not_installed("ComplexHeatmap")
+  annotation <- anno_glycan(
+    "Gal(b1-3)GalNAc(a1-",
+    style = style_glydraw(red_end = "~"),
+    red_end = "Reducing end"
+  )
+  reducing_annotation <-
+    annotation@var_env$grobs[[1]]$annotation_data$reducing_info$annotation
+
+  expect_match(reducing_annotation$annot[[2]], "Reducing end")
+})
+
 test_that("anno_glycan sizes rotated and nudged labels like glycan scales", {
   skip_if_not_installed("ComplexHeatmap")
   grDevices::pdf(NULL)

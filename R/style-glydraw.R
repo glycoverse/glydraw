@@ -158,3 +158,11 @@ style_glycoworkbench <- function(
     class = "glydraw_style"
   )
 }
+
+.resolve_red_end <- function(red_end, style) {
+  if (is.null(red_end)) {
+    return(style$red_end)
+  }
+  checkmate::assert_string(red_end, na.ok = FALSE)
+  red_end
+}

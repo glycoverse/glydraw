@@ -13,7 +13,8 @@ export_cartoons(
   scale = 1,
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
-  style = style_glydraw()
+  style = style_glydraw(),
+  red_end = NULL
 )
 }
 \arguments{
@@ -40,6 +41,9 @@ one of \code{"left"}, \code{"right"}, \code{"up"}, or \code{"down"}. Defaults to
 
 \item{style}{A \code{\link[=style_glydraw]{style_glydraw()}} object that controls the cartoon's visual
 appearance.}
+
+\item{red_end}{Reducing-end annotation. \code{NULL}, the default, uses \code{red_end}
+from \code{style}. A non-\code{NULL} value overrides \code{style$red_end}.}
 }
 \value{
 The function returns the list of cartoons implicitly.

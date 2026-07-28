@@ -155,9 +155,11 @@ geom_glycan <- function(
   style = style_glydraw(),
   na.rm = FALSE,
   show.legend = NA,
-  inherit.aes = TRUE
+  inherit.aes = TRUE,
+  red_end = NULL
 ) {
   orient <- rlang::arg_match(orient)
+  red_end <- .resolve_red_end(red_end, style)
   show_linkage <- .resolve_linkage_visibility(
     show_linkage,
     style$node_size
@@ -167,7 +169,7 @@ geom_glycan <- function(
     show_linkage = show_linkage,
     orient = orient,
     fuc_orient = style$fuc_orient,
-    red_end = style$red_end,
+    red_end = red_end,
     edge_linewidth = style$edge_linewidth,
     node_linewidth = style$node_linewidth,
     node_size = style$node_size,
