@@ -2,11 +2,7 @@
 
 ## Breaking changes
 
-* `red_end` in `style_glydraw()`, `style_glygen()`, `style_snfg()`, and
-  `style_glycoworkbench()` must now be a string. Set `red_end_length = 0` to
-  conceal the reducing-end line while retaining its axis-aligned anomer
-  annotation. Explicit `red_end = NULL` on drawing interfaces continues to
-  inherit `red_end` from `style`.
+* `red_end` in `style_glydraw()`, `style_glygen()`, `style_snfg()`, and `style_glycoworkbench()` must now be a string. Set `red_end_length = 0` to conceal the reducing-end line while retaining its axis-aligned anomer annotation. Explicit `red_end = NULL` on drawing interfaces continues to inherit `red_end` from `style`. (#80)
 
 * `glydraw_style()` has been renamed to `style_glydraw()` and is no longer exported; replace calls to `glydraw_style()` with `style_glydraw()`. (#73)
 
@@ -16,8 +12,7 @@
 
 ## New features
 
-* New `red_end_length` style option controls the length of the reducing-end
-  line.
+* New `red_end_length` style option controls the length of the reducing-end line. (#80)
 
 * New `draw_cartoon_sketch()` draws hand-sketched glycan cartoons with reproducible rough strokes, patterned residue fills, optional drawing media, and the same layout, annotation, orientation, highlighting, styling, sizing, and saving behavior as `draw_cartoon()`. (#77)
 
