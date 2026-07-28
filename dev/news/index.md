@@ -36,6 +36,15 @@
 
 ### New features
 
+- New
+  [`draw_cartoon_sketch()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon_sketch.md)
+  draws hand-sketched glycan cartoons with reproducible rough strokes,
+  patterned residue fills, optional drawing media, and the same layout,
+  annotation, orientation, highlighting, styling, sizing, and saving
+  behavior as
+  [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md).
+  ([\#77](https://github.com/glycoverse/glydraw/issues/77))
+
 - [`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md)
   replaces `glydraw_style()` as the single reusable interface for tuning
   cartoon appearance; `show_linkage` and `orient` are explicit drawing

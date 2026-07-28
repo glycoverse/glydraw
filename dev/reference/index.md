@@ -4,6 +4,8 @@
 
 - [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
   : Draw a Symbol Nomenclature For Glycan (SNFG)
+- [`draw_cartoon_sketch()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon_sketch.md)
+  : Draw a sketch-style glycan cartoon
 - [`print(`*`<glydraw_cartoon>`*`)`](https://glycoverse.github.io/glydraw/dev/reference/print.glydraw_cartoon.md)
   : Print glycan cartoon
 - [`save_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/save_cartoon.md)
