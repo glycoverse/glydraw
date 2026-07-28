@@ -36,12 +36,12 @@
 style_glydraw <- function(
   fuc_orient = "flex",
   red_end = "",
+  red_end_length = 0.6,
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "",
-  colors = glydraw_colors(),
-  red_end_length = 0.6
+  colors = glydraw_colors()
 ) {
   .make_glydraw_style(
     fuc_orient = fuc_orient,
@@ -60,12 +60,12 @@ style_glydraw <- function(
 style_glygen <- function(
   fuc_orient = "flex",
   red_end = "~",
+  red_end_length = 0.6,
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "arial",
-  colors = glydraw_colors(),
-  red_end_length = 0.6
+  colors = glydraw_colors()
 ) {
   .make_glydraw_style(
     fuc_orient = fuc_orient,
@@ -84,12 +84,12 @@ style_glygen <- function(
 style_snfg <- function(
   fuc_orient = "up",
   red_end = "",
+  red_end_length = 0.6,
   edge_linewidth = 1.5,
   node_linewidth = 0.8,
   node_size = 1.15,
   font_family = "arial",
-  colors = glydraw_colors(),
-  red_end_length = 0.6
+  colors = glydraw_colors()
 ) {
   .make_glydraw_style(
     fuc_orient = fuc_orient,
@@ -108,6 +108,7 @@ style_snfg <- function(
 style_glycoworkbench <- function(
   fuc_orient = "flex",
   red_end = "~",
+  red_end_length = 0.6,
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
@@ -123,8 +124,7 @@ style_glycoworkbench <- function(
     glyLightBlue = "#EDFEFF",
     glyBrown = "#8F663B",
     glyRed = "#E53222"
-  ),
-  red_end_length = 0.6
+  )
 ) {
   .make_glydraw_style(
     fuc_orient = fuc_orient,

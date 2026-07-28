@@ -10,47 +10,47 @@
 style_glydraw(
   fuc_orient = "flex",
   red_end = "",
+  red_end_length = 0.6,
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "",
-  colors = glydraw_colors(),
-  red_end_length = 0.6
+  colors = glydraw_colors()
 )
 
 style_glygen(
   fuc_orient = "flex",
   red_end = "~",
+  red_end_length = 0.6,
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "arial",
-  colors = glydraw_colors(),
-  red_end_length = 0.6
+  colors = glydraw_colors()
 )
 
 style_snfg(
   fuc_orient = "up",
   red_end = "",
+  red_end_length = 0.6,
   edge_linewidth = 1.5,
   node_linewidth = 0.8,
   node_size = 1.15,
   font_family = "arial",
-  colors = glydraw_colors(),
-  red_end_length = 0.6
+  colors = glydraw_colors()
 )
 
 style_glycoworkbench(
   fuc_orient = "flex",
   red_end = "~",
+  red_end_length = 0.6,
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "arial",
   colors = c(glyWhite = "#FFFFFF", glyBlue = "#0000F0", glyGreen = "#5AC54B", glyYellow =
     "#FFFF54", glyOrange = "#F7EAD7", glyPink = "#FFFFFF", glyPurple = "#B726C1",
-    glyLightBlue = "#EDFEFF", glyBrown = "#8F663B", glyRed = "#E53222"),
-  red_end_length = 0.6
+    glyLightBlue = "#EDFEFF", glyBrown = "#8F663B", glyRed = "#E53222")
 )
 }
 \arguments{
@@ -58,6 +58,9 @@ style_glycoworkbench(
 
 \item{red_end}{Reducing-end annotation. Use \code{"~"} for a wave or \code{NULL} to
 omit the reducing-end line and anomer annotation.}
+
+\item{red_end_length}{Length of the reducing-end line in plot coordinate
+units.}
 
 \item{edge_linewidth}{Linewidth of glycosidic linkages.}
 
@@ -73,9 +76,6 @@ uses the graphics device's default font.}
 
 \item{colors}{A named character vector of SNFG colors in the format returned
 by \code{\link[=glydraw_colors]{glydraw_colors()}}. Names must be complete and match that palette.}
-
-\item{red_end_length}{Length of the reducing-end line in plot coordinate
-units.}
 }
 \value{
 A \code{glydraw_style} object.

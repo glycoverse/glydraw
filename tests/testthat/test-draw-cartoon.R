@@ -320,12 +320,15 @@ test_that("style constructors control reducing-end line length", {
   )
   styles <- purrr::map(constructors, ~ .x(red_end_length = 1.25))
 
-  expect_true(all(purrr::map_dbl(styles, "red_end_length") == 1.25))
-  expect_true(all(purrr::map_dbl(constructors, ~ .x()$red_end_length) == 0.6))
-  expect_true(all(
-    purrr::map_chr(constructors, ~ tail(names(formals(.x)), 1)) ==
-      "red_end_length"
-  ))
+  expect_equal(purrr::map_dbl(styles, "red_end_length"), rep(1.25, 4))
+  expect_equal(
+    purrr::map_dbl(constructors, ~ .x()$red_end_length),
+    rep(0.6, 4)
+  )
+  expect_equal(
+    purrr::map_chr(constructors, ~ names(formals(.x))[[3]]),
+    rep("red_end_length", 4)
+  )
 
   purrr::walk(c("left", "right", "up", "down"), function(orient) {
     segment <- glycanGrob(
