@@ -34,6 +34,21 @@ test_that("Hex residues use native circle grobs", {
 
   expect_s3_class(native_nodes[["glycan.node.circle"]], "circle")
   expect_s3_class(native_nodes[["glycan.node.polygon"]], "polygon")
+  old_polygon_radius <- diff(range(
+    grob$polygon_coor$point_x[hex_rows]
+  )) /
+    2
+  expected_radius <- old_polygon_radius *
+    .cartoon_units_per_coordinate /
+    .default_cartoon_dpi /
+    (1 + 2 * .cartoon_panel_expansion)
+  expect_lt(
+    abs(
+      as.numeric(native_nodes[["glycan.node.circle"]]$r) -
+        expected_radius
+    ),
+    5e-4
+  )
 
   plot <- .glycan_grob_to_plot(grob)
   gtable <- ggplot2::ggplotGrob(plot)
@@ -47,11 +62,19 @@ test_that("Hex residues use native circle grobs", {
   )
 
   expect_length(residue_layers, 2)
-  expect_true(all(vapply(
+  circles <- lapply(
     residue_layers,
-    \(layer) any(vapply(layer$children, inherits, logical(1), "circle")),
-    logical(1)
-  )))
+    \(layer) Filter(\(child) inherits(child, "circle"), layer$children)[[1]]
+  )
+  circle_radii <- unname(vapply(
+    circles,
+    \(circle) as.numeric(circle$r),
+    numeric(1)
+  ))
+  expect_lt(
+    max(abs(circle_radii - expected_radius)),
+    5e-4
+  )
 })
 
 test_that("glycanGrob converts to the existing cartoon plot contract", {

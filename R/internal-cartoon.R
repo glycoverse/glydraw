@@ -5,6 +5,7 @@
 .default_cartoon_dpi <- 300
 .default_cartoon_border_px <- 50
 .cartoon_units_per_coordinate <- 3 * 118
+.cartoon_panel_expansion <- 0.05
 .node_size_linkage_threshold <- 1.4
 .node_size_upper_boundary <- 2
 
@@ -152,6 +153,21 @@
   return(polygon_coor)
 }
 
+#' Convert a residue radius to its physical circle-grob size
+#'
+#' @param radius Numeric radius in cartoon coordinates.
+#' @param scale Positive whole-cartoon size multiplier.
+#'
+#' @returns A numeric radius in inches.
+#' @noRd
+.cartoon_circle_radius_inches <- function(radius, scale = 1) {
+  radius *
+    .cartoon_units_per_coordinate /
+    .default_cartoon_dpi *
+    scale /
+    (1 + 2 * .cartoon_panel_expansion)
+}
+
 #' Draw residue polygons and native circles in one ggplot2 layer
 #'
 #' @noRd
@@ -201,9 +217,7 @@ GeomGlydrawResidue <- ggplot2::ggproto(
         x = grid::unit(centers$x, "native"),
         y = grid::unit(centers$y, "native"),
         r = grid::unit(
-          circle_data$radius *
-            .cartoon_units_per_coordinate /
-            .default_cartoon_dpi,
+          .cartoon_circle_radius_inches(circle_data$radius),
           "in"
         ),
         gp = grid::gpar(

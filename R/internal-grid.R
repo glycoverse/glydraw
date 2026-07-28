@@ -1,7 +1,5 @@
 # Internal helpers for drawing prepared glycan geometry directly with grid.
 
-.cartoon_grid_expansion <- 0.05
-
 #' Calculate native grid layout metadata
 #'
 #' @param grob A prepared `glycanGrob`.
@@ -39,7 +37,7 @@
   panel_ranges <- lapply(
     data_ranges,
     scales::expand_range,
-    mul = .cartoon_grid_expansion
+    mul = .cartoon_panel_expansion
   )
   panel_size_px <- c(
     width = .cartoon_units_per_coordinate * diff(x_range),
@@ -420,10 +418,10 @@
         "native"
       ),
       r = grid::unit(
-        polygons$radius[circle_groups] *
-          .cartoon_units_per_coordinate /
-          .default_cartoon_dpi *
-          scale,
+        .cartoon_circle_radius_inches(
+          polygons$radius[circle_groups],
+          scale
+        ),
         "in"
       ),
       gp = grid::gpar(

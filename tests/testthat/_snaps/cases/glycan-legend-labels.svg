@@ -57,21 +57,21 @@
 <line x1='670.93' y1='270.65' x2='647.75' y2='270.65' style='stroke-width: 0.51; stroke-linecap: butt;' />
 <line x1='670.93' y1='270.65' x2='684.83' y2='270.65' style='stroke-width: 0.51; stroke-linecap: butt;' />
 <polygon points='665.94,275.64 665.94,265.67 675.91,265.67 675.91,275.64 665.94,275.64 ' style='stroke-width: 0.51; stroke: #FFFFFF; stroke-linecap: butt; fill: #FFFFFF;' />
-<circle cx='647.75' cy='270.65' r='5.48' style='stroke-width: 0.51; stroke: #FFFFFF; stroke-linecap: butt; fill: #FFFFFF;' />
+<circle cx='647.75' cy='270.65' r='4.98' style='stroke-width: 0.51; stroke: #FFFFFF; stroke-linecap: butt; fill: #FFFFFF;' />
 <polygon points='665.94,275.64 665.94,265.67 675.91,265.67 675.91,275.64 665.94,275.64 ' style='stroke-width: 0.51; stroke-linecap: butt; fill: #FFD400;' />
-<circle cx='647.75' cy='270.65' r='5.48' style='stroke-width: 0.51; stroke-linecap: butt; fill: #FFD400;' />
+<circle cx='647.75' cy='270.65' r='4.98' style='stroke-width: 0.51; stroke-linecap: butt; fill: #FFD400;' />
 <line x1='670.93' y1='302.99' x2='647.75' y2='314.58' style='stroke-width: 0.51; stroke-linecap: butt;' />
 <line x1='670.93' y1='302.99' x2='647.75' y2='291.41' style='stroke-width: 0.51; stroke-linecap: butt;' />
 <line x1='694.10' y1='302.99' x2='670.93' y2='302.99' style='stroke-width: 0.51; stroke-linecap: butt;' />
 <line x1='694.10' y1='302.99' x2='708.00' y2='302.99' style='stroke-width: 0.51; stroke-linecap: butt;' />
 <polygon points='689.11,307.98 689.11,298.01 699.08,298.01 699.08,307.98 689.11,307.98 ' style='stroke-width: 0.51; stroke: #FFFFFF; stroke-linecap: butt; fill: #FFFFFF;' />
-<circle cx='670.93' cy='302.99' r='5.48' style='stroke-width: 0.51; stroke: #FFFFFF; stroke-linecap: butt; fill: #FFFFFF;' />
-<circle cx='647.75' cy='314.58' r='5.48' style='stroke-width: 0.51; stroke: #FFFFFF; stroke-linecap: butt; fill: #FFFFFF;' />
-<circle cx='647.75' cy='291.41' r='5.48' style='stroke-width: 0.51; stroke: #FFFFFF; stroke-linecap: butt; fill: #FFFFFF;' />
+<circle cx='670.93' cy='302.99' r='4.98' style='stroke-width: 0.51; stroke: #FFFFFF; stroke-linecap: butt; fill: #FFFFFF;' />
+<circle cx='647.75' cy='314.58' r='4.98' style='stroke-width: 0.51; stroke: #FFFFFF; stroke-linecap: butt; fill: #FFFFFF;' />
+<circle cx='647.75' cy='291.41' r='4.98' style='stroke-width: 0.51; stroke: #FFFFFF; stroke-linecap: butt; fill: #FFFFFF;' />
 <polygon points='689.11,307.98 689.11,298.01 699.08,298.01 699.08,307.98 689.11,307.98 ' style='stroke-width: 0.51; stroke-linecap: butt; fill: #0072BC;' />
-<circle cx='670.93' cy='302.99' r='5.48' style='stroke-width: 0.51; stroke-linecap: butt; fill: #00A651;' />
-<circle cx='647.75' cy='314.58' r='5.48' style='stroke-width: 0.51; stroke-linecap: butt; fill: #00A651;' />
-<circle cx='647.75' cy='291.41' r='5.48' style='stroke-width: 0.51; stroke-linecap: butt; fill: #00A651;' />
+<circle cx='670.93' cy='302.99' r='4.98' style='stroke-width: 0.51; stroke-linecap: butt; fill: #00A651;' />
+<circle cx='647.75' cy='314.58' r='4.98' style='stroke-width: 0.51; stroke-linecap: butt; fill: #00A651;' />
+<circle cx='647.75' cy='291.41' r='4.98' style='stroke-width: 0.51; stroke-linecap: butt; fill: #00A651;' />
 <text x='35.24' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='119.63px' lengthAdjust='spacingAndGlyphs'>glycan legend labels</text>
 </g>
 </svg>
