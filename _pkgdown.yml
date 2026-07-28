@@ -9,6 +9,7 @@ reference:
   - title: Draw and export glycans
     contents:
       - draw_cartoon
+      - draw_cartoon_sketch
       - print.glydraw_cartoon
       - save_cartoon
       - export_cartoons

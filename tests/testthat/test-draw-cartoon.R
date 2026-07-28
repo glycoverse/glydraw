@@ -362,6 +362,7 @@ test_that("cartoon styling is available only through style", {
   styling_arguments <- names(formals(style_glydraw))
   interfaces <- list(
     draw_cartoon = draw_cartoon,
+    draw_cartoon_sketch = draw_cartoon_sketch,
     glycanGrob = glycanGrob,
     geom_glycan = geom_glycan,
     guide_glycan = guide_glycan,
