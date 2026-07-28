@@ -70,7 +70,10 @@ test_that("draw_cartoon_sketch gives each node a reproducible random seed", {
   changed <- draw_cartoon_sketch(structure, seed = 12)
   node_seeds <- function(plot) {
     layers <- Filter(
-      \(layer) inherits(layer$geom, "GeomSketchPolygon"),
+      \(layer) {
+        inherits(layer$geom, "GeomSketchCircle") ||
+          inherits(layer$geom, "GeomSketchPolygon")
+      },
       plot$layers
     )
     vapply(layers, \(layer) layer$geom_params$seed, numeric(1))
@@ -80,6 +83,27 @@ test_that("draw_cartoon_sketch gives each node a reproducible random seed", {
   expect_length(unique(node_seeds(first)), 4)
   expect_identical(node_seeds(first), node_seeds(second))
   expect_identical(identical(node_seeds(first), node_seeds(changed)), FALSE)
+})
+
+test_that("draw_cartoon_sketch uses smoother sketch circles for Hex nodes", {
+  plot <- draw_cartoon_sketch(
+    "Gal(b1-3)GlcNAc(b1-",
+    roughness = 1,
+    seed = 1
+  )
+  circle_layers <- Filter(
+    \(layer) inherits(layer$geom, "GeomSketchCircle"),
+    plot$layers
+  )
+  polygon_layers <- Filter(
+    \(layer) inherits(layer$geom, "GeomSketchPolygon"),
+    plot$layers
+  )
+
+  expect_length(circle_layers, 1)
+  expect_length(polygon_layers, 1)
+  expect_equal(circle_layers[[1]]$aes_params$roughness, 0.1)
+  expect_equal(polygon_layers[[1]]$geom_params$roughness, 1)
 })
 
 test_that("draw_cartoon_sketch builds a fixed-size sketch cartoon", {
@@ -93,7 +117,8 @@ test_that("draw_cartoon_sketch builds a fixed-size sketch cartoon", {
   expect_s3_class(plot, "ggplot")
   expect_s3_class(plot$layers[[1]]$geom, "GeomSketchSegment")
   expect_s3_class(plot$layers[[2]]$geom, "GeomPolygon")
-  expect_s3_class(plot$layers[[3]]$geom, "GeomSketchPolygon")
+  expect_s3_class(plot$layers[[3]]$geom, "GeomSketchCircle")
+  expect_s3_class(plot$layers[[4]]$geom, "GeomSketchPolygon")
   expect_named(attr(plot, "glydraw_size_px"), c("width", "height"))
   expect_equal(attr(plot, "glydraw_font_family"), "sans")
 })

@@ -45,7 +45,8 @@ setting \code{highlight = c(1, 3)} will highlight the "Gal" and "GalNAc" nodes.}
 appearance.}
 
 \item{roughness}{Non-negative roughness of the hand-drawn strokes. Zero
-produces straight strokes.}
+produces straight strokes. Hex circle outlines are automatically softened
+to keep their curved borders smooth.}
 
 \item{bowing}{Non-negative multiplier controlling how much strokes bow.}
 

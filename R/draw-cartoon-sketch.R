@@ -14,7 +14,8 @@
 #' @param show_linkage Show glycosidic linkage annotations or not. Defaults to
 #'   `TRUE`. Substituent annotations are always shown.
 #' @param roughness Non-negative roughness of the hand-drawn strokes. Zero
-#'   produces straight strokes.
+#'   produces straight strokes. Hex circle outlines are automatically softened
+#'   to keep their curved borders smooth.
 #' @param bowing Non-negative multiplier controlling how much strokes bow.
 #' @param n_passes Number of times each sketch stroke is drawn.
 #' @param seed An optional integer seed for reproducible sketch strokes. When

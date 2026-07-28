@@ -94,17 +94,43 @@
   seeds <- .sketch_node_seeds(sketch$seed, length(rows_by_group))
 
   purrr::map2(rows_by_group, seeds, function(rows, seed) {
-    polygon <- grob$polygon_coor[rows, , drop = FALSE]
+    node <- grob$polygon_coor[rows, , drop = FALSE]
+    if (node$primitive[[1L]] == "circle") {
+      return(
+        ggsketch::geom_sketch_circle(
+          data = node[1L, , drop = FALSE],
+          ggplot2::aes(
+            x = .data$center_x,
+            y = .data$center_y,
+            r = .data$radius
+          ),
+          alpha = node$alpha[[1L]],
+          fill = grob$filled_color[[rows[[1L]]]],
+          color = scales::alpha("black", node$alpha[[1L]]),
+          linewidth = grob$node_linewidth,
+          # Ellipse jitter reads more strongly than polygon jitter at node size.
+          roughness = sketch$roughness * 0.1,
+          bowing = sketch$bowing,
+          n_passes = sketch$n_passes,
+          seed = seed,
+          fill_style = sketch$fill_style,
+          hachure_angle = sketch$hachure_angle,
+          hachure_gap = sketch$hachure_gap,
+          fill_weight = sketch$fill_weight
+        )
+      )
+    }
+
     ggsketch::geom_sketch_polygon(
-      data = polygon,
+      data = node,
       ggplot2::aes(
         x = .data$point_x,
         y = .data$point_y,
         group = .data$group
       ),
-      alpha = polygon$alpha,
+      alpha = node$alpha,
       fill = grob$filled_color[rows],
-      color = scales::alpha("black", polygon$alpha),
+      color = scales::alpha("black", node$alpha),
       linewidth = grob$node_linewidth,
       roughness = sketch$roughness,
       bowing = sketch$bowing,
