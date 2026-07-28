@@ -31,7 +31,8 @@ scale_x_glycan(
   nudge_x = 0,
   nudge_y = 0,
   show_linkage = TRUE,
-  style = style_glydraw()
+  style = style_glydraw(),
+  red_end = NULL
 )
 
 scale_y_glycan(
@@ -49,7 +50,8 @@ scale_y_glycan(
   nudge_x = 0,
   nudge_y = 0,
   show_linkage = TRUE,
-  style = style_glydraw()
+  style = style_glydraw(),
+  red_end = NULL
 )
 ```
 
@@ -134,6 +136,11 @@ scale_y_glycan(
   A
   [`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md)
   object that controls the cartoons' visual appearance.
+
+- red_end:
+
+  Reducing-end annotation. `NULL`, the default, uses `red_end` from
+  `style`. A non-`NULL` value overrides `style$red_end`.
 
 ## Value
 

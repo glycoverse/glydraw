@@ -63,7 +63,8 @@ follow row or column clustering, reordering, and splitting.</p>
 <span>  style <span class="op">=</span> <span class="fu"><a href="style_glydraw.html">style_glydraw</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  width <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  height <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  show_name <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  show_name <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  red_end <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -142,6 +143,11 @@ calculates the height from the rendered cartoons.</p></dd>
 <dd><p>Whether ComplexHeatmap should show the annotation name.
 Defaults to <code>FALSE</code> because the cartoons normally replace row or column
 names.</p></dd>
+
+
+<dt id="arg-red-end">red_end<a class="anchor" aria-label="anchor" href="#arg-red-end"></a></dt>
+<dd><p>Reducing-end annotation. <code>NULL</code>, the default, uses <code>red_end</code>
+from <code>style</code>. A non-<code>NULL</code> value overrides <code>style$red_end</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

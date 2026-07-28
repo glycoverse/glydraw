@@ -29,7 +29,8 @@ geom_glycan(
   style = style_glydraw(),
   na.rm = FALSE,
   show.legend = NA,
-  inherit.aes = TRUE
+  inherit.aes = TRUE,
+  red_end = NULL
 )
 ```
 
@@ -111,6 +112,11 @@ geom_glycan(
 
   If `FALSE`, overrides the default aesthetics rather than combining
   with them.
+
+- red_end:
+
+  Reducing-end annotation. `NULL`, the default, uses `red_end` from
+  `style`. A non-`NULL` value overrides `style$red_end`.
 
 ## Value
 

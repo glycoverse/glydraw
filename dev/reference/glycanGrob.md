@@ -13,7 +13,8 @@ glycanGrob(
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
   highlight = NULL,
-  style = style_glydraw()
+  style = style_glydraw(),
+  red_end = NULL
 )
 ```
 
@@ -59,6 +60,11 @@ glycanGrob(
   A
   [`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md)
   object that controls the cartoon's visual appearance.
+
+- red_end:
+
+  Reducing-end annotation. `NULL`, the default, uses `red_end` from
+  `style`. A non-`NULL` value overrides `style$red_end`.
 
 ## Value
 

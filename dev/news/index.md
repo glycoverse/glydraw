@@ -10,8 +10,8 @@
   [`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md).
   ([\#73](https://github.com/glycoverse/glydraw/issues/73))
 
-- Cartoon appearance is now configured only with
-  `style = style_glydraw(...)` across
+- Cartoon appearance is now configured with `style = style_glydraw(...)`
+  across
   [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md),
   [`glycanGrob()`](https://glycoverse.github.io/glydraw/dev/reference/glycanGrob.md),
   [`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md),
@@ -21,14 +21,16 @@
   [`anno_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/anno_glycan.md),
   and
   [`export_cartoons()`](https://glycoverse.github.io/glydraw/dev/reference/export_cartoons.md);
-  calls that pass `fuc_orient`, `red_end`, `edge_linewidth`,
-  `node_linewidth`, `node_size`, `font_family`, or `colors` directly
-  should move those arguments into
-  [`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md),
-  while `show_linkage` and `orient` remain explicit arguments and are no
-  longer accepted by
+  calls that pass `fuc_orient`, `edge_linewidth`, `node_linewidth`,
+  `node_size`, `font_family`, or `colors` directly should move those
+  arguments into
   [`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md).
-  ([\#73](https://github.com/glycoverse/glydraw/issues/73))
+  `show_linkage` and `orient` remain explicit arguments and are no
+  longer accepted by
+  [`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md),
+  while explicit `red_end` overrides the reusable style value.
+  ([\#73](https://github.com/glycoverse/glydraw/issues/73),
+  [\#79](https://github.com/glycoverse/glydraw/issues/79))
 
 - The shared `orient` argument no longer accepts `"H"` or `"V"`; calls
   using them now error and should replace `"H"` with `"left"` and `"V"`
@@ -48,13 +50,15 @@
 - [`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md)
   replaces `glydraw_style()` as the single reusable interface for tuning
   cartoon appearance; `show_linkage` and `orient` are explicit drawing
-  controls instead of style fields, while new
+  controls instead of style fields, and explicit `red_end = NULL`
+  inherits the style value. New
   [`style_glygen()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md),
   [`style_snfg()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md),
   and
   [`style_glycoworkbench()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md)
   provide reusable presets for common glycan-drawing conventions.
-  ([\#73](https://github.com/glycoverse/glydraw/issues/73))
+  ([\#73](https://github.com/glycoverse/glydraw/issues/73),
+  [\#79](https://github.com/glycoverse/glydraw/issues/79))
 
 - New `font_family` style option controls the font used for text
   annotations across glycan cartoons, including alpha and beta anomer
@@ -101,8 +105,8 @@
   keeping linkage notation readable with enlarged nodes.
   ([\#74](https://github.com/glycoverse/glydraw/issues/74))
 
-- `red_end = NULL` now omits both the reducing-end line and its anomer
-  annotation across glycan drawing interfaces.
+- `style_glydraw(red_end = NULL)` now omits both the reducing-end line
+  and its anomer annotation across glycan drawing interfaces.
   ([\#71](https://github.com/glycoverse/glydraw/issues/71))
 
 - Move beta linkage annotations slightly away from horizontal and skewed

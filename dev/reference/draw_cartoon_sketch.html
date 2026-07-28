@@ -67,7 +67,8 @@ layout, annotations, orientation, and sizing are otherwise identical to
 <span>  hachure_angle <span class="op">=</span> <span class="fl">45</span>,</span>
 <span>  hachure_gap <span class="op">=</span> <span class="fl">0.03</span>,</span>
 <span>  fill_weight <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>  medium <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  medium <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  red_end <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -148,6 +149,11 @@ node diameter. Defaults to <code>0.03</code>.</p></dd>
 <dt id="arg-medium">medium<a class="anchor" aria-label="anchor" href="#arg-medium"></a></dt>
 <dd><p>Optional drawing medium for linkage and reducing-end strokes.
 See <code><a href="https://orijitghosh.github.io/ggsketch/reference/sketch_media.html" class="external-link">ggsketch::sketch_media()</a></code> for the available media.</p></dd>
+
+
+<dt id="arg-red-end">red_end<a class="anchor" aria-label="anchor" href="#arg-red-end"></a></dt>
+<dd><p>Reducing-end annotation. <code>NULL</code>, the default, uses <code>red_end</code>
+from <code>style</code>. A non-<code>NULL</code> value overrides <code>style$red_end</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

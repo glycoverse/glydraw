@@ -25,7 +25,8 @@ draw_cartoon_sketch(
   hachure_angle = 45,
   hachure_gap = 0.03,
   fill_weight = 0.5,
-  medium = NULL
+  medium = NULL,
+  red_end = NULL
 )
 ```
 
@@ -115,6 +116,11 @@ draw_cartoon_sketch(
   Optional drawing medium for linkage and reducing-end strokes. See
   [`ggsketch::sketch_media()`](https://orijitghosh.github.io/ggsketch/reference/sketch_media.html)
   for the available media.
+
+- red_end:
+
+  Reducing-end annotation. `NULL`, the default, uses `red_end` from
+  `style`. A non-`NULL` value overrides `style$red_end`.
 
 ## Value
 

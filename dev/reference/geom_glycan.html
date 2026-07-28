@@ -83,7 +83,8 @@ background.</p>
 <span>  style <span class="op">=</span> <span class="fu"><a href="style_glydraw.html">style_glydraw</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  red_end <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -158,6 +159,11 @@ warning. If <code>TRUE</code>, missing values are silently removed.</p></dd>
 <dt id="arg-inherit-aes">inherit.aes<a class="anchor" aria-label="anchor" href="#arg-inherit-aes"></a></dt>
 <dd><p>If <code>FALSE</code>, overrides the default aesthetics rather than
 combining with them.</p></dd>
+
+
+<dt id="arg-red-end">red_end<a class="anchor" aria-label="anchor" href="#arg-red-end"></a></dt>
+<dd><p>Reducing-end annotation. <code>NULL</code>, the default, uses <code>red_end</code>
+from <code>style</code>. A non-<code>NULL</code> value overrides <code>style$red_end</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

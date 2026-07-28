@@ -23,7 +23,8 @@ anno_glycan(
   style = style_glydraw(),
   width = NULL,
   height = NULL,
-  show_name = FALSE
+  show_name = FALSE,
+  red_end = NULL
 )
 ```
 
@@ -106,6 +107,11 @@ anno_glycan(
 
   Whether ComplexHeatmap should show the annotation name. Defaults to
   `FALSE` because the cartoons normally replace row or column names.
+
+- red_end:
+
+  Reducing-end annotation. `NULL`, the default, uses `red_end` from
+  `style`. A non-`NULL` value overrides `style$red_end`.
 
 ## Value
 
