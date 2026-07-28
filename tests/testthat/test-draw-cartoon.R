@@ -311,6 +311,37 @@ test_that("red_end = NULL omits the complete reducing end", {
   expect_s3_class(draw_cartoon(structure, style = style), "glydraw_cartoon")
 })
 
+test_that("style constructors control reducing-end line length", {
+  constructors <- list(
+    style_glydraw,
+    style_glygen,
+    style_snfg,
+    style_glycoworkbench
+  )
+  styles <- purrr::map(constructors, ~ .x(red_end_length = 1.25))
+
+  expect_true(all(purrr::map_dbl(styles, "red_end_length") == 1.25))
+  expect_true(all(purrr::map_dbl(constructors, ~ .x()$red_end_length) == 0.6))
+  expect_true(all(
+    purrr::map_chr(constructors, ~ tail(names(formals(.x)), 1)) ==
+      "red_end_length"
+  ))
+
+  purrr::walk(c("left", "right", "up", "down"), function(orient) {
+    segment <- glycanGrob(
+      "Gal(b1-3)GalNAc(a1-",
+      orient = orient,
+      style = style_glydraw(red_end_length = 1.25)
+    )$annotation_data$reducing_info$segment
+    length <- sqrt(
+      (segment$end_x - segment$start_x)^2 +
+        (segment$end_y - segment$start_y)^2
+    )
+
+    expect_equal(length, 1.25)
+  })
+})
+
 test_that("draw_cartoon applies a complete custom SNFG palette", {
   structure <- "Gal(b1-4)GlcNAc(b1-"
   colors <- glydraw_colors()

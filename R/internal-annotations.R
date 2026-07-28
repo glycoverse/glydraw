@@ -1171,6 +1171,8 @@
 #' @param red_end A string or `NULL`. `NULL` omits the reducing end, `""`
 #'   draws only the current reducing-end line, `"~"` draws a wavy end, and any
 #'   other string draws custom text.
+#' @param red_end_length Length of the reducing-end line in plot coordinate
+#'   units.
 #'
 #' @returns A list with data frames `annotation`, `segment`, `wave`, and
 #'   `bounds`. `annotation` contains text rows; `segment` contains one line
@@ -1181,7 +1183,8 @@
   structure,
   coor,
   orient = c("left", "right", "up", "down"),
-  red_end = ""
+  red_end = "",
+  red_end_length = 0.6
 ) {
   orient <- rlang::arg_match(orient)
   if (is.null(red_end)) {
@@ -1194,7 +1197,12 @@
 
   label <- .reducing_end_anomer_label(anomer)
   root <- length(structure)
-  geometry <- .reducing_end_geometry(coor[root, ], orient, label = label)
+  geometry <- .reducing_end_geometry(
+    coor[root, ],
+    orient,
+    label = label,
+    line_length = red_end_length
+  )
   red_end_annotation <- .reducing_end_text_data(
     red_end,
     geometry$line_end,

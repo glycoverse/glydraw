@@ -9,6 +9,8 @@
 #' @param fuc_orient Fuc-like triangle orientation: `"flex"` or `"up"`.
 #' @param red_end Reducing-end annotation. Use `"~"` for a wave or `NULL` to
 #'   omit the reducing-end line and anomer annotation.
+#' @param red_end_length Length of the reducing-end line in plot coordinate
+#'   units.
 #' @param edge_linewidth Linewidth of glycosidic linkages.
 #' @param node_linewidth Linewidth of node borders.
 #' @param node_size Multiplier for the default node size.
@@ -38,7 +40,8 @@ style_glydraw <- function(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "",
-  colors = glydraw_colors()
+  colors = glydraw_colors(),
+  red_end_length = 0.6
 ) {
   .make_glydraw_style(
     fuc_orient = fuc_orient,
@@ -47,7 +50,8 @@ style_glydraw <- function(
     node_linewidth = node_linewidth,
     node_size = node_size,
     font_family = font_family,
-    colors = colors
+    colors = colors,
+    red_end_length = red_end_length
   )
 }
 
@@ -60,7 +64,8 @@ style_glygen <- function(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "arial",
-  colors = glydraw_colors()
+  colors = glydraw_colors(),
+  red_end_length = 0.6
 ) {
   .make_glydraw_style(
     fuc_orient = fuc_orient,
@@ -69,7 +74,8 @@ style_glygen <- function(
     node_linewidth = node_linewidth,
     node_size = node_size,
     font_family = font_family,
-    colors = colors
+    colors = colors,
+    red_end_length = red_end_length
   )
 }
 
@@ -82,7 +88,8 @@ style_snfg <- function(
   node_linewidth = 0.8,
   node_size = 1.15,
   font_family = "arial",
-  colors = glydraw_colors()
+  colors = glydraw_colors(),
+  red_end_length = 0.6
 ) {
   .make_glydraw_style(
     fuc_orient = fuc_orient,
@@ -91,7 +98,8 @@ style_snfg <- function(
     node_linewidth = node_linewidth,
     node_size = node_size,
     font_family = font_family,
-    colors = colors
+    colors = colors,
+    red_end_length = red_end_length
   )
 }
 
@@ -115,7 +123,8 @@ style_glycoworkbench <- function(
     glyLightBlue = "#EDFEFF",
     glyBrown = "#8F663B",
     glyRed = "#E53222"
-  )
+  ),
+  red_end_length = 0.6
 ) {
   .make_glydraw_style(
     fuc_orient = fuc_orient,
@@ -124,7 +133,8 @@ style_glycoworkbench <- function(
     node_linewidth = node_linewidth,
     node_size = node_size,
     font_family = font_family,
-    colors = colors
+    colors = colors,
+    red_end_length = red_end_length
   )
 }
 
@@ -135,7 +145,8 @@ style_glycoworkbench <- function(
   node_linewidth,
   node_size,
   font_family,
-  colors
+  colors,
+  red_end_length
 ) {
   checkmate::assert_choice(fuc_orient, c("flex", "up"))
   checkmate::assert_string(red_end, na.ok = FALSE, null.ok = TRUE)
@@ -143,6 +154,7 @@ style_glycoworkbench <- function(
   checkmate::assert_number(node_linewidth, lower = 0)
   .validate_node_size(node_size)
   checkmate::assert_string(font_family, na.ok = FALSE)
+  checkmate::assert_number(red_end_length, lower = 0)
   colors <- .validate_colors(colors)
 
   structure(
@@ -153,7 +165,8 @@ style_glycoworkbench <- function(
       node_linewidth = node_linewidth,
       node_size = node_size,
       font_family = font_family,
-      colors = colors
+      colors = colors,
+      red_end_length = red_end_length
     ),
     class = "glydraw_style"
   )
