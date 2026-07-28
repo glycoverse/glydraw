@@ -15,7 +15,7 @@ draw_cartoon_sketch(
   bowing = 1,
   n_passes = 2L,
   seed = NULL,
-  fill_style = "hachure",
+  fill_style = "pencil_shade",
   hachure_angle = 45,
   hachure_gap = NULL,
   fill_weight = 0.5,
@@ -55,13 +55,13 @@ to keep their curved borders smooth.}
 \item{seed}{An optional integer seed for reproducible sketch strokes. When
 \code{NULL}, \code{ggsketch} uses \code{getOption("ggsketch.seed", 1L)}.}
 
-\item{fill_style}{Residue fill pattern. See
+\item{fill_style}{Residue fill pattern. Defaults to \code{"pencil_shade"}. See
 \code{\link[ggsketch:geom_sketch_polygon]{ggsketch::geom_sketch_polygon()}} for the available styles.}
 
 \item{hachure_angle}{Angle of patterned fill lines in degrees.}
 
-\item{hachure_gap}{Gap between patterned fill lines in normalized parent
-coordinates. \code{NULL} uses the \code{ggsketch} default.}
+\item{hachure_gap}{Gap between patterned fill lines as a proportion of the
+node diameter. \code{NULL} uses 0.15 for consistent density across node shapes.}
 
 \item{fill_weight}{Stroke weight of patterned fill lines.}
 

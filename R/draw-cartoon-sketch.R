@@ -20,11 +20,11 @@
 #' @param n_passes Number of times each sketch stroke is drawn.
 #' @param seed An optional integer seed for reproducible sketch strokes. When
 #'   `NULL`, `ggsketch` uses `getOption("ggsketch.seed", 1L)`.
-#' @param fill_style Residue fill pattern. See
+#' @param fill_style Residue fill pattern. Defaults to `"pencil_shade"`. See
 #'   [ggsketch::geom_sketch_polygon()] for the available styles.
 #' @param hachure_angle Angle of patterned fill lines in degrees.
-#' @param hachure_gap Gap between patterned fill lines in normalized parent
-#'   coordinates. `NULL` uses the `ggsketch` default.
+#' @param hachure_gap Gap between patterned fill lines as a proportion of the
+#'   node diameter. Defaults to `0.03`.
 #' @param fill_weight Stroke weight of patterned fill lines.
 #' @param medium Optional drawing medium for linkage and reducing-end strokes.
 #'   See [ggsketch::sketch_media()] for the available media.
@@ -47,9 +47,9 @@ draw_cartoon_sketch <- function(
   bowing = 1,
   n_passes = 2L,
   seed = NULL,
-  fill_style = "hachure",
+  fill_style = "pencil_shade",
   hachure_angle = 45,
-  hachure_gap = NULL,
+  hachure_gap = 0.03,
   fill_weight = 0.5,
   medium = NULL
 ) {

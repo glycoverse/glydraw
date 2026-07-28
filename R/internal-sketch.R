@@ -92,13 +92,12 @@
     factor(grob$polygon_coor$group, levels = group_levels)
   )
   seeds <- .sketch_node_seeds(sketch$seed, length(rows_by_group))
-  circle_hachure_gap <- sketch$hachure_gap
-  if (is.null(circle_hachure_gap)) {
-    circle_hachure_gap <- 0.07
-  }
+  fill_gap <- sketch$hachure_gap
 
   purrr::map2(rows_by_group, seeds, function(rows, seed) {
     node <- grob$polygon_coor[rows, , drop = FALSE]
+    node_diameter <- 2 * .cartoon_circle_radius_inches(node$radius[[1L]])
+    fill_gap_inches <- fill_gap * node_diameter
     if (node$primitive[[1L]] == "circle") {
       return(
         ggsketch::geom_sketch_circle(
@@ -119,8 +118,9 @@
           seed = seed,
           fill_style = sketch$fill_style,
           hachure_angle = sketch$hachure_angle,
-          hachure_gap = circle_hachure_gap,
-          fill_weight = sketch$fill_weight
+          hachure_gap = fill_gap,
+          fill_weight = sketch$fill_weight,
+          fill_roughness = sketch$roughness * 0.5
         )
       )
     }
@@ -142,8 +142,9 @@
       seed = seed,
       fill_style = sketch$fill_style,
       hachure_angle = sketch$hachure_angle,
-      hachure_gap = sketch$hachure_gap,
-      fill_weight = sketch$fill_weight
+      hachure_gap = fill_gap_inches,
+      fill_weight = sketch$fill_weight,
+      fill_roughness = sketch$roughness * 0.5
     )
   })
 }

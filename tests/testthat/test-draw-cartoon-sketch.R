@@ -85,7 +85,7 @@ test_that("draw_cartoon_sketch gives each node a reproducible random seed", {
   expect_identical(identical(node_seeds(first), node_seeds(changed)), FALSE)
 })
 
-test_that("draw_cartoon_sketch uses smooth shaded circles for Hex nodes", {
+test_that("draw_cartoon_sketch pencil shades every node by default", {
   plot <- draw_cartoon_sketch(
     "Gal(b1-3)GlcNAc(b1-",
     roughness = 1,
@@ -104,18 +104,44 @@ test_that("draw_cartoon_sketch uses smooth shaded circles for Hex nodes", {
     \(layer) inherits(layer$geom, "GeomSketchCircle"),
     custom_gap$layers
   )
+  custom_polygon_layers <- Filter(
+    \(layer) inherits(layer$geom, "GeomSketchPolygon"),
+    custom_gap$layers
+  )
   polygon_layers <- Filter(
     \(layer) inherits(layer$geom, "GeomSketchPolygon"),
     plot$layers
   )
+  node_diameter <- 2 *
+    .cartoon_circle_radius_inches(
+      circle_layers[[1]]$data$radius[[1]]
+    )
 
   expect_length(circle_layers, 1)
   expect_length(polygon_layers, 1)
   expect_equal(circle_layers[[1]]$aes_params$roughness, 0.1)
   expect_equal(polygon_layers[[1]]$geom_params$roughness, 1)
-  expect_identical(circle_layers[[1]]$geom_params$fill_style, "hachure")
-  expect_equal(circle_layers[[1]]$geom_params$hachure_gap, 0.07)
+  expect_identical(formals(draw_cartoon_sketch)$fill_style, "pencil_shade")
+  expect_identical(
+    circle_layers[[1]]$geom_params$fill_style,
+    "pencil_shade"
+  )
+  expect_identical(
+    polygon_layers[[1]]$geom_params$fill_style,
+    "pencil_shade"
+  )
+  expect_equal(circle_layers[[1]]$geom_params$fill_roughness, 0.5)
+  expect_equal(polygon_layers[[1]]$geom_params$fill_roughness, 0.5)
+  expect_equal(circle_layers[[1]]$geom_params$hachure_gap, 0.15)
+  expect_equal(
+    polygon_layers[[1]]$geom_params$hachure_gap,
+    0.15 * node_diameter
+  )
   expect_equal(custom_circle_layers[[1]]$geom_params$hachure_gap, 0.12)
+  expect_equal(
+    custom_polygon_layers[[1]]$geom_params$hachure_gap,
+    0.12 * node_diameter
+  )
 })
 
 test_that("draw_cartoon_sketch builds a fixed-size sketch cartoon", {
