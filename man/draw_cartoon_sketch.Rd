@@ -70,7 +70,8 @@ node diameter. Defaults to \code{0.03}.}
 See \code{\link[ggsketch:sketch_media]{ggsketch::sketch_media()}} for the available media.}
 
 \item{red_end}{Reducing-end annotation. \code{NULL}, the default, uses \code{red_end}
-from \code{style}. A non-\code{NULL} value overrides \code{style$red_end}.}
+from \code{style}. A non-\code{NULL} value overrides \code{style$red_end}. Ignored when
+\code{style$red_end_length} is \code{0}.}
 }
 \value{
 A \code{glydraw_cartoon} ggplot2 object.

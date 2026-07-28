@@ -5,7 +5,7 @@
     Condition
       Error in `.make_glydraw_style()`:
       ! `red_end` in a glycan style cannot be `NULL`.
-      i Set `red_end_length` to 0 to conceal the reducing-end line.
+      i Set `red_end_length` to 0 to omit the reducing-end line and `red_end` decoration while retaining the anomer annotation.
 
 # draw_cartoon rejects the previous orientation abbreviations
 

@@ -474,12 +474,8 @@ test_that("glycan axis labels support reducing-end annotations", {
       nrow,
       integer(1)
     ),
-    c(annotation = 1L, segment = 1L, wave = 0L, bounds = 0L)
+    c(annotation = 1L, segment = 0L, wave = 0L, bounds = 0L)
   )
-  zero_segment <-
-    zero_length_label$annotation_data$reducing_info$segment
-  expect_equal(zero_segment$end_x, zero_segment$start_x)
-  expect_equal(zero_segment$end_y, zero_segment$start_y)
 })
 
 test_that("glycan scales red_end overrides their styles", {

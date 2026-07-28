@@ -1169,14 +1169,17 @@
 #' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
 #'   `"down"`.
 #' @param red_end A string. `""` draws only the current reducing-end line,
-#'   `"~"` draws a wavy end, and any other string draws custom text.
+#'   `"~"` draws a wavy end, and any other string draws custom text. Ignored
+#'   when `red_end_length` is `0`.
 #' @param red_end_length Length of the reducing-end line in plot coordinate
-#'   units.
+#'   units. At `0`, the line and all `red_end` decorations are omitted while
+#'   the core anomer annotation remains.
 #'
 #' @returns A list with data frames `annotation`, `segment`, `wave`, and
 #'   `bounds`. `annotation` contains text rows; `segment` contains one line
-#'   segment row; `wave` contains path coordinates for `"~"`; `bounds` contains
-#'   invisible points used to reserve space for custom text.
+#'   segment row when `red_end_length` is positive; `wave` contains path
+#'   coordinates for `"~"`; `bounds` contains invisible points used to reserve
+#'   space for custom text.
 #' @noRd
 .reducing_end_annotation_data <- function(
   structure,
@@ -1200,6 +1203,16 @@
     label = label,
     line_length = red_end_length
   )
+  anomer_annotation <- .reducing_end_anomer_row(
+    root,
+    label,
+    geometry$label_coor
+  )
+  if (red_end_length == 0) {
+    result <- .empty_reducing_end_annotation_data()
+    result$annotation <- anomer_annotation
+    return(result)
+  }
   red_end_annotation <- .reducing_end_text_data(
     red_end,
     geometry$line_end,
@@ -1215,7 +1228,7 @@
   )
   list(
     annotation = dplyr::bind_rows(
-      .reducing_end_anomer_row(root, label, geometry$label_coor),
+      anomer_annotation,
       red_end_annotation
     ),
     segment = .reducing_end_segment_data(

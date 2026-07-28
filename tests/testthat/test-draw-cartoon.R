@@ -356,26 +356,34 @@ test_that("zero-length reducing ends retain axis-aligned anomer labels", {
     "Gal(b1-3)GalNAc(a1-",
     "Gal(b1-3)GalNAc(b1-"
   )
+  red_ends <- c("", "~", "Reducing end")
 
   purrr::walk(c("left", "right", "up", "down"), function(orient) {
     purrr::walk(structures, function(structure) {
-      grob <- glycanGrob(
-        structure,
-        orient = orient,
-        style = style_glydraw(red_end_length = 0)
-      )
-      reducing_info <- grob$annotation_data$reducing_info
-      segment <- reducing_info$segment
-      label <- reducing_info$annotation[1, c("x", "y")]
-      expected_label <- grob$reducing_end_coor +
-        .reducing_end_line_vector(orient, 0.42)
+      purrr::walk(red_ends, function(red_end) {
+        grob <- glycanGrob(
+          structure,
+          orient = orient,
+          style = style_glydraw(
+            red_end = red_end,
+            red_end_length = 0
+          )
+        )
+        reducing_info <- grob$annotation_data$reducing_info
+        label <- reducing_info$annotation[1, c("x", "y")]
+        expected_label <- grob$reducing_end_coor +
+          .reducing_end_line_vector(orient, 0.42)
 
-      expect_equal(segment$end_x, segment$start_x)
-      expect_equal(segment$end_y, segment$start_y)
-      expect_equal(
-        unname(unlist(label)),
-        unname(expected_label)
-      )
+        expect_equal(
+          vapply(reducing_info, nrow, integer(1)),
+          c(annotation = 1L, segment = 0L, wave = 0L, bounds = 0L)
+        )
+        expect_equal(
+          unname(unlist(label)),
+          unname(expected_label)
+        )
+        expect_identical(reducing_info$annotation$is_red_end_text, FALSE)
+      })
     })
   })
 })

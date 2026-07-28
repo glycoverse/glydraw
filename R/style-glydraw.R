@@ -8,10 +8,10 @@
 #'
 #' @param fuc_orient Fuc-like triangle orientation: `"flex"` or `"up"`.
 #' @param red_end Reducing-end annotation. Use `"~"` for a wave or any other
-#'   string for custom text.
+#'   string for custom text. Ignored when `red_end_length` is `0`.
 #' @param red_end_length Length of the reducing-end line in plot coordinate
-#'   units. Set to `0` to conceal the line while retaining the anomer
-#'   annotation.
+#'   units. Set to `0` to omit the line and any `red_end` wave or custom text
+#'   while retaining the axis-aligned core anomer annotation.
 #' @param edge_linewidth Linewidth of glycosidic linkages.
 #' @param node_linewidth Linewidth of node borders.
 #' @param node_size Multiplier for the default node size.
@@ -153,7 +153,10 @@ style_glycoworkbench <- function(
   if (is.null(red_end)) {
     cli::cli_abort(c(
       "{.arg red_end} in a glycan style cannot be {.code NULL}.",
-      "i" = "Set {.arg red_end_length} to 0 to conceal the reducing-end line."
+      "i" = paste(
+        "Set {.arg red_end_length} to 0 to omit the reducing-end line and",
+        "{.arg red_end} decoration while retaining the anomer annotation."
+      )
     ))
   }
   checkmate::assert_string(red_end, na.ok = FALSE)
