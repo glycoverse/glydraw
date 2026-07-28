@@ -1,5 +1,18 @@
 skip_if_not_installed("ggsketch", minimum_version = "2.0.0")
 
+test_that("draw_cartoon_sketch hides linkage annotations by default", {
+  default <- draw_cartoon_sketch("Gal(b1-3)GalNAc(a1-", seed = 1)
+  with_linkage <- draw_cartoon_sketch(
+    "Gal(b1-3)GalNAc(a1-",
+    show_linkage = TRUE,
+    seed = 1
+  )
+
+  expect_identical(formals(draw_cartoon_sketch)$show_linkage, FALSE)
+  expect_length(default$layers, 3)
+  expect_s3_class(with_linkage$layers[[4]]$geom, "GeomText")
+})
+
 test_that("draw_cartoon_sketch builds a fixed-size sketch cartoon", {
   plot <- draw_cartoon_sketch(
     "Gal(b1-3)GalNAc(a1-",
@@ -43,6 +56,7 @@ test_that("draw_cartoon_sketch preserves cartoon controls", {
 test_that("draw_cartoon_sketch sketches reducing-end waves", {
   plot <- draw_cartoon_sketch(
     "Gal(b1-3)GalNAc(a1-",
+    show_linkage = TRUE,
     style = style_glydraw(red_end = "~"),
     seed = 1
   )
@@ -51,7 +65,11 @@ test_that("draw_cartoon_sketch sketches reducing-end waves", {
 })
 
 test_that("draw_cartoon_sketch saves with its resolved handwriting font", {
-  plot <- draw_cartoon_sketch("Gal(b1-3)GalNAc(a1-", seed = 1)
+  plot <- draw_cartoon_sketch(
+    "Gal(b1-3)GalNAc(a1-",
+    show_linkage = TRUE,
+    seed = 1
+  )
   file <- tempfile(fileext = ".png")
   on.exit(unlink(file), add = TRUE)
 

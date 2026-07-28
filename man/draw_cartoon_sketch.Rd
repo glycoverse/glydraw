@@ -7,7 +7,7 @@
 draw_cartoon_sketch(
   structure,
   ...,
-  show_linkage = TRUE,
+  show_linkage = FALSE,
   orient = c("left", "right", "up", "down"),
   highlight = NULL,
   style = style_glydraw(),
@@ -28,8 +28,8 @@ or a string of any glycan structure text nomenclatures supported by \code{\link[
 
 \item{...}{Ignored.}
 
-\item{show_linkage}{Show glycosidic linkage annotations or not. Default is
-TRUE. Substituent annotations are always shown.}
+\item{show_linkage}{Show glycosidic linkage annotations or not. Defaults to
+\code{FALSE}. Substituent annotations are always shown.}
 
 \item{orient}{Direction in which the glycan extends from its reducing end:
 one of \code{"left"}, \code{"right"}, \code{"up"}, or \code{"down"}. Defaults to \code{"left"}.}
