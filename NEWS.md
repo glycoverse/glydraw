@@ -1,5 +1,9 @@
 # glydraw (development version)
 
+* `red_end` now accepts amino-acid sequences with one tagged glycosite, such as
+  `"ABC<site>D</site>EFG"`. The site is bold and anchored to the reducing end,
+  and the sequence rotates with the glycan orientation. (#78)
+
 ## Breaking changes
 
 * `red_end` in `style_glydraw()`, `style_glygen()`, `style_snfg()`, and `style_glycoworkbench()` must now be a string. Set `red_end_length = 0` to omit the reducing-end line and ignore any `red_end` wave or custom text while retaining its axis-aligned core anomer annotation. Explicit `red_end = NULL` on drawing interfaces continues to inherit `red_end` from `style`. (#80)

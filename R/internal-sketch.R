@@ -183,23 +183,30 @@
   }
   family <- .resolve_sketch_text_family()
   annotation$annot_label <- .sketch_annotation_labels(annotation)
-
-  text_layer <- ggsketch::geom_sketch_text(
-    data = annotation,
-    ggplot2::aes(
-      x = .data$x,
-      y = .data$y,
-      label = .data$annot_label,
-      hjust = .data$hjust,
-      vjust = .data$vjust
-    ),
-    alpha = annotation$transparency,
-    parse = FALSE,
-    size = 6,
-    family = family
-  )
-  plot <- plot + text_layer
-  attr(plot, "glydraw_sketch_font_family") <- text_layer$aes_params$family
+  aa_sequence <- annotation$is_aa_sequence
+  for (parse in c(FALSE, TRUE)) {
+    rows <- aa_sequence == parse
+    if (!any(rows)) {
+      next
+    }
+    text_layer <- ggsketch::geom_sketch_text(
+      data = annotation[rows, , drop = FALSE],
+      ggplot2::aes(
+        x = .data$x,
+        y = .data$y,
+        label = .data$annot_label,
+        hjust = .data$hjust,
+        vjust = .data$vjust,
+        angle = .data$angle
+      ),
+      alpha = annotation$transparency[rows],
+      parse = parse,
+      size = 6,
+      family = family
+    )
+    plot <- plot + text_layer
+  }
+  attr(plot, "glydraw_sketch_font_family") <- family
   plot
 }
 
@@ -216,6 +223,11 @@
     red_end_text <- !is.na(annotation$is_red_end_text) &
       annotation$is_red_end_text
     labels[red_end_text] <- .unquote_plotmath_text(labels[red_end_text])
+  }
+  if ("is_aa_sequence" %in% names(annotation)) {
+    labels[annotation$is_aa_sequence] <- annotation$annot_label[
+      annotation$is_aa_sequence
+    ]
   }
   labels[labels == "alpha"] <- "\u03b1"
   labels[labels == "beta"] <- "\u03b2"

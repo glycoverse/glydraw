@@ -56,8 +56,9 @@ style_glycoworkbench(
 \arguments{
 \item{fuc_orient}{Fuc-like triangle orientation: \code{"flex"} or \code{"up"}.}
 
-\item{red_end}{Reducing-end annotation. Use \code{"~"} for a wave or any other
-string for custom text. Ignored when \code{red_end_length} is \code{0}.}
+\item{red_end}{Reducing-end annotation. Use \code{"~"} for a wave, any other
+string for custom text, or tag one amino-acid site as
+\code{"ABC<site>D</site>EFG"}. Ignored when \code{red_end_length} is \code{0}.}
 
 \item{red_end_length}{Length of the reducing-end line in plot coordinate
 units. Set to \code{0} to omit the line and any \code{red_end} wave or custom text

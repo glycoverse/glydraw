@@ -1146,7 +1146,7 @@
 #'   wrapped in double quotes and embedded quotes escaped.
 #' @noRd
 .quote_plotmath_text <- function(annot) {
-  paste0('"', gsub('"', '\\"', annot, fixed = TRUE), '"')
+  encodeString(annot, quote = '"')
 }
 
 # Recover plain text previously stored for plotmath parsing.
@@ -1157,7 +1157,87 @@
     nchar(annot) >= 2L
   annot[quoted] <- substr(annot[quoted], 2L, nchar(annot[quoted]) - 1L)
   annot[quoted] <- gsub('\\"', '"', annot[quoted], fixed = TRUE)
+  annot[quoted] <- gsub("\\\\", "\\", annot[quoted], fixed = TRUE)
   annot
+}
+
+#' Parse a tagged reducing-end amino-acid sequence
+#'
+#' @param red_end A reducing-end annotation string.
+#'
+#' @returns `NULL` when `red_end` is ordinary custom text, otherwise a named
+#'   list containing `prefix`, `site`, and `suffix`.
+#' @noRd
+.parse_reducing_end_aa_sequence <- function(red_end) {
+  has_site_tag <- grepl("<site>|</site>", red_end, perl = TRUE)
+  if (!has_site_tag) {
+    return(NULL)
+  }
+
+  matched <- regexec(
+    "^([A-Za-z]*)<site>(.)</site>([A-Za-z]*)$",
+    red_end,
+    perl = TRUE
+  )
+  parts <- regmatches(red_end, matched)[[1]]
+  if (length(parts) != 4L || nchar(parts[[3]], type = "chars") != 1L) {
+    cli::cli_abort(c(
+      "{.arg red_end} has an invalid amino-acid site annotation.",
+      "i" = paste(
+        "Use one {.code <site></site>} pair containing exactly one",
+        "character, for example {.code ABC<site>D</site>EFG}."
+      )
+    ))
+  }
+
+  stats::setNames(as.list(parts[2:4]), c("prefix", "site", "suffix"))
+}
+
+#' Format a tagged amino-acid sequence as plotmath
+#'
+#' @param sequence A parsed sequence from
+#'   `.parse_reducing_end_aa_sequence()`.
+#'
+#' @returns A length-one plotmath string with a bold site.
+#' @noRd
+.format_reducing_end_aa_sequence <- function(sequence) {
+  paste0(
+    .quote_plotmath_text(sequence$prefix),
+    "~bold(",
+    .quote_plotmath_text(sequence$site),
+    ")~",
+    .quote_plotmath_text(sequence$suffix)
+  )
+}
+
+#' Calculate the tagged-site position within an amino-acid sequence
+#'
+#' @param sequence A parsed sequence from
+#'   `.parse_reducing_end_aa_sequence()`.
+#'
+#' @returns A numeric justification between zero and one.
+#' @noRd
+.reducing_end_aa_sequence_hjust <- function(sequence) {
+  prefix_width <- nchar(sequence$prefix, type = "width")
+  suffix_width <- nchar(sequence$suffix, type = "width")
+  (prefix_width + 1.5) / (prefix_width + suffix_width + 3)
+}
+
+#' Calculate amino-acid sequence text rotation
+#'
+#' @param orient Drawing orientation.
+#'
+#' @returns Zero for vertical glycans, 90 for leftward glycans, and -90 for
+#'   rightward glycans.
+#' @noRd
+.reducing_end_aa_sequence_angle <- function(orient) {
+  switch(
+    orient,
+    left = 90,
+    right = -90,
+    up = 0,
+    down = 0
+  )
 }
 
 #' Build reducing-end segment, label, wave, and bounds data
@@ -1169,8 +1249,9 @@
 #' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
 #'   `"down"`.
 #' @param red_end A string. `""` draws only the current reducing-end line,
-#'   `"~"` draws a wavy end, and any other string draws custom text. Ignored
-#'   when `red_end_length` is `0`.
+#'   `"~"` draws a wavy end, a string with one `<site>` tag draws an amino-acid
+#'   sequence, and any other string draws custom text. Ignored when
+#'   `red_end_length` is `0`.
 #' @param red_end_length Length of the reducing-end line in plot coordinate
 #'   units. At `0`, the line and all `red_end` decorations are omitted while
 #'   the core anomer annotation remains.
@@ -1270,7 +1351,9 @@
       y = numeric(0),
       hjust = numeric(0),
       vjust = numeric(0),
-      is_red_end_text = logical(0)
+      is_red_end_text = logical(0),
+      is_aa_sequence = logical(0),
+      angle = numeric(0)
     ),
     segment = data.frame(
       start_x = numeric(0),
@@ -1419,7 +1502,9 @@
     y = as.numeric(label_coor[["y"]]),
     hjust = 0.5,
     vjust = 0.5,
-    is_red_end_text = FALSE
+    is_red_end_text = FALSE,
+    is_aa_sequence = FALSE,
+    angle = 0
   )
 }
 
@@ -1471,9 +1556,12 @@
       y = numeric(0),
       hjust = numeric(0),
       vjust = numeric(0),
-      is_red_end_text = logical(0)
+      is_red_end_text = logical(0),
+      is_aa_sequence = logical(0),
+      angle = numeric(0)
     ))
   }
+  sequence <- .parse_reducing_end_aa_sequence(red_end)
   line_unit <- line_vec / sqrt(sum(line_vec^2))
   text_offset <- 0.02
   text_coor <- line_end + line_unit * text_offset
@@ -1491,14 +1579,28 @@
   } else {
     0.5
   }
+  if (!is.null(sequence)) {
+    hjust <- .reducing_end_aa_sequence_hjust(sequence)
+    vjust <- if (.is_horizontal_glycan_orientation(orient)) 1 else vjust
+  }
   data.frame(
     vertice = as.character(root),
-    annot = .quote_plotmath_text(red_end),
+    annot = if (is.null(sequence)) {
+      .quote_plotmath_text(red_end)
+    } else {
+      .format_reducing_end_aa_sequence(sequence)
+    },
     x = as.numeric(text_coor["x"]),
     y = as.numeric(text_coor["y"]),
     hjust = hjust,
     vjust = vjust,
-    is_red_end_text = TRUE
+    is_red_end_text = TRUE,
+    is_aa_sequence = !is.null(sequence),
+    angle = if (is.null(sequence)) {
+      0
+    } else {
+      .reducing_end_aa_sequence_angle(orient)
+    }
   )
 }
 
@@ -1522,7 +1624,27 @@
   }
   line_unit <- line_vec / sqrt(sum(line_vec^2))
   text_offset <- 0.1
-  text_width <- max(nchar(red_end), 1) * 0.12
+  sequence <- .parse_reducing_end_aa_sequence(red_end)
+  display_width <- if (is.null(sequence)) {
+    nchar(red_end, type = "width")
+  } else {
+    nchar(
+      paste0(sequence$prefix, " ", sequence$site, " ", sequence$suffix),
+      type = "width"
+    )
+  }
+  text_width <- max(display_width, 1) * 0.12
+  if (!is.null(sequence)) {
+    hjust <- .reducing_end_aa_sequence_hjust(sequence)
+    angle <- .reducing_end_aa_sequence_angle(orient) * pi / 180
+    text_unit <- c(x = cos(angle), y = sin(angle))
+    text_coor <- line_end + line_unit * 0.02
+    along <- c(-hjust, 1 - hjust) * text_width
+    return(data.frame(
+      x = as.numeric(text_coor[["x"]] + text_unit[["x"]] * along),
+      y = as.numeric(text_coor[["y"]] + text_unit[["y"]] * along)
+    ))
+  }
   if (.is_horizontal_glycan_orientation(orient)) {
     text_bound <- line_end + line_unit * (text_offset + text_width)
     return(data.frame(

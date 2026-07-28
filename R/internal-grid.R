@@ -480,7 +480,7 @@
     just = "centre",
     hjust = annotation$hjust,
     vjust = annotation$vjust,
-    rot = rep(0, nrow(annotation)),
+    rot = annotation$angle,
     gp = grid::gpar(
       col = scales::alpha("black", annotation$transparency),
       fontsize = rep(6 * ggplot2::.pt * scale, nrow(annotation)),

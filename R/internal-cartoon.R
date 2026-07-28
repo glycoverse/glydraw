@@ -470,7 +470,8 @@ GeomGlydrawResidue <- ggplot2::ggproto(
 #' @param coor A numeric coordinate matrix with columns `x` and `y`.
 #' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
 #'   `"down"`.
-#' @param red_end A string reducing-end annotation.
+#' @param red_end A string reducing-end annotation, optionally containing one
+#'   tagged amino-acid site.
 #' @param red_end_length Length of the reducing-end line in plot coordinate
 #'   units.
 #' @param highlight `NULL` or a numeric vector of 1-based vertex indices to
@@ -580,13 +581,19 @@ GeomGlydrawResidue <- ggplot2::ggproto(
 #' Prepare annotation labels for `geom_text(parse = TRUE)`
 #'
 #' @param annotation A data frame with columns `annot`, `hjust`, `vjust`, and
-#'   `is_red_end_text`; missing justification columns are allowed.
+#'   `is_red_end_text`; missing justification and angle columns are allowed.
 #'
 #' @returns The same data frame columns as `annotation`, with normalized
-#'   `is_red_end_text`, `hjust`, and `vjust`, plus character column
-#'   `annot_label` containing plotmath-safe labels.
+#'   `is_red_end_text`, `is_aa_sequence`, `hjust`, `vjust`, and `angle`, plus
+#'   character column `annot_label` containing plotmath-safe labels.
 #' @noRd
 .prepare_plotmath_annotations <- function(annotation) {
+  if (!"is_aa_sequence" %in% names(annotation)) {
+    annotation$is_aa_sequence <- FALSE
+  }
+  if (!"angle" %in% names(annotation)) {
+    annotation$angle <- 0
+  }
   annotation |>
     dplyr::mutate(
       is_red_end_text = dplyr::if_else(
@@ -594,9 +601,16 @@ GeomGlydrawResidue <- ggplot2::ggproto(
         FALSE,
         .data$is_red_end_text
       ),
+      is_aa_sequence = dplyr::if_else(
+        is.na(.data$is_aa_sequence),
+        FALSE,
+        .data$is_aa_sequence
+      ),
       hjust = dplyr::if_else(is.na(.data$hjust), 0.5, .data$hjust),
       vjust = dplyr::if_else(is.na(.data$vjust), 0.5, .data$vjust),
+      angle = dplyr::if_else(is.na(.data$angle), 0, .data$angle),
       annot_label = dplyr::case_when(
+        .data$is_aa_sequence ~ .data$annot,
         .data$annot == "?" ~ '~"?"',
         .data$annot == "??" ~ '~"?"',
         grepl("^\\?\\d+", .data$annot) ~ '~"?"',
@@ -802,7 +816,7 @@ GeomGlydrawResidue <- ggplot2::ggproto(
 #'
 #' @param plot A ggplot object.
 #' @param annotation A data frame with columns `x`, `y`, `annot_label`,
-#'   `hjust`, `vjust`, and `transparency`.
+#'   `hjust`, `vjust`, `angle`, and `transparency`.
 #' @param font_family Font family used for text annotations.
 #'
 #' @returns A ggplot object with one `geom_text(parse = TRUE)` layer added.
@@ -820,7 +834,8 @@ GeomGlydrawResidue <- ggplot2::ggproto(
         y = .data$y,
         label = .data$annot_label,
         hjust = .data$hjust,
-        vjust = .data$vjust
+        vjust = .data$vjust,
+        angle = .data$angle
       ),
       alpha = annotation$transparency,
       parse = TRUE,

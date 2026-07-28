@@ -131,6 +131,34 @@ test_that("draw_cartoon_sketch red_end overrides its style", {
   expect_contains(text$label, "Reducing end")
 })
 
+test_that("draw_cartoon_sketch parses tagged amino-acid sites", {
+  plot <- draw_cartoon_sketch(
+    "Gal(b1-3)GalNAc(a1-",
+    orient = "right",
+    red_end = "ABC<site>*</site>EFG",
+    seed = 1
+  )
+  text_layers <- Filter(
+    \(layer) inherits(layer$geom, "GeomText"),
+    plot$layers
+  )
+  parsed <- Filter(
+    \(layer) isTRUE(layer$geom_params$parse),
+    text_layers
+  )
+  built <- ggplot2::ggplot_build(plot)
+  sequence <- Filter(
+    \(layer) any(grepl("bold", layer$label, fixed = TRUE)),
+    built$data
+  )
+
+  expect_length(text_layers, 2)
+  expect_length(parsed, 1)
+  expect_length(sequence, 1)
+  expect_equal(sequence[[1]]$angle, -90)
+  expect_match(sequence[[1]]$label, 'bold\\("\\*"\\)')
+})
+
 test_that("draw_cartoon_sketch gives each node a reproducible random seed", {
   structure <- paste0(
     "Gal(b1-3)Gal(b1-3)",

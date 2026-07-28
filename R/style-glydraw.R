@@ -7,8 +7,9 @@
 #' Supply a returned style with `style =` to reuse its visual specification.
 #'
 #' @param fuc_orient Fuc-like triangle orientation: `"flex"` or `"up"`.
-#' @param red_end Reducing-end annotation. Use `"~"` for a wave or any other
-#'   string for custom text. Ignored when `red_end_length` is `0`.
+#' @param red_end Reducing-end annotation. Use `"~"` for a wave, any other
+#'   string for custom text, or tag one amino-acid site as
+#'   `"ABC<site>D</site>EFG"`. Ignored when `red_end_length` is `0`.
 #' @param red_end_length Length of the reducing-end line in plot coordinate
 #'   units. Set to `0` to omit the line and any `red_end` wave or custom text
 #'   while retaining the axis-aligned core anomer annotation.
@@ -160,6 +161,7 @@ style_glycoworkbench <- function(
     ))
   }
   checkmate::assert_string(red_end, na.ok = FALSE)
+  .parse_reducing_end_aa_sequence(red_end)
   checkmate::assert_number(edge_linewidth, lower = 0)
   checkmate::assert_number(node_linewidth, lower = 0)
   .validate_node_size(node_size)

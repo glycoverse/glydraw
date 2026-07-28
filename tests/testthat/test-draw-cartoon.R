@@ -311,6 +311,70 @@ test_that("style constructors reject a NULL red_end", {
   })
 })
 
+test_that("tagged amino-acid sequences require exactly one site character", {
+  valid_sites <- c("D", "@", "*", '"', "\\")
+  purrr::walk(valid_sites, function(site) {
+    red_end <- paste0("ABC<site>", site, "</site>EFG")
+    style <- style_glydraw(red_end = red_end)
+    sequence <- .parse_reducing_end_aa_sequence(style$red_end)
+
+    expect_identical(sequence$site, site)
+    expect_silent(parse(text = .format_reducing_end_aa_sequence(sequence)))
+  })
+
+  expect_snapshot(
+    error = TRUE,
+    style_glydraw(red_end = "ABC<site></site>EFG")
+  )
+  expect_snapshot(
+    error = TRUE,
+    style_glydraw(red_end = "ABC<site>DE</site>FG")
+  )
+  expect_snapshot(
+    error = TRUE,
+    style_glydraw(red_end = "ABC<site>D</site>EFG<site>H</site>I")
+  )
+  expect_snapshot(
+    error = TRUE,
+    style_glydraw(red_end = "ABC<site>D")
+  )
+})
+
+test_that("amino-acid reducing ends follow glycan orientation", {
+  structure <- paste0(
+    "Man(a1-3)[Man(a1-6)]Man(b1-4)",
+    "GlcNAc(b1-4)GlcNAc(b1-"
+  )
+  red_end <- "ABC<site>D</site>EFGHIJK"
+  orientations <- c("left", "right", "up", "down")
+  expected_angles <- c(left = 90, right = -90, up = 0, down = 0)
+  expected_vjust <- c(left = 1, right = 1, up = 1, down = 0)
+
+  purrr::walk(orientations, function(orient) {
+    grob <- glycanGrob(structure, orient = orient, red_end = red_end)
+    info <- grob$annotation_data$reducing_info
+    sequence <- dplyr::filter(info$annotation, .data$is_aa_sequence)
+    segment <- info$segment
+    line <- c(
+      x = segment$end_x - segment$start_x,
+      y = segment$end_y - segment$start_y
+    )
+    expected_coor <- c(x = segment$end_x, y = segment$end_y) +
+      0.02 * line / sqrt(sum(line^2))
+
+    expect_equal(sequence$angle, expected_angles[[orient]])
+    expect_equal(sequence$vjust, expected_vjust[[orient]])
+    expect_equal(sequence$hjust, 4.5 / 13)
+    expect_equal(
+      unname(unlist(sequence[c("x", "y")])),
+      unname(expected_coor)
+    )
+    expect_match(sequence$annot, 'bold\\("D"\\)')
+    expect_false(grepl("<site>", sequence$annot, fixed = TRUE))
+    expect_equal(nrow(info$bounds), 2)
+  })
+})
+
 test_that("style constructors control reducing-end line length", {
   constructors <- list(
     style_glydraw,

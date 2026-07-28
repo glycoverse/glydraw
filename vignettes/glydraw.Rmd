@@ -82,12 +82,14 @@ draw_cartoon(fucosylated, style = style_glydraw(fuc_orient = "up"))
 ### `red_end`
 
 `red_end` controls the reducing-end annotation. The default `""` draws the
-standard reducing-end line. Use `"~"` for a wavy reducing end, or pass any other
-string to draw that string at the reducing end.
+standard reducing-end line. Use `"~"` for a wavy reducing end, pass any other
+string to draw that string at the reducing end, or wrap one amino-acid
+glycosite in `<site>` tags to bold and anchor it to the glycan.
 
 ```{r red-end, fig.width = 5.09, fig.height = 2.02}
 draw_cartoon(n_core, style = style_glydraw(red_end = "~"))
 draw_cartoon(n_core, style = style_glydraw(red_end = "R"))
+draw_cartoon(n_core, red_end = "ABC<site>D</site>EFG")
 ```
 
 ### `edge_linewidth` and `node_linewidth`
