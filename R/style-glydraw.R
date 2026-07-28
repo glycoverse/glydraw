@@ -61,7 +61,7 @@ style_glydraw <- function(
 style_glygen <- function(
   fuc_orient = "flex",
   red_end = "~",
-  red_end_length = 0.6,
+  red_end_length = 1,
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
@@ -85,7 +85,7 @@ style_glygen <- function(
 style_snfg <- function(
   fuc_orient = "up",
   red_end = "",
-  red_end_length = 0.6,
+  red_end_length = 1,
   edge_linewidth = 1.5,
   node_linewidth = 0.8,
   node_size = 1.15,
@@ -109,7 +109,7 @@ style_snfg <- function(
 style_glycoworkbench <- function(
   fuc_orient = "flex",
   red_end = "~",
-  red_end_length = 0.6,
+  red_end_length = 1,
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
