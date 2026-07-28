@@ -14,7 +14,7 @@
 
 * New `red_end_length` style option controls the length of the reducing-end line; at `0`, the line and all `red_end` decorations are omitted while the axis-aligned core anomer annotation remains. (#80)
 
-* New `draw_cartoon_sketch()` draws hand-sketched glycan cartoons with reproducible rough strokes, patterned residue fills, optional drawing media, and the same layout, annotation, orientation, highlighting, styling, sizing, and saving behavior as `draw_cartoon()`. Sketch cartoons always use their handwriting font, ignoring `font_family` in style presets. (#77)
+* New `draw_cartoon_sketch()` draws hand-sketched glycan cartoons with reproducible rough strokes, patterned residue fills, optional drawing media, and the same layout, annotation, orientation, highlighting, styling, sizing, and saving behavior as `draw_cartoon()`. Sketch cartoons always use their handwriting font, ignoring `font_family` in style presets. (#77, #81)
 
 * `style_glydraw()` replaces `glydraw_style()` as the single reusable interface for tuning cartoon appearance; `show_linkage` and `orient` are explicit drawing controls instead of style fields, and explicit `red_end = NULL` inherits the style value. New `style_glygen()`, `style_snfg()`, and `style_glycoworkbench()` provide reusable presets for common glycan-drawing conventions. (#73, #79)
 
