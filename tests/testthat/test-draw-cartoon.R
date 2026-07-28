@@ -331,17 +331,30 @@ test_that("style constructors control reducing-end line length", {
   )
 
   purrr::walk(c("left", "right", "up", "down"), function(orient) {
-    segment <- glycanGrob(
-      "Gal(b1-3)GalNAc(a1-",
-      orient = orient,
-      style = style_glydraw(red_end_length = 1.25)
-    )$annotation_data$reducing_info$segment
-    length <- sqrt(
-      (segment$end_x - segment$start_x)^2 +
-        (segment$end_y - segment$start_y)^2
-    )
+    purrr::walk(c(0, 1.25), function(red_end_length) {
+      purrr::walk(
+        c("Gal(b1-3)GalNAc(a1-", "Gal(b1-3)GalNAc(b1-"),
+        function(structure) {
+          default <- glycanGrob(structure, orient = orient)
+          custom <- glycanGrob(
+            structure,
+            orient = orient,
+            style = style_glydraw(red_end_length = red_end_length)
+          )
+          segment <- custom$annotation_data$reducing_info$segment
+          length <- sqrt(
+            (segment$end_x - segment$start_x)^2 +
+              (segment$end_y - segment$start_y)^2
+          )
 
-    expect_equal(length, 1.25)
+          expect_equal(length, red_end_length)
+          expect_equal(
+            custom$annotation_data$reducing_info$annotation[1, c("x", "y")],
+            default$annotation_data$reducing_info$annotation[1, c("x", "y")]
+          )
+        }
+      )
+    })
   })
 })
 

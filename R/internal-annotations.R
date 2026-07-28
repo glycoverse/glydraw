@@ -1307,7 +1307,7 @@
 #'   `"down"`.
 #' @param label The reducing-end anomer label.
 #' @param line_length Numeric length of the reducing-end line segment.
-#' @param label_offset Numeric extra distance between the line length and the
+#' @param label_distance Numeric distance from the reducing-end residue to the
 #'   anomer label anchor before rotation.
 #'
 #' @returns A list with named numeric vectors `root_coor`, `line_vec`,
@@ -1318,25 +1318,25 @@
   orient,
   label = "",
   line_length = 0.6,
-  label_offset = 0.1
+  label_distance = 0.7
 ) {
   root_coor <- c(
     x = as.numeric(root_coor[["x"]]),
     y = as.numeric(root_coor[["y"]])
   )
   line_vec <- .reducing_end_line_vector(orient, line_length)
-  label_vec <- .reducing_end_line_vector(orient, line_length + label_offset)
+  label_vec <- .reducing_end_line_vector(orient, label_distance)
   label_position_offset <- matrix(
     .rotated_reducing_end_label_vector(label_vec),
     ncol = 1
   )
   label_position_offset <- .nudge_child_label_perpendicular(
     label_offset = label_position_offset,
-    direction = matrix(line_vec, ncol = 1),
+    direction = matrix(label_vec, ncol = 1),
     nudge = .beta_perpendicular_nudge_for_linkage(
       label,
       root_coor[["x"]],
-      root_coor[["x"]] + line_vec[["x"]]
+      root_coor[["x"]] + label_vec[["x"]]
     )
   )
   label_coor <- root_coor +
