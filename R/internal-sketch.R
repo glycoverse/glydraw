@@ -212,6 +212,11 @@
 #' @noRd
 .sketch_annotation_labels <- function(annotation) {
   labels <- annotation$annot
+  if ("is_red_end_text" %in% names(annotation)) {
+    red_end_text <- !is.na(annotation$is_red_end_text) &
+      annotation$is_red_end_text
+    labels[red_end_text] <- .unquote_plotmath_text(labels[red_end_text])
+  }
   labels[labels == "alpha"] <- "\u03b1"
   labels[labels == "beta"] <- "\u03b2"
   unknown <- labels %in% c("?", "??", '~"?"') | grepl("^\\?\\d+", labels)
