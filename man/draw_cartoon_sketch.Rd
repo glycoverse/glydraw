@@ -17,7 +17,7 @@ draw_cartoon_sketch(
   seed = NULL,
   fill_style = "pencil_shade",
   hachure_angle = 45,
-  hachure_gap = NULL,
+  hachure_gap = 0.03,
   fill_weight = 0.5,
   medium = NULL
 )
@@ -61,7 +61,7 @@ to keep their curved borders smooth.}
 \item{hachure_angle}{Angle of patterned fill lines in degrees.}
 
 \item{hachure_gap}{Gap between patterned fill lines as a proportion of the
-node diameter. \code{NULL} uses 0.15 for consistent density across node shapes.}
+node diameter. Defaults to \code{0.03}.}
 
 \item{fill_weight}{Stroke weight of patterned fill lines.}
 

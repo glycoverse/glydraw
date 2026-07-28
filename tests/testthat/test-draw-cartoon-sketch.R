@@ -132,10 +132,10 @@ test_that("draw_cartoon_sketch pencil shades every node by default", {
   )
   expect_equal(circle_layers[[1]]$geom_params$fill_roughness, 0.5)
   expect_equal(polygon_layers[[1]]$geom_params$fill_roughness, 0.5)
-  expect_equal(circle_layers[[1]]$geom_params$hachure_gap, 0.15)
+  expect_equal(circle_layers[[1]]$geom_params$hachure_gap, 0.03)
   expect_equal(
     polygon_layers[[1]]$geom_params$hachure_gap,
-    0.15 * node_diameter
+    0.03 * node_diameter
   )
   expect_equal(custom_circle_layers[[1]]$geom_params$hachure_gap, 0.12)
   expect_equal(
