@@ -295,7 +295,7 @@ GeomGlydrawResidue <- ggplot2::ggproto(
   orient = c("left", "right", "up", "down"),
   red_end = ""
 ) {
-  checkmate::assert_string(red_end, na.ok = FALSE, null.ok = TRUE)
+  checkmate::assert_string(red_end, na.ok = FALSE)
   if (!is.null(highlight) && !glyrepr::is_glycan_structure(structure)) {
     cli::cli_warn(
       "{.arg highlight} can only be set when {.arg structure} is a {.fn glyrepr::glycan_structure}."
@@ -471,6 +471,8 @@ GeomGlydrawResidue <- ggplot2::ggproto(
 #' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
 #'   `"down"`.
 #' @param red_end A string reducing-end annotation.
+#' @param red_end_length Length of the reducing-end line in plot coordinate
+#'   units.
 #' @param highlight `NULL` or a numeric vector of 1-based vertex indices to
 #'   highlight.
 #' @param node_size Numeric scalar used as a multiplier for the default node
@@ -491,7 +493,8 @@ GeomGlydrawResidue <- ggplot2::ggproto(
   red_end = "",
   highlight = NULL,
   node_size = 1,
-  show_linkage = TRUE
+  show_linkage = TRUE,
+  red_end_length = 0.6
 ) {
   orient <- rlang::arg_match(orient)
   substituent_annotation <- .substituent_annotation_data(
@@ -510,7 +513,8 @@ GeomGlydrawResidue <- ggplot2::ggproto(
     structure,
     coor,
     orient,
-    red_end
+    red_end,
+    red_end_length
   )
   reducing_annotation <- reducing_info$annotation |>
     dplyr::mutate(show_without_linkage = .data$is_red_end_text)

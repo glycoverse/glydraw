@@ -43,7 +43,8 @@ one of \code{"left"}, \code{"right"}, \code{"up"}, or \code{"down"}. Defaults to
 appearance.}
 
 \item{red_end}{Reducing-end annotation. \code{NULL}, the default, uses \code{red_end}
-from \code{style}. A non-\code{NULL} value overrides \code{style$red_end}.}
+from \code{style}. A non-\code{NULL} value overrides \code{style$red_end}. Ignored when
+\code{style$red_end_length} is \code{0}.}
 }
 \value{
 The function returns the list of cartoons implicitly.

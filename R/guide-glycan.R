@@ -117,6 +117,7 @@ guide_glycan <- function(
     glycan_vjust = vjust,
     glycan_show_linkage = show_linkage,
     glycan_red_end = red_end,
+    glycan_red_end_length = style$red_end_length,
     glycan_fuc_orient = style$fuc_orient,
     glycan_edge_linewidth = style$edge_linewidth,
     glycan_node_linewidth = style$node_linewidth,
@@ -184,7 +185,8 @@ guide_glycan <- function(
       node_linewidth = params$glycan_node_linewidth,
       node_size = params$glycan_node_size,
       font_family = params$glycan_font_family,
-      colors = params$glycan_colors
+      colors = params$glycan_colors,
+      red_end_length = params$glycan_red_end_length
     )
   )
   grob$name <- "guide.glycan.label"
@@ -375,6 +377,7 @@ GuideGlycan <- ggplot2::ggproto(
       glycan_vjust = .vjust_red_end,
       glycan_show_linkage = TRUE,
       glycan_red_end = "",
+      glycan_red_end_length = 0.6,
       glycan_fuc_orient = "flex",
       glycan_edge_linewidth = 0.8,
       glycan_node_linewidth = 0.8,

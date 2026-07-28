@@ -1168,25 +1168,28 @@
 #'   per graph vertex.
 #' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
 #'   `"down"`.
-#' @param red_end A string or `NULL`. `NULL` omits the reducing end, `""`
-#'   draws only the current reducing-end line, `"~"` draws a wavy end, and any
-#'   other string draws custom text.
+#' @param red_end A string. `""` draws only the current reducing-end line,
+#'   `"~"` draws a wavy end, and any other string draws custom text. Ignored
+#'   when `red_end_length` is `0`.
+#' @param red_end_length Length of the reducing-end line in plot coordinate
+#'   units. At `0`, the line and all `red_end` decorations are omitted while
+#'   the core anomer annotation remains.
 #'
 #' @returns A list with data frames `annotation`, `segment`, `wave`, and
 #'   `bounds`. `annotation` contains text rows; `segment` contains one line
-#'   segment row; `wave` contains path coordinates for `"~"`; `bounds` contains
-#'   invisible points used to reserve space for custom text.
+#'   segment row when `red_end_length` is positive; `wave` contains path
+#'   coordinates for `"~"`; `bounds` contains invisible points used to reserve
+#'   space for custom text.
 #' @noRd
 .reducing_end_annotation_data <- function(
   structure,
   coor,
   orient = c("left", "right", "up", "down"),
-  red_end = ""
+  red_end = "",
+  red_end_length = 0.6
 ) {
   orient <- rlang::arg_match(orient)
-  if (is.null(red_end)) {
-    return(.empty_reducing_end_annotation_data())
-  }
+  checkmate::assert_string(red_end, na.ok = FALSE)
   anomer <- igraph::graph_attr(structure, "anomer")
   if (.has_no_reducing_end_anomer(anomer)) {
     return(.empty_reducing_end_annotation_data())
@@ -1194,7 +1197,22 @@
 
   label <- .reducing_end_anomer_label(anomer)
   root <- length(structure)
-  geometry <- .reducing_end_geometry(coor[root, ], orient, label = label)
+  geometry <- .reducing_end_geometry(
+    coor[root, ],
+    orient,
+    label = label,
+    line_length = red_end_length
+  )
+  anomer_annotation <- .reducing_end_anomer_row(
+    root,
+    label,
+    geometry$label_coor
+  )
+  if (red_end_length == 0) {
+    result <- .empty_reducing_end_annotation_data()
+    result$annotation <- anomer_annotation
+    return(result)
+  }
   red_end_annotation <- .reducing_end_text_data(
     red_end,
     geometry$line_end,
@@ -1210,7 +1228,7 @@
   )
   list(
     annotation = dplyr::bind_rows(
-      .reducing_end_anomer_row(root, label, geometry$label_coor),
+      anomer_annotation,
       red_end_annotation
     ),
     segment = .reducing_end_segment_data(
@@ -1299,7 +1317,7 @@
 #'   `"down"`.
 #' @param label The reducing-end anomer label.
 #' @param line_length Numeric length of the reducing-end line segment.
-#' @param label_offset Numeric extra distance between the line length and the
+#' @param label_distance Numeric distance from the reducing-end residue to the
 #'   anomer label anchor before rotation.
 #'
 #' @returns A list with named numeric vectors `root_coor`, `line_vec`,
@@ -1310,27 +1328,31 @@
   orient,
   label = "",
   line_length = 0.6,
-  label_offset = 0.1
+  label_distance = 0.7
 ) {
   root_coor <- c(
     x = as.numeric(root_coor[["x"]]),
     y = as.numeric(root_coor[["y"]])
   )
   line_vec <- .reducing_end_line_vector(orient, line_length)
-  label_vec <- .reducing_end_line_vector(orient, line_length + label_offset)
-  label_position_offset <- matrix(
-    .rotated_reducing_end_label_vector(label_vec),
-    ncol = 1
-  )
-  label_position_offset <- .nudge_child_label_perpendicular(
-    label_offset = label_position_offset,
-    direction = matrix(line_vec, ncol = 1),
-    nudge = .beta_perpendicular_nudge_for_linkage(
-      label,
-      root_coor[["x"]],
-      root_coor[["x"]] + line_vec[["x"]]
+  label_vec <- .reducing_end_line_vector(orient, label_distance)
+  if (line_length == 0) {
+    label_position_offset <- matrix(0.6 * label_vec, ncol = 1)
+  } else {
+    label_position_offset <- matrix(
+      .rotated_reducing_end_label_vector(label_vec),
+      ncol = 1
     )
-  )
+    label_position_offset <- .nudge_child_label_perpendicular(
+      label_offset = label_position_offset,
+      direction = matrix(label_vec, ncol = 1),
+      nudge = .beta_perpendicular_nudge_for_linkage(
+        label,
+        root_coor[["x"]],
+        root_coor[["x"]] + label_vec[["x"]]
+      )
+    )
+  }
   label_coor <- root_coor +
     c(
       x = as.numeric(label_position_offset[1, 1]),

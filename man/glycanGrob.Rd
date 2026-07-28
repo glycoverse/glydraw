@@ -37,7 +37,8 @@ setting \code{highlight = c(1, 3)} will highlight the "Gal" and "GalNAc" nodes.}
 appearance.}
 
 \item{red_end}{Reducing-end annotation. \code{NULL}, the default, uses \code{red_end}
-from \code{style}. A non-\code{NULL} value overrides \code{style$red_end}.}
+from \code{style}. A non-\code{NULL} value overrides \code{style$red_end}. Ignored when
+\code{style$red_end_length} is \code{0}.}
 }
 \value{
 A \code{glycanGrob} object inheriting from \code{\link[grid:grid.grob]{grid::gTree()}}.

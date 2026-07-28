@@ -294,21 +294,98 @@ test_that("reducing-end beta annotations follow the physical edge direction", {
   })
 })
 
-test_that("red_end = NULL omits the complete reducing end", {
-  structure <- "Gal(b1-3)GalNAc(a1-"
-  style <- style_glydraw(red_end = NULL)
-  grob <- glycanGrob(structure, style = style)
-  single_residue_grob <- glycanGrob("GlcNAc(b1-", style = style)
-  reducing_info <- grob$annotation_data$reducing_info
-
-  expect_null(style_glydraw(red_end = NULL)$red_end)
-  expect_equal(
-    vapply(reducing_info, nrow, integer(1)),
-    c(annotation = 0L, segment = 0L, wave = 0L, bounds = 0L)
+test_that("style constructors reject a NULL red_end", {
+  expect_snapshot(
+    error = TRUE,
+    style_glydraw(red_end = NULL)
   )
-  expect_equal(nrow(grob$connect_df), 1)
-  expect_equal(nrow(single_residue_grob$connect_df), 0)
-  expect_s3_class(draw_cartoon(structure, style = style), "glydraw_cartoon")
+  constructors <- list(style_glygen, style_snfg, style_glycoworkbench)
+  purrr::walk(constructors, function(constructor) {
+    condition <- rlang::catch_cnd(
+      constructor(red_end = NULL),
+      classes = "error"
+    )
+
+    expect_s3_class(condition, "error")
+    expect_match(conditionMessage(condition), "red_end_length")
+  })
+})
+
+test_that("style constructors control reducing-end line length", {
+  constructors <- list(
+    style_glydraw,
+    style_glygen,
+    style_snfg,
+    style_glycoworkbench
+  )
+  styles <- purrr::map(constructors, ~ .x(red_end_length = 1.25))
+
+  expect_equal(purrr::map_dbl(styles, "red_end_length"), rep(1.25, 4))
+  expect_equal(
+    purrr::map_dbl(constructors, ~ .x()$red_end_length),
+    c(0.6, 1, 1, 1)
+  )
+  expect_equal(
+    purrr::map_chr(constructors, ~ names(formals(.x))[[3]]),
+    rep("red_end_length", 4)
+  )
+
+  purrr::walk(c("left", "right", "up", "down"), function(orient) {
+    default <- glycanGrob("Gal(b1-3)GalNAc(a1-", orient = orient)
+    custom <- glycanGrob(
+      "Gal(b1-3)GalNAc(a1-",
+      orient = orient,
+      style = style_glydraw(red_end_length = 1.25)
+    )
+    segment <- custom$annotation_data$reducing_info$segment
+    length <- sqrt(
+      (segment$end_x - segment$start_x)^2 +
+        (segment$end_y - segment$start_y)^2
+    )
+
+    expect_equal(length, 1.25)
+    expect_equal(
+      custom$annotation_data$reducing_info$annotation[1, c("x", "y")],
+      default$annotation_data$reducing_info$annotation[1, c("x", "y")]
+    )
+  })
+})
+
+test_that("zero-length reducing ends retain axis-aligned anomer labels", {
+  structures <- c(
+    "Gal(b1-3)GalNAc(a1-",
+    "Gal(b1-3)GalNAc(b1-"
+  )
+  red_ends <- c("", "~", "Reducing end")
+
+  purrr::walk(c("left", "right", "up", "down"), function(orient) {
+    purrr::walk(structures, function(structure) {
+      purrr::walk(red_ends, function(red_end) {
+        grob <- glycanGrob(
+          structure,
+          orient = orient,
+          style = style_glydraw(
+            red_end = red_end,
+            red_end_length = 0
+          )
+        )
+        reducing_info <- grob$annotation_data$reducing_info
+        label <- reducing_info$annotation[1, c("x", "y")]
+        expected_label <- grob$reducing_end_coor +
+          .reducing_end_line_vector(orient, 0.42)
+
+        expect_equal(
+          vapply(reducing_info, nrow, integer(1)),
+          c(annotation = 1L, segment = 0L, wave = 0L, bounds = 0L)
+        )
+        expect_equal(
+          unname(unlist(label)),
+          unname(expected_label)
+        )
+        expect_identical(reducing_info$annotation$is_red_end_text, FALSE)
+      })
+    })
+  })
 })
 
 test_that("draw_cartoon applies a complete custom SNFG palette", {

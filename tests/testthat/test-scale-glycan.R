@@ -449,16 +449,16 @@ test_that("glycan axis labels support reducing-end annotations", {
   ) +
     ggplot2::geom_col() +
     scale_y_glycan(style = style_glydraw(red_end = "Reducing end"))
-  no_red_end_plot <- ggplot2::ggplot(
+  zero_length_plot <- ggplot2::ggplot(
     data,
     ggplot2::aes(x = .data$structure, y = .data$value)
   ) +
     ggplot2::geom_col() +
-    scale_x_glycan(style = style_glydraw(red_end = NULL))
+    scale_x_glycan(style = style_glydraw(red_end_length = 0))
   x_label <- .axis_glycan_labels(x_plot, "axis-b")$children[[1]]
   y_label <- .axis_glycan_labels(y_plot, "axis-l")$children[[1]]
-  no_red_end_label <-
-    .axis_glycan_labels(no_red_end_plot, "axis-b")$children[[1]]
+  zero_length_label <-
+    .axis_glycan_labels(zero_length_plot, "axis-b")$children[[1]]
 
   expect_gt(nrow(x_label$annotation_data$reducing_info$wave), 0)
   expect_true(any(
@@ -470,11 +470,11 @@ test_that("glycan axis labels support reducing-end annotations", {
   )
   expect_equal(
     vapply(
-      no_red_end_label$annotation_data$reducing_info,
+      zero_length_label$annotation_data$reducing_info,
       nrow,
       integer(1)
     ),
-    c(annotation = 0L, segment = 0L, wave = 0L, bounds = 0L)
+    c(annotation = 1L, segment = 0L, wave = 0L, bounds = 0L)
   )
 })
 
@@ -498,6 +498,18 @@ test_that("glycan scales red_end overrides their styles", {
       red_end = "Reducing end"
     )$guide$params$glycan_red_end,
     "Reducing end"
+  )
+  expect_equal(
+    scale_x_glycan(
+      style = style_glydraw(red_end_length = 1.25)
+    )$guide$params$glycan_red_end_length,
+    1.25
+  )
+  expect_equal(
+    scale_y_glycan(
+      style = style_glydraw(red_end_length = 1.25)
+    )$guide$params$glycan_red_end_length,
+    1.25
   )
 })
 

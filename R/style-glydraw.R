@@ -7,8 +7,11 @@
 #' Supply a returned style with `style =` to reuse its visual specification.
 #'
 #' @param fuc_orient Fuc-like triangle orientation: `"flex"` or `"up"`.
-#' @param red_end Reducing-end annotation. Use `"~"` for a wave or `NULL` to
-#'   omit the reducing-end line and anomer annotation.
+#' @param red_end Reducing-end annotation. Use `"~"` for a wave or any other
+#'   string for custom text. Ignored when `red_end_length` is `0`.
+#' @param red_end_length Length of the reducing-end line in plot coordinate
+#'   units. Set to `0` to omit the line and any `red_end` wave or custom text
+#'   while retaining the axis-aligned core anomer annotation.
 #' @param edge_linewidth Linewidth of glycosidic linkages.
 #' @param node_linewidth Linewidth of node borders.
 #' @param node_size Multiplier for the default node size.
@@ -34,6 +37,7 @@
 style_glydraw <- function(
   fuc_orient = "flex",
   red_end = "",
+  red_end_length = 0.6,
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
@@ -47,7 +51,8 @@ style_glydraw <- function(
     node_linewidth = node_linewidth,
     node_size = node_size,
     font_family = font_family,
-    colors = colors
+    colors = colors,
+    red_end_length = red_end_length
   )
 }
 
@@ -56,6 +61,7 @@ style_glydraw <- function(
 style_glygen <- function(
   fuc_orient = "flex",
   red_end = "~",
+  red_end_length = 1,
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
@@ -69,7 +75,8 @@ style_glygen <- function(
     node_linewidth = node_linewidth,
     node_size = node_size,
     font_family = font_family,
-    colors = colors
+    colors = colors,
+    red_end_length = red_end_length
   )
 }
 
@@ -78,6 +85,7 @@ style_glygen <- function(
 style_snfg <- function(
   fuc_orient = "up",
   red_end = "",
+  red_end_length = 1,
   edge_linewidth = 1.5,
   node_linewidth = 0.8,
   node_size = 1.15,
@@ -91,7 +99,8 @@ style_snfg <- function(
     node_linewidth = node_linewidth,
     node_size = node_size,
     font_family = font_family,
-    colors = colors
+    colors = colors,
+    red_end_length = red_end_length
   )
 }
 
@@ -100,6 +109,7 @@ style_snfg <- function(
 style_glycoworkbench <- function(
   fuc_orient = "flex",
   red_end = "~",
+  red_end_length = 1,
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
@@ -124,7 +134,8 @@ style_glycoworkbench <- function(
     node_linewidth = node_linewidth,
     node_size = node_size,
     font_family = font_family,
-    colors = colors
+    colors = colors,
+    red_end_length = red_end_length
   )
 }
 
@@ -135,14 +146,25 @@ style_glycoworkbench <- function(
   node_linewidth,
   node_size,
   font_family,
-  colors
+  colors,
+  red_end_length
 ) {
   checkmate::assert_choice(fuc_orient, c("flex", "up"))
-  checkmate::assert_string(red_end, na.ok = FALSE, null.ok = TRUE)
+  if (is.null(red_end)) {
+    cli::cli_abort(c(
+      "{.arg red_end} in a glycan style cannot be {.code NULL}.",
+      "i" = paste(
+        "Set {.arg red_end_length} to 0 to omit the reducing-end line and",
+        "{.arg red_end} decoration while retaining the anomer annotation."
+      )
+    ))
+  }
+  checkmate::assert_string(red_end, na.ok = FALSE)
   checkmate::assert_number(edge_linewidth, lower = 0)
   checkmate::assert_number(node_linewidth, lower = 0)
   .validate_node_size(node_size)
   checkmate::assert_string(font_family, na.ok = FALSE)
+  checkmate::assert_number(red_end_length, lower = 0)
   colors <- .validate_colors(colors)
 
   structure(
@@ -153,7 +175,8 @@ style_glycoworkbench <- function(
       node_linewidth = node_linewidth,
       node_size = node_size,
       font_family = font_family,
-      colors = colors
+      colors = colors,
+      red_end_length = red_end_length
     ),
     class = "glydraw_style"
   )

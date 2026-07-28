@@ -34,6 +34,12 @@ test_that("geom_glycan red_end overrides its style", {
     geom_glycan(style = style, red_end = "Reducing end")$geom_params$red_end,
     "Reducing end"
   )
+  expect_equal(
+    geom_glycan(
+      style = style_glydraw(red_end_length = 1.25)
+    )$geom_params$red_end_length,
+    1.25
+  )
 })
 
 test_that("geom_glycan preserves mapped glycan structure vectors", {
