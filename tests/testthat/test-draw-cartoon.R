@@ -323,7 +323,7 @@ test_that("style constructors control reducing-end line length", {
   expect_equal(purrr::map_dbl(styles, "red_end_length"), rep(1.25, 4))
   expect_equal(
     purrr::map_dbl(constructors, ~ .x()$red_end_length),
-    rep(0.6, 4)
+    c(0.6, 1, 1, 1)
   )
   expect_equal(
     purrr::map_chr(constructors, ~ names(formals(.x))[[3]]),
