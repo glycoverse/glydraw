@@ -618,17 +618,29 @@
 #' Find the shortest distance among annotation coordinates
 #'
 #' @param coords A numeric matrix with columns `x` and `y`.
+#' @param group_keys A character vector mapping rows to linkage groups.
+#'   Distances within the same non-missing group are ignored.
 #'
 #' @returns A numeric scalar minimum pairwise Euclidean distance among complete
-#'   rows. Returns `Inf` when fewer than two complete rows are available.
+#'   rows from different groups. Returns `Inf` when fewer than two eligible rows
+#'   are available.
 #' @noRd
-.minimum_annotation_distance <- function(coords) {
+.minimum_annotation_distance <- function(
+  coords,
+  group_keys = rep(NA_character_, nrow(coords))
+) {
   finite <- stats::complete.cases(coords)
   if (sum(finite) < 2) {
     return(Inf)
   }
 
-  min(stats::dist(coords[finite, , drop = FALSE]))
+  distances <- as.matrix(stats::dist(coords[finite, , drop = FALSE]))
+  finite_groups <- group_keys[finite]
+  same_group <- outer(finite_groups, finite_groups, "==")
+  same_group[is.na(same_group)] <- FALSE
+  distances[same_group] <- Inf
+  diag(distances) <- Inf
+  min(distances)
 }
 
 #' Check whether two annotation rows are sufficiently separated
@@ -740,7 +752,7 @@
       candidate_coords <- coords
       rows <- groups$rows[[candidate]]
       candidate_coords[rows, ] <- reflected_coords[rows, ]
-      .minimum_annotation_distance(candidate_coords)
+      .minimum_annotation_distance(candidate_coords, groups$keys)
     }
   )
 
@@ -849,6 +861,12 @@
   for (pair in seq_len(nrow(pairs))) {
     i <- pairs$i[pair]
     j <- pairs$j[pair]
+    same_group <- !is.na(groups$keys[[i]]) &&
+      !is.na(groups$keys[[j]]) &&
+      groups$keys[[i]] == groups$keys[[j]]
+    if (same_group) {
+      next
+    }
     if (.annotations_are_separated(coords, i, j, min_distance)) {
       next
     }
