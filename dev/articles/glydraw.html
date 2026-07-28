@@ -145,14 +145,18 @@ triangle should point upward.</p>
 </h3>
 <p><code>red_end</code> controls the reducing-end annotation. The
 default <code>""</code> draws the standard reducing-end line. Use
-<code>"~"</code> for a wavy reducing end, or pass any other string to
-draw that string at the reducing end.</p>
+<code>"~"</code> for a wavy reducing end, pass any other string to draw
+that string at the reducing end, or wrap one amino-acid glycosite in
+<code>&lt;site&gt;</code> tags to bold and anchor it to the glycan.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="va">n_core</span>, style <span class="op">=</span> <span class="fu"><a href="../reference/style_glydraw.html">style_glydraw</a></span><span class="op">(</span>red_end <span class="op">=</span> <span class="st">"~"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="glydraw_files/figure-html/red-end-1.png" class="r-plt" alt="" width="407.2"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="va">n_core</span>, style <span class="op">=</span> <span class="fu"><a href="../reference/style_glydraw.html">style_glydraw</a></span><span class="op">(</span>red_end <span class="op">=</span> <span class="st">"R"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="glydraw_files/figure-html/red-end-2.png" class="r-plt" alt="" width="407.2"></p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="va">n_core</span>, red_end <span class="op">=</span> <span class="st">"ABC&lt;site&gt;D&lt;/site&gt;EFG"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="glydraw_files/figure-html/red-end-3.png" class="r-plt" alt="" width="407.2"></p>
 </div>
 <div class="section level3">
 <h3 id="edge_linewidth-and-node_linewidth">
@@ -161,7 +165,7 @@ draw that string at the reducing end.</p>
 <p><code>edge_linewidth</code> controls linkage line width.
 <code>node_linewidth</code> controls the border width of residue
 symbols.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span></span>
 <span>  <span class="va">n_core</span>,</span>
 <span>  style <span class="op">=</span> <span class="fu"><a href="../reference/style_glydraw.html">style_glydraw</a></span><span class="op">(</span></span>
@@ -178,10 +182,10 @@ symbols.</p>
 <p><code>node_size</code> is a multiplier for the default residue-symbol
 size. The default is <code>1</code>. Larger nodes keep the same cartoon
 layout but draw larger symbols.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="va">n_core</span>, style <span class="op">=</span> <span class="fu"><a href="../reference/style_glydraw.html">style_glydraw</a></span><span class="op">(</span>node_size <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="glydraw_files/figure-html/node-size-1.png" class="r-plt" alt="" width="391.2"></p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="va">n_core</span>, style <span class="op">=</span> <span class="fu"><a href="../reference/style_glydraw.html">style_glydraw</a></span><span class="op">(</span>node_size <span class="op">=</span> <span class="fl">1.6</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Linkage annotations are hidden because `node_size` is larger than <span style="color: #0000BB;">1.4</span>.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Set `show_linkage = FALSE` to silence this warning, or use a smaller</span></span>
@@ -198,7 +202,7 @@ requested node size leaves too little annotation space.</p>
 <p><code>colors</code> is a complete named SNFG palette in the format
 returned by <code><a href="../reference/glydraw_colors.html">glydraw_colors()</a></code>. Modify entries in that
 palette to customize the corresponding residue colors.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">colors</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glydraw_colors.html">glydraw_colors</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">colors</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"glyGreen"</span>, <span class="st">"glyBlue"</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#4DAF4A"</span>, <span class="st">"#377EB8"</span><span class="op">)</span></span>
 <span></span>
@@ -216,7 +220,7 @@ palette to customize the corresponding residue colors.</p>
 when <code>structure</code> is a
 <code><a href="https://glycoverse.github.io/glyrepr/reference/glycan_structure.html" class="external-link">glyrepr::glycan_structure()</a></code> object. Node indices match the
 monosaccharide order in the printed IUPAC-condensed structure.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">highlight_glycan</span> <span class="op">&lt;-</span> <span class="fu">glyrepr</span><span class="fu">::</span><span class="fu"><a href="https://glycoverse.github.io/glyrepr/reference/as_glycan_structure.html" class="external-link">as_glycan_structure</a></span><span class="op">(</span></span>
 <span>  <span class="st">"Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"</span></span>
 <span><span class="op">)</span></span>
@@ -230,13 +234,13 @@ monosaccharide order in the printed IUPAC-condensed structure.</p>
 </h2>
 <p>Use <code><a href="../reference/save_cartoon.html">save_cartoon()</a></code> when you already have one cartoon
 object.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cartoon</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/draw_cartoon.html">draw_cartoon</a></span><span class="op">(</span><span class="va">n_core</span>, style <span class="op">=</span> <span class="fu"><a href="../reference/style_glydraw.html">style_glydraw</a></span><span class="op">(</span>red_end <span class="op">=</span> <span class="st">"~"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">outfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"n-core.png"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/save_cartoon.html">save_cartoon</a></span><span class="op">(</span><span class="va">cartoon</span>, <span class="va">outfile</span>, scale <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">outfile</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpBY8rpY/n-core.png"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/tmp/RtmpBYuBdq/n-core.png"</span></span></code></pre></div>
 <p><code>glydraw</code> does not expose separate <code>width</code> and
 <code>height</code> controls because each cartoon has a natural size
 calculated from its glycan structure. <code>scale</code> preserves the
@@ -248,7 +252,7 @@ aspect ratio and relative symbol sizes.</p>
 <p>Use <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> to draw and save a vector of
 glycans in one call. The input can be a character vector or a
 <code><a href="https://glycoverse.github.io/glyrepr/reference/glycan_structure.html" class="external-link">glyrepr::glycan_structure()</a></code> vector.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">glycans</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  core <span class="op">=</span> <span class="st">"Man(a1-3)Man(b1-4)GlcNAc(b1-"</span>,</span>
 <span>  antenna <span class="op">=</span> <span class="st">"Gal(b1-4)GlcNAc(b1-"</span>,</span>

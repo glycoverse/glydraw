@@ -65,8 +65,9 @@ style_glycoworkbench(
 
 - red_end:
 
-  Reducing-end annotation. Use `"~"` for a wave or any other string for
-  custom text. Ignored when `red_end_length` is `0`.
+  Reducing-end annotation. Use `"~"` for a wave, any other string for
+  custom text, or tag one amino-acid site as `"ABC<site>D</site>EFG"`.
+  Ignored when `red_end_length` is `0`.
 
 - red_end_length:
 

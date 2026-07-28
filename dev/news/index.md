@@ -2,6 +2,12 @@
 
 ## glydraw (development version)
 
+- `red_end` now accepts amino-acid sequences with one tagged glycosite,
+  such as `"ABC<site>D</site>EFG"`. The site is bold and anchored to the
+  reducing end, and the sequence rotates with the glycan orientation.
+  ([\#78](https://github.com/glycoverse/glydraw/issues/78),
+  [\#82](https://github.com/glycoverse/glydraw/issues/82))
+
 ### Breaking changes
 
 - `red_end` in

@@ -38,7 +38,9 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="glydraw-development-version">glydraw (development version)<a class="anchor" aria-label="anchor" href="#glydraw-development-version"></a></h2>
-<div class="section level3">
+<ul><li>
+<code>red_end</code> now accepts amino-acid sequences with one tagged glycosite, such as <code>"ABC&lt;site&gt;D&lt;/site&gt;EFG"</code>. The site is bold and anchored to the reducing end, and the sequence rotates with the glycan orientation. (<a href="https://github.com/glycoverse/glydraw/issues/78" class="external-link">#78</a>, <a href="https://github.com/glycoverse/glydraw/issues/82" class="external-link">#82</a>)</li>
+</ul><div class="section level3">
 <h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
 <ul><li><p><code>red_end</code> in <code><a href="../reference/style_glydraw.html">style_glydraw()</a></code>, <code><a href="../reference/style_glydraw.html">style_glygen()</a></code>, <code><a href="../reference/style_glydraw.html">style_snfg()</a></code>, and <code><a href="../reference/style_glydraw.html">style_glycoworkbench()</a></code> must now be a string. Set <code>red_end_length = 0</code> to omit the reducing-end line and ignore any <code>red_end</code> wave or custom text while retaining its axis-aligned core anomer annotation. Explicit <code>red_end = NULL</code> on drawing interfaces continues to inherit <code>red_end</code> from <code>style</code>. (<a href="https://github.com/glycoverse/glydraw/issues/80" class="external-link">#80</a>)</p></li>
 <li><p><code>glydraw_style()</code> has been renamed to <code><a href="../reference/style_glydraw.html">style_glydraw()</a></code> and is no longer exported; replace calls to <code>glydraw_style()</code> with <code><a href="../reference/style_glydraw.html">style_glydraw()</a></code>. (<a href="https://github.com/glycoverse/glydraw/issues/73" class="external-link">#73</a>)</p></li>

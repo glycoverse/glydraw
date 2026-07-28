@@ -121,7 +121,8 @@ draw_cartoon_sketch(
 
   Reducing-end annotation. `NULL`, the default, uses `red_end` from
   `style`. A non-`NULL` value overrides `style$red_end`. Ignored when
-  `style$red_end_length` is `0`.
+  `style$red_end_length` is `0`. To annotate an amino-acid sequence, tag
+  its single glycosite as, for example, `"ABC<site>D</site>EFG"`.
 
 ## Value
 
