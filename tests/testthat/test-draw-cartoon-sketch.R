@@ -1,16 +1,16 @@
 skip_if_not_installed("ggsketch", minimum_version = "2.0.0")
 
-test_that("draw_cartoon_sketch hides linkage annotations by default", {
+test_that("draw_cartoon_sketch shows linkage annotations by default", {
   default <- draw_cartoon_sketch("Gal(b1-3)GalNAc(a1-", seed = 1)
-  with_linkage <- draw_cartoon_sketch(
+  hidden <- draw_cartoon_sketch(
     "Gal(b1-3)GalNAc(a1-",
-    show_linkage = TRUE,
+    show_linkage = FALSE,
     seed = 1
   )
 
-  expect_identical(formals(draw_cartoon_sketch)$show_linkage, FALSE)
-  expect_length(default$layers, 3)
-  expect_s3_class(with_linkage$layers[[4]]$geom, "GeomText")
+  expect_identical(formals(draw_cartoon_sketch)$show_linkage, TRUE)
+  expect_s3_class(default$layers[[4]]$geom, "GeomText")
+  expect_length(hidden$layers, 3)
 })
 
 test_that("draw_cartoon_sketch uses one handwriting font for text labels", {

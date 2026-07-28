@@ -12,7 +12,7 @@
 #'
 #' @inheritParams draw_cartoon
 #' @param show_linkage Show glycosidic linkage annotations or not. Defaults to
-#'   `FALSE`. Substituent annotations are always shown.
+#'   `TRUE`. Substituent annotations are always shown.
 #' @param roughness Non-negative roughness of the hand-drawn strokes. Zero
 #'   produces straight strokes.
 #' @param bowing Non-negative multiplier controlling how much strokes bow.
@@ -38,7 +38,7 @@
 draw_cartoon_sketch <- function(
   structure,
   ...,
-  show_linkage = FALSE,
+  show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
   highlight = NULL,
   style = style_glydraw(),
