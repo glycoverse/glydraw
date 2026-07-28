@@ -111,16 +111,8 @@
   if (nrow(annotation) == 0) {
     return(plot)
   }
-  family <- if (identical(grob$font_family, "")) {
-    NULL
-  } else {
-    grob$font_family
-  }
-  label_family <- if (is.null(family)) "ggsketch" else family
-  annotation$annot_label <- .font_family_annotation_labels(
-    annotation,
-    label_family
-  )
+  family <- .resolve_sketch_text_family(grob$font_family)
+  annotation$annot_label <- .sketch_annotation_labels(annotation)
 
   text_layer <- ggsketch::geom_sketch_text(
     data = annotation,
@@ -132,13 +124,81 @@
       vjust = .data$vjust
     ),
     alpha = annotation$transparency,
-    parse = TRUE,
+    parse = FALSE,
     size = 6,
     family = family
   )
   plot <- plot + text_layer
   attr(plot, "glydraw_sketch_font_family") <- text_layer$aes_params$family
   plot
+}
+
+#' Prepare plain-text labels for a sketch cartoon
+#'
+#' @param annotation An annotation data frame with character column `annot`.
+#'
+#' @returns A character vector containing Unicode Greek letters, normalized
+#'   unknown linkages, and otherwise unchanged annotation text.
+#' @noRd
+.sketch_annotation_labels <- function(annotation) {
+  labels <- annotation$annot
+  labels[labels == "alpha"] <- "\u03b1"
+  labels[labels == "beta"] <- "\u03b2"
+  unknown <- labels %in% c("?", "??", '~"?"') | grepl("^\\?\\d+", labels)
+  labels[unknown] <- "?"
+  labels
+}
+
+#' Resolve a handwriting font that covers all sketch annotation glyphs
+#'
+#' @param font_family Font family requested by the glydraw style. An empty
+#'   string requests automatic sketch-font selection.
+#'
+#' @returns A character font family. Explicitly requested families are returned
+#'   unchanged. Automatic selection prefers an available handwriting font that
+#'   contains Greek alpha, Greek beta, and decimal digits.
+#' @noRd
+.resolve_sketch_text_family <- function(font_family) {
+  if (!identical(font_family, "")) {
+    return(font_family)
+  }
+
+  resolved <- ggsketch::geom_sketch_text()$aes_params$family
+  if (
+    !requireNamespace("systemfonts", quietly = TRUE) ||
+      .sketch_font_supports_labels(resolved)
+  ) {
+    return(resolved)
+  }
+
+  available <- suppressMessages(ggsketch::ggsketch_check_fonts())
+  candidates <- names(available)[available]
+  supported <- vapply(
+    candidates,
+    .sketch_font_supports_labels,
+    logical(1)
+  )
+  if (any(supported)) {
+    return(candidates[[which(supported)[[1]]]])
+  }
+  resolved
+}
+
+#' Check whether a font covers sketch linkage labels
+#'
+#' @param font_family A character font family.
+#'
+#' @returns A logical scalar.
+#' @noRd
+.sketch_font_supports_labels <- function(font_family) {
+  if (!nzchar(font_family)) {
+    return(FALSE)
+  }
+  glyphs <- systemfonts::glyph_info(
+    c("\u03b1", "\u03b2", as.character(0:9)),
+    family = font_family
+  )
+  all(glyphs$index > 0)
 }
 
 #' Add a sketch reducing-end wave and its invisible bounds

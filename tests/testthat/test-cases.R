@@ -8,8 +8,8 @@ test_that("Draw sketch-style glycan cartoon", {
     "sketch-style glycan cartoon",
     draw_cartoon_sketch(
       "Fuc(a1-2)Gal(b1-3)GlcNAc(b1-3)GalNAc(a1-",
-      seed = 1,
-      style = style_glydraw(font_family = "sans")
+      show_linkage = TRUE,
+      seed = 1
     )
   )
 })

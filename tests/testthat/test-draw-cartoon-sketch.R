@@ -13,6 +13,39 @@ test_that("draw_cartoon_sketch hides linkage annotations by default", {
   expect_s3_class(with_linkage$layers[[4]]$geom, "GeomText")
 })
 
+test_that("draw_cartoon_sketch uses one handwriting font for text labels", {
+  plot <- draw_cartoon_sketch(
+    "Gal(b1-3)GalNAc(a1-",
+    show_linkage = TRUE,
+    seed = 1
+  )
+  text <- ggplot2::ggplot_build(plot)$data[[4]]
+
+  expect_setequal(text$label, c("\u03b2", "3", "\u03b1"))
+  expect_identical(plot$layers[[4]]$geom_params$parse, FALSE)
+  expect_identical(unique(text$family), attr(plot, "glydraw_font_family"))
+  if (
+    requireNamespace("systemfonts", quietly = TRUE) &&
+      nzchar(unique(text$family))
+  ) {
+    expect_identical(
+      .sketch_font_supports_labels(unique(text$family)),
+      TRUE
+    )
+  }
+})
+
+test_that("sketch text preserves unknown and substituent labels", {
+  annotation <- data.frame(
+    annot = c("?", "??", '?1', '~"?"', "3S,6S", "Ser/Thr")
+  )
+
+  expect_identical(
+    .sketch_annotation_labels(annotation),
+    c("?", "?", "?", "?", "3S,6S", "Ser/Thr")
+  )
+})
+
 test_that("draw_cartoon_sketch builds a fixed-size sketch cartoon", {
   plot <- draw_cartoon_sketch(
     "Gal(b1-3)GalNAc(a1-",

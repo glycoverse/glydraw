@@ -76,6 +76,12 @@ glycan cartoon hand-drawn strokes and patterned residue fills. Its glycan
 layout, annotations, orientation, and sizing are otherwise identical to
 \code{\link[=draw_cartoon]{draw_cartoon()}}.
 }
+\details{
+When \code{style_glydraw(font_family = "")} is used, the default, sketch cartoons
+prefer an installed handwriting font that contains Greek alpha, Greek beta,
+and decimal digits so all linkage labels use one font. An explicitly
+selected \code{font_family} is used unchanged.
+}
 \examples{
 if (requireNamespace("ggsketch", quietly = TRUE)) {
   draw_cartoon_sketch("Gal(b1-3)GalNAc(a1-", seed = 1)

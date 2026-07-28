@@ -5,6 +5,11 @@
 #' layout, annotations, orientation, and sizing are otherwise identical to
 #' [draw_cartoon()].
 #'
+#' When `style_glydraw(font_family = "")` is used, the default, sketch cartoons
+#' prefer an installed handwriting font that contains Greek alpha, Greek beta,
+#' and decimal digits so all linkage labels use one font. An explicitly
+#' selected `font_family` is used unchanged.
+#'
 #' @inheritParams draw_cartoon
 #' @param show_linkage Show glycosidic linkage annotations or not. Defaults to
 #'   `FALSE`. Substituent annotations are always shown.
