@@ -71,7 +71,8 @@ See \code{\link[ggsketch:sketch_media]{ggsketch::sketch_media()}} for the availa
 
 \item{red_end}{Reducing-end annotation. \code{NULL}, the default, uses \code{red_end}
 from \code{style}. A non-\code{NULL} value overrides \code{style$red_end}. Ignored when
-\code{style$red_end_length} is \code{0}.}
+\code{style$red_end_length} is \code{0}. To annotate an amino-acid sequence, tag its
+single glycosite as, for example, \code{"ABC<site>D</site>EFG"}.}
 }
 \value{
 A \code{glydraw_cartoon} ggplot2 object.

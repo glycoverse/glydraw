@@ -11,7 +11,8 @@
 #'   appearance.
 #' @param red_end Reducing-end annotation. `NULL`, the default, uses `red_end`
 #'   from `style`. A non-`NULL` value overrides `style$red_end`. Ignored when
-#'   `style$red_end_length` is `0`.
+#'   `style$red_end_length` is `0`. To annotate an amino-acid sequence, tag its
+#'   single glycosite as, for example, `"ABC<site>D</site>EFG"`.
 #' @param highlight An integer vector specifying the node indices to highlight.
 #'   This argument is applicable only when `structure` is a [glyrepr::glycan_structure()].
 #'   Note that for a [glyrepr::glycan_structure()], the node indices correspond exactly

@@ -139,6 +139,26 @@ test_that("glycanGrob controls the text annotation font family", {
   )
 })
 
+test_that("native grid renders bold rotated amino-acid sites", {
+  grob <- glycanGrob(
+    "Gal(b1-3)GalNAc(a1-",
+    orient = "left",
+    red_end = "ABC<site>D</site>EFG"
+  )
+  content <- grid::makeContent(grob)
+  annotations <-
+    content$children[[1]]$children[[2]]$children[["glycan.annotations"]]
+  labels <- as.list(annotations$label)
+  sequence <- which(vapply(
+    labels,
+    \(label) "bold" %in% all.names(label),
+    logical(1)
+  ))
+
+  expect_length(sequence, 1)
+  expect_equal(annotations$rot[[sequence]], 90)
+})
+
 test_that("native grid layout preserves the cartoon plot geometry", {
   cases <- list(
     list(

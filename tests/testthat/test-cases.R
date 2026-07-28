@@ -226,6 +226,21 @@ test_that("Draw reducing-end annotations", {
   )
 })
 
+test_that("Draw amino-acid reducing ends in every orientation", {
+  glycan <- paste0(
+    "Man(a1-3)[Man(a1-6)]Man(b1-4)",
+    "GlcNAc(b1-4)GlcNAc(b1-"
+  )
+  red_end <- "ABC<site>D</site>EFGHIJK"
+
+  purrr::walk(c("left", "right", "up", "down"), function(orient) {
+    vdiffr::expect_doppelganger(
+      paste("amino-acid reducing end", orient),
+      draw_cartoon(glycan, orient = orient, red_end = red_end)
+    )
+  })
+})
+
 test_that("Draw linkage-hidden branch", {
   glycan <- "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
   vdiffr::expect_doppelganger(
