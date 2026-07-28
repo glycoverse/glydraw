@@ -63,7 +63,10 @@
   annotation, orientation, highlighting, styling, sizing, and saving
   behavior as
   [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md).
-  ([\#77](https://github.com/glycoverse/glydraw/issues/77))
+  Sketch cartoons always use their handwriting font, ignoring
+  `font_family` in style presets.
+  ([\#77](https://github.com/glycoverse/glydraw/issues/77),
+  [\#81](https://github.com/glycoverse/glydraw/issues/81))
 
 - [`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md)
   replaces `glydraw_style()` as the single reusable interface for tuning

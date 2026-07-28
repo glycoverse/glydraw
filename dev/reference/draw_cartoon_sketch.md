@@ -129,10 +129,10 @@ A `glydraw_cartoon` ggplot2 object.
 
 ## Details
 
-When `style_glydraw(font_family = "")` is used, the default, sketch
-cartoons prefer an installed handwriting font that contains Greek alpha,
-Greek beta, and decimal digits so all linkage labels use one font. An
-explicitly selected `font_family` is used unchanged.
+Sketch cartoons always use a handwriting font, ignoring `font_family` in
+`style`. They prefer an installed sketch-style font that contains Greek
+alpha, Greek beta, and decimal digits so all linkage labels use one
+font.
 
 ## Examples
 
