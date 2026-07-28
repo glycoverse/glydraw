@@ -83,10 +83,9 @@ layout, annotations, orientation, and sizing are otherwise identical to
 \code{\link[=draw_cartoon]{draw_cartoon()}}.
 }
 \details{
-When \code{style_glydraw(font_family = "")} is used, the default, sketch cartoons
-prefer an installed handwriting font that contains Greek alpha, Greek beta,
-and decimal digits so all linkage labels use one font. An explicitly
-selected \code{font_family} is used unchanged.
+Sketch cartoons always use a handwriting font, ignoring \code{font_family} in
+\code{style}. They prefer an installed sketch-style font that contains Greek
+alpha, Greek beta, and decimal digits so all linkage labels use one font.
 }
 \examples{
 if (requireNamespace("ggsketch", quietly = TRUE)) {

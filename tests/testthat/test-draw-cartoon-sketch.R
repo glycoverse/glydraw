@@ -49,6 +49,39 @@ test_that("draw_cartoon_sketch uses one handwriting font for text labels", {
   }
 })
 
+test_that("draw_cartoon_sketch ignores font_family in every style preset", {
+  styles <- list(
+    style_glydraw(font_family = "serif"),
+    style_glygen(font_family = "serif"),
+    style_snfg(font_family = "serif"),
+    style_glycoworkbench(font_family = "serif")
+  )
+  expected <- .resolve_sketch_text_family()
+
+  for (style in styles) {
+    plot <- draw_cartoon_sketch(
+      "Gal(b1-3)GalNAc(a1-",
+      style = style,
+      seed = 1
+    )
+    text_layer <- Filter(
+      \(layer) inherits(layer$geom, "GeomText"),
+      plot$layers
+    )[[1]]
+
+    expect_identical(text_layer$aes_params$family, expected)
+    expect_identical(attr(plot, "glydraw_font_family"), expected)
+  }
+
+  without_text <- draw_cartoon_sketch(
+    "Gal(b1-3)GalNAc(b1-",
+    show_linkage = FALSE,
+    style = style_glydraw(font_family = "serif"),
+    seed = 1
+  )
+  expect_identical(attr(without_text, "glydraw_font_family"), expected)
+})
+
 test_that("sketch text preserves unknown and substituent labels", {
   annotation <- data.frame(
     annot = c("?", "??", '?1', '~"?"', "3S,6S", "Ser/Thr")
@@ -196,7 +229,10 @@ test_that("draw_cartoon_sketch builds a fixed-size sketch cartoon", {
   expect_s3_class(plot$layers[[3]]$geom, "GeomSketchCircle")
   expect_s3_class(plot$layers[[4]]$geom, "GeomSketchPolygon")
   expect_named(attr(plot, "glydraw_size_px"), c("width", "height"))
-  expect_equal(attr(plot, "glydraw_font_family"), "sans")
+  expect_equal(
+    attr(plot, "glydraw_font_family"),
+    .resolve_sketch_text_family()
+  )
 })
 
 test_that("draw_cartoon_sketch preserves cartoon controls", {

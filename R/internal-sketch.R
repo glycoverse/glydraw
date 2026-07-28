@@ -22,7 +22,7 @@
   plot <- .add_sketch_cartoon_text_layers(plot, grob)
   font_family <- attr(plot, "glydraw_sketch_font_family", exact = TRUE)
   if (is.null(font_family)) {
-    font_family <- grob$font_family
+    font_family <- .resolve_sketch_text_family()
   }
   plot <- .add_cartoon_text_bounds(plot, grob$annotation_data$bounds)
   plot <- .add_sketch_reducing_end_layers(plot, grob, sketch)
@@ -181,7 +181,7 @@
   if (nrow(annotation) == 0) {
     return(plot)
   }
-  family <- .resolve_sketch_text_family(grob$font_family)
+  family <- .resolve_sketch_text_family()
   annotation$annot_label <- .sketch_annotation_labels(annotation)
 
   text_layer <- ggsketch::geom_sketch_text(
@@ -226,18 +226,10 @@
 
 #' Resolve a handwriting font that covers all sketch annotation glyphs
 #'
-#' @param font_family Font family requested by the glydraw style. An empty
-#'   string requests automatic sketch-font selection.
-#'
-#' @returns A character font family. Explicitly requested families are returned
-#'   unchanged. Automatic selection prefers an available handwriting font that
-#'   contains Greek alpha, Greek beta, and decimal digits.
+#' @returns A character font family. Selection prefers an available handwriting
+#'   font that contains Greek alpha, Greek beta, and decimal digits.
 #' @noRd
-.resolve_sketch_text_family <- function(font_family) {
-  if (!identical(font_family, "")) {
-    return(font_family)
-  }
-
+.resolve_sketch_text_family <- function() {
   resolved <- ggsketch::geom_sketch_text()$aes_params$family
   if (
     !requireNamespace("systemfonts", quietly = TRUE) ||
