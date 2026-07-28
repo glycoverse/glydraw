@@ -85,15 +85,24 @@ test_that("draw_cartoon_sketch gives each node a reproducible random seed", {
   expect_identical(identical(node_seeds(first), node_seeds(changed)), FALSE)
 })
 
-test_that("draw_cartoon_sketch uses smoother sketch circles for Hex nodes", {
+test_that("draw_cartoon_sketch uses smooth shaded circles for Hex nodes", {
   plot <- draw_cartoon_sketch(
     "Gal(b1-3)GlcNAc(b1-",
     roughness = 1,
     seed = 1
   )
+  custom_gap <- draw_cartoon_sketch(
+    "Gal(b1-3)GlcNAc(b1-",
+    hachure_gap = 0.12,
+    seed = 1
+  )
   circle_layers <- Filter(
     \(layer) inherits(layer$geom, "GeomSketchCircle"),
     plot$layers
+  )
+  custom_circle_layers <- Filter(
+    \(layer) inherits(layer$geom, "GeomSketchCircle"),
+    custom_gap$layers
   )
   polygon_layers <- Filter(
     \(layer) inherits(layer$geom, "GeomSketchPolygon"),
@@ -104,6 +113,9 @@ test_that("draw_cartoon_sketch uses smoother sketch circles for Hex nodes", {
   expect_length(polygon_layers, 1)
   expect_equal(circle_layers[[1]]$aes_params$roughness, 0.1)
   expect_equal(polygon_layers[[1]]$geom_params$roughness, 1)
+  expect_identical(circle_layers[[1]]$geom_params$fill_style, "hachure")
+  expect_equal(circle_layers[[1]]$geom_params$hachure_gap, 0.07)
+  expect_equal(custom_circle_layers[[1]]$geom_params$hachure_gap, 0.12)
 })
 
 test_that("draw_cartoon_sketch builds a fixed-size sketch cartoon", {

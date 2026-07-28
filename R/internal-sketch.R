@@ -92,6 +92,10 @@
     factor(grob$polygon_coor$group, levels = group_levels)
   )
   seeds <- .sketch_node_seeds(sketch$seed, length(rows_by_group))
+  circle_hachure_gap <- sketch$hachure_gap
+  if (is.null(circle_hachure_gap)) {
+    circle_hachure_gap <- 0.07
+  }
 
   purrr::map2(rows_by_group, seeds, function(rows, seed) {
     node <- grob$polygon_coor[rows, , drop = FALSE]
@@ -115,7 +119,7 @@
           seed = seed,
           fill_style = sketch$fill_style,
           hachure_angle = sketch$hachure_angle,
-          hachure_gap = sketch$hachure_gap,
+          hachure_gap = circle_hachure_gap,
           fill_weight = sketch$fill_weight
         )
       )
