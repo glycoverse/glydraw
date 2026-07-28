@@ -21,6 +21,39 @@ test_that("glycanGrob constructs a drawable grid grob", {
   )
 })
 
+test_that("Hex residues use native circle grobs", {
+  grob <- glycanGrob("Gal(b1-3)GalNAc(a1-")
+  hex_rows <- grob$polygon_coor$mono == "Gal"
+
+  expect_setequal(unique(grob$polygon_coor$primitive[hex_rows]), "circle")
+  expect_setequal(unique(grob$polygon_coor$primitive[!hex_rows]), "polygon")
+
+  content <- grid::makeContent(grob)
+  primitives <- content$children[[1]]$children[[2]]$children
+  native_nodes <- primitives[["glycan.node"]]$children
+
+  expect_s3_class(native_nodes[["glycan.node.circle"]], "circle")
+  expect_s3_class(native_nodes[["glycan.node.polygon"]], "polygon")
+
+  plot <- .glycan_grob_to_plot(grob)
+  gtable <- ggplot2::ggplotGrob(plot)
+  panel <- gtable$grobs[[match("panel", gtable$layout$name)]]
+  residue_layers <- Filter(
+    \(child) {
+      inherits(child, "gTree") &&
+        any(vapply(child$children, inherits, logical(1), "circle"))
+    },
+    panel$children
+  )
+
+  expect_length(residue_layers, 2)
+  expect_true(all(vapply(
+    residue_layers,
+    \(layer) any(vapply(layer$children, inherits, logical(1), "circle")),
+    logical(1)
+  )))
+})
+
 test_that("glycanGrob converts to the existing cartoon plot contract", {
   colors <- glydraw_colors()
   colors["glyYellow"] <- "#123456"

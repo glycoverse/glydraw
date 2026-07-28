@@ -22,6 +22,8 @@
 
 ## Minor improvements and bug fixes
 
+* `Hex` residues now render as smooth, device-native circles across standalone cartoons and embedded glycan grobs.
+
 * Linkage-annotation collision handling now ignores the two labels belonging to the same edge, preventing enlarged nodes from unnecessarily reflecting an otherwise collision-free linkage. (#75)
 
 * `style_glydraw(node_size = ...)` now distributes linkage-annotation spacing adjustments across the node-to-label and label-to-label gaps, keeping linkage notation readable with enlarged nodes. (#74)

@@ -4,6 +4,7 @@
 .default_node_point_size <- 0.215
 .default_cartoon_dpi <- 300
 .default_cartoon_border_px <- 50
+.cartoon_units_per_coordinate <- 3 * 118
 .node_size_linkage_threshold <- 1.4
 .node_size_upper_boundary <- 2
 
@@ -102,8 +103,9 @@
 #'   `.cartoon_residue_data()`.
 #' @param point_size Numeric scale factor for SNFG shape templates.
 #'
-#' @returns A data frame with columns `point_x`, `point_y`, `group`, `mono`,
-#'   `color`, and `alpha`. Multi-part residue shapes contribute multiple groups.
+#' @returns A data frame with columns `point_x`, `point_y`, `center_x`,
+#'   `center_y`, `radius`, `primitive`, `group`, `mono`, `color`, and `alpha`.
+#'   Multi-part residue shapes contribute multiple groups.
 #' @noRd
 .residue_polygon_data <- function(gly_list, point_size) {
   # Progressively read and process lines in gly_list
@@ -119,6 +121,10 @@
       df1 <- data.frame(
         point_x = c(point_size * glycan_shape[[composition]]$x + center_x),
         point_y = c(point_size * glycan_shape[[composition]]$y + center_y),
+        center_x = center_x,
+        center_y = center_y,
+        radius = point_size,
+        primitive = if (composition == "Hex") "circle" else "polygon",
         # For Distinguishing the Coordinates of each point
         group = paste0(glycoform, center_x, "_", center_y),
         mono = mono,
@@ -129,6 +135,10 @@
         df2 <- data.frame(
           point_x = c(point_size * glycan_shape[[composition]]$xx + center_x),
           point_y = c(point_size * glycan_shape[[composition]]$yy + center_y),
+          center_x = center_x,
+          center_y = center_y,
+          radius = point_size,
+          primitive = "polygon",
           # For Distinguishing the Coordinates of each point
           group = paste0(glycoform, center_x, "_", center_y, 'remain'),
           mono = mono,
@@ -140,6 +150,114 @@
       return(df1)
     })
   return(polygon_coor)
+}
+
+#' Draw residue polygons and native circles in one ggplot2 layer
+#'
+#' @noRd
+GeomGlydrawResidue <- ggplot2::ggproto(
+  "GeomGlydrawResidue",
+  ggplot2::Geom,
+  required_aes = c(
+    "x",
+    "y",
+    "center_x",
+    "center_y",
+    "radius",
+    "primitive",
+    "group"
+  ),
+  default_aes = ggplot2::aes(
+    colour = "black",
+    fill = "white",
+    linewidth = 0.5,
+    linetype = 1,
+    alpha = NA
+  ),
+  draw_key = ggplot2::draw_key_polygon,
+  draw_panel = function(data, panel_params, coord, na.rm = FALSE) {
+    polygon_data <- data[data$primitive == "polygon", , drop = FALSE]
+    polygon_grob <- if (nrow(polygon_data) == 0) {
+      grid::nullGrob()
+    } else {
+      ggplot2::GeomPolygon$draw_panel(
+        polygon_data,
+        panel_params,
+        coord
+      )
+    }
+
+    circle_data <- data[data$primitive == "circle", , drop = FALSE]
+    circle_data <- circle_data[!duplicated(circle_data$group), , drop = FALSE]
+    circle_grob <- if (nrow(circle_data) == 0) {
+      grid::nullGrob()
+    } else {
+      centers <- circle_data
+      centers$x <- centers$center_x
+      centers$y <- centers$center_y
+      centers <- coord$transform(centers, panel_params)
+
+      grid::circleGrob(
+        x = grid::unit(centers$x, "native"),
+        y = grid::unit(centers$y, "native"),
+        r = grid::unit(
+          circle_data$radius *
+            .cartoon_units_per_coordinate /
+            .default_cartoon_dpi,
+          "in"
+        ),
+        gp = grid::gpar(
+          col = scales::alpha(circle_data$colour, circle_data$alpha),
+          fill = scales::alpha(circle_data$fill, circle_data$alpha),
+          lwd = circle_data$linewidth * ggplot2::.pt,
+          lty = circle_data$linetype,
+          lineend = "butt",
+          linejoin = "round"
+        )
+      )
+    }
+
+    grid::grobTree(polygon_grob, circle_grob)
+  }
+)
+
+#' Add a mixed native-circle and polygon residue layer
+#'
+#' @noRd
+.geom_glydraw_residue <- function(
+  data,
+  fill,
+  colour,
+  linewidth,
+  alpha = NULL
+) {
+  params <- list(
+    fill = fill,
+    colour = colour,
+    linewidth = linewidth,
+    na.rm = FALSE
+  )
+  if (!is.null(alpha)) {
+    params$alpha <- alpha
+  }
+
+  ggplot2::layer(
+    geom = GeomGlydrawResidue,
+    stat = "identity",
+    position = "identity",
+    data = data,
+    mapping = ggplot2::aes(
+      x = .data$point_x,
+      y = .data$point_y,
+      center_x = .data$center_x,
+      center_y = .data$center_y,
+      radius = .data$radius,
+      primitive = .data$primitive,
+      group = .data$group
+    ),
+    inherit.aes = FALSE,
+    params = params
+  )
 }
 
 #' Prepare graph, coordinates, and options for one cartoon
@@ -611,19 +729,17 @@
       alpha = connect_df$transparency,
       linewidth = edge_linewidth
     ) +
-    ggplot2::geom_polygon(
+    .geom_glydraw_residue(
       data = polygon_coor,
-      ggplot2::aes(x = .data$point_x, y = .data$point_y, group = .data$group),
       fill = "white",
-      color = "white",
+      colour = "white",
       linewidth = node_linewidth
     ) +
-    ggplot2::geom_polygon(
+    .geom_glydraw_residue(
       data = polygon_coor,
-      ggplot2::aes(x = .data$point_x, y = .data$point_y, group = .data$group),
       alpha = polygon_coor$alpha,
       fill = filled_color,
-      color = scales::alpha("black", polygon_coor$alpha),
+      colour = scales::alpha("black", polygon_coor$alpha),
       linewidth = node_linewidth
     ) +
     ggplot2::coord_fixed(ratio = 1, clip = "off") +
@@ -774,11 +890,9 @@
 #' @return A list with numeric `width` and `height` values in pixels.
 #' @noRd
 .cartoon_size_pixels <- function(cartoon, border_px = 0) {
-  panel_width <- 3 *
-    118 *
+  panel_width <- .cartoon_units_per_coordinate *
     diff(ggplot2::get_panel_scales(cartoon)$x$range$range)
-  panel_height <- 3 *
-    118 *
+  panel_height <- .cartoon_units_per_coordinate *
     diff(ggplot2::get_panel_scales(cartoon)$y$range$range)
   width <- panel_width + 2 * border_px
   height <- panel_height + 2 * border_px
