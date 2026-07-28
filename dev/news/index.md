@@ -4,6 +4,19 @@
 
 ### Breaking changes
 
+- `red_end` in
+  [`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md),
+  [`style_glygen()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md),
+  [`style_snfg()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md),
+  and
+  [`style_glycoworkbench()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md)
+  must now be a string. Set `red_end_length = 0` to omit the
+  reducing-end line and ignore any `red_end` wave or custom text while
+  retaining its axis-aligned core anomer annotation. Explicit
+  `red_end = NULL` on drawing interfaces continues to inherit `red_end`
+  from `style`.
+  ([\#80](https://github.com/glycoverse/glydraw/issues/80))
+
 - `glydraw_style()` has been renamed to
   [`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md)
   and is no longer exported; replace calls to `glydraw_style()` with
@@ -37,6 +50,11 @@
   with `"up"`. ([\#68](https://github.com/glycoverse/glydraw/issues/68))
 
 ### New features
+
+- New `red_end_length` style option controls the length of the
+  reducing-end line; at `0`, the line and all `red_end` decorations are
+  omitted while the axis-aligned core anomer annotation remains.
+  ([\#80](https://github.com/glycoverse/glydraw/issues/80))
 
 - New
   [`draw_cartoon_sketch()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon_sketch.md)
@@ -104,10 +122,6 @@
   spacing adjustments across the node-to-label and label-to-label gaps,
   keeping linkage notation readable with enlarged nodes.
   ([\#74](https://github.com/glycoverse/glydraw/issues/74))
-
-- `style_glydraw(red_end = NULL)` now omits both the reducing-end line
-  and its anomer annotation across glycan drawing interfaces.
-  ([\#71](https://github.com/glycoverse/glydraw/issues/71))
 
 - Move beta linkage annotations slightly away from horizontal and skewed
   edge lines while leaving labels beside vertical edges unchanged,

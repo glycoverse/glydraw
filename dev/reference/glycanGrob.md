@@ -64,7 +64,8 @@ glycanGrob(
 - red_end:
 
   Reducing-end annotation. `NULL`, the default, uses `red_end` from
-  `style`. A non-`NULL` value overrides `style$red_end`.
+  `style`. A non-`NULL` value overrides `style$red_end`. Ignored when
+  `style$red_end_length` is `0`.
 
 ## Value
 
