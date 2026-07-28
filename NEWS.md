@@ -10,6 +10,8 @@
 
 ## New features
 
+* New `draw_cartoon_sketch()` draws hand-sketched glycan cartoons with reproducible rough strokes, patterned residue fills, optional drawing media, and the same layout, annotation, orientation, highlighting, styling, sizing, and saving behavior as `draw_cartoon()`. (#77)
+
 * `style_glydraw()` replaces `glydraw_style()` as the single reusable interface for tuning cartoon appearance; `show_linkage` and `orient` are explicit drawing controls instead of style fields, while new `style_glygen()`, `style_snfg()`, and `style_glycoworkbench()` provide reusable presets for common glycan-drawing conventions. (#73)
 
 * New `font_family` style option controls the font used for text annotations across glycan cartoons, including alpha and beta anomer labels. (#69)

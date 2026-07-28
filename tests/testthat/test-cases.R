@@ -2,6 +2,18 @@ skip_on_ci()
 skip_on_cran()
 skip_if_not_installed("vdiffr")
 
+test_that("Draw sketch-style glycan cartoon", {
+  skip_if_not_installed("ggsketch", minimum_version = "2.0.0")
+  vdiffr::expect_doppelganger(
+    "sketch-style glycan cartoon",
+    draw_cartoon_sketch(
+      "Fuc(a1-2)Gal(b1-3)GlcNAc(b1-3)GalNAc(a1-",
+      show_linkage = TRUE,
+      seed = 1
+    )
+  )
+})
+
 test_that("Draw G97345NY", {
   glycan <- "Neu5Ac(a2-3)Gal(b1-3)[Neu5Ac(a2-3)Gal(b1-4)[Fuc(a1-3)]GlcNAc(b1-6)]GalNAc(a1-"
   vdiffr::expect_doppelganger("G97345NY", draw_cartoon(glycan))

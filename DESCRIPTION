@@ -16,8 +16,10 @@ License: MIT + file LICENSE
 Suggests: 
     ComplexHeatmap,
     ggraph,
+    ggsketch (>= 2.0.0),
     knitr,
     rmarkdown,
+    systemfonts,
     testthat (>= 3.0.0),
     tibble,
     vdiffr

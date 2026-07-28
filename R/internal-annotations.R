@@ -1149,6 +1149,17 @@
   paste0('"', gsub('"', '\\"', annot, fixed = TRUE), '"')
 }
 
+# Recover plain text previously stored for plotmath parsing.
+.unquote_plotmath_text <- function(annot) {
+  quoted <- !is.na(annot) &
+    startsWith(annot, '"') &
+    endsWith(annot, '"') &
+    nchar(annot) >= 2L
+  annot[quoted] <- substr(annot[quoted], 2L, nchar(annot[quoted]) - 1L)
+  annot[quoted] <- gsub('\\"', '"', annot[quoted], fixed = TRUE)
+  annot
+}
+
 #' Build reducing-end segment, label, wave, and bounds data
 #'
 #' @param structure An igraph glycan graph. The graph attribute `anomer`
