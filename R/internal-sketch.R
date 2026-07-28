@@ -42,6 +42,8 @@
 #' @returns A ggplot object containing sketch-style glycan layers.
 #' @noRd
 .sketch_cartoon_base_layers <- function(grob, sketch) {
+  node_layers <- .sketch_cartoon_node_layers(grob, sketch)
+
   ggplot2::ggplot() +
     ggsketch::geom_sketch_segment(
       data = grob$connect_df,
@@ -70,29 +72,66 @@
       color = "white",
       linewidth = grob$node_linewidth
     ) +
+    node_layers +
+    ggplot2::coord_fixed(ratio = 1, clip = "off") +
+    ggplot2::theme_void() +
+    ggplot2::theme(legend.position = "none")
+}
+
+#' Build one independently seeded sketch layer per residue
+#'
+#' @param grob A prepared `glycanGrob`.
+#' @param sketch A named list of ggsketch rendering parameters.
+#'
+#' @returns A list of ggplot2 sketch polygon layers.
+#' @noRd
+.sketch_cartoon_node_layers <- function(grob, sketch) {
+  group_levels <- unique(grob$polygon_coor$group)
+  rows_by_group <- split(
+    seq_len(nrow(grob$polygon_coor)),
+    factor(grob$polygon_coor$group, levels = group_levels)
+  )
+  seeds <- .sketch_node_seeds(sketch$seed, length(rows_by_group))
+
+  purrr::map2(rows_by_group, seeds, function(rows, seed) {
+    polygon <- grob$polygon_coor[rows, , drop = FALSE]
     ggsketch::geom_sketch_polygon(
-      data = grob$polygon_coor,
+      data = polygon,
       ggplot2::aes(
         x = .data$point_x,
         y = .data$point_y,
         group = .data$group
       ),
-      alpha = grob$polygon_coor$alpha,
-      fill = grob$filled_color,
-      color = scales::alpha("black", grob$polygon_coor$alpha),
+      alpha = polygon$alpha,
+      fill = grob$filled_color[rows],
+      color = scales::alpha("black", polygon$alpha),
       linewidth = grob$node_linewidth,
       roughness = sketch$roughness,
       bowing = sketch$bowing,
       n_passes = sketch$n_passes,
-      seed = sketch$seed,
+      seed = seed,
       fill_style = sketch$fill_style,
       hachure_angle = sketch$hachure_angle,
       hachure_gap = sketch$hachure_gap,
       fill_weight = sketch$fill_weight
-    ) +
-    ggplot2::coord_fixed(ratio = 1, clip = "off") +
-    ggplot2::theme_void() +
-    ggplot2::theme(legend.position = "none")
+    )
+  })
+}
+
+#' Derive stable independent seeds for sketch nodes
+#'
+#' @param seed Optional user-supplied sketch seed.
+#' @param n Number of node seeds to derive.
+#'
+#' @returns An integer vector of length `n`.
+#' @noRd
+.sketch_node_seeds <- function(seed, n) {
+  if (is.null(seed) || (length(seed) == 1L && is.na(seed))) {
+    seed <- getOption("ggsketch.seed", 1L)
+  }
+  base_seed <- as.integer(seed[[1L]])
+  offsets <- seq_len(n) * 104729
+  as.integer((as.double(base_seed) + offsets) %% 2147483647)
 }
 
 #' Add sketch cartoon text layers

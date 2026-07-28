@@ -9,8 +9,16 @@ test_that("draw_cartoon_sketch shows linkage annotations by default", {
   )
 
   expect_identical(formals(draw_cartoon_sketch)$show_linkage, TRUE)
-  expect_s3_class(default$layers[[4]]$geom, "GeomText")
-  expect_length(hidden$layers, 3)
+  default_text <- Filter(
+    \(layer) inherits(layer$geom, "GeomText"),
+    default$layers
+  )
+  hidden_text <- Filter(
+    \(layer) inherits(layer$geom, "GeomText"),
+    hidden$layers
+  )
+  expect_length(default_text, 1)
+  expect_length(hidden_text, 0)
 })
 
 test_that("draw_cartoon_sketch uses one handwriting font for text labels", {
@@ -19,10 +27,16 @@ test_that("draw_cartoon_sketch uses one handwriting font for text labels", {
     show_linkage = TRUE,
     seed = 1
   )
-  text <- ggplot2::ggplot_build(plot)$data[[4]]
+  text_index <- which(vapply(
+    plot$layers,
+    \(layer) inherits(layer$geom, "GeomText"),
+    logical(1)
+  ))
+  text_layer <- plot$layers[[text_index]]
+  text <- ggplot2::ggplot_build(plot)$data[[text_index]]
 
   expect_setequal(text$label, c("\u03b2", "3", "\u03b1"))
-  expect_identical(plot$layers[[4]]$geom_params$parse, FALSE)
+  expect_identical(text_layer$geom_params$parse, FALSE)
   expect_identical(unique(text$family), attr(plot, "glydraw_font_family"))
   if (
     requireNamespace("systemfonts", quietly = TRUE) &&
@@ -44,6 +58,28 @@ test_that("sketch text preserves unknown and substituent labels", {
     .sketch_annotation_labels(annotation),
     c("?", "?", "?", "?", "3S,6S", "Ser/Thr")
   )
+})
+
+test_that("draw_cartoon_sketch gives each node a reproducible random seed", {
+  structure <- paste0(
+    "Gal(b1-3)Gal(b1-3)",
+    "GlcNAc(b1-3)GlcNAc(b1-"
+  )
+  first <- draw_cartoon_sketch(structure, seed = 11)
+  second <- draw_cartoon_sketch(structure, seed = 11)
+  changed <- draw_cartoon_sketch(structure, seed = 12)
+  node_seeds <- function(plot) {
+    layers <- Filter(
+      \(layer) inherits(layer$geom, "GeomSketchPolygon"),
+      plot$layers
+    )
+    vapply(layers, \(layer) layer$geom_params$seed, numeric(1))
+  }
+
+  expect_length(node_seeds(first), 4)
+  expect_length(unique(node_seeds(first)), 4)
+  expect_identical(node_seeds(first), node_seeds(second))
+  expect_identical(identical(node_seeds(first), node_seeds(changed)), FALSE)
 })
 
 test_that("draw_cartoon_sketch builds a fixed-size sketch cartoon", {
@@ -93,8 +129,12 @@ test_that("draw_cartoon_sketch sketches reducing-end waves", {
     style = style_glydraw(red_end = "~"),
     seed = 1
   )
+  wave_layers <- Filter(
+    \(layer) inherits(layer$geom, "GeomSketchPath"),
+    plot$layers
+  )
 
-  expect_s3_class(plot$layers[[5]]$geom, "GeomSketchPath")
+  expect_length(wave_layers, 1)
 })
 
 test_that("draw_cartoon_sketch saves with its resolved handwriting font", {
@@ -107,10 +147,14 @@ test_that("draw_cartoon_sketch saves with its resolved handwriting font", {
   on.exit(unlink(file), add = TRUE)
 
   save_cartoon(plot, file)
+  text_layer <- Filter(
+    \(layer) inherits(layer$geom, "GeomText"),
+    plot$layers
+  )[[1]]
 
   expect_identical(
     attr(plot, "glydraw_font_family"),
-    plot$layers[[4]]$aes_params$family
+    text_layer$aes_params$family
   )
   expect_true(file.exists(file))
   expect_gt(file.info(file)$size, 0)
