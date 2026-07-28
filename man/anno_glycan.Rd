@@ -18,7 +18,8 @@ anno_glycan(
   style = style_glydraw(),
   width = NULL,
   height = NULL,
-  show_name = FALSE
+  show_name = FALSE,
+  red_end = NULL
 )
 }
 \arguments{
@@ -66,6 +67,9 @@ calculates the height from the rendered cartoons.}
 \item{show_name}{Whether ComplexHeatmap should show the annotation name.
 Defaults to \code{FALSE} because the cartoons normally replace row or column
 names.}
+
+\item{red_end}{Reducing-end annotation. \code{NULL}, the default, uses \code{red_end}
+from \code{style}. A non-\code{NULL} value overrides \code{style$red_end}.}
 }
 \value{
 A ComplexHeatmap \code{AnnotationFunction} object.

@@ -81,6 +81,23 @@ test_that("sketch text unquotes custom reducing-end labels", {
   )
 })
 
+test_that("draw_cartoon_sketch red_end overrides its style", {
+  plot <- draw_cartoon_sketch(
+    "Gal(b1-3)GalNAc(a1-",
+    style = style_glydraw(red_end = "~"),
+    red_end = "Reducing end",
+    seed = 1
+  )
+  text_index <- which(vapply(
+    plot$layers,
+    \(layer) inherits(layer$geom, "GeomText"),
+    logical(1)
+  ))
+  text <- ggplot2::ggplot_build(plot)$data[[text_index]]
+
+  expect_contains(text$label, "Reducing end")
+})
+
 test_that("draw_cartoon_sketch gives each node a reproducible random seed", {
   structure <- paste0(
     "Gal(b1-3)Gal(b1-3)",

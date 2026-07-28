@@ -20,13 +20,15 @@ glycanGrob <- function(
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
   highlight = NULL,
-  style = style_glydraw()
+  style = style_glydraw(),
+  red_end = NULL
 ) {
   orient <- rlang::arg_match(orient, error_call = NULL)
   checkmate::assert_class(style, "glydraw_style")
+  red_end <- .resolve_red_end(red_end, style)
   style <- .make_glydraw_style(
     fuc_orient = style$fuc_orient,
-    red_end = style$red_end,
+    red_end = red_end,
     edge_linewidth = style$edge_linewidth,
     node_linewidth = style$node_linewidth,
     node_size = style$node_size,

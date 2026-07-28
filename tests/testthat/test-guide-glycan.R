@@ -176,6 +176,19 @@ test_that("guide_glycan draws scale labels as cartoons", {
   )))
 })
 
+test_that("guide_glycan red_end overrides its style", {
+  style <- style_glydraw(red_end = "~")
+
+  expect_identical(guide_glycan(style = style)$params$glycan_red_end, "~")
+  expect_identical(
+    guide_glycan(
+      style = style,
+      red_end = "Reducing end"
+    )$params$glycan_red_end,
+    "Reducing end"
+  )
+})
+
 test_that("guide_glycan anchors labels at their reducing ends by default", {
   structures <- c(
     paste0(

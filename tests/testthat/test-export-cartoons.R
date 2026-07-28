@@ -64,6 +64,23 @@ test_that("export_cartoons forwards custom linewidths", {
   expect_equal(unique(layers[[3]]$linewidth), 0.3)
 })
 
+test_that("export_cartoons red_end overrides its style", {
+  temp_dir <- tempfile()
+  on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
+
+  suppressMessages(
+    result <- export_cartoons(
+      "Gal(b1-3)GalNAc(a1-",
+      temp_dir,
+      style = style_glydraw(red_end = "~"),
+      red_end = "Reducing end"
+    )
+  )
+  annotation <- result[[1]]$layers[["geom_text"]]$data$annot
+
+  expect_contains(annotation, '"Reducing end"')
+})
+
 test_that("export_cartoons forwards custom colors", {
   glycans <- "Gal(b1-4)GlcNAc(b1-"
   temp_dir <- tempfile()

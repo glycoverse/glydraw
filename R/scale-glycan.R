@@ -40,6 +40,8 @@
 #'   the cartoons. Defaults to `TRUE`.
 #' @param style A [style_glydraw()] object that controls the cartoons' visual
 #'   appearance.
+#' @param red_end Reducing-end annotation. `NULL`, the default, uses `red_end`
+#'   from `style`. A non-`NULL` value overrides `style$red_end`.
 #'
 #' @returns A ggplot2 discrete position scale.
 #'
@@ -71,8 +73,10 @@ scale_x_glycan <- function(
   nudge_x = 0,
   nudge_y = 0,
   show_linkage = TRUE,
-  style = style_glydraw()
+  style = style_glydraw(),
+  red_end = NULL
 ) {
+  red_end <- .resolve_red_end(red_end, style)
   guide <- .new_glycan_axis_guide(
     orient = "up",
     size = size,
@@ -82,7 +86,7 @@ scale_x_glycan <- function(
     nudge_x = nudge_x,
     nudge_y = nudge_y,
     show_linkage = show_linkage,
-    red_end = style$red_end,
+    red_end = red_end,
     fuc_orient = style$fuc_orient,
     edge_linewidth = style$edge_linewidth,
     node_linewidth = style$node_linewidth,
@@ -122,8 +126,10 @@ scale_y_glycan <- function(
   nudge_x = 0,
   nudge_y = 0,
   show_linkage = TRUE,
-  style = style_glydraw()
+  style = style_glydraw(),
+  red_end = NULL
 ) {
+  red_end <- .resolve_red_end(red_end, style)
   guide <- .new_glycan_axis_guide(
     orient = "left",
     size = size,
@@ -133,7 +139,7 @@ scale_y_glycan <- function(
     nudge_x = nudge_x,
     nudge_y = nudge_y,
     show_linkage = show_linkage,
-    red_end = style$red_end,
+    red_end = red_end,
     fuc_orient = style$fuc_orient,
     edge_linewidth = style$edge_linewidth,
     node_linewidth = style$node_linewidth,

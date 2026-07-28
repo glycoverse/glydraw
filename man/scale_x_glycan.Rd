@@ -20,7 +20,8 @@ scale_x_glycan(
   nudge_x = 0,
   nudge_y = 0,
   show_linkage = TRUE,
-  style = style_glydraw()
+  style = style_glydraw(),
+  red_end = NULL
 )
 
 scale_y_glycan(
@@ -38,7 +39,8 @@ scale_y_glycan(
   nudge_x = 0,
   nudge_y = 0,
   show_linkage = TRUE,
-  style = style_glydraw()
+  style = style_glydraw(),
+  red_end = NULL
 )
 }
 \arguments{
@@ -86,6 +88,9 @@ the cartoons. Defaults to \code{TRUE}.}
 
 \item{style}{A \code{\link[=style_glydraw]{style_glydraw()}} object that controls the cartoons' visual
 appearance.}
+
+\item{red_end}{Reducing-end annotation. \code{NULL}, the default, uses \code{red_end}
+from \code{style}. A non-\code{NULL} value overrides \code{style$red_end}.}
 }
 \value{
 A ggplot2 discrete position scale.

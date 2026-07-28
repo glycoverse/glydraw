@@ -351,7 +351,7 @@ test_that("draw_cartoon accepts reusable glydraw styles", {
   expect_contains(unique(styled_layers[[3]]$fill), "#123456")
 })
 
-test_that("cartoon styling is available only through style", {
+test_that("main APIs expose only the red_end style override", {
   expect_setequal(
     intersect(
       getNamespaceExports("glydraw"),
@@ -377,7 +377,7 @@ test_that("cartoon styling is available only through style", {
 
   purrr::walk(
     interface_arguments,
-    ~ expect_false(any(styling_arguments %in% .x))
+    ~ expect_setequal(intersect(styling_arguments, .x), "red_end")
   )
   expect_false(any(c("show_linkage", "orient") %in% styling_arguments))
   expect_true(all(
@@ -402,6 +402,43 @@ test_that("cartoon styling is available only through style", {
     interfaces,
     ~ expect_identical(formals(.x)$style, quote(style_glydraw()))
   )
+  purrr::walk(
+    interfaces,
+    ~ expect_null(formals(.x)$red_end)
+  )
+  purrr::walk(
+    interface_arguments,
+    ~ expect_identical(tail(.x, 1), "red_end")
+  )
+})
+
+test_that("explicit red_end overrides style and NULL inherits it", {
+  structure <- "Gal(b1-3)GalNAc(a1-"
+  style <- style_glydraw(red_end = "~")
+
+  inherited <- glycanGrob(structure, style = style)
+  overridden <- glycanGrob(
+    structure,
+    style = style,
+    red_end = "Reducing end"
+  )
+  drawn <- draw_cartoon(
+    structure,
+    style = style,
+    red_end = "Reducing end"
+  )
+  drawn_annotation <- drawn$layers[["geom_text"]]$data$annot
+
+  expect_gt(nrow(inherited$annotation_data$reducing_info$wave), 0)
+  expect_true(any(
+    overridden$annotation_data$reducing_info$annotation$is_red_end_text
+  ))
+  expect_match(
+    overridden$annotation_data$reducing_info$annotation$annot[[2]],
+    "Reducing end"
+  )
+  expect_contains(drawn_annotation, '"Reducing end"')
+  expect_identical(style$red_end, "~")
 })
 
 test_that("draw_cartoon requires the complete named SNFG palette", {

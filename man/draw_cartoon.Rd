@@ -10,7 +10,8 @@ draw_cartoon(
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
   highlight = NULL,
-  style = style_glydraw()
+  style = style_glydraw(),
+  red_end = NULL
 )
 }
 \arguments{
@@ -34,6 +35,9 @@ setting \code{highlight = c(1, 3)} will highlight the "Gal" and "GalNAc" nodes.}
 
 \item{style}{A \code{\link[=style_glydraw]{style_glydraw()}} object that controls the cartoon's visual
 appearance.}
+
+\item{red_end}{Reducing-end annotation. \code{NULL}, the default, uses \code{red_end}
+from \code{style}. A non-\code{NULL} value overrides \code{style$red_end}.}
 }
 \value{
 a ggplot2 object

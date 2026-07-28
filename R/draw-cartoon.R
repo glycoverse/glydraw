@@ -9,6 +9,8 @@
 #'   one of `"left"`, `"right"`, `"up"`, or `"down"`. Defaults to `"left"`.
 #' @param style A [style_glydraw()] object that controls the cartoon's visual
 #'   appearance.
+#' @param red_end Reducing-end annotation. `NULL`, the default, uses `red_end`
+#'   from `style`. A non-`NULL` value overrides `style$red_end`.
 #' @param highlight An integer vector specifying the node indices to highlight.
 #'   This argument is applicable only when `structure` is a [glyrepr::glycan_structure()].
 #'   Note that for a [glyrepr::glycan_structure()], the node indices correspond exactly
@@ -30,7 +32,8 @@ draw_cartoon <- function(
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
   highlight = NULL,
-  style = style_glydraw()
+  style = style_glydraw(),
+  red_end = NULL
 ) {
   glycanGrob(
     structure,
@@ -38,7 +41,8 @@ draw_cartoon <- function(
     show_linkage = show_linkage,
     orient = orient,
     highlight = highlight,
-    style = style
+    style = style,
+    red_end = red_end
   ) |>
     .glycan_grob_to_plot()
 }

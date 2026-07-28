@@ -26,6 +26,16 @@ test_that("geom_glycan maps structures to x and y positions", {
   expect_setequal(GeomGlycan$required_aes, c("x", "y", "structure"))
 })
 
+test_that("geom_glycan red_end overrides its style", {
+  style <- style_glydraw(red_end = "~")
+
+  expect_identical(geom_glycan(style = style)$geom_params$red_end, "~")
+  expect_identical(
+    geom_glycan(style = style, red_end = "Reducing end")$geom_params$red_end,
+    "Reducing end"
+  )
+})
+
 test_that("geom_glycan preserves mapped glycan structure vectors", {
   structures <- glyrepr::as_glycan_structure(c(
     "GalNAc(a1-",
