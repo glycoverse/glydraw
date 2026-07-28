@@ -22,7 +22,7 @@
 
 ## Minor improvements and bug fixes
 
-* `Hex` residues now render as smooth, device-native circles across standalone cartoons and embedded glycan grobs.
+* `Hex` residues now render as smooth, device-native circles across standalone cartoons and embedded glycan grobs. (#76)
 
 * Linkage-annotation collision handling now ignores the two labels belonging to the same edge, preventing enlarged nodes from unnecessarily reflecting an otherwise collision-free linkage. (#75)
 
