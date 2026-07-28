@@ -7,10 +7,11 @@
 #' Supply a returned style with `style =` to reuse its visual specification.
 #'
 #' @param fuc_orient Fuc-like triangle orientation: `"flex"` or `"up"`.
-#' @param red_end Reducing-end annotation. Use `"~"` for a wave or `NULL` to
-#'   omit the reducing-end line and anomer annotation.
+#' @param red_end Reducing-end annotation. Use `"~"` for a wave or any other
+#'   string for custom text.
 #' @param red_end_length Length of the reducing-end line in plot coordinate
-#'   units.
+#'   units. Set to `0` to conceal the line while retaining the anomer
+#'   annotation.
 #' @param edge_linewidth Linewidth of glycosidic linkages.
 #' @param node_linewidth Linewidth of node borders.
 #' @param node_size Multiplier for the default node size.
@@ -149,7 +150,13 @@ style_glycoworkbench <- function(
   red_end_length
 ) {
   checkmate::assert_choice(fuc_orient, c("flex", "up"))
-  checkmate::assert_string(red_end, na.ok = FALSE, null.ok = TRUE)
+  if (is.null(red_end)) {
+    cli::cli_abort(c(
+      "{.arg red_end} in a glycan style cannot be {.code NULL}.",
+      "i" = "Set {.arg red_end_length} to 0 to conceal the reducing-end line."
+    ))
+  }
+  checkmate::assert_string(red_end, na.ok = FALSE)
   checkmate::assert_number(edge_linewidth, lower = 0)
   checkmate::assert_number(node_linewidth, lower = 0)
   .validate_node_size(node_size)

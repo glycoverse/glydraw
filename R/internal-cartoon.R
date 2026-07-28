@@ -295,7 +295,7 @@ GeomGlydrawResidue <- ggplot2::ggproto(
   orient = c("left", "right", "up", "down"),
   red_end = ""
 ) {
-  checkmate::assert_string(red_end, na.ok = FALSE, null.ok = TRUE)
+  checkmate::assert_string(red_end, na.ok = FALSE)
   if (!is.null(highlight) && !glyrepr::is_glycan_structure(structure)) {
     cli::cli_warn(
       "{.arg highlight} can only be set when {.arg structure} is a {.fn glyrepr::glycan_structure}."

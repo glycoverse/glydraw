@@ -1,3 +1,12 @@
+# style constructors reject a NULL red_end
+
+    Code
+      style_glydraw(red_end = NULL)
+    Condition
+      Error in `.make_glydraw_style()`:
+      ! `red_end` in a glycan style cannot be `NULL`.
+      i Set `red_end_length` to 0 to conceal the reducing-end line.
+
 # draw_cartoon rejects the previous orientation abbreviations
 
     Code

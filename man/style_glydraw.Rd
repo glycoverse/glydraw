@@ -56,11 +56,12 @@ style_glycoworkbench(
 \arguments{
 \item{fuc_orient}{Fuc-like triangle orientation: \code{"flex"} or \code{"up"}.}
 
-\item{red_end}{Reducing-end annotation. Use \code{"~"} for a wave or \code{NULL} to
-omit the reducing-end line and anomer annotation.}
+\item{red_end}{Reducing-end annotation. Use \code{"~"} for a wave or any other
+string for custom text.}
 
 \item{red_end_length}{Length of the reducing-end line in plot coordinate
-units.}
+units. Set to \code{0} to conceal the line while retaining the anomer
+annotation.}
 
 \item{edge_linewidth}{Linewidth of glycosidic linkages.}
 

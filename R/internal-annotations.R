@@ -1168,9 +1168,8 @@
 #'   per graph vertex.
 #' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
 #'   `"down"`.
-#' @param red_end A string or `NULL`. `NULL` omits the reducing end, `""`
-#'   draws only the current reducing-end line, `"~"` draws a wavy end, and any
-#'   other string draws custom text.
+#' @param red_end A string. `""` draws only the current reducing-end line,
+#'   `"~"` draws a wavy end, and any other string draws custom text.
 #' @param red_end_length Length of the reducing-end line in plot coordinate
 #'   units.
 #'
@@ -1187,9 +1186,7 @@
   red_end_length = 0.6
 ) {
   orient <- rlang::arg_match(orient)
-  if (is.null(red_end)) {
-    return(.empty_reducing_end_annotation_data())
-  }
+  checkmate::assert_string(red_end, na.ok = FALSE)
   anomer <- igraph::graph_attr(structure, "anomer")
   if (.has_no_reducing_end_anomer(anomer)) {
     return(.empty_reducing_end_annotation_data())
@@ -1326,19 +1323,23 @@
   )
   line_vec <- .reducing_end_line_vector(orient, line_length)
   label_vec <- .reducing_end_line_vector(orient, label_distance)
-  label_position_offset <- matrix(
-    .rotated_reducing_end_label_vector(label_vec),
-    ncol = 1
-  )
-  label_position_offset <- .nudge_child_label_perpendicular(
-    label_offset = label_position_offset,
-    direction = matrix(label_vec, ncol = 1),
-    nudge = .beta_perpendicular_nudge_for_linkage(
-      label,
-      root_coor[["x"]],
-      root_coor[["x"]] + label_vec[["x"]]
+  if (line_length == 0) {
+    label_position_offset <- matrix(0.6 * label_vec, ncol = 1)
+  } else {
+    label_position_offset <- matrix(
+      .rotated_reducing_end_label_vector(label_vec),
+      ncol = 1
     )
-  )
+    label_position_offset <- .nudge_child_label_perpendicular(
+      label_offset = label_position_offset,
+      direction = matrix(label_vec, ncol = 1),
+      nudge = .beta_perpendicular_nudge_for_linkage(
+        label,
+        root_coor[["x"]],
+        root_coor[["x"]] + label_vec[["x"]]
+      )
+    )
+  }
   label_coor <- root_coor +
     c(
       x = as.numeric(label_position_offset[1, 1]),

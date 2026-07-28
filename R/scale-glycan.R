@@ -324,7 +324,7 @@ scale_y_glycan <- function(
   checkmate::assert_number(edge_linewidth, lower = 0)
   checkmate::assert_number(node_linewidth, lower = 0)
   checkmate::assert_number(red_end_length, lower = 0)
-  checkmate::assert_string(red_end, na.ok = FALSE, null.ok = TRUE)
+  checkmate::assert_string(red_end, na.ok = FALSE)
   checkmate::assert_string(font_family, na.ok = FALSE)
   .validate_node_size(node_size)
   colors <- .validate_colors(colors)
