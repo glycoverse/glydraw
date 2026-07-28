@@ -1,8 +1,5 @@
 # Internal helpers for drawing prepared glycan geometry directly with grid.
 
-.cartoon_grid_units_per_coordinate <- 3 * 118
-.cartoon_grid_expansion <- 0.05
-
 #' Calculate native grid layout metadata
 #'
 #' @param grob A prepared `glycanGrob`.
@@ -40,11 +37,11 @@
   panel_ranges <- lapply(
     data_ranges,
     scales::expand_range,
-    mul = .cartoon_grid_expansion
+    mul = .cartoon_panel_expansion
   )
   panel_size_px <- c(
-    width = .cartoon_grid_units_per_coordinate * diff(x_range),
-    height = .cartoon_grid_units_per_coordinate * diff(y_range)
+    width = .cartoon_units_per_coordinate * diff(x_range),
+    height = .cartoon_units_per_coordinate * diff(y_range)
   )
   border_px <- grob$glydraw_border_px
   if (is.null(border_px)) {
@@ -319,7 +316,7 @@
   )
 }
 
-#' Draw glycan residue polygons
+#' Draw glycan residue polygons and native circles
 #'
 #' @param grob A prepared `glycanGrob`.
 #' @param layout Grid layout metadata from `.cartoon_grid_layout()`.
@@ -327,7 +324,7 @@
 #' @param fill,colour,alpha Per-point graphical properties.
 #' @param name Grob name.
 #'
-#' @returns A `polygon` grob.
+#' @returns A grob tree containing polygon and circle grobs as needed.
 #' @noRd
 .cartoon_grid_polygons <- function(
   grob,
@@ -359,36 +356,90 @@
     group_fill <- scales::alpha(group_fill, alpha[first])
   }
 
-  grid::polygonGrob(
-    x = grid::unit(
-      .normalize_cartoon_grid_coordinates(
-        polygons$point_x,
-        layout$panel_ranges$x
+  polygon_rows <- polygons$primitive == "polygon"
+  polygon_grob <- if (!any(polygon_rows)) {
+    grid::nullGrob()
+  } else {
+    polygon_group <- group[polygon_rows]
+    polygon_ids <- sort(unique(polygon_group))
+    polygon_group <- match(polygon_group, polygon_ids)
+    polygon_first <- !duplicated(group[polygon_rows])
+
+    grid::polygonGrob(
+      x = grid::unit(
+        .normalize_cartoon_grid_coordinates(
+          polygons$point_x[polygon_rows],
+          layout$panel_ranges$x
+        ),
+        "native"
       ),
-      "native"
-    ),
-    y = grid::unit(
-      .normalize_cartoon_grid_coordinates(
-        polygons$point_y,
-        layout$panel_ranges$y
+      y = grid::unit(
+        .normalize_cartoon_grid_coordinates(
+          polygons$point_y[polygon_rows],
+          layout$panel_ranges$y
+        ),
+        "native"
       ),
-      "native"
-    ),
-    id = group,
-    gp = grid::gpar(
-      col = group_colour,
-      fill = group_fill,
-      lwd = rep(
-        grob$node_linewidth * ggplot2::.pt * scale,
-        group_count
+      id = polygon_group,
+      gp = grid::gpar(
+        col = group_colour[polygon_ids],
+        fill = group_fill[polygon_ids],
+        lwd = rep(
+          grob$node_linewidth * ggplot2::.pt * scale,
+          sum(polygon_first)
+        ),
+        lty = rep(1, sum(polygon_first)),
+        lineend = "butt",
+        linejoin = "round",
+        linemitre = 10
       ),
-      lty = rep(1, group_count),
-      lineend = "butt",
-      linejoin = "round",
-      linemitre = 10
-    ),
-    name = name
-  )
+      name = paste0(name, ".polygon")
+    )
+  }
+
+  circle_groups <- which(first & polygons$primitive == "circle")
+  circle_grob <- if (length(circle_groups) == 0) {
+    grid::nullGrob()
+  } else {
+    circle_ids <- group[circle_groups]
+    grid::circleGrob(
+      x = grid::unit(
+        .normalize_cartoon_grid_coordinates(
+          polygons$center_x[circle_groups],
+          layout$panel_ranges$x
+        ),
+        "native"
+      ),
+      y = grid::unit(
+        .normalize_cartoon_grid_coordinates(
+          polygons$center_y[circle_groups],
+          layout$panel_ranges$y
+        ),
+        "native"
+      ),
+      r = grid::unit(
+        .cartoon_circle_radius_inches(
+          polygons$radius[circle_groups],
+          scale
+        ),
+        "in"
+      ),
+      gp = grid::gpar(
+        col = group_colour[circle_ids],
+        fill = group_fill[circle_ids],
+        lwd = rep(
+          grob$node_linewidth * ggplot2::.pt * scale,
+          length(circle_groups)
+        ),
+        lty = rep(1, length(circle_groups)),
+        lineend = "butt",
+        linejoin = "round"
+      ),
+      name = paste0(name, ".circle")
+    )
+  }
+
+  grid::grobTree(polygon_grob, circle_grob, name = name)
 }
 
 #' Draw glycan text annotations
