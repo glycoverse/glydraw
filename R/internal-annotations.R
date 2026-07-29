@@ -1255,6 +1255,7 @@
 #' @param red_end_length Length of the reducing-end line in plot coordinate
 #'   units. At `0`, the line and all `red_end` decorations are omitted while
 #'   the core anomer annotation remains.
+#' @param red_end_size Size of custom reducing-end text.
 #'
 #' @returns A list with data frames `annotation`, `segment`, `wave`, and
 #'   `bounds`. `annotation` contains text rows; `segment` contains one line
@@ -1267,7 +1268,8 @@
   coor,
   orient = c("left", "right", "up", "down"),
   red_end = "",
-  red_end_length = 0.6
+  red_end_length = 0.6,
+  red_end_size = 6
 ) {
   orient <- rlang::arg_match(orient)
   checkmate::assert_string(red_end, na.ok = FALSE)
@@ -1305,7 +1307,8 @@
     red_end,
     geometry$line_end,
     geometry$line_vec,
-    orient
+    orient,
+    red_end_size
   )
   list(
     annotation = dplyr::bind_rows(
@@ -1613,12 +1616,19 @@
 #'   direction.
 #' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
 #'   `"down"`.
+#' @param red_end_size Size of custom reducing-end text.
 #'
 #' @returns A data frame with numeric columns `x` and `y`. Horizontal text
 #'   returns one bound point; vertical text returns two bound points; `""` and
 #'   `"~"` return zero rows.
 #' @noRd
-.reducing_end_text_bounds <- function(red_end, line_end, line_vec, orient) {
+.reducing_end_text_bounds <- function(
+  red_end,
+  line_end,
+  line_vec,
+  orient,
+  red_end_size = 6
+) {
   if (red_end %in% c("", "~")) {
     return(data.frame(x = numeric(0), y = numeric(0)))
   }
@@ -1633,7 +1643,8 @@
       type = "width"
     )
   }
-  text_width <- max(display_width, 1) * 0.12
+  size_scale <- red_end_size / 6
+  text_width <- max(display_width, 1) * 0.12 * size_scale
   if (!is.null(sequence)) {
     hjust <- .reducing_end_aa_sequence_hjust(sequence)
     angle <- .reducing_end_aa_sequence_angle(orient) * pi / 180
@@ -1653,7 +1664,7 @@
     ))
   }
   text_coor <- line_end + line_unit * 0.02
-  text_height <- 0.36
+  text_height <- 0.36 * size_scale
   data.frame(
     x = as.numeric(text_coor["x"] + c(-1, 1) * text_width / 2),
     y = as.numeric(

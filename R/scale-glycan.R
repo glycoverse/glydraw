@@ -88,6 +88,7 @@ scale_x_glycan <- function(
     show_linkage = show_linkage,
     red_end = red_end,
     red_end_length = style$red_end_length,
+    red_end_size = style$red_end_size,
     fuc_orient = style$fuc_orient,
     edge_linewidth = style$edge_linewidth,
     node_linewidth = style$node_linewidth,
@@ -142,6 +143,7 @@ scale_y_glycan <- function(
     show_linkage = show_linkage,
     red_end = red_end,
     red_end_length = style$red_end_length,
+    red_end_size = style$red_end_size,
     fuc_orient = style$fuc_orient,
     edge_linewidth = style$edge_linewidth,
     node_linewidth = style$node_linewidth,
@@ -176,6 +178,7 @@ scale_y_glycan <- function(
 #' @param show_linkage Whether to draw glycosidic linkage annotations.
 #' @param red_end Reducing-end annotation.
 #' @param red_end_length Reducing-end line length.
+#' @param red_end_size Size of custom reducing-end text.
 #' @param fuc_orient Fuc-like triangle orientation.
 #' @param edge_linewidth Linkage linewidth.
 #' @param node_linewidth Node-border linewidth.
@@ -196,6 +199,7 @@ scale_y_glycan <- function(
   show_linkage,
   red_end,
   red_end_length,
+  red_end_size,
   fuc_orient,
   edge_linewidth,
   node_linewidth,
@@ -214,6 +218,7 @@ scale_y_glycan <- function(
     show_linkage = show_linkage,
     red_end = red_end,
     red_end_length = red_end_length,
+    red_end_size = red_end_size,
     fuc_orient = fuc_orient,
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
@@ -260,6 +265,7 @@ scale_y_glycan <- function(
     glycan_show_linkage = options$show_linkage,
     glycan_red_end = options$red_end,
     glycan_red_end_length = options$red_end_length,
+    glycan_red_end_size = options$red_end_size,
     glycan_fuc_orient = options$fuc_orient,
     glycan_edge_linewidth = options$edge_linewidth,
     glycan_node_linewidth = options$node_linewidth,
@@ -306,6 +312,7 @@ scale_y_glycan <- function(
   show_linkage,
   red_end,
   red_end_length,
+  red_end_size,
   fuc_orient,
   edge_linewidth,
   node_linewidth,
@@ -324,6 +331,7 @@ scale_y_glycan <- function(
   checkmate::assert_number(edge_linewidth, lower = 0)
   checkmate::assert_number(node_linewidth, lower = 0)
   checkmate::assert_number(red_end_length, lower = 0)
+  checkmate::assert_number(red_end_size, lower = 0)
   checkmate::assert_string(red_end, na.ok = FALSE)
   checkmate::assert_string(font_family, na.ok = FALSE)
   .validate_node_size(node_size)
@@ -342,6 +350,7 @@ scale_y_glycan <- function(
     show_linkage = show_linkage,
     red_end = red_end,
     red_end_length = red_end_length,
+    red_end_size = red_end_size,
     fuc_orient = fuc_orient,
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
@@ -422,7 +431,8 @@ scale_y_glycan <- function(
       node_size = params$glycan_node_size,
       font_family = params$glycan_font_family,
       colors = params$glycan_colors,
-      red_end_length = params$glycan_red_end_length
+      red_end_length = params$glycan_red_end_length,
+      red_end_size = params$glycan_red_end_size
     )
   )
   grob$glydraw_scale <- params$glycan_size
@@ -664,6 +674,7 @@ GuideGlycanAxis <- ggplot2::ggproto(
       glycan_show_linkage = FALSE,
       glycan_red_end = "",
       glycan_red_end_length = 0.6,
+      glycan_red_end_size = 6,
       glycan_fuc_orient = "flex",
       glycan_edge_linewidth = 0.8,
       glycan_node_linewidth = 0.8,

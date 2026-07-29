@@ -375,7 +375,7 @@ test_that("amino-acid reducing ends follow glycan orientation", {
   })
 })
 
-test_that("style constructors control reducing-end line length", {
+test_that("style constructors control reducing-end line length and text size", {
   constructors <- list(
     style_glydraw,
     style_glygen,
@@ -392,6 +392,16 @@ test_that("style constructors control reducing-end line length", {
   expect_equal(
     purrr::map_chr(constructors, ~ names(formals(.x))[[3]]),
     rep("red_end_length", 4)
+  )
+  sizes <- purrr::map(constructors, ~ .x(red_end_size = 9))
+  expect_equal(purrr::map_dbl(sizes, "red_end_size"), rep(9, 4))
+  expect_equal(
+    purrr::map_dbl(constructors, ~ .x()$red_end_size),
+    rep(6, 4)
+  )
+  expect_equal(
+    purrr::map_chr(constructors, ~ names(formals(.x))[[4]]),
+    rep("red_end_size", 4)
   )
 
   purrr::walk(c("left", "right", "up", "down"), function(orient) {
@@ -413,6 +423,37 @@ test_that("style constructors control reducing-end line length", {
       default$annotation_data$reducing_info$annotation[1, c("x", "y")]
     )
   })
+})
+
+test_that("red_end_size controls only custom reducing-end text", {
+  structure <- "Gal(b1-3)GalNAc(a1-"
+  custom <- glycanGrob(
+    structure,
+    style = style_glydraw(red_end = "Ser/Thr", red_end_size = 9)
+  )
+  annotation <- custom$annotation_data$annotation
+
+  expect_equal(
+    annotation$text_size[annotation$is_red_end_text],
+    9
+  )
+  expect_equal(
+    unique(annotation$text_size[!annotation$is_red_end_text]),
+    6
+  )
+
+  default_wave <- glycanGrob(
+    structure,
+    style = style_glydraw(red_end = "~")
+  )
+  resized_wave <- glycanGrob(
+    structure,
+    style = style_glydraw(red_end = "~", red_end_size = 12)
+  )
+  expect_equal(
+    resized_wave$annotation_data$reducing_info$wave,
+    default_wave$annotation_data$reducing_info$wave
+  )
 })
 
 test_that("zero-length reducing ends retain axis-aligned anomer labels", {

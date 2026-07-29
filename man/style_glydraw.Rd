@@ -11,6 +11,7 @@ style_glydraw(
   fuc_orient = "flex",
   red_end = "",
   red_end_length = 0.6,
+  red_end_size = 6,
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
@@ -22,6 +23,7 @@ style_glygen(
   fuc_orient = "flex",
   red_end = "~",
   red_end_length = 1,
+  red_end_size = 6,
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
@@ -33,6 +35,7 @@ style_snfg(
   fuc_orient = "up",
   red_end = "",
   red_end_length = 1,
+  red_end_size = 6,
   edge_linewidth = 1.5,
   node_linewidth = 0.8,
   node_size = 1.15,
@@ -44,6 +47,7 @@ style_glycoworkbench(
   fuc_orient = "flex",
   red_end = "~",
   red_end_length = 1,
+  red_end_size = 6,
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
@@ -63,6 +67,9 @@ string for custom text, or tag one amino-acid site as
 \item{red_end_length}{Length of the reducing-end line in plot coordinate
 units. Set to \code{0} to omit the line and any \code{red_end} wave or custom text
 while retaining the axis-aligned core anomer annotation.}
+
+\item{red_end_size}{Size of custom text passed to \code{red_end}. The \code{"~"} wave
+is not affected.}
 
 \item{edge_linewidth}{Linewidth of glycosidic linkages.}
 

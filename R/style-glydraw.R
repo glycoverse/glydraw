@@ -13,6 +13,8 @@
 #' @param red_end_length Length of the reducing-end line in plot coordinate
 #'   units. Set to `0` to omit the line and any `red_end` wave or custom text
 #'   while retaining the axis-aligned core anomer annotation.
+#' @param red_end_size Size of custom text passed to `red_end`. The `"~"` wave
+#'   is not affected.
 #' @param edge_linewidth Linewidth of glycosidic linkages.
 #' @param node_linewidth Linewidth of node borders.
 #' @param node_size Multiplier for the default node size.
@@ -39,6 +41,7 @@ style_glydraw <- function(
   fuc_orient = "flex",
   red_end = "",
   red_end_length = 0.6,
+  red_end_size = 6,
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
@@ -53,7 +56,8 @@ style_glydraw <- function(
     node_size = node_size,
     font_family = font_family,
     colors = colors,
-    red_end_length = red_end_length
+    red_end_length = red_end_length,
+    red_end_size = red_end_size
   )
 }
 
@@ -63,6 +67,7 @@ style_glygen <- function(
   fuc_orient = "flex",
   red_end = "~",
   red_end_length = 1,
+  red_end_size = 6,
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
@@ -77,7 +82,8 @@ style_glygen <- function(
     node_size = node_size,
     font_family = font_family,
     colors = colors,
-    red_end_length = red_end_length
+    red_end_length = red_end_length,
+    red_end_size = red_end_size
   )
 }
 
@@ -87,6 +93,7 @@ style_snfg <- function(
   fuc_orient = "up",
   red_end = "",
   red_end_length = 1,
+  red_end_size = 6,
   edge_linewidth = 1.5,
   node_linewidth = 0.8,
   node_size = 1.15,
@@ -101,7 +108,8 @@ style_snfg <- function(
     node_size = node_size,
     font_family = font_family,
     colors = colors,
-    red_end_length = red_end_length
+    red_end_length = red_end_length,
+    red_end_size = red_end_size
   )
 }
 
@@ -111,6 +119,7 @@ style_glycoworkbench <- function(
   fuc_orient = "flex",
   red_end = "~",
   red_end_length = 1,
+  red_end_size = 6,
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
@@ -136,7 +145,8 @@ style_glycoworkbench <- function(
     node_size = node_size,
     font_family = font_family,
     colors = colors,
-    red_end_length = red_end_length
+    red_end_length = red_end_length,
+    red_end_size = red_end_size
   )
 }
 
@@ -148,7 +158,8 @@ style_glycoworkbench <- function(
   node_size,
   font_family,
   colors,
-  red_end_length
+  red_end_length,
+  red_end_size
 ) {
   checkmate::assert_choice(fuc_orient, c("flex", "up"))
   if (is.null(red_end)) {
@@ -167,6 +178,7 @@ style_glycoworkbench <- function(
   .validate_node_size(node_size)
   checkmate::assert_string(font_family, na.ok = FALSE)
   checkmate::assert_number(red_end_length, lower = 0)
+  checkmate::assert_number(red_end_size, lower = 0)
   colors <- .validate_colors(colors)
 
   structure(
@@ -178,7 +190,8 @@ style_glycoworkbench <- function(
       node_size = node_size,
       font_family = font_family,
       colors = colors,
-      red_end_length = red_end_length
+      red_end_length = red_end_length,
+      red_end_size = red_end_size
     ),
     class = "glydraw_style"
   )

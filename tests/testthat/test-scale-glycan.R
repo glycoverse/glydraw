@@ -511,6 +511,18 @@ test_that("glycan scales red_end overrides their styles", {
     )$guide$params$glycan_red_end_length,
     1.25
   )
+  expect_equal(
+    scale_x_glycan(
+      style = style_glydraw(red_end_size = 9)
+    )$guide$params$glycan_red_end_size,
+    9
+  )
+  expect_equal(
+    scale_y_glycan(
+      style = style_glydraw(red_end_size = 9)
+    )$guide$params$glycan_red_end_size,
+    9
+  )
 })
 
 test_that("glycan axis scales use plain cartoon parameters", {

@@ -474,6 +474,7 @@ GeomGlydrawResidue <- ggplot2::ggproto(
 #'   tagged amino-acid site.
 #' @param red_end_length Length of the reducing-end line in plot coordinate
 #'   units.
+#' @param red_end_size Size of custom reducing-end text.
 #' @param highlight `NULL` or a numeric vector of 1-based vertex indices to
 #'   highlight.
 #' @param node_size Numeric scalar used as a multiplier for the default node
@@ -495,7 +496,8 @@ GeomGlydrawResidue <- ggplot2::ggproto(
   highlight = NULL,
   node_size = 1,
   show_linkage = TRUE,
-  red_end_length = 0.6
+  red_end_length = 0.6,
+  red_end_size = 6
 ) {
   orient <- rlang::arg_match(orient)
   substituent_annotation <- .substituent_annotation_data(
@@ -515,7 +517,8 @@ GeomGlydrawResidue <- ggplot2::ggproto(
     coor,
     orient,
     red_end,
-    red_end_length
+    red_end_length,
+    red_end_size
   )
   reducing_annotation <- reducing_info$annotation |>
     dplyr::mutate(show_without_linkage = .data$is_red_end_text)
@@ -546,7 +549,10 @@ GeomGlydrawResidue <- ggplot2::ggproto(
     struc_annotation,
     highlight
   )
-  struc_annotation <- .prepare_plotmath_annotations(struc_annotation)
+  struc_annotation <- .prepare_plotmath_annotations(
+    struc_annotation,
+    red_end_size
+  )
 
   list(
     annotation = struc_annotation,
@@ -582,12 +588,13 @@ GeomGlydrawResidue <- ggplot2::ggproto(
 #'
 #' @param annotation A data frame with columns `annot`, `hjust`, `vjust`, and
 #'   `is_red_end_text`; missing justification and angle columns are allowed.
+#' @param red_end_size Size of custom reducing-end text.
 #'
 #' @returns The same data frame columns as `annotation`, with normalized
 #'   `is_red_end_text`, `is_aa_sequence`, `hjust`, `vjust`, and `angle`, plus
 #'   character column `annot_label` containing plotmath-safe labels.
 #' @noRd
-.prepare_plotmath_annotations <- function(annotation) {
+.prepare_plotmath_annotations <- function(annotation, red_end_size = 6) {
   if (!"is_aa_sequence" %in% names(annotation)) {
     annotation$is_aa_sequence <- FALSE
   }
@@ -609,6 +616,11 @@ GeomGlydrawResidue <- ggplot2::ggproto(
       hjust = dplyr::if_else(is.na(.data$hjust), 0.5, .data$hjust),
       vjust = dplyr::if_else(is.na(.data$vjust), 0.5, .data$vjust),
       angle = dplyr::if_else(is.na(.data$angle), 0, .data$angle),
+      text_size = dplyr::if_else(
+        .data$is_red_end_text,
+        red_end_size,
+        6
+      ),
       annot_label = dplyr::case_when(
         .data$is_aa_sequence ~ .data$annot,
         .data$annot == "?" ~ '~"?"',
@@ -839,7 +851,7 @@ GeomGlydrawResidue <- ggplot2::ggproto(
       ),
       alpha = annotation$transparency,
       parse = TRUE,
-      size = 6,
+      size = annotation$text_size,
       family = font_family,
     )
 }

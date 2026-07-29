@@ -143,7 +143,8 @@ test_that("native grid renders bold rotated amino-acid sites", {
   grob <- glycanGrob(
     "Gal(b1-3)GalNAc(a1-",
     orient = "left",
-    red_end = "ABC<site>D</site>EFG"
+    red_end = "ABC<site>D</site>EFG",
+    style = style_glydraw(red_end_size = 9)
   )
   content <- grid::makeContent(grob)
   annotations <-
@@ -157,6 +158,7 @@ test_that("native grid renders bold rotated amino-acid sites", {
 
   expect_length(sequence, 1)
   expect_equal(annotations$rot[[sequence]], 90)
+  expect_equal(annotations$gp$fontsize[[sequence]], 9 * ggplot2::.pt)
 })
 
 test_that("native grid layout preserves the cartoon plot geometry", {
