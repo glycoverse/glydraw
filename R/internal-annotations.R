@@ -1250,21 +1250,31 @@
 ) {
   named_font_family <- nzchar(font_family) &&
     !font_family %in% c("sans", "serif", "mono")
+  metric_font_family <- .reducing_end_metric_font_family(font_family)
   no_device_open <- grDevices::dev.cur() == 1L
   measurement_file <- NULL
+  measurement_device <- NULL
   opened_device <- FALSE
   if (named_font_family && capabilities("cairo")) {
     measurement_file <- tempfile(fileext = ".pdf")
     grDevices::cairo_pdf(measurement_file)
+    measurement_device <- grDevices::dev.cur()
     opened_device <- TRUE
   } else if (no_device_open) {
     grDevices::pdf(NULL)
+    measurement_device <- grDevices::dev.cur()
     opened_device <- TRUE
   }
   if (opened_device) {
     on.exit(
       {
-        grDevices::dev.off()
+        devices <- grDevices::dev.list()
+        if (
+          !is.null(devices) &&
+            measurement_device %in% devices
+        ) {
+          grDevices::dev.off(which = measurement_device)
+        }
         if (!is.null(measurement_file)) {
           unlink(measurement_file)
         }
@@ -1273,15 +1283,6 @@
     )
   }
   measurement_size <- if (red_end_size == 0) 1 else red_end_size
-  metric_font_family <- if (
-    named_font_family &&
-      !capabilities("cairo") &&
-      no_device_open
-  ) {
-    "sans"
-  } else {
-    font_family
-  }
   labels <- c(
     full = .format_reducing_end_aa_sequence(sequence),
     through_site = paste0(
@@ -1335,6 +1336,30 @@
     site_center = site_center * size_scale,
     hjust = site_center / width
   )
+}
+
+#' Resolve a named font to the family selected by the graphics font matcher
+#'
+#' @param font_family Requested text font family.
+#'
+#' @returns The concrete matched family when `systemfonts` is available, or the
+#'   requested family otherwise.
+#' @noRd
+.reducing_end_metric_font_family <- function(font_family) {
+  if (
+    !nzchar(font_family) ||
+      font_family %in% c("sans", "serif", "mono") ||
+      !requireNamespace("systemfonts", quietly = TRUE) ||
+      !exists("match_fonts", asNamespace("systemfonts"), inherits = FALSE)
+  ) {
+    return(font_family)
+  }
+  matched <- systemfonts::match_fonts(font_family)
+  info <- systemfonts::font_info(
+    path = matched$path[[1]],
+    index = matched$index[[1]]
+  )
+  info$family[[1]]
 }
 
 #' Calculate amino-acid sequence text rotation
