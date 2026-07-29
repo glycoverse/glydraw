@@ -416,6 +416,33 @@ test_that("large amino-acid reducing ends reserve their full text box", {
   )
 })
 
+test_that("amino-acid geometry uses installed named-font metrics", {
+  skip_if_not_installed("systemfonts")
+  skip_if_not(capabilities("cairo"))
+
+  fonts <- systemfonts::system_fonts()
+  named_monospace <- unique(fonts$family[
+    fonts$monospace &
+      !fonts$italic &
+      fonts$weight == "normal"
+  ])
+  skip_if(length(named_monospace) == 0)
+  named_monospace <- named_monospace[[1]]
+  sequence <- .parse_reducing_end_aa_sequence(
+    "IIIIIIII<site>W</site>WWWWWWWW"
+  )
+  named_metrics <- .reducing_end_aa_sequence_metrics(
+    sequence,
+    font_family = named_monospace
+  )
+  sans_metrics <- .reducing_end_aa_sequence_metrics(
+    sequence,
+    font_family = "sans"
+  )
+
+  expect_gt(abs(named_metrics$hjust - sans_metrics$hjust), 0.05)
+})
+
 test_that("style constructors control reducing-end line length and text size", {
   constructors <- list(
     style_glydraw,
