@@ -129,7 +129,7 @@ ggplot(plot_data, aes(glycan, value)) +
   )
 ```
 
-![](man/figures/README-ggplot2-extension-1.png)<!-- -->
+<img src="man/figures/README-ggplot2-extension-1.png" alt="" width="450px" />
 
 ### ComplexHeatmap extension
 
@@ -167,7 +167,7 @@ Heatmap(
 )
 ```
 
-![](man/figures/README-complexheatmap-extension-1.png)<!-- -->
+<img src="man/figures/README-complexheatmap-extension-1.png" alt="" width="600px" />
 
 ### Gallery
 

@@ -186,7 +186,7 @@ draw_cartoon_sketch(sketch_glycan, red_end = "PP-Dol", seed = 1)
 `glydraw` provides `ggplot2` extensions to plot glycan cartoons on a panel, axis, or legend.
 For example, `geom_glycan()` adds glycan cartoons to a bar plot:
 
-```{r ggplot2-extension, fig.width = 3, fig.height = 4}
+```{r ggplot2-extension, fig.width = 3, fig.height = 4, out.width = "450px"}
 library(ggplot2)
 library(glydraw)
 library(tibble)
@@ -218,7 +218,7 @@ ggplot(plot_data, aes(glycan, value)) +
 `anno_glycan()` adds glycan cartoons as row or column labels in a
 [`ComplexHeatmap`](https://jokergoo.github.io/ComplexHeatmap-reference/book/) heatmap.
 
-```{r complexheatmap-extension, fig.width = 4, fig.height = 3}
+```{r complexheatmap-extension, fig.width = 4, fig.height = 3, out.width = "600px"}
 suppressPackageStartupMessages(library(ComplexHeatmap))
 
 mat <- matrix(
