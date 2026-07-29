@@ -21,7 +21,11 @@ test_that("anno_glycan creates row and column annotation functions", {
   skip_if_not_installed("ComplexHeatmap")
   structures <- .annotation_glycan_structures()
 
-  style <- style_glydraw(red_end_length = 1.25)
+  style <- style_glydraw(
+    red_end = "Reducing end",
+    red_end_length = 1.25,
+    red_end_size = 9
+  )
   column <- anno_glycan(structures, which = "column", style = style)
   row <- anno_glycan(structures, which = "row", style = style)
 
@@ -47,6 +51,12 @@ test_that("anno_glycan creates row and column annotation functions", {
         (segment$end_y - segment$start_y)^2
     )
     expect_equal(length, 1.25)
+    expect_equal(
+      grob$annotation_data$annotation$text_size[
+        grob$annotation_data$annotation$is_red_end_text
+      ],
+      9
+    )
   })
   expect_equal(
     unname(purrr::map_lgl(column_grobs, "glydraw_axis_vertical")),

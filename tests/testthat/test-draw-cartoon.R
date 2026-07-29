@@ -340,12 +340,14 @@ test_that("tagged amino-acid sequences require exactly one site character", {
   )
 })
 
-test_that("amino-acid reducing ends follow glycan orientation", {
+test_that("amino-acid reducing ends anchor and fit in every orientation", {
   structure <- paste0(
     "Man(a1-3)[Man(a1-6)]Man(b1-4)",
     "GlcNAc(b1-4)GlcNAc(b1-"
   )
   red_end <- "ABC<site>D</site>EFGHIJK"
+  parsed_sequence <- .parse_reducing_end_aa_sequence(red_end)
+  metrics <- .reducing_end_aa_sequence_metrics(parsed_sequence)
   orientations <- c("left", "right", "up", "down")
   expected_angles <- c(left = 90, right = -90, up = 0, down = 0)
   expected_vjust <- c(left = 1, right = 1, up = 1, down = 0)
@@ -355,27 +357,97 @@ test_that("amino-acid reducing ends follow glycan orientation", {
     info <- grob$annotation_data$reducing_info
     sequence <- dplyr::filter(info$annotation, .data$is_aa_sequence)
     segment <- info$segment
-    line <- c(
-      x = segment$end_x - segment$start_x,
-      y = segment$end_y - segment$start_y
-    )
-    expected_coor <- c(x = segment$end_x, y = segment$end_y) +
-      0.02 * line / sqrt(sum(line^2))
+    expected_coor <- c(x = segment$end_x, y = segment$end_y)
 
     expect_equal(sequence$angle, expected_angles[[orient]])
     expect_equal(sequence$vjust, expected_vjust[[orient]])
-    expect_equal(sequence$hjust, 4.5 / 13)
+    expect_equal(
+      sequence$hjust * metrics$width,
+      metrics$site_center
+    )
     expect_equal(
       unname(unlist(sequence[c("x", "y")])),
       unname(expected_coor)
     )
     expect_match(sequence$annot, 'bold\\("D"\\)')
     expect_false(grepl("<site>", sequence$annot, fixed = TRUE))
-    expect_equal(nrow(info$bounds), 2)
+    expect_equal(nrow(info$bounds), 4)
   })
 })
 
-test_that("style constructors control reducing-end line length", {
+test_that("large amino-acid reducing ends reserve their full text box", {
+  grob <- glycanGrob(
+    "GalNAc(a1-",
+    red_end = "ABC<site>D</site>EFJHI",
+    style = style_glydraw(red_end_size = 10)
+  )
+  info <- grob$annotation_data$reducing_info
+  sequence <- dplyr::filter(info$annotation, .data$is_aa_sequence)
+  line_end <- c(x = info$segment$end_x, y = info$segment$end_y)
+  parsed_sequence <- .parse_reducing_end_aa_sequence(
+    "ABC<site>D</site>EFJHI"
+  )
+  metrics <- .reducing_end_aa_sequence_metrics(
+    parsed_sequence,
+    red_end_size = 10
+  )
+
+  expect_equal(unname(unlist(sequence[c("x", "y")])), unname(line_end))
+  expect_equal(
+    sequence$hjust * metrics$width,
+    metrics$site_center
+  )
+  expect_equal(
+    diff(range(info$bounds$x)),
+    metrics$height
+  )
+  expect_equal(
+    diff(range(info$bounds$y)),
+    metrics$width
+  )
+  expect_no_error(
+    glycanGrob(
+      "GalNAc(a1-",
+      style = style_glygen(
+        red_end = "ABC<site>D</site>EFJHI",
+        red_end_size = 10
+      )
+    )
+  )
+})
+
+test_that("amino-acid geometry uses installed named-font metrics", {
+  skip_if_not_installed("ragg")
+  skip_if_not_installed("systemfonts")
+
+  fonts <- systemfonts::system_fonts()
+  named_monospace <- unique(fonts$family[
+    fonts$monospace &
+      !fonts$italic &
+      fonts$weight == "normal"
+  ])
+  skip_if(length(named_monospace) == 0)
+  named_monospace <- named_monospace[[1]]
+  grDevices::pdf(NULL)
+  measurement_device <- grDevices::dev.cur()
+  on.exit(grDevices::dev.off(), add = TRUE)
+  sequence <- .parse_reducing_end_aa_sequence(
+    "IIIIIIII<site>W</site>WWWWWWWW"
+  )
+  named_metrics <- .reducing_end_aa_sequence_metrics(
+    sequence,
+    font_family = named_monospace
+  )
+  sans_metrics <- .reducing_end_aa_sequence_metrics(
+    sequence,
+    font_family = "sans"
+  )
+
+  expect_identical(grDevices::dev.cur(), measurement_device)
+  expect_gt(abs(named_metrics$hjust - sans_metrics$hjust), 0.05)
+})
+
+test_that("style constructors control reducing-end line length and text size", {
   constructors <- list(
     style_glydraw,
     style_glygen,
@@ -392,6 +464,16 @@ test_that("style constructors control reducing-end line length", {
   expect_equal(
     purrr::map_chr(constructors, ~ names(formals(.x))[[3]]),
     rep("red_end_length", 4)
+  )
+  sizes <- purrr::map(constructors, ~ .x(red_end_size = 9))
+  expect_equal(purrr::map_dbl(sizes, "red_end_size"), rep(9, 4))
+  expect_equal(
+    purrr::map_dbl(constructors, ~ .x()$red_end_size),
+    rep(6, 4)
+  )
+  expect_equal(
+    purrr::map_chr(constructors, ~ names(formals(.x))[[4]]),
+    rep("red_end_size", 4)
   )
 
   purrr::walk(c("left", "right", "up", "down"), function(orient) {
@@ -413,6 +495,37 @@ test_that("style constructors control reducing-end line length", {
       default$annotation_data$reducing_info$annotation[1, c("x", "y")]
     )
   })
+})
+
+test_that("red_end_size controls only custom reducing-end text", {
+  structure <- "Gal(b1-3)GalNAc(a1-"
+  custom <- glycanGrob(
+    structure,
+    style = style_glydraw(red_end = "Ser/Thr", red_end_size = 9)
+  )
+  annotation <- custom$annotation_data$annotation
+
+  expect_equal(
+    annotation$text_size[annotation$is_red_end_text],
+    9
+  )
+  expect_equal(
+    unique(annotation$text_size[!annotation$is_red_end_text]),
+    6
+  )
+
+  default_wave <- glycanGrob(
+    structure,
+    style = style_glydraw(red_end = "~")
+  )
+  resized_wave <- glycanGrob(
+    structure,
+    style = style_glydraw(red_end = "~", red_end_size = 12)
+  )
+  expect_equal(
+    resized_wave$annotation_data$reducing_info$wave,
+    default_wave$annotation_data$reducing_info$wave
+  )
 })
 
 test_that("zero-length reducing ends retain axis-aligned anomer labels", {

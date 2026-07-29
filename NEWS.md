@@ -28,6 +28,8 @@
 
 * New `red_end_length` style option controls the length of the reducing-end line; at `0`, the line and all `red_end` decorations are omitted while the axis-aligned core anomer annotation remains. (#80)
 
+* New `red_end_size` style option controls the size of custom `red_end` text without changing the `"~"` wave. (#83)
+
 * `style_glydraw()` replaces `glydraw_style()` as the single reusable interface for tuning cartoon appearance; `show_linkage` and `orient` are explicit drawing controls instead of style fields, and explicit `red_end = NULL` inherits the style value. New `style_glygen()`, `style_snfg()`, and `style_glycoworkbench()` provide reusable presets for common glycan-drawing conventions. (#73, #79)
 
 ## Minor improvements and bug fixes

@@ -171,6 +171,7 @@ geom_glycan <- function(
     fuc_orient = style$fuc_orient,
     red_end = red_end,
     red_end_length = style$red_end_length,
+    red_end_size = style$red_end_size,
     edge_linewidth = style$edge_linewidth,
     node_linewidth = style$node_linewidth,
     node_size = style$node_size,
@@ -212,6 +213,7 @@ geom_glycan <- function(
 #' @param fuc_orient Fuc-like triangle orientation passed to [glycanGrob()].
 #' @param red_end Reducing-end annotation passed to [glycanGrob()].
 #' @param red_end_length Reducing-end line length passed to [glycanGrob()].
+#' @param red_end_size Custom reducing-end text size passed to [glycanGrob()].
 #' @param edge_linewidth Linkage linewidth passed to [glycanGrob()].
 #' @param node_linewidth Node-border linewidth passed to [glycanGrob()].
 #' @param node_size Node-size multiplier passed to [glycanGrob()].
@@ -231,6 +233,7 @@ geom_glycan <- function(
   fuc_orient = "flex",
   red_end = "",
   red_end_length = 0.6,
+  red_end_size = 6,
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
@@ -280,7 +283,8 @@ geom_glycan <- function(
         node_size = node_size,
         font_family = font_family,
         colors = colours,
-        red_end_length = red_end_length
+        red_end_length = red_end_length,
+        red_end_size = red_end_size
       )
     )
   })

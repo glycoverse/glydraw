@@ -483,7 +483,7 @@
     rot = annotation$angle,
     gp = grid::gpar(
       col = scales::alpha("black", annotation$transparency),
-      fontsize = rep(6 * ggplot2::.pt * scale, nrow(annotation)),
+      fontsize = annotation$text_size * ggplot2::.pt * scale,
       fontfamily = rep(grob$font_family, nrow(annotation)),
       lineheight = rep(1.2, nrow(annotation)),
       font = rep(1, nrow(annotation))

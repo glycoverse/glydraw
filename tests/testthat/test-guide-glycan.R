@@ -193,6 +193,12 @@ test_that("guide_glycan red_end overrides its style", {
     )$params$glycan_red_end_length,
     1.25
   )
+  expect_equal(
+    guide_glycan(
+      style = style_glydraw(red_end_size = 9)
+    )$params$glycan_red_end_size,
+    9
+  )
 })
 
 test_that("guide_glycan anchors labels at their reducing ends by default", {
