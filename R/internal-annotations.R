@@ -1255,7 +1255,14 @@
   measurement_file <- NULL
   measurement_device <- NULL
   opened_device <- FALSE
-  if (named_font_family && capabilities("cairo")) {
+  if (
+    named_font_family &&
+      requireNamespace("ragg", quietly = TRUE)
+  ) {
+    ragg::agg_capture()
+    measurement_device <- grDevices::dev.cur()
+    opened_device <- TRUE
+  } else if (named_font_family && capabilities("cairo")) {
     measurement_file <- tempfile(fileext = ".pdf")
     grDevices::cairo_pdf(measurement_file)
     measurement_device <- grDevices::dev.cur()

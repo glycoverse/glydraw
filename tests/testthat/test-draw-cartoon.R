@@ -417,8 +417,8 @@ test_that("large amino-acid reducing ends reserve their full text box", {
 })
 
 test_that("amino-acid geometry uses installed named-font metrics", {
+  skip_if_not_installed("ragg")
   skip_if_not_installed("systemfonts")
-  skip_if_not(capabilities("cairo"))
 
   fonts <- systemfonts::system_fonts()
   named_monospace <- unique(fonts$family[
