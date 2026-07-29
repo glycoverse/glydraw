@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   ggplot2-extension: ggplot2-extension.html
   glydraw: glydraw.html
-last_built: 2026-07-29T06:07Z
+last_built: 2026-07-29T06:31Z
 urls:
   reference: https://glycoverse.github.io/glydraw/reference
   article: https://glycoverse.github.io/glydraw/articles
