@@ -106,6 +106,10 @@
   omitted while the axis-aligned core anomer annotation remains.
   ([\#80](https://github.com/glycoverse/glydraw/issues/80))
 
+- New `red_end_size` style option controls the size of custom `red_end`
+  text without changing the `"~"` wave.
+  ([\#83](https://github.com/glycoverse/glydraw/issues/83))
+
 - [`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md)
   replaces `glydraw_style()` as the single reusable interface for tuning
   cartoon appearance; `show_linkage` and `orient` are explicit drawing

@@ -14,6 +14,7 @@ style_glydraw(
   fuc_orient = "flex",
   red_end = "",
   red_end_length = 0.6,
+  red_end_size = 6,
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
@@ -25,6 +26,7 @@ style_glygen(
   fuc_orient = "flex",
   red_end = "~",
   red_end_length = 1,
+  red_end_size = 6,
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
@@ -36,6 +38,7 @@ style_snfg(
   fuc_orient = "up",
   red_end = "",
   red_end_length = 1,
+  red_end_size = 6,
   edge_linewidth = 1.5,
   node_linewidth = 0.8,
   node_size = 1.15,
@@ -47,6 +50,7 @@ style_glycoworkbench(
   fuc_orient = "flex",
   red_end = "~",
   red_end_length = 1,
+  red_end_size = 6,
   edge_linewidth = 0.8,
   node_linewidth = 0.8,
   node_size = 1,
@@ -74,6 +78,11 @@ style_glycoworkbench(
   Length of the reducing-end line in plot coordinate units. Set to `0`
   to omit the line and any `red_end` wave or custom text while retaining
   the axis-aligned core anomer annotation.
+
+- red_end_size:
+
+  Size of custom text passed to `red_end`. The `"~"` wave is not
+  affected.
 
 - edge_linewidth:
 
