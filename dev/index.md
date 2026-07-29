@@ -61,18 +61,37 @@ glycan <- paste0(
   "Glc(a1-2)Glc(a1-3)Glc(a1-3)Man(a1-2)Man(a1-2)Man(a1-3)[Man(a1-2)Man(a1-3)",
   "[Man(a1-2)Man(a1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(a1-"
 )
-draw_cartoon(glycan, style = style_glydraw(red_end = "PP-Dol"))
+draw_cartoon(glycan, red_end = "PP-Dol")
 ```
 
 ![](reference/figures/README-unnamed-chunk-2-1.png)
 
+### Plot one sketch-style glycan
+
+[`draw_cartoon_sketch()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon_sketch.md)
+uses the optional [`ggsketch`](https://github.com/nrennie/ggsketch)
+package to give a glycan cartoon hand-drawn strokes and patterned
+residue fills.
+
+``` r
+
+library(glydraw)
+
+glycan <- paste0(
+  "Glc(a1-2)Glc(a1-3)Glc(a1-3)Man(a1-2)Man(a1-2)Man(a1-3)[Man(a1-2)Man(a1-3)",
+  "[Man(a1-2)Man(a1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(a1-"
+)
+draw_cartoon_sketch(glycan, red_end = "PP-Dol", seed = 1)
+```
+
+![](reference/figures/README-sketch-style-glycan-1.png)
+
 ### ggplot2 extension
 
+`glydraw` provides `ggplot2` extensions to plot glycan cartoons on a
+panel, axis, or legend. For example, you can use
 [`scale_x_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md)
-and
-[`scale_y_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md)
-can add glycan cartoons to standard ggplot2 figures. For example, you
-can use glycan cartoons as labels in a heatmap:
+to set glycan cartoons as labels in a heatmap:
 
 ``` r
 
@@ -109,6 +128,46 @@ ggplot(plot_data, aes(branch, sample)) +
 
 ![](reference/figures/README-ggplot2-extension-1.png)
 
+### ComplexHeatmap extension
+
+[`anno_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/anno_glycan.md)
+adds glycan cartoons as row or column labels in a
+[`ComplexHeatmap`](https://jokergoo.github.io/ComplexHeatmap-reference/book/)
+heatmap.
+
+``` r
+
+suppressPackageStartupMessages(library(ComplexHeatmap))
+
+mat <- matrix(
+  seq_len(9),
+  nrow = 3,
+  dimnames = list(paste0("row", 1:3), paste0("column", 1:3))
+)
+structures <- c(
+  "GlcNAc(b1-",
+  "Gal(b1-4)GlcNAc(b1-",
+  "Neu5Ac(a2-?)Gal(b1-4)GlcNAc(b1-"
+)
+
+Heatmap(
+  mat,
+  name = "Corr. Coef.",
+  show_row_names = FALSE,
+  show_column_names = FALSE,
+  row_dend_side = "right",
+  column_dend_side = "bottom",
+  left_annotation = rowAnnotation(
+    glycan = anno_glycan(structures, which = "row")
+  ),
+  top_annotation = HeatmapAnnotation(
+    glycan = anno_glycan(structures, which = "column")
+  )
+)
+```
+
+![](reference/figures/README-complexheatmap-extension-1.png)
+
 ### Gallery
 
 ``` r
@@ -117,10 +176,7 @@ glycan <- paste0(
   "Neu5Ac(a2-3)Gal(b1-3)[Fuc(a1-2)Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-3)",
   "[Gal(b1-4)[Fuc(a1-3)]GlcNAc(b1-6)]Gal(b1-4)GlcNAc(b1-6)]GalNAc(a1-"
 )
-draw_cartoon(
-  glycan,
-  style = style_glydraw(red_end = "~", node_size = 1.2)
-)
+draw_cartoon(glycan, style = style_glygen())
 ```
 
 ![](reference/figures/README-unnamed-chunk-3-1.png)
@@ -128,11 +184,7 @@ draw_cartoon(
 ``` r
 
 glycan <- "Gal(b1-3)[Neu5Ac(a2-3)Gal6S(b1-4)[Fuc(a1-3)]GlcNAc(b1-6)]GalNAc(a1-"
-draw_cartoon(
-  glycan,
-  orient = "up",
-  style = style_glydraw(red_end = "Ser/Thr")
-)
+draw_cartoon(glycan, orient = "up", red_end = "Ser/Thr")
 ```
 
 ![](reference/figures/README-unnamed-chunk-4-1.png)
@@ -143,7 +195,8 @@ glycan <- "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-"
 draw_cartoon(
   glycan,
   orient = "up",
-  style = style_glydraw(red_end = "Asn", fuc_orient = "up")
+  red_end = "Asn",
+  style = style_glydraw(fuc_orient = "up")
 )
 ```
 
