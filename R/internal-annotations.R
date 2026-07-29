@@ -1248,18 +1248,20 @@
   red_end_size = 6,
   font_family = ""
 ) {
-  if (grDevices::dev.cur() == 1L) {
-    measurement_file <- NULL
-    if (
-      nzchar(font_family) &&
-        !font_family %in% c("sans", "serif", "mono") &&
-        capabilities("cairo")
-    ) {
-      measurement_file <- tempfile(fileext = ".pdf")
-      grDevices::cairo_pdf(measurement_file)
-    } else {
-      grDevices::pdf(NULL)
-    }
+  named_font_family <- nzchar(font_family) &&
+    !font_family %in% c("sans", "serif", "mono")
+  no_device_open <- grDevices::dev.cur() == 1L
+  measurement_file <- NULL
+  opened_device <- FALSE
+  if (named_font_family && capabilities("cairo")) {
+    measurement_file <- tempfile(fileext = ".pdf")
+    grDevices::cairo_pdf(measurement_file)
+    opened_device <- TRUE
+  } else if (no_device_open) {
+    grDevices::pdf(NULL)
+    opened_device <- TRUE
+  }
+  if (opened_device) {
     on.exit(
       {
         grDevices::dev.off()
@@ -1271,6 +1273,15 @@
     )
   }
   measurement_size <- if (red_end_size == 0) 1 else red_end_size
+  metric_font_family <- if (
+    named_font_family &&
+      !capabilities("cairo") &&
+      no_device_open
+  ) {
+    "sans"
+  } else {
+    font_family
+  }
   labels <- c(
     full = .format_reducing_end_aa_sequence(sequence),
     through_site = paste0(
@@ -1290,7 +1301,7 @@
       label = parse(text = label),
       gp = grid::gpar(
         fontsize = measurement_size * ggplot2::.pt,
-        fontfamily = font_family
+        fontfamily = metric_font_family
       )
     )
   })

@@ -428,6 +428,9 @@ test_that("amino-acid geometry uses installed named-font metrics", {
   ])
   skip_if(length(named_monospace) == 0)
   named_monospace <- named_monospace[[1]]
+  grDevices::pdf(NULL)
+  measurement_device <- grDevices::dev.cur()
+  on.exit(grDevices::dev.off(), add = TRUE)
   sequence <- .parse_reducing_end_aa_sequence(
     "IIIIIIII<site>W</site>WWWWWWWW"
   )
@@ -440,6 +443,7 @@ test_that("amino-acid geometry uses installed named-font metrics", {
     font_family = "sans"
   )
 
+  expect_identical(grDevices::dev.cur(), measurement_device)
   expect_gt(abs(named_metrics$hjust - sans_metrics$hjust), 0.05)
 })
 
