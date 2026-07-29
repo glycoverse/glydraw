@@ -475,6 +475,7 @@ GeomGlydrawResidue <- ggplot2::ggproto(
 #' @param red_end_length Length of the reducing-end line in plot coordinate
 #'   units.
 #' @param red_end_size Size of custom reducing-end text.
+#' @param font_family Font family used for text annotations.
 #' @param highlight `NULL` or a numeric vector of 1-based vertex indices to
 #'   highlight.
 #' @param node_size Numeric scalar used as a multiplier for the default node
@@ -497,7 +498,8 @@ GeomGlydrawResidue <- ggplot2::ggproto(
   node_size = 1,
   show_linkage = TRUE,
   red_end_length = 0.6,
-  red_end_size = 6
+  red_end_size = 6,
+  font_family = ""
 ) {
   orient <- rlang::arg_match(orient)
   substituent_annotation <- .substituent_annotation_data(
@@ -518,7 +520,8 @@ GeomGlydrawResidue <- ggplot2::ggproto(
     orient,
     red_end,
     red_end_length,
-    red_end_size
+    red_end_size,
+    font_family
   )
   reducing_annotation <- reducing_info$annotation |>
     dplyr::mutate(show_without_linkage = .data$is_red_end_text)

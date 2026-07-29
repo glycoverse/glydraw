@@ -1214,13 +1214,103 @@
 #'
 #' @param sequence A parsed sequence from
 #'   `.parse_reducing_end_aa_sequence()`.
+#' @param red_end_size Size of the amino-acid sequence text.
+#' @param font_family Font family used for the amino-acid sequence text.
 #'
 #' @returns A numeric justification between zero and one.
 #' @noRd
-.reducing_end_aa_sequence_hjust <- function(sequence) {
-  prefix_width <- nchar(sequence$prefix, type = "width")
-  suffix_width <- nchar(sequence$suffix, type = "width")
-  (prefix_width + 1.5) / (prefix_width + suffix_width + 3)
+.reducing_end_aa_sequence_hjust <- function(
+  sequence,
+  red_end_size = 6,
+  font_family = ""
+) {
+  metrics <- .reducing_end_aa_sequence_metrics(
+    sequence,
+    red_end_size,
+    font_family
+  )
+  metrics$hjust
+}
+
+#' Measure a tagged amino-acid sequence in plot coordinates
+#'
+#' @param sequence A parsed sequence from
+#'   `.parse_reducing_end_aa_sequence()`.
+#' @param red_end_size Size of the amino-acid sequence text.
+#' @param font_family Font family used for the amino-acid sequence text.
+#'
+#' @returns A list containing the full text `width` and `height`, the
+#'   `site_center` distance from the start of the text to the middle of the
+#'   tagged amino acid in plot coordinate units, and its numeric `hjust`.
+#' @noRd
+.reducing_end_aa_sequence_metrics <- function(
+  sequence,
+  red_end_size = 6,
+  font_family = ""
+) {
+  if (grDevices::dev.cur() == 1L) {
+    grDevices::pdf(NULL)
+    on.exit(grDevices::dev.off(), add = TRUE)
+  }
+  measurement_size <- if (red_end_size == 0) 1 else red_end_size
+  metric_font_family <- if (font_family %in% c("", "sans", "serif", "mono")) {
+    font_family
+  } else {
+    "sans"
+  }
+  labels <- c(
+    full = .format_reducing_end_aa_sequence(sequence),
+    through_site = paste0(
+      .quote_plotmath_text(sequence$prefix),
+      "~bold(",
+      .quote_plotmath_text(sequence$site),
+      ")"
+    ),
+    site = paste0(
+      "bold(",
+      .quote_plotmath_text(sequence$site),
+      ")"
+    )
+  )
+  grobs <- lapply(labels, function(label) {
+    grid::textGrob(
+      label = parse(text = label),
+      gp = grid::gpar(
+        fontsize = measurement_size * ggplot2::.pt,
+        fontfamily = metric_font_family
+      )
+    )
+  })
+  widths <- vapply(
+    grobs,
+    function(grob) {
+      grid::convertWidth(
+        grid::grobWidth(grob),
+        "mm",
+        valueOnly = TRUE
+      )
+    },
+    numeric(1)
+  )
+  height <- grid::convertHeight(
+    grid::grobHeight(grobs[["full"]]),
+    "mm",
+    valueOnly = TRUE
+  )
+  millimetres_per_coordinate <-
+    .cartoon_units_per_coordinate / 300 * 25.4
+  size_scale <- red_end_size / measurement_size
+  width <- widths[["full"]] / millimetres_per_coordinate
+  site_center <- (widths[["through_site"]] -
+    widths[["site"]] / 2) /
+    millimetres_per_coordinate
+
+  list(
+    width = width * size_scale,
+    height = height / millimetres_per_coordinate * size_scale,
+    site_center = site_center * size_scale,
+    hjust = site_center / width
+  )
 }
 
 #' Calculate amino-acid sequence text rotation
@@ -1256,6 +1346,7 @@
 #'   units. At `0`, the line and all `red_end` decorations are omitted while
 #'   the core anomer annotation remains.
 #' @param red_end_size Size of custom reducing-end text.
+#' @param font_family Font family used for custom reducing-end text.
 #'
 #' @returns A list with data frames `annotation`, `segment`, `wave`, and
 #'   `bounds`. `annotation` contains text rows; `segment` contains one line
@@ -1269,7 +1360,8 @@
   orient = c("left", "right", "up", "down"),
   red_end = "",
   red_end_length = 0.6,
-  red_end_size = 6
+  red_end_size = 6,
+  font_family = ""
 ) {
   orient <- rlang::arg_match(orient)
   checkmate::assert_string(red_end, na.ok = FALSE)
@@ -1301,14 +1393,17 @@
     geometry$line_end,
     geometry$line_vec,
     orient,
-    root
+    root,
+    red_end_size,
+    font_family
   )
   red_end_bounds <- .reducing_end_text_bounds(
     red_end,
     geometry$line_end,
     geometry$line_vec,
     orient,
-    red_end_size
+    red_end_size,
+    font_family
   )
   list(
     annotation = dplyr::bind_rows(
@@ -1539,6 +1634,8 @@
 #' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
 #'   `"down"`.
 #' @param root Integer reducing-end vertex index.
+#' @param red_end_size Size of custom reducing-end text.
+#' @param font_family Font family used for custom reducing-end text.
 #'
 #' @returns A data frame with columns `vertice`, `annot`, `x`, `y`, `hjust`,
 #'   `vjust`, and `is_red_end_text`. Returns an empty data frame with those
@@ -1549,7 +1646,9 @@
   line_end,
   line_vec,
   orient,
-  root
+  root,
+  red_end_size = 6,
+  font_family = ""
 ) {
   if (red_end %in% c("", "~")) {
     return(data.frame(
@@ -1566,7 +1665,7 @@
   }
   sequence <- .parse_reducing_end_aa_sequence(red_end)
   line_unit <- line_vec / sqrt(sum(line_vec^2))
-  text_offset <- 0.02
+  text_offset <- if (is.null(sequence)) 0.02 else 0
   text_coor <- line_end + line_unit * text_offset
   hjust <- if (line_unit[["x"]] > 0) {
     0
@@ -1583,7 +1682,11 @@
     0.5
   }
   if (!is.null(sequence)) {
-    hjust <- .reducing_end_aa_sequence_hjust(sequence)
+    hjust <- .reducing_end_aa_sequence_hjust(
+      sequence,
+      red_end_size,
+      font_family
+    )
     vjust <- if (.is_horizontal_glycan_orientation(orient)) 1 else vjust
   }
   data.frame(
@@ -1617,17 +1720,20 @@
 #' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
 #'   `"down"`.
 #' @param red_end_size Size of custom reducing-end text.
+#' @param font_family Font family used for custom reducing-end text.
 #'
-#' @returns A data frame with numeric columns `x` and `y`. Horizontal text
-#'   returns one bound point; vertical text returns two bound points; `""` and
-#'   `"~"` return zero rows.
+#' @returns A data frame with numeric columns `x` and `y`. Amino-acid sequences
+#'   return all four text-box corners, ordinary horizontal text returns one
+#'   bound point, ordinary vertical text returns two, and `""` and `"~"` return
+#'   zero rows.
 #' @noRd
 .reducing_end_text_bounds <- function(
   red_end,
   line_end,
   line_vec,
   orient,
-  red_end_size = 6
+  red_end_size = 6,
+  font_family = ""
 ) {
   if (red_end %in% c("", "~")) {
     return(data.frame(x = numeric(0), y = numeric(0)))
@@ -1635,27 +1741,45 @@
   line_unit <- line_vec / sqrt(sum(line_vec^2))
   text_offset <- 0.1
   sequence <- .parse_reducing_end_aa_sequence(red_end)
-  display_width <- if (is.null(sequence)) {
-    nchar(red_end, type = "width")
-  } else {
-    nchar(
-      paste0(sequence$prefix, " ", sequence$site, " ", sequence$suffix),
-      type = "width"
-    )
-  }
   size_scale <- red_end_size / 6
-  text_width <- max(display_width, 1) * 0.12 * size_scale
   if (!is.null(sequence)) {
-    hjust <- .reducing_end_aa_sequence_hjust(sequence)
+    metrics <- .reducing_end_aa_sequence_metrics(
+      sequence,
+      red_end_size,
+      font_family
+    )
+    hjust <- metrics$hjust
+    vjust <- if (.is_horizontal_glycan_orientation(orient)) {
+      1
+    } else if (line_unit[["y"]] > 0) {
+      0
+    } else if (line_unit[["y"]] < 0) {
+      1
+    } else {
+      0.5
+    }
     angle <- .reducing_end_aa_sequence_angle(orient) * pi / 180
     text_unit <- c(x = cos(angle), y = sin(angle))
-    text_coor <- line_end + line_unit * 0.02
-    along <- c(-hjust, 1 - hjust) * text_width
+    normal_unit <- c(x = -sin(angle), y = cos(angle))
+    text_coor <- line_end
+    along <- c(-hjust, 1 - hjust) * metrics$width
+    across <- c(-vjust, 1 - vjust) * metrics$height
+    corners <- expand.grid(along = along, across = across)
     return(data.frame(
-      x = as.numeric(text_coor[["x"]] + text_unit[["x"]] * along),
-      y = as.numeric(text_coor[["y"]] + text_unit[["y"]] * along)
+      x = as.numeric(
+        text_coor[["x"]] +
+          text_unit[["x"]] * corners$along +
+          normal_unit[["x"]] * corners$across
+      ),
+      y = as.numeric(
+        text_coor[["y"]] +
+          text_unit[["y"]] * corners$along +
+          normal_unit[["y"]] * corners$across
+      )
     ))
   }
+  display_width <- nchar(red_end, type = "width")
+  text_width <- max(display_width, 1) * 0.12 * size_scale
   if (.is_horizontal_glycan_orientation(orient)) {
     text_bound <- line_end + line_unit * (text_offset + text_width)
     return(data.frame(

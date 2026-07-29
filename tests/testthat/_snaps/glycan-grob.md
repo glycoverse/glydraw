@@ -13,3 +13,4 @@
     Condition
       Error in `.validate_node_size()`:
       ! `node_size` must be no larger than 2 because larger values make residues overlap.
+

@@ -340,12 +340,14 @@ test_that("tagged amino-acid sequences require exactly one site character", {
   )
 })
 
-test_that("amino-acid reducing ends follow glycan orientation", {
+test_that("amino-acid reducing ends anchor and fit in every orientation", {
   structure <- paste0(
     "Man(a1-3)[Man(a1-6)]Man(b1-4)",
     "GlcNAc(b1-4)GlcNAc(b1-"
   )
   red_end <- "ABC<site>D</site>EFGHIJK"
+  parsed_sequence <- .parse_reducing_end_aa_sequence(red_end)
+  metrics <- .reducing_end_aa_sequence_metrics(parsed_sequence)
   orientations <- c("left", "right", "up", "down")
   expected_angles <- c(left = 90, right = -90, up = 0, down = 0)
   expected_vjust <- c(left = 1, right = 1, up = 1, down = 0)
@@ -355,24 +357,63 @@ test_that("amino-acid reducing ends follow glycan orientation", {
     info <- grob$annotation_data$reducing_info
     sequence <- dplyr::filter(info$annotation, .data$is_aa_sequence)
     segment <- info$segment
-    line <- c(
-      x = segment$end_x - segment$start_x,
-      y = segment$end_y - segment$start_y
-    )
-    expected_coor <- c(x = segment$end_x, y = segment$end_y) +
-      0.02 * line / sqrt(sum(line^2))
+    expected_coor <- c(x = segment$end_x, y = segment$end_y)
 
     expect_equal(sequence$angle, expected_angles[[orient]])
     expect_equal(sequence$vjust, expected_vjust[[orient]])
-    expect_equal(sequence$hjust, 4.5 / 13)
+    expect_equal(
+      sequence$hjust * metrics$width,
+      metrics$site_center
+    )
     expect_equal(
       unname(unlist(sequence[c("x", "y")])),
       unname(expected_coor)
     )
     expect_match(sequence$annot, 'bold\\("D"\\)')
     expect_false(grepl("<site>", sequence$annot, fixed = TRUE))
-    expect_equal(nrow(info$bounds), 2)
+    expect_equal(nrow(info$bounds), 4)
   })
+})
+
+test_that("large amino-acid reducing ends reserve their full text box", {
+  grob <- glycanGrob(
+    "GalNAc(a1-",
+    red_end = "ABC<site>D</site>EFJHI",
+    style = style_glydraw(red_end_size = 10)
+  )
+  info <- grob$annotation_data$reducing_info
+  sequence <- dplyr::filter(info$annotation, .data$is_aa_sequence)
+  line_end <- c(x = info$segment$end_x, y = info$segment$end_y)
+  parsed_sequence <- .parse_reducing_end_aa_sequence(
+    "ABC<site>D</site>EFJHI"
+  )
+  metrics <- .reducing_end_aa_sequence_metrics(
+    parsed_sequence,
+    red_end_size = 10
+  )
+
+  expect_equal(unname(unlist(sequence[c("x", "y")])), unname(line_end))
+  expect_equal(
+    sequence$hjust * metrics$width,
+    metrics$site_center
+  )
+  expect_equal(
+    diff(range(info$bounds$x)),
+    metrics$height
+  )
+  expect_equal(
+    diff(range(info$bounds$y)),
+    metrics$width
+  )
+  expect_no_error(
+    glycanGrob(
+      "GalNAc(a1-",
+      style = style_glygen(
+        red_end = "ABC<site>D</site>EFJHI",
+        red_end_size = 10
+      )
+    )
+  )
 })
 
 test_that("style constructors control reducing-end line length and text size", {
