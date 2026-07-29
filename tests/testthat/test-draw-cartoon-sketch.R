@@ -97,7 +97,7 @@ test_that("sketch text unquotes custom reducing-end labels", {
   custom_label <- 'Ser/"Thr"\\site'
   plot <- draw_cartoon_sketch(
     "Gal(b1-3)GalNAc(a1-",
-    style = style_glydraw(red_end = custom_label),
+    style = style_glydraw(red_end = custom_label, red_end_size = 10),
     seed = 1
   )
   text_index <- which(vapply(
@@ -108,6 +108,8 @@ test_that("sketch text unquotes custom reducing-end labels", {
   text <- ggplot2::ggplot_build(plot)$data[[text_index]]
 
   expect_identical(sum(text$label == custom_label), 1L)
+  expect_equal(text$size[text$label == custom_label], 10)
+  expect_equal(unique(text$size[text$label != custom_label]), 6)
   expect_identical(
     .unquote_plotmath_text(.quote_plotmath_text(custom_label)),
     custom_label

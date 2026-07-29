@@ -201,7 +201,7 @@
       ),
       alpha = annotation$transparency[rows],
       parse = parse,
-      size = 6,
+      size = annotation$text_size[rows],
       family = family
     )
     plot <- plot + text_layer
