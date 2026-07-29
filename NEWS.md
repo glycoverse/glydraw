@@ -3,43 +3,28 @@
 ## Breaking changes
 
 * Cartoon appearance is now configured with `style = style_glydraw(...)` across `draw_cartoon()`, `glycanGrob()`, `geom_glycan()`, `guide_glycan()`, `scale_x_glycan()`, `scale_y_glycan()`, `anno_glycan()`, and `export_cartoons()`; calls that pass `fuc_orient`, `edge_linewidth`, `node_linewidth`, `node_size`, `font_family`, or `colors` directly should move those arguments into `style_glydraw()`. `show_linkage` and `orient` remain explicit arguments and are no longer accepted by `style_glydraw()`, while explicit `red_end` overrides the reusable style value. (#73, #79)
-
 * `colors` now accepts a complete SNFG palette in the format returned by `glydraw_colors()`; sparse monosaccharide overrides are no longer supported. (#72)
-
 * `glydraw_style()` has been renamed to `style_glydraw()` and is no longer exported; replace calls to `glydraw_style()` with `style_glydraw()`. (#73)
-
 * `orient` no longer accepts `"H"` or `"V"`; calls using them now error and should replace `"H"` with `"left"` and `"V"` with `"up"`. (#68)
-
 * `red_end` in `style_glydraw()`, `style_glygen()`, `style_snfg()`, and `style_glycoworkbench()` must now be a string. Set `red_end_length = 0` to omit the reducing-end line and ignore any `red_end` wave or custom text while retaining its axis-aligned core anomer annotation. Explicit `red_end = NULL` on drawing interfaces continues to inherit `red_end` from `style`. (#80)
 
 ## New features
 
 * `anno_glycan()` uses glycan cartoons as row or column labels in ComplexHeatmap heatmaps, with clustering-aware ordering and the sizing, anchoring, rotation, nudging, and styling controls of glycan axis scales. (#67)
-
 * `draw_cartoon_sketch()` draws hand-sketched glycan cartoons with reproducible rough strokes, patterned residue fills, optional drawing media, and the same layout, annotation, orientation, highlighting, styling, sizing, and saving behavior as `draw_cartoon()`. Sketch cartoons always use their handwriting font, ignoring `font_family` in style presets. (#77, #81)
-
 * `font_family` style option controls the font used for text annotations across glycan cartoons, including alpha and beta anomer labels. (#69)
-
 * Glycan grobs used by `geom_glycan()`, `geom_node_glycan()`, `guide_glycan()`, `scale_x_glycan()`, and `scale_y_glycan()` now remain vector graphics at every size when exported to PDF or SVG; `draw_cartoon()` and repeated panel structures also render more efficiently with native grid primitives without changing cartoon layout or appearance. (#64, #65, #66)
-
 * `orient` now accepts `"left"`, `"right"`, `"up"`, and `"down"` to draw glycans in any direction.
-
 * `red_end` now accepts amino-acid sequences with one tagged glycosite, such as `"ABC<site>D</site>EFG"`. The site is bold and anchored to the reducing end, and the sequence rotates with the glycan orientation. (#78, #82)
-
 * New `red_end_length` style option controls the length of the reducing-end line; at `0`, the line and all `red_end` decorations are omitted while the axis-aligned core anomer annotation remains. (#80)
-
 * New `red_end_size` style option controls the size of custom `red_end` text without changing the `"~"` wave. (#83)
-
 * `style_glydraw()` replaces `glydraw_style()` as the single reusable interface for tuning cartoon appearance; `show_linkage` and `orient` are explicit drawing controls instead of style fields, and explicit `red_end = NULL` inherits the style value. New `style_glygen()`, `style_snfg()`, and `style_glycoworkbench()` provide reusable presets for common glycan-drawing conventions. (#73, #79)
 
 ## Minor improvements and bug fixes
 
 * `Hex` residues now render as smooth, device-native circles across standalone cartoons and embedded glycan grobs. (#76)
-
 * Linkage annotations now move beta labels slightly away from horizontal and skewed edge lines while leaving labels beside vertical edges unchanged, including reducing-end annotations. (#70)
-
 * Linkage-annotation collision handling now ignores the two labels belonging to the same edge, preventing enlarged nodes from unnecessarily reflecting an otherwise collision-free linkage. (#75)
-
 * `style_glydraw(node_size = ...)` now distributes linkage-annotation spacing adjustments across the node-to-label and label-to-label gaps, keeping linkage notation readable with enlarged nodes. (#74)
 
 # glydraw 0.7.0
