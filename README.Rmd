@@ -23,7 +23,7 @@ readme_cartoon_examples <- list(
       "Glc(a1-2)Glc(a1-3)Glc(a1-3)Man(a1-2)Man(a1-2)Man(a1-3)[Man(a1-2)Man(a1-3)",
       "[Man(a1-2)Man(a1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(a1-"
     ),
-    args = list(style = style_glydraw(red_end = "PP-Dol"))
+    args = list(red_end = "PP-Dol")
   ),
   list(
     file = "man/figures/README-unnamed-chunk-3-1.png",
@@ -31,14 +31,14 @@ readme_cartoon_examples <- list(
       "Neu5Ac(a2-3)Gal(b1-3)[Fuc(a1-2)Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-3)",
       "[Gal(b1-4)[Fuc(a1-3)]GlcNAc(b1-6)]Gal(b1-4)GlcNAc(b1-6)]GalNAc(a1-"
     ),
-    args = list(style = style_glydraw(red_end = "~", node_size = 1.2))
+    args = list(style = style_glygen())
   ),
   list(
     file = "man/figures/README-unnamed-chunk-4-1.png",
     glycan = "Gal(b1-3)[Neu5Ac(a2-3)Gal6S(b1-4)[Fuc(a1-3)]GlcNAc(b1-6)]GalNAc(a1-",
     args = list(
       orient = "up",
-      style = style_glydraw(red_end = "Ser/Thr")
+      red_end = "Ser/Thr"
     )
   ),
   list(
@@ -46,7 +46,8 @@ readme_cartoon_examples <- list(
     glycan = "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-",
     args = list(
       orient = "up",
-      style = style_glydraw(red_end = "Asn", fuc_orient = "up")
+      red_end = "Asn",
+      style = style_glydraw(fuc_orient = "up")
     )
   ),
   list(
@@ -149,19 +150,43 @@ glycan <- paste0(
   "Glc(a1-2)Glc(a1-3)Glc(a1-3)Man(a1-2)Man(a1-2)Man(a1-3)[Man(a1-2)Man(a1-3)",
   "[Man(a1-2)Man(a1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(a1-"
 )
-draw_cartoon(glycan, style = style_glydraw(red_end = "PP-Dol"))
+draw_cartoon(glycan, red_end = "PP-Dol")
 ```
 
 ```{r, echo = FALSE, results = "asis"}
 readme_img(1)
 ```
 
+### Plot one sketch-style glycan
+
+`draw_cartoon_sketch()` uses the optional
+[`ggsketch`](https://github.com/nrennie/ggsketch) package to give a glycan
+cartoon hand-drawn strokes and patterned residue fills.
+
+``` r
+library(glydraw)
+
+glycan <- paste0(
+  "Glc(a1-2)Glc(a1-3)Glc(a1-3)Man(a1-2)Man(a1-2)Man(a1-3)[Man(a1-2)Man(a1-3)",
+  "[Man(a1-2)Man(a1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(a1-"
+)
+draw_cartoon_sketch(glycan, red_end = "PP-Dol", seed = 1)
+```
+
+```{r sketch-style-glycan, echo = FALSE, fig.width = 7, fig.height = 3}
+sketch_glycan <- paste0(
+  "Glc(a1-2)Glc(a1-3)Glc(a1-3)Man(a1-2)Man(a1-2)Man(a1-3)[Man(a1-2)Man(a1-3)",
+  "[Man(a1-2)Man(a1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(a1-"
+)
+draw_cartoon_sketch(sketch_glycan, red_end = "PP-Dol", seed = 1)
+```
+
 ### ggplot2 extension
 
-`scale_x_glycan()` and `scale_y_glycan()` can add glycan cartoons to standard ggplot2 figures.
-For example, you can use glycan cartoons as labels in a heatmap:
+`glydraw` provides `ggplot2` extensions to plot glycan cartoons on a panel, axis, or legend.
+For example, you can use `scale_x_glycan()` to set glycan cartoons as labels in a heatmap:
 
-```{r ggplot2-extension, fig.width = 4, fig.height = 3}
+```{r ggplot2-extension, fig.width = 3, fig.height = 2.5}
 library(ggplot2)
 library(glydraw)
 library(tibble)
@@ -193,6 +218,41 @@ ggplot(plot_data, aes(branch, sample)) +
   theme(axis.text.y = element_text())
 ```
 
+### ComplexHeatmap extension
+
+`anno_glycan()` adds glycan cartoons as row or column labels in a
+[`ComplexHeatmap`](https://jokergoo.github.io/ComplexHeatmap-reference/book/) heatmap.
+
+```{r complexheatmap-extension, fig.width = 4, fig.height = 3}
+suppressPackageStartupMessages(library(ComplexHeatmap))
+
+mat <- matrix(
+  seq_len(9),
+  nrow = 3,
+  dimnames = list(paste0("row", 1:3), paste0("column", 1:3))
+)
+structures <- c(
+  "GlcNAc(b1-",
+  "Gal(b1-4)GlcNAc(b1-",
+  "Neu5Ac(a2-?)Gal(b1-4)GlcNAc(b1-"
+)
+
+Heatmap(
+  mat,
+  name = "Corr. Coef.",
+  show_row_names = FALSE,
+  show_column_names = FALSE,
+  row_dend_side = "right",
+  column_dend_side = "bottom",
+  left_annotation = rowAnnotation(
+    glycan = anno_glycan(structures, which = "row")
+  ),
+  top_annotation = HeatmapAnnotation(
+    glycan = anno_glycan(structures, which = "column")
+  )
+)
+```
+
 ### Gallery
 
 ``` r
@@ -200,10 +260,7 @@ glycan <- paste0(
   "Neu5Ac(a2-3)Gal(b1-3)[Fuc(a1-2)Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-3)",
   "[Gal(b1-4)[Fuc(a1-3)]GlcNAc(b1-6)]Gal(b1-4)GlcNAc(b1-6)]GalNAc(a1-"
 )
-draw_cartoon(
-  glycan,
-  style = style_glydraw(red_end = "~", node_size = 1.2)
-)
+draw_cartoon(glycan, style = style_glygen())
 ```
 
 ```{r, echo = FALSE, results = "asis"}
@@ -212,11 +269,7 @@ readme_img(2)
 
 ``` r
 glycan <- "Gal(b1-3)[Neu5Ac(a2-3)Gal6S(b1-4)[Fuc(a1-3)]GlcNAc(b1-6)]GalNAc(a1-"
-draw_cartoon(
-  glycan,
-  orient = "up",
-  style = style_glydraw(red_end = "Ser/Thr")
-)
+draw_cartoon(glycan, orient = "up", red_end = "Ser/Thr")
 ```
 
 ```{r, echo = FALSE, results = "asis"}
@@ -228,7 +281,8 @@ glycan <- "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-"
 draw_cartoon(
   glycan,
   orient = "up",
-  style = style_glydraw(red_end = "Asn", fuc_orient = "up")
+  red_end = "Asn",
+  style = style_glydraw(fuc_orient = "up")
 )
 ```
 
