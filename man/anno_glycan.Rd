@@ -19,7 +19,8 @@ anno_glycan(
   width = NULL,
   height = NULL,
   show_name = FALSE,
-  red_end = NULL
+  red_end = NULL,
+  orient = NULL
 )
 }
 \arguments{
@@ -70,6 +71,10 @@ names.}
 
 \item{red_end}{Reducing-end annotation. \code{NULL}, the default, uses \code{red_end}
 from \code{style}. A non-\code{NULL} value overrides \code{style$red_end}.}
+
+\item{orient}{Glycan drawing orientation. \code{NULL}, the default, selects the
+orientation from \code{side}: \code{"up"} for \code{"bottom"} or \code{"top"}, \code{"left"} for
+\code{"left"}, and \code{"right"} for \code{"right"}.}
 }
 \value{
 A ComplexHeatmap \code{AnnotationFunction} object.

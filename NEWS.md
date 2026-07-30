@@ -10,6 +10,7 @@
 
 ## New features
 
+* `scale_x_glycan()`, `scale_y_glycan()`, and `anno_glycan()` gain an `orient` argument. Its `NULL` default automatically selects a drawing orientation from the displayed axis position or annotation side.
 * `anno_glycan()` uses glycan cartoons as row or column labels in ComplexHeatmap heatmaps, with clustering-aware ordering and the sizing, anchoring, rotation, nudging, and styling controls of glycan axis scales. (#67)
 * `draw_cartoon_sketch()` draws hand-sketched glycan cartoons with reproducible rough strokes, patterned residue fills, optional drawing media, and the same layout, annotation, orientation, highlighting, styling, sizing, and saving behavior as `draw_cartoon()`. Sketch cartoons always use their handwriting font, ignoring `font_family` in style presets. (#77, #81)
 * `font_family` style option controls the font used for text annotations across glycan cartoons, including alpha and beta anomer labels. (#69)

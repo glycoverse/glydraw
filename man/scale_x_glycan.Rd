@@ -21,7 +21,8 @@ scale_x_glycan(
   nudge_y = 0,
   show_linkage = TRUE,
   style = style_glydraw(),
-  red_end = NULL
+  red_end = NULL,
+  orient = NULL
 )
 
 scale_y_glycan(
@@ -40,7 +41,8 @@ scale_y_glycan(
   nudge_y = 0,
   show_linkage = TRUE,
   style = style_glydraw(),
-  red_end = NULL
+  red_end = NULL,
+  orient = NULL
 )
 }
 \arguments{
@@ -91,6 +93,10 @@ appearance.}
 
 \item{red_end}{Reducing-end annotation. \code{NULL}, the default, uses \code{red_end}
 from \code{style}. A non-\code{NULL} value overrides \code{style$red_end}.}
+
+\item{orient}{Glycan drawing orientation. \code{NULL}, the default, selects the
+orientation from the displayed axis position: \code{"up"} for \code{"bottom"} or
+\code{"top"}, \code{"left"} for \code{"left"}, and \code{"right"} for \code{"right"}.}
 }
 \value{
 A ggplot2 discrete position scale.

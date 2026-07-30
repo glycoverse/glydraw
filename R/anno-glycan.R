@@ -30,6 +30,9 @@
 #'   `0.4`.
 #' @param angle Rotation in degrees applied to each cartoon independently of
 #'   its drawing orientation. Defaults to `0`.
+#' @param orient Glycan drawing orientation. `NULL`, the default, selects the
+#'   orientation from `side`: `"up"` for `"bottom"` or `"top"`, `"left"` for
+#'   `"left"`, and `"right"` for `"right"`.
 #' @param hjust Horizontal justification. `NULL` uses [hjust_red_end()] for
 #'   column labels and `1` for row labels.
 #' @param vjust Vertical justification. `NULL` uses `0` for column labels and
@@ -95,7 +98,8 @@ anno_glycan <- function(
   width = NULL,
   height = NULL,
   show_name = FALSE,
-  red_end = NULL
+  red_end = NULL,
+  orient = NULL
 ) {
   if (!requireNamespace("ComplexHeatmap", quietly = TRUE)) {
     cli::cli_abort(
@@ -105,7 +109,7 @@ anno_glycan <- function(
   .validate_glycan_annotation_structures(structure)
   which <- rlang::arg_match(which)
   side <- .resolve_glycan_annotation_side(side, which)
-  orient <- switch(which, column = "up", row = "left")
+  orient <- .resolve_glycan_label_orient(orient, side)
   if (is.null(hjust)) {
     hjust <- switch(which, column = hjust_red_end(), row = 1)
   }

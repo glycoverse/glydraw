@@ -649,9 +649,15 @@ test_that("main APIs expose only the red_end style override", {
   expect_true(all(
     c("show_linkage", "orient") %in% interface_arguments$export_cartoons
   ))
-  expect_true("show_linkage" %in% interface_arguments$scale_x_glycan)
-  expect_true("show_linkage" %in% interface_arguments$scale_y_glycan)
-  expect_true("show_linkage" %in% interface_arguments$anno_glycan)
+  expect_true(all(
+    c("show_linkage", "orient") %in% interface_arguments$scale_x_glycan
+  ))
+  expect_true(all(
+    c("show_linkage", "orient") %in% interface_arguments$scale_y_glycan
+  ))
+  expect_true(all(
+    c("show_linkage", "orient") %in% interface_arguments$anno_glycan
+  ))
   purrr::walk(
     interfaces,
     ~ expect_identical(formals(.x)$style, quote(style_glydraw()))
@@ -660,9 +666,25 @@ test_that("main APIs expose only the red_end style override", {
     interfaces,
     ~ expect_null(formals(.x)$red_end)
   )
+  new_orient_interfaces <- c(
+    "scale_x_glycan",
+    "scale_y_glycan",
+    "anno_glycan"
+  )
   purrr::walk(
-    interface_arguments,
+    interface_arguments[setdiff(
+      names(interface_arguments),
+      new_orient_interfaces
+    )],
     ~ expect_identical(tail(.x, 1), "red_end")
+  )
+  purrr::walk(
+    interface_arguments[new_orient_interfaces],
+    ~ expect_identical(tail(.x, 2), c("red_end", "orient"))
+  )
+  purrr::walk(
+    interfaces[new_orient_interfaces],
+    ~ expect_null(formals(.x)$orient)
   )
 })
 

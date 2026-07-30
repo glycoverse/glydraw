@@ -167,12 +167,68 @@ test_that("glycan axis scales adapt their configuration to coord_flip", {
   x_label <- .axis_glycan_labels(x_plot, "axis-l")$children[[1]]
   y_label <- .axis_glycan_labels(y_plot, "axis-b")$children[[1]]
 
+  expect_equal(x_label$glydraw_orient, "left")
+  expect_equal(y_label$glydraw_orient, "up")
   expect_false(x_label$glydraw_axis_vertical)
   expect_equal(x_label$glydraw_hjust, 1)
   expect_equal(x_label$glydraw_vjust, vjust_red_end())
   expect_true(y_label$glydraw_axis_vertical)
   expect_equal(y_label$glydraw_hjust, hjust_red_end())
   expect_equal(y_label$glydraw_vjust, 0)
+})
+
+test_that("glycan axis orientation follows position and can be overridden", {
+  data <- data.frame(
+    structure = "Gal(b1-3)GalNAc(a1-",
+    value = 1
+  )
+  x_plot <- function(position = "bottom", orient = NULL) {
+    ggplot2::ggplot(
+      data,
+      ggplot2::aes(x = .data$structure, y = .data$value)
+    ) +
+      ggplot2::geom_col() +
+      scale_x_glycan(position = position, orient = orient)
+  }
+  y_plot <- function(position = "left", orient = NULL) {
+    ggplot2::ggplot(
+      data,
+      ggplot2::aes(x = .data$value, y = .data$structure)
+    ) +
+      ggplot2::geom_col() +
+      scale_y_glycan(position = position, orient = orient)
+  }
+
+  expect_equal(
+    .axis_glycan_labels(x_plot(), "axis-b")$children[[1]]$glydraw_orient,
+    "up"
+  )
+  expect_equal(
+    .axis_glycan_labels(x_plot("top"), "axis-t")$children[[1]]$glydraw_orient,
+    "up"
+  )
+  expect_equal(
+    .axis_glycan_labels(y_plot(), "axis-l")$children[[1]]$glydraw_orient,
+    "left"
+  )
+  expect_equal(
+    .axis_glycan_labels(y_plot("right"), "axis-r")$children[[1]]$glydraw_orient,
+    "right"
+  )
+  expect_equal(
+    .axis_glycan_labels(
+      x_plot(orient = "down"),
+      "axis-b"
+    )$children[[1]]$glydraw_orient,
+    "down"
+  )
+  expect_equal(
+    .axis_glycan_labels(
+      y_plot(orient = "right"),
+      "axis-l"
+    )$children[[1]]$glydraw_orient,
+    "right"
+  )
 })
 
 test_that("glycan axis alignment can be adjusted", {

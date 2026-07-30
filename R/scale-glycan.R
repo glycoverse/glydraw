@@ -24,6 +24,9 @@
 #'   Defaults to `0.4`.
 #' @param angle Rotation in degrees applied to each axis-label cartoon,
 #'   independently of the cartoon orientation. Defaults to `0`.
+#' @param orient Glycan drawing orientation. `NULL`, the default, selects the
+#'   orientation from the displayed axis position: `"up"` for `"bottom"` or
+#'   `"top"`, `"left"` for `"left"`, and `"right"` for `"right"`.
 #' @param hjust Horizontal justification. Vertical x-axis cartoons default to
 #'   [hjust_red_end()], while horizontal y-axis cartoons default to `1`.
 #' @param vjust Vertical justification. Vertical x-axis cartoons default to
@@ -74,11 +77,15 @@ scale_x_glycan <- function(
   nudge_y = 0,
   show_linkage = TRUE,
   style = style_glydraw(),
-  red_end = NULL
+  red_end = NULL,
+  orient = NULL
 ) {
+  orient_auto <- is.null(orient)
+  orient <- .resolve_glycan_label_orient(orient, position)
   red_end <- .resolve_red_end(red_end, style)
   guide <- .new_glycan_axis_guide(
-    orient = "up",
+    orient = orient,
+    orient_auto = orient_auto,
     size = size,
     angle = angle,
     hjust = hjust,
@@ -129,11 +136,15 @@ scale_y_glycan <- function(
   nudge_y = 0,
   show_linkage = TRUE,
   style = style_glydraw(),
-  red_end = NULL
+  red_end = NULL,
+  orient = NULL
 ) {
+  orient_auto <- is.null(orient)
+  orient <- .resolve_glycan_label_orient(orient, position)
   red_end <- .resolve_red_end(red_end, style)
   guide <- .new_glycan_axis_guide(
-    orient = "left",
+    orient = orient,
+    orient_auto = orient_auto,
     size = size,
     angle = angle,
     hjust = hjust,
@@ -169,6 +180,8 @@ scale_y_glycan <- function(
 #' Create a ggplot2 guide that draws glycan cartoons as axis labels
 #'
 #' @param orient Glycan drawing orientation.
+#' @param orient_auto Whether the guide should resolve `orient` from its
+#'   displayed position.
 #' @param size Positive whole-cartoon scale multiplier.
 #' @param angle Rotation in degrees applied to each cartoon.
 #' @param hjust Horizontal glycan justification.
@@ -190,6 +203,7 @@ scale_y_glycan <- function(
 #' @noRd
 .new_glycan_axis_guide <- function(
   orient,
+  orient_auto,
   size,
   angle,
   hjust,
@@ -236,6 +250,7 @@ scale_y_glycan <- function(
     minor.ticks = FALSE,
     cap = "none",
     glycan_orient = options$orient,
+    glycan_orient_auto = orient_auto,
     glycan_size = options$size,
     glycan_angle = options$angle,
     glycan_hjust = options$hjust,
@@ -277,6 +292,33 @@ scale_y_glycan <- function(
     position = ggplot2::waiver(),
     name = "axis",
     super = GuideGlycanAxis
+  )
+}
+
+#' Resolve an automatic glycan label orientation
+#'
+#' @param orient Requested glycan orientation or `NULL`.
+#' @param side Side on which the glycan label is displayed.
+#'
+#' @returns A resolved glycan drawing orientation.
+#' @noRd
+.resolve_glycan_label_orient <- function(orient, side) {
+  if (!is.null(orient)) {
+    return(rlang::arg_match(
+      orient,
+      c("left", "right", "up", "down")
+    ))
+  }
+
+  switch(
+    side,
+    bottom = "up",
+    top = "up",
+    left = "left",
+    right = "right",
+    cli::cli_abort(
+      "{.arg side} must be one of \"bottom\", \"top\", \"left\", or \"right\"."
+    )
   )
 }
 
@@ -436,6 +478,7 @@ scale_y_glycan <- function(
     )
   )
   grob$glydraw_scale <- params$glycan_size
+  grob$glydraw_orient <- params$glycan_orient
   grob$glydraw_angle <- params$glycan_angle
   grob$glydraw_hjust <- params$glycan_hjust
   grob$glydraw_vjust <- params$glycan_vjust
@@ -661,6 +704,7 @@ GuideGlycanAxis <- ggplot2::ggproto(
     ggplot2:::GuideAxis$params,
     list(
       glycan_orient = "left",
+      glycan_orient_auto = FALSE,
       glycan_size = 0.4,
       glycan_angle = 0,
       glycan_hjust = 0.5,
@@ -686,14 +730,18 @@ GuideGlycanAxis <- ggplot2::ggproto(
   setup_params = function(params) {
     params <- ggplot2:::GuideAxis$setup_params(params)
 
-    if (params$vertical) {
-      params$glycan_orient <- "left"
-      params$glycan_hjust <- params$glycan_y_hjust
-      params$glycan_vjust <- params$glycan_y_vjust
-    } else {
-      params$glycan_orient <- "up"
-      params$glycan_hjust <- params$glycan_x_hjust
-      params$glycan_vjust <- params$glycan_x_vjust
+    if (params$glycan_orient_auto) {
+      params$glycan_orient <- .resolve_glycan_label_orient(
+        NULL,
+        params$position
+      )
+      if (params$vertical) {
+        params$glycan_hjust <- params$glycan_y_hjust
+        params$glycan_vjust <- params$glycan_y_vjust
+      } else {
+        params$glycan_hjust <- params$glycan_x_hjust
+        params$glycan_vjust <- params$glycan_x_vjust
+      }
     }
     .validate_red_end_justification_orientation(
       params$glycan_hjust,
