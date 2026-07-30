@@ -16,14 +16,12 @@ knitr::opts_chunk$set(
 ```
 
 `glydraw` draws SNFG glycan cartoons from glycan structure text or
-`glyrepr::glycan_structure()` objects. The main workflow is:
+`glyrepr::glycan_structure()` objects.
 
-1. Draw one glycan with `draw_cartoon()`.
-2. Save one cartoon with `save_cartoon()`.
-3. Export many cartoons with `export_cartoons()`.
-
-This vignette uses IUPAC-condensed strings because they are compact and easy to
-copy into examples.
+`draw_cartoon()` returns a ggplot2 object with class `glydraw_cartoon`. You can
+print it directly, pass it to `save_cartoon()`, or add ggplot2 layers when
+needed. This vignette uses IUPAC-condensed strings because they are compact and
+easy to copy into examples.
 
 ```{r setup}
 library(glydraw)
@@ -41,12 +39,14 @@ n_core <- "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
 draw_cartoon(n_core)
 ```
 
-## Drawing controls and styles
+For a sketch-like appearance, use `draw_cartoon_sketch()` instead of
+`draw_cartoon()`.
 
-`draw_cartoon()` returns a ggplot2 object with class `glydraw_cartoon`. You can
-print it directly, pass it to `save_cartoon()`, or add normal ggplot2 layers
-when needed. Set `show_linkage` and `orient` directly; collect all visual
-options in `style_glydraw()` and pass the result through `style`.
+```{r sketch-cartoon, fig.width = 4.84, fig.height = 2.03}
+draw_cartoon_sketch(n_core)
+```
+
+## Basic options
 
 ### `show_linkage`
 
@@ -66,11 +66,75 @@ end. Choose `"left"`, `"right"`, `"up"`, or `"down"`; the default is `"left"`.
 draw_cartoon(n_core, orient = "up")
 ```
 
+### `red_end` annotation
+
+`red_end` controls what is drawn after the reducing-end line. Possible values
+are:
+
+- `""`: draw nothing (the default)
+- `"~"`: draw a wavy line
+- Any other text: draw that text after the line
+- An amino-acid sequence: custom text with one tagged glycosite
+
+```{r red-end-default, fig.width = 4.84, fig.height = 2.03}
+draw_cartoon(n_core, red_end = "")
+```
+
+```{r red-end-wave, fig.width = 4.88, fig.height = 2.03}
+draw_cartoon(n_core, red_end = "~")
+```
+
+```{r red-end-text, fig.width = 5.38, fig.height = 2.03}
+draw_cartoon(n_core, red_end = "Asn")
+```
+
+To annotate an amino-acid sequence at the reducing end, wrap the glycosite in
+`<site>` and `</site>` tags.
+
+```{r red-end-sequence, fig.width = 5.02, fig.height = 2.03}
+draw_cartoon(n_core, red_end = "ABC<site>D</site>EFJHI")
+```
+
+Although this notation is slightly verbose, it lets you use arbitrary
+characters in the sequence without ambiguity.
+
+```{r red-end-site, fig.width = 5.02, fig.height = 2.13}
+draw_cartoon(n_core, red_end = "<site>N</site>-X-S/T")
+```
+
+## Styles
+
+`glydraw` provides many additional visual options, including linewidths, node
+sizes, colors, and fonts. The style system collects these options while
+preserving the information conveyed by the glycan notation.
+
+Use the `style` argument to apply these customizations. By default,
+`style = style_glydraw()`, which returns a style object containing the
+available settings.
+
+```{r style-default}
+style_glydraw()
+```
+
+The style contains the following parameters:
+
+- `fuc_orient`: orientation of Fuc-like residues
+- `red_end`: reducing-end annotation, as described above
+- `red_end_length`: length of the reducing-end line
+- `red_end_size`: size of custom reducing-end text
+- `edge_linewidth`: linewidth of glycosidic linkages
+- `node_linewidth`: linewidth of node borders
+- `node_size`: multiplier for node size
+- `font_family`: font family for text annotations
+- `colors`: palette used to fill the nodes
+
+The following sections describe these settings in more detail.
+
 ### `fuc_orient`
 
-`fuc_orient` controls how Fuc triangles are rotated. The default, `"flex"`,
-points non-reducing Fuc residues toward their rendered linkage direction.
-Use `"up"` when every Fuc triangle should point upward.
+`fuc_orient` controls how Fuc-like triangles are rotated.
+The default, `"flex"`, points non-reducing Fuc residues toward their rendered
+linkage direction. Use `"up"` when every Fuc triangle should point upward.
 
 ```{r fuc-orient, fig.width = 2.47, fig.height = 1.91}
 fucosylated <- "Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-"
@@ -79,17 +143,41 @@ draw_cartoon(fucosylated, style = style_glydraw(fuc_orient = "flex"))
 draw_cartoon(fucosylated, style = style_glydraw(fuc_orient = "up"))
 ```
 
-### `red_end`
+### `red_end` in a style
 
-`red_end` controls the reducing-end annotation. The default `""` draws the
-standard reducing-end line. Use `"~"` for a wavy reducing end, pass any other
-string to draw that string at the reducing end, or wrap one amino-acid
-glycosite in `<site>` tags to bold and anchor it to the glycan.
+This setting controls the same feature as the `red_end` argument described
+above. It is also available in the style object so that it can be reused
+across drawings. The explicit `red_end` argument in `draw_cartoon()` overrides
+`style$red_end`.
 
-```{r red-end, fig.width = 5.09, fig.height = 2.02}
-draw_cartoon(n_core, style = style_glydraw(red_end = "~"))
-draw_cartoon(n_core, style = style_glydraw(red_end = "R"))
-draw_cartoon(n_core, red_end = "ABC<site>D</site>EFG")
+```{r red-end-override, fig.width = 5.38, fig.height = 2.03}
+# The explicit argument overrides the style setting.
+draw_cartoon(n_core, red_end = "Asn", style = style_glydraw(red_end = "~"))
+```
+
+### `red_end_length`
+
+`red_end_length` is the length of the reducing-end line in plot-coordinate
+units. It can be any non-negative number. Setting it to `0` omits the line and
+any reducing-end wave or custom text while retaining the core anomer
+annotation.
+
+```{r red-end-length, fig.width = 5.31, fig.height = 2.03}
+draw_cartoon(n_core, style = style_glydraw(red_end_length = 1))
+```
+
+```{r red-end-length-zero, fig.width = 4.63, fig.height = 2.03}
+# The custom text is omitted when `red_end_length = 0`.
+draw_cartoon(n_core, red_end = "Asn", style = style_glydraw(red_end_length = 0))
+```
+
+### `red_end_size`
+
+`red_end_size` controls the size of custom text passed through `red_end`. It
+does not affect the `"~"` wave.
+
+```{r red-end-size, fig.width = 5.66, fig.height = 2.03}
+draw_cartoon(n_core, red_end = "Asn", style = style_glydraw(red_end_size = 10))
 ```
 
 ### `edge_linewidth` and `node_linewidth`
@@ -121,11 +209,26 @@ Very large symbols can overlap, so values larger than `2` are rejected. Linkage
 annotations are hidden with a warning when the requested node size leaves too
 little annotation space.
 
+**Tip:** To make a compact cartoon while keeping the symbols legible, increase
+`node_size`, `node_linewidth`, and `edge_linewidth`. If linkage information is
+not essential for the display, also set `show_linkage = FALSE`.
+This makes sure the cartoon still looks nice when you shrink in Adobe Illustration.
+
+```{r compact-cartoon, fig.width = 2.21, fig.height = 1}
+compact_style <- style_glydraw(
+  node_size = 1.4,
+  edge_linewidth = 1.5,
+  node_linewidth = 1.5
+)
+draw_cartoon(n_core, show_linkage = FALSE, style = compact_style)
+```
+
 ### `colors`
 
-`colors` is a complete named SNFG palette in the format returned by
-`glydraw_colors()`. Modify entries in that palette to customize the
-corresponding residue colors.
+`colors` is a complete named palette in the format returned by `glydraw_colors()`.
+Modify entries in that palette to customize the corresponding residue colors.
+By default, `glydraw_colors()` uses the colors defined by
+[SNFG](https://www.ncbi.nlm.nih.gov/glycans/snfg.html).
 
 ```{r colors, fig.width = 4.83, fig.height = 2.02}
 colors <- glydraw_colors()
@@ -137,7 +240,51 @@ draw_cartoon(
 )
 ```
 
-### `highlight`
+### Reusing styles
+
+Create a style object once and reuse it for multiple glycans.
+
+```r
+glycans <- c(
+  core = n_core,
+  antenna = "Gal(b1-4)GlcNAc(b1-",
+  fucosylated = "Gal(b1-4)[Fuc(a1-3)]GlcNAc(b1-"
+)
+
+my_style <- style_glydraw(
+  node_size = 1.4,
+  edge_linewidth = 1.5,
+  node_linewidth = 1.5
+)
+
+draw_cartoon(glycans[[1]], style = my_style)
+draw_cartoon(glycans[[2]], style = my_style)
+draw_cartoon(glycans[[3]], style = my_style)
+```
+
+### Bundled styles
+
+`glydraw` also provides presets based on common glycan-drawing conventions.
+
+```{r style-glygen, fig.width = 5.35, fig.height = 2.03}
+draw_cartoon(n_core, style = style_glygen())
+```
+
+```{r style-snfg, fig.width = 5.35, fig.height = 2.10}
+draw_cartoon(n_core, style = style_snfg())
+```
+
+```{r style-glycoworkbench, fig.width = 5.35, fig.height = 2.03}
+draw_cartoon(n_core, style = style_glycoworkbench())
+```
+
+These styles can also be used with `draw_cartoon_sketch()`.
+
+```{r sketch-style-glycoworkbench, fig.width = 5.35, fig.height = 2.03}
+draw_cartoon_sketch(n_core, style = style_glycoworkbench())
+```
+
+## Node highlighting
 
 `highlight` marks selected residue nodes. It is available when `structure` is a
 `glyrepr::glycan_structure()` object. Node indices match the monosaccharide
