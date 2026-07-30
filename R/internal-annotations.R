@@ -428,7 +428,7 @@
 .floating_linkage_annotation_data <- function(
   structure,
   coor,
-  orient = c("H", "V"),
+  orient = c("left", "right", "up", "down"),
   floating = NULL,
   node_size = 1
 ) {

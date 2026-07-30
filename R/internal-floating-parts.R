@@ -213,22 +213,27 @@
   offsets + mean(range(main_y)) - mean(range(floating_y))
 }
 
-.orient_cartoon_layout <- function(layout, orient = c("H", "V")) {
+.orient_cartoon_layout <- function(
+  layout,
+  orient = c("left", "right", "up", "down")
+) {
   orient <- rlang::arg_match(orient)
-  if (orient == "H") {
+  if (orient == "left") {
     return(layout)
   }
 
-  layout$coor <- .rotate_cartoon_coordinates(layout$coor)
+  layout$coor <- .rotate_cartoon_coordinates(layout$coor, orient)
   if (is.null(layout$floating)) {
     return(layout)
   }
 
   layout$floating$virtual_segments <- .rotate_cartoon_segments(
-    layout$floating$virtual_segments
+    layout$floating$virtual_segments,
+    orient
   )
   layout$floating$bracket_segments <- .rotate_cartoon_segments(
-    layout$floating$bracket_segments
+    layout$floating$bracket_segments,
+    orient
   )
   layout$floating$groups <- purrr::map(
     layout$floating$groups,
@@ -238,33 +243,37 @@
           c(group$count_x, group$count_y),
           nrow = 1,
           dimnames = list(NULL, c("x", "y"))
-        )
+        ),
+        orient
       )
       group$count_x <- count[[1, "x"]]
       group$count_y <- count[[1, "y"]]
-      group$segment <- .rotate_cartoon_segments(group$segment)
+      group$segment <- .rotate_cartoon_segments(group$segment, orient)
       group
     }
   )
   layout
 }
 
-.rotate_cartoon_coordinates <- function(coor) {
-  rotated <- coor
-  rotated[, "x"] <- coor[, "y"]
-  rotated[, "y"] <- -coor[, "x"]
-  rotated
-}
-
-.rotate_cartoon_segments <- function(segments) {
+.rotate_cartoon_segments <- function(segments, orient) {
   if (nrow(segments) == 0) {
     return(segments)
   }
+  starts <- .rotate_cartoon_coordinates(
+    as.matrix(segments[, c("start_x", "start_y")]) |>
+      `colnames<-`(c("x", "y")),
+    orient
+  )
+  ends <- .rotate_cartoon_coordinates(
+    as.matrix(segments[, c("end_x", "end_y")]) |>
+      `colnames<-`(c("x", "y")),
+    orient
+  )
   rotated <- segments
-  rotated$start_x <- segments$start_y
-  rotated$start_y <- -segments$start_x
-  rotated$end_x <- segments$end_y
-  rotated$end_y <- -segments$end_x
+  rotated$start_x <- starts[, "x"]
+  rotated$start_y <- starts[, "y"]
+  rotated$end_x <- ends[, "x"]
+  rotated$end_y <- ends[, "y"]
   rotated
 }
 

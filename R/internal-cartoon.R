@@ -750,8 +750,17 @@ GeomGlydrawResidue <- ggplot2::ggproto(
     },
     segment_type = rep("glycosidic", length(gly_connect$start_x))
   )
-  reducing_segment$transparency <- 1
-  reducing_segment$segment_type <- "reducing_end"
+  reducing_transparency <- gly_list$transparency[
+    match(length(structure), as.integer(rownames(gly_list)))
+  ]
+  reducing_segment$transparency <- rep(
+    reducing_transparency,
+    nrow(reducing_segment)
+  )
+  reducing_segment$segment_type <- rep(
+    "reducing_end",
+    nrow(reducing_segment)
+  )
   connect_df <- dplyr::bind_rows(
     connect_df,
     reducing_segment

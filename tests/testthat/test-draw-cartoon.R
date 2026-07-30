@@ -980,7 +980,7 @@ test_that("floating brackets span the whole main glycan", {
   inputs <- .prepare_cartoon_inputs(
     floating_wurcs_examples()[["multiple_parts"]],
     NULL,
-    "H",
+    "left",
     ""
   )
   main_y <- inputs$coor[inputs$floating$main_nodes, "y"]
