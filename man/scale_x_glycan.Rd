@@ -69,11 +69,15 @@ Defaults to \code{0.4}.}
 \item{angle}{Rotation in degrees applied to each axis-label cartoon,
 independently of the cartoon orientation. Defaults to \code{0}.}
 
-\item{hjust}{Horizontal justification. Vertical x-axis cartoons default to
-\code{\link[=hjust_red_end]{hjust_red_end()}}, while horizontal y-axis cartoons default to \code{1}.}
+\item{hjust}{Horizontal justification. When omitted, cartoons on a top or
+bottom axis with a vertical orientation use \code{\link[=hjust_red_end]{hjust_red_end()}}. Cartoons on
+a left or right axis with a horizontal orientation use \code{1} or \code{0},
+respectively. Other position-orientation combinations use \code{0.5}.}
 
-\item{vjust}{Vertical justification. Vertical x-axis cartoons default to
-\code{0}, while horizontal y-axis cartoons default to \code{\link[=vjust_red_end]{vjust_red_end()}}.}
+\item{vjust}{Vertical justification. When omitted, cartoons on a top or
+bottom axis with a vertical orientation use \code{0}. Cartoons on a left or
+right axis with a horizontal orientation use \code{\link[=vjust_red_end]{vjust_red_end()}}. Other
+position-orientation combinations use \code{0.5}.}
 
 \item{nudge_x}{Horizontal adjustment of each cartoon, in millimetres.
 Positive values move cartoons to the right. When this moves cartoons

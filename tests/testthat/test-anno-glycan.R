@@ -96,12 +96,34 @@ test_that("anno_glycan orientation follows side and can be overridden", {
     which = "column",
     orient = "down"
   )
+  column_unusual <- anno_glycan(
+    structure,
+    which = "column",
+    orient = "left"
+  )
+  row_unusual <- anno_glycan(
+    structure,
+    which = "row",
+    orient = "up"
+  )
 
   expect_equal(bottom@var_env$grobs[[1]]$glydraw_orient, "up")
   expect_equal(top@var_env$grobs[[1]]$glydraw_orient, "up")
   expect_equal(left@var_env$grobs[[1]]$glydraw_orient, "left")
   expect_equal(right@var_env$grobs[[1]]$glydraw_orient, "right")
   expect_equal(overridden@var_env$grobs[[1]]$glydraw_orient, "down")
+  expect_equal(bottom@var_env$grobs[[1]]$glydraw_hjust, hjust_red_end())
+  expect_equal(bottom@var_env$grobs[[1]]$glydraw_vjust, 0)
+  expect_equal(top@var_env$grobs[[1]]$glydraw_hjust, hjust_red_end())
+  expect_equal(top@var_env$grobs[[1]]$glydraw_vjust, 0)
+  expect_equal(left@var_env$grobs[[1]]$glydraw_hjust, 1)
+  expect_equal(left@var_env$grobs[[1]]$glydraw_vjust, vjust_red_end())
+  expect_equal(right@var_env$grobs[[1]]$glydraw_hjust, 0)
+  expect_equal(right@var_env$grobs[[1]]$glydraw_vjust, vjust_red_end())
+  expect_equal(column_unusual@var_env$grobs[[1]]$glydraw_hjust, 0.5)
+  expect_equal(column_unusual@var_env$grobs[[1]]$glydraw_vjust, 0.5)
+  expect_equal(row_unusual@var_env$grobs[[1]]$glydraw_hjust, 0.5)
+  expect_equal(row_unusual@var_env$grobs[[1]]$glydraw_vjust, 0.5)
 })
 
 test_that("anno_glycan accepts structure vectors and preserves duplicates", {

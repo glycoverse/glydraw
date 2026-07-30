@@ -33,10 +33,14 @@
 #' @param orient Glycan drawing orientation. `NULL`, the default, selects the
 #'   orientation from `side`: `"up"` for `"bottom"` or `"top"`, `"left"` for
 #'   `"left"`, and `"right"` for `"right"`.
-#' @param hjust Horizontal justification. `NULL` uses [hjust_red_end()] for
-#'   column labels and `1` for row labels.
-#' @param vjust Vertical justification. `NULL` uses `0` for column labels and
-#'   [vjust_red_end()] for row labels.
+#' @param hjust Horizontal justification. `NULL` uses [hjust_red_end()] for a
+#'   top or bottom annotation with a vertical orientation, `1` or `0` for a
+#'   left or right annotation with a horizontal orientation, respectively, and
+#'   `0.5` for other side-orientation combinations.
+#' @param vjust Vertical justification. `NULL` uses `0` for a top or bottom
+#'   annotation with a vertical orientation, [vjust_red_end()] for a left or
+#'   right annotation with a horizontal orientation, and `0.5` for other
+#'   side-orientation combinations.
 #' @param nudge_x Horizontal adjustment of each cartoon, in millimetres.
 #'   Positive values move cartoons to the right. Defaults to `0`.
 #' @param nudge_y Vertical adjustment of each cartoon, in millimetres. Positive
@@ -110,12 +114,12 @@ anno_glycan <- function(
   which <- rlang::arg_match(which)
   side <- .resolve_glycan_annotation_side(side, which)
   orient <- .resolve_glycan_label_orient(orient, side)
-  if (is.null(hjust)) {
-    hjust <- switch(which, column = hjust_red_end(), row = 1)
-  }
-  if (is.null(vjust)) {
-    vjust <- switch(which, column = 0, row = vjust_red_end())
-  }
+  justification <- .resolve_glycan_label_justification(
+    hjust,
+    vjust,
+    side,
+    orient
+  )
   checkmate::assert_flag(show_name)
   red_end <- .resolve_red_end(red_end, style)
 
@@ -123,8 +127,8 @@ anno_glycan <- function(
     orient = orient,
     size = size,
     angle = angle,
-    hjust = hjust,
-    vjust = vjust,
+    hjust = justification$hjust,
+    vjust = justification$vjust,
     nudge_x = nudge_x,
     nudge_y = nudge_y,
     show_linkage = show_linkage,

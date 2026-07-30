@@ -41,11 +41,15 @@ accept \code{"bottom"} or \code{"top"}; row annotations accept \code{"left"} or
 \item{angle}{Rotation in degrees applied to each cartoon independently of
 its drawing orientation. Defaults to \code{0}.}
 
-\item{hjust}{Horizontal justification. \code{NULL} uses \code{\link[=hjust_red_end]{hjust_red_end()}} for
-column labels and \code{1} for row labels.}
+\item{hjust}{Horizontal justification. \code{NULL} uses \code{\link[=hjust_red_end]{hjust_red_end()}} for a
+top or bottom annotation with a vertical orientation, \code{1} or \code{0} for a
+left or right annotation with a horizontal orientation, respectively, and
+\code{0.5} for other side-orientation combinations.}
 
-\item{vjust}{Vertical justification. \code{NULL} uses \code{0} for column labels and
-\code{\link[=vjust_red_end]{vjust_red_end()}} for row labels.}
+\item{vjust}{Vertical justification. \code{NULL} uses \code{0} for a top or bottom
+annotation with a vertical orientation, \code{\link[=vjust_red_end]{vjust_red_end()}} for a left or
+right annotation with a horizontal orientation, and \code{0.5} for other
+side-orientation combinations.}
 
 \item{nudge_x}{Horizontal adjustment of each cartoon, in millimetres.
 Positive values move cartoons to the right. Defaults to \code{0}.}

@@ -231,6 +231,62 @@ test_that("glycan axis orientation follows position and can be overridden", {
   )
 })
 
+test_that("glycan axis justification defaults follow side and orientation", {
+  data <- data.frame(
+    structure = "Gal(b1-3)GalNAc(a1-",
+    value = 1
+  )
+  x_label <- function(position = "bottom", orient = NULL, flip = FALSE, ...) {
+    plot <- ggplot2::ggplot(
+      data,
+      ggplot2::aes(x = .data$structure, y = .data$value)
+    ) +
+      ggplot2::geom_col() +
+      scale_x_glycan(position = position, orient = orient, ...)
+    axis_name <- if (flip) "axis-l" else paste0("axis-", substr(position, 1, 1))
+    if (flip) {
+      plot <- plot + ggplot2::coord_flip()
+    }
+    .axis_glycan_labels(plot, axis_name)$children[[1]]
+  }
+  y_label <- function(position = "left", orient = NULL, ...) {
+    plot <- ggplot2::ggplot(
+      data,
+      ggplot2::aes(x = .data$value, y = .data$structure)
+    ) +
+      ggplot2::geom_col() +
+      scale_y_glycan(position = position, orient = orient, ...)
+    axis_name <- paste0("axis-", substr(position, 1, 1))
+    .axis_glycan_labels(plot, axis_name)$children[[1]]
+  }
+
+  bottom <- x_label(orient = "down")
+  top <- x_label(position = "top", orient = "down")
+  left <- y_label(orient = "right")
+  right <- y_label(position = "right", orient = "left")
+  x_unusual <- x_label(orient = "left")
+  y_unusual <- y_label(orient = "up")
+  flipped_unusual <- x_label(orient = "up", flip = TRUE)
+  partial_override <- y_label(orient = "up", hjust = 0.25)
+
+  expect_equal(bottom$glydraw_hjust, hjust_red_end())
+  expect_equal(bottom$glydraw_vjust, 0)
+  expect_equal(top$glydraw_hjust, hjust_red_end())
+  expect_equal(top$glydraw_vjust, 0)
+  expect_equal(left$glydraw_hjust, 1)
+  expect_equal(left$glydraw_vjust, vjust_red_end())
+  expect_equal(right$glydraw_hjust, 0)
+  expect_equal(right$glydraw_vjust, vjust_red_end())
+  expect_equal(x_unusual$glydraw_hjust, 0.5)
+  expect_equal(x_unusual$glydraw_vjust, 0.5)
+  expect_equal(y_unusual$glydraw_hjust, 0.5)
+  expect_equal(y_unusual$glydraw_vjust, 0.5)
+  expect_equal(flipped_unusual$glydraw_hjust, 0.5)
+  expect_equal(flipped_unusual$glydraw_vjust, 0.5)
+  expect_equal(partial_override$glydraw_hjust, 0.25)
+  expect_equal(partial_override$glydraw_vjust, 0.5)
+})
+
 test_that("glycan axis alignment can be adjusted", {
   data <- data.frame(
     structure = "Gal(b1-3)GalNAc(a1-",
