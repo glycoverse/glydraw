@@ -2,6 +2,8 @@
 
 ### All vignettes
 
+- [glydraw with
+  ComplexHeatmap](https://glycoverse.github.io/glydraw/dev/articles/complex-heatmap.md):
 - [glydraw as a ggplot2
   extension](https://glycoverse.github.io/glydraw/dev/articles/ggplot2-extension.md):
 - [Get Started with
