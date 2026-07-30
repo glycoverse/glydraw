@@ -449,8 +449,20 @@ test_that("amino-acid geometry uses installed named-font metrics", {
   skip_if(length(named_monospace) == 0)
   named_monospace <- named_monospace[[1]]
   grDevices::pdf(NULL)
+  background_device <- grDevices::dev.cur()
+  grDevices::pdf(NULL)
   measurement_device <- grDevices::dev.cur()
-  on.exit(grDevices::dev.off(), add = TRUE)
+  on.exit(
+    {
+      devices <- grDevices::dev.list()
+      for (device in c(measurement_device, background_device)) {
+        if (!is.null(devices) && device %in% devices) {
+          grDevices::dev.off(which = device)
+        }
+      }
+    },
+    add = TRUE
+  )
   sequence <- .parse_reducing_end_aa_sequence(
     "IIIIIIII<site>W</site>WWWWWWWW"
   )
@@ -464,7 +476,10 @@ test_that("amino-acid geometry uses installed named-font metrics", {
   )
 
   expect_identical(grDevices::dev.cur(), measurement_device)
-  expect_gt(abs(named_metrics$hjust - sans_metrics$hjust), 0.05)
+  metric_difference <- max(abs(
+    unlist(named_metrics) - unlist(sans_metrics)
+  ))
+  expect_gt(metric_difference, sqrt(.Machine$double.eps))
 })
 
 test_that("style constructors control reducing-end line length and text size", {

@@ -1262,7 +1262,8 @@
   named_font_family <- nzchar(font_family) &&
     !font_family %in% c("sans", "serif", "mono")
   metric_font_family <- .reducing_end_metric_font_family(font_family)
-  no_device_open <- grDevices::dev.cur() == 1L
+  original_device <- grDevices::dev.cur()
+  no_device_open <- original_device == 1L
   measurement_file <- NULL
   measurement_device <- NULL
   opened_device <- FALSE
@@ -1295,6 +1296,14 @@
         }
         if (!is.null(measurement_file)) {
           unlink(measurement_file)
+        }
+        devices <- grDevices::dev.list()
+        if (
+          original_device != 1L &&
+            !is.null(devices) &&
+            original_device %in% devices
+        ) {
+          grDevices::dev.set(which = original_device)
         }
       },
       add = TRUE
