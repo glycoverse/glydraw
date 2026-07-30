@@ -24,7 +24,8 @@ anno_glycan(
   width = NULL,
   height = NULL,
   show_name = FALSE,
-  red_end = NULL
+  red_end = NULL,
+  orient = NULL
 )
 ```
 
@@ -62,13 +63,17 @@ anno_glycan(
 
   Horizontal justification. `NULL` uses
   [`hjust_red_end()`](https://glycoverse.github.io/glydraw/dev/reference/hjust_red_end.md)
-  for column labels and `1` for row labels.
+  for a top or bottom annotation with a vertical orientation, `1` or `0`
+  for a left or right annotation with a horizontal orientation,
+  respectively, and `0.5` for other side-orientation combinations.
 
 - vjust:
 
-  Vertical justification. `NULL` uses `0` for column labels and
+  Vertical justification. `NULL` uses `0` for a top or bottom annotation
+  with a vertical orientation,
   [`vjust_red_end()`](https://glycoverse.github.io/glydraw/dev/reference/hjust_red_end.md)
-  for row labels.
+  for a left or right annotation with a horizontal orientation, and
+  `0.5` for other side-orientation combinations.
 
 - nudge_x:
 
@@ -112,6 +117,12 @@ anno_glycan(
 
   Reducing-end annotation. `NULL`, the default, uses `red_end` from
   `style`. A non-`NULL` value overrides `style$red_end`.
+
+- orient:
+
+  Glycan drawing orientation. `NULL`, the default, selects the
+  orientation from `side`: `"up"` for `"bottom"` or `"top"`, `"left"`
+  for `"left"`, and `"right"` for `"right"`.
 
 ## Value
 

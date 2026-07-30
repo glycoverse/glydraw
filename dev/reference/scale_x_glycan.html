@@ -83,7 +83,8 @@ displayed axis, including when the axes are swapped by
 <span>  nudge_y <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  show_linkage <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  style <span class="op">=</span> <span class="fu"><a href="style_glydraw.html">style_glydraw</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  red_end <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  red_end <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  orient <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">scale_y_glycan</span><span class="op">(</span></span>
@@ -102,7 +103,8 @@ displayed axis, including when the axes are swapped by
 <span>  nudge_y <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  show_linkage <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  style <span class="op">=</span> <span class="fu"><a href="style_glydraw.html">style_glydraw</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  red_end <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  red_end <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  orient <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -152,13 +154,17 @@ independently of the cartoon orientation. Defaults to <code>0</code>.</p></dd>
 
 
 <dt id="arg-hjust">hjust<a class="anchor" aria-label="anchor" href="#arg-hjust"></a></dt>
-<dd><p>Horizontal justification. Vertical x-axis cartoons default to
-<code><a href="hjust_red_end.html">hjust_red_end()</a></code>, while horizontal y-axis cartoons default to <code>1</code>.</p></dd>
+<dd><p>Horizontal justification. When omitted, cartoons on a top or
+bottom axis with a vertical orientation use <code><a href="hjust_red_end.html">hjust_red_end()</a></code>. Cartoons on
+a left or right axis with a horizontal orientation use <code>1</code> or <code>0</code>,
+respectively. Other position-orientation combinations use <code>0.5</code>.</p></dd>
 
 
 <dt id="arg-vjust">vjust<a class="anchor" aria-label="anchor" href="#arg-vjust"></a></dt>
-<dd><p>Vertical justification. Vertical x-axis cartoons default to
-<code>0</code>, while horizontal y-axis cartoons default to <code><a href="hjust_red_end.html">vjust_red_end()</a></code>.</p></dd>
+<dd><p>Vertical justification. When omitted, cartoons on a top or
+bottom axis with a vertical orientation use <code>0</code>. Cartoons on a left or
+right axis with a horizontal orientation use <code><a href="hjust_red_end.html">vjust_red_end()</a></code>. Other
+position-orientation combinations use <code>0.5</code>.</p></dd>
 
 
 <dt id="arg-nudge-x">nudge_x<a class="anchor" aria-label="anchor" href="#arg-nudge-x"></a></dt>
@@ -188,6 +194,12 @@ appearance.</p></dd>
 <dt id="arg-red-end">red_end<a class="anchor" aria-label="anchor" href="#arg-red-end"></a></dt>
 <dd><p>Reducing-end annotation. <code>NULL</code>, the default, uses <code>red_end</code>
 from <code>style</code>. A non-<code>NULL</code> value overrides <code>style$red_end</code>.</p></dd>
+
+
+<dt id="arg-orient">orient<a class="anchor" aria-label="anchor" href="#arg-orient"></a></dt>
+<dd><p>Glycan drawing orientation. <code>NULL</code>, the default, selects the
+orientation from the displayed axis position: <code>"up"</code> for <code>"bottom"</code> or
+<code>"top"</code>, <code>"left"</code> for <code>"left"</code>, and <code>"right"</code> for <code>"right"</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

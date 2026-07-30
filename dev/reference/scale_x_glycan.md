@@ -32,7 +32,8 @@ scale_x_glycan(
   nudge_y = 0,
   show_linkage = TRUE,
   style = style_glydraw(),
-  red_end = NULL
+  red_end = NULL,
+  orient = NULL
 )
 
 scale_y_glycan(
@@ -51,7 +52,8 @@ scale_y_glycan(
   nudge_y = 0,
   show_linkage = TRUE,
   style = style_glydraw(),
-  red_end = NULL
+  red_end = NULL,
+  orient = NULL
 )
 ```
 
@@ -102,15 +104,20 @@ scale_y_glycan(
 
 - hjust:
 
-  Horizontal justification. Vertical x-axis cartoons default to
-  [`hjust_red_end()`](https://glycoverse.github.io/glydraw/dev/reference/hjust_red_end.md),
-  while horizontal y-axis cartoons default to `1`.
+  Horizontal justification. When omitted, cartoons on a top or bottom
+  axis with a vertical orientation use
+  [`hjust_red_end()`](https://glycoverse.github.io/glydraw/dev/reference/hjust_red_end.md).
+  Cartoons on a left or right axis with a horizontal orientation use `1`
+  or `0`, respectively. Other position-orientation combinations use
+  `0.5`.
 
 - vjust:
 
-  Vertical justification. Vertical x-axis cartoons default to `0`, while
-  horizontal y-axis cartoons default to
+  Vertical justification. When omitted, cartoons on a top or bottom axis
+  with a vertical orientation use `0`. Cartoons on a left or right axis
+  with a horizontal orientation use
   [`vjust_red_end()`](https://glycoverse.github.io/glydraw/dev/reference/hjust_red_end.md).
+  Other position-orientation combinations use `0.5`.
 
 - nudge_x:
 
@@ -141,6 +148,12 @@ scale_y_glycan(
 
   Reducing-end annotation. `NULL`, the default, uses `red_end` from
   `style`. A non-`NULL` value overrides `style$red_end`.
+
+- orient:
+
+  Glycan drawing orientation. `NULL`, the default, selects the
+  orientation from the displayed axis position: `"up"` for `"bottom"` or
+  `"top"`, `"left"` for `"left"`, and `"right"` for `"right"`.
 
 ## Value
 

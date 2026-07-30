@@ -64,7 +64,8 @@ follow row or column clustering, reordering, and splitting.</p>
 <span>  width <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  height <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  show_name <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  red_end <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  red_end <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  orient <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -100,13 +101,17 @@ its drawing orientation. Defaults to <code>0</code>.</p></dd>
 
 
 <dt id="arg-hjust">hjust<a class="anchor" aria-label="anchor" href="#arg-hjust"></a></dt>
-<dd><p>Horizontal justification. <code>NULL</code> uses <code><a href="hjust_red_end.html">hjust_red_end()</a></code> for
-column labels and <code>1</code> for row labels.</p></dd>
+<dd><p>Horizontal justification. <code>NULL</code> uses <code><a href="hjust_red_end.html">hjust_red_end()</a></code> for a
+top or bottom annotation with a vertical orientation, <code>1</code> or <code>0</code> for a
+left or right annotation with a horizontal orientation, respectively, and
+<code>0.5</code> for other side-orientation combinations.</p></dd>
 
 
 <dt id="arg-vjust">vjust<a class="anchor" aria-label="anchor" href="#arg-vjust"></a></dt>
-<dd><p>Vertical justification. <code>NULL</code> uses <code>0</code> for column labels and
-<code><a href="hjust_red_end.html">vjust_red_end()</a></code> for row labels.</p></dd>
+<dd><p>Vertical justification. <code>NULL</code> uses <code>0</code> for a top or bottom
+annotation with a vertical orientation, <code><a href="hjust_red_end.html">vjust_red_end()</a></code> for a left or
+right annotation with a horizontal orientation, and <code>0.5</code> for other
+side-orientation combinations.</p></dd>
 
 
 <dt id="arg-nudge-x">nudge_x<a class="anchor" aria-label="anchor" href="#arg-nudge-x"></a></dt>
@@ -148,6 +153,12 @@ names.</p></dd>
 <dt id="arg-red-end">red_end<a class="anchor" aria-label="anchor" href="#arg-red-end"></a></dt>
 <dd><p>Reducing-end annotation. <code>NULL</code>, the default, uses <code>red_end</code>
 from <code>style</code>. A non-<code>NULL</code> value overrides <code>style$red_end</code>.</p></dd>
+
+
+<dt id="arg-orient">orient<a class="anchor" aria-label="anchor" href="#arg-orient"></a></dt>
+<dd><p>Glycan drawing orientation. <code>NULL</code>, the default, selects the
+orientation from <code>side</code>: <code>"up"</code> for <code>"bottom"</code> or <code>"top"</code>, <code>"left"</code> for
+<code>"left"</code>, and <code>"right"</code> for <code>"right"</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

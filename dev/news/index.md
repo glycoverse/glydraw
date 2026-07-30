@@ -52,6 +52,15 @@
 
 ### New features
 
+- [`scale_x_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md),
+  [`scale_y_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md),
+  and
+  [`anno_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/anno_glycan.md)
+  gain an `orient` argument. Its `NULL` default automatically selects a
+  drawing orientation from the displayed axis position or annotation
+  side. Default justification follows compatible position-orientation
+  combinations and centers other combinations.
+  ([\#84](https://github.com/glycoverse/glydraw/issues/84))
 - [`anno_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/anno_glycan.md)
   uses glycan cartoons as row or column labels in ComplexHeatmap
   heatmaps, with clustering-aware ordering and the sizing, anchoring,
