@@ -322,6 +322,26 @@ test_that("tagged amino-acid sequences require exactly one site character", {
     expect_silent(parse(text = .format_reducing_end_aa_sequence(sequence)))
   })
 
+  sequon <- "<site>N</site>-X-S/T"
+  sequence <- .parse_reducing_end_aa_sequence(sequon)
+  expect_identical(
+    sequence,
+    list(prefix = "", site = "N", suffix = "-X-S/T")
+  )
+  expect_s3_class(
+    draw_cartoon(
+      "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-",
+      red_end = sequon
+    ),
+    "glydraw_cartoon"
+  )
+
+  arbitrary_text <- "<>🙂<site>N</site>-X/S (T) [1]"
+  expect_identical(
+    .parse_reducing_end_aa_sequence(arbitrary_text),
+    list(prefix = "<>🙂", site = "N", suffix = "-X/S (T) [1]")
+  )
+
   expect_snapshot(
     error = TRUE,
     style_glydraw(red_end = "ABC<site></site>EFG")

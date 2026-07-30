@@ -1169,18 +1169,26 @@
 #'   list containing `prefix`, `site`, and `suffix`.
 #' @noRd
 .parse_reducing_end_aa_sequence <- function(red_end) {
-  has_site_tag <- grepl("<site>|</site>", red_end, perl = TRUE)
+  open_tag <- "<site>"
+  close_tag <- "</site>"
+  has_site_tag <- grepl(open_tag, red_end, fixed = TRUE) ||
+    grepl(close_tag, red_end, fixed = TRUE)
   if (!has_site_tag) {
     return(NULL)
   }
 
-  matched <- regexec(
-    "^([A-Za-z]*)<site>(.)</site>([A-Za-z]*)$",
-    red_end,
-    perl = TRUE
-  )
-  parts <- regmatches(red_end, matched)[[1]]
-  if (length(parts) != 4L || nchar(parts[[3]], type = "chars") != 1L) {
+  open_position <- gregexpr(open_tag, red_end, fixed = TRUE)[[1]]
+  close_position <- gregexpr(close_tag, red_end, fixed = TRUE)[[1]]
+  has_one_tag_pair <- length(open_position) == 1L &&
+    open_position != -1L &&
+    length(close_position) == 1L &&
+    close_position != -1L &&
+    open_position < close_position
+  if (has_one_tag_pair) {
+    site_start <- open_position + nchar(open_tag)
+    site <- substr(red_end, site_start, close_position - 1L)
+  }
+  if (!has_one_tag_pair || nchar(site, type = "chars") != 1L) {
     cli::cli_abort(c(
       "{.arg red_end} has an invalid amino-acid site annotation.",
       "i" = paste(
@@ -1190,7 +1198,10 @@
     ))
   }
 
-  stats::setNames(as.list(parts[2:4]), c("prefix", "site", "suffix"))
+  prefix <- substr(red_end, 1L, open_position - 1L)
+  suffix_start <- close_position + nchar(close_tag)
+  suffix <- substr(red_end, suffix_start, nchar(red_end))
+  list(prefix = prefix, site = site, suffix = suffix)
 }
 
 #' Format a tagged amino-acid sequence as plotmath
