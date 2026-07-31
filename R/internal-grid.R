@@ -217,6 +217,7 @@
 #' @returns A list of native grid grobs in drawing order.
 #' @noRd
 .cartoon_grid_primitives <- function(grob, layout, scale) {
+  alpha <- .cartoon_grid_alpha(grob)
   primitives <- list(
     .cartoon_grid_segments(grob, layout, scale),
     .cartoon_grid_polygons(
@@ -243,7 +244,89 @@
 
   primitives <- Filter(\(primitive) !inherits(primitive, "null"), primitives)
   names(primitives) <- vapply(primitives, \(primitive) primitive$name, "")
+  if (alpha != 1) {
+    primitives <- .composite_cartoon_alpha(primitives, alpha)
+  }
   primitives
+}
+
+#' Resolve and validate whole-cartoon transparency
+#'
+#' @param grob A prepared `glycanGrob`.
+#'
+#' @returns A numeric alpha value. Missing values and `NULL` resolve to `1`.
+#' @noRd
+.cartoon_grid_alpha <- function(grob) {
+  alpha <- grob$glydraw_alpha
+  if (is.null(alpha) || is.na(alpha)) {
+    alpha <- 1
+  }
+  .validate_cartoon_alpha_device(alpha)
+  alpha
+}
+
+#' Validate graphics-device support for whole-cartoon transparency
+#'
+#' @param alpha Numeric whole-cartoon transparency.
+#' @param capabilities Graphics-device capabilities returned by
+#'   [grDevices::dev.capabilities()].
+#'
+#' @returns `alpha`, invisibly. Throws an error when non-opaque alpha is
+#'   requested on a device without alpha-mask and transformation support.
+#' @noRd
+.validate_cartoon_alpha_device <- function(
+  alpha,
+  capabilities = grDevices::dev.capabilities()
+) {
+  supported <- is.character(capabilities$masks) &&
+    "alpha" %in% capabilities$masks &&
+    isTRUE(capabilities$transformations)
+
+  if (alpha != 1 && !supported) {
+    cli::cli_abort(c(
+      "The active graphics device does not support the {.field alpha} aesthetic.",
+      "i" = "Use a device that supports alpha masks and transformations, such as {.fn grDevices::pdf} or {.fn grDevices::svg}."
+    ))
+  }
+
+  invisible(alpha)
+}
+
+#' Apply transparency once to an isolated cartoon
+#'
+#' @param primitives Named list of native grid grobs in drawing order.
+#' @param alpha Numeric whole-cartoon transparency.
+#'
+#' @returns A named list containing one isolated, alpha-masked group.
+#' @noRd
+.composite_cartoon_alpha <- function(primitives, alpha) {
+  source <- grid::gTree(
+    children = rlang::exec(grid::gList, !!!primitives),
+    name = "glycan.alpha.source"
+  )
+  alpha_mask <- grid::as.mask(
+    grid::rectGrob(
+      gp = grid::gpar(
+        col = NA,
+        fill = scales::alpha("black", alpha)
+      ),
+      name = "glycan.alpha.mask"
+    ),
+    type = "alpha"
+  )
+  alpha_group <- grid::groupGrob(
+    source,
+    name = "glycan.alpha.group"
+  )
+
+  rlang::set_names(
+    list(grid::grobTree(
+      alpha_group,
+      vp = grid::viewport(mask = alpha_mask),
+      name = "glycan.alpha"
+    )),
+    "glycan.alpha"
+  )
 }
 
 #' Normalize grid coordinates into the drawing viewport

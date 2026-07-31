@@ -10,6 +10,7 @@
 
 ## New features
 
+* `geom_glycan()` and `geom_node_glycan()` gain an `alpha` aesthetic. Each cartoon is composited before transparency is applied so nodes continue to occlude the linkage edges beneath them. Graphics devices without alpha-mask and transformation support throw an error for non-opaque values rather than render an inaccurate cartoon. (#85)
 * `scale_x_glycan()`, `scale_y_glycan()`, and `anno_glycan()` gain an `orient` argument. Its `NULL` default automatically selects a drawing orientation from the displayed axis position or annotation side. Default justification follows compatible position-orientation combinations and centers other combinations. (#84)
 * `anno_glycan()` uses glycan cartoons as row or column labels in ComplexHeatmap heatmaps, with clustering-aware ordering and the sizing, anchoring, rotation, nudging, and styling controls of glycan axis scales. (#67)
 * `draw_cartoon_sketch()` draws hand-sketched glycan cartoons with reproducible rough strokes, patterned residue fills, optional drawing media, and the same layout, annotation, orientation, highlighting, styling, sizing, and saving behavior as `draw_cartoon()`. Sketch cartoons always use their handwriting font, ignoring `font_family` in style presets. (#77, #81)

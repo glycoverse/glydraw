@@ -7,15 +7,26 @@ test_that("geom_node_glycan uses ggraph node positions", {
         "GalNAc(a1-",
         "Gal(b1-3)GalNAc(a1-"
       )
+    ) |>
+    igraph::set_vertex_attr(
+      "alpha",
+      value = c(0.25, 0.75)
     )
 
   plot <- ggraph::ggraph(graph, layout = "linear") +
-    geom_node_glycan(ggplot2::aes(structure = .data$structure))
+    geom_node_glycan(
+      ggplot2::aes(
+        structure = .data$structure,
+        alpha = .data$alpha
+      )
+    ) +
+    ggplot2::scale_alpha_identity()
   built <- ggplot2::ggplot_build(plot)
 
   expect_equal(built$data[[1]]$x, plot$data$x)
   expect_equal(built$data[[1]]$y, plot$data$y)
   expect_equal(built$data[[1]]$structure, plot$data$structure)
+  expect_equal(built$data[[1]]$alpha, plot$data$alpha)
   expect_identical(plot$layers[[1]]$geom, GeomGlycan)
   expect_identical(plot$layers[[1]]$stat, ggraph::StatFilter)
   expect_identical(plot$layers[[1]]$inherit.aes, FALSE)

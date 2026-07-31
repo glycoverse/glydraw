@@ -23,6 +23,7 @@ test_that("geom_glycan maps structures to x and y positions", {
   expect_equal(built$data[[1]]$size, rep(1, nrow(data)))
   expect_equal(built$data[[1]]$hjust, rep(0.5, nrow(data)))
   expect_equal(built$data[[1]]$vjust, rep(0.5, nrow(data)))
+  expect_identical(built$data[[1]]$alpha, rep(NA, nrow(data)))
   expect_setequal(GeomGlycan$required_aes, c("x", "y", "structure"))
 })
 
@@ -205,6 +206,58 @@ test_that("geom_glycan uses size as a whole-cartoon scale multiplier", {
   expect_equal(heights[[2]] / heights[[1]], 3)
 })
 
+test_that("geom_glycan applies alpha without exposing edges through nodes", {
+  data <- data.frame(
+    x = c(1, 2),
+    y = 1,
+    alpha = c(0.25, 0.75),
+    structure = rep("Gal(b1-3)GalNAc(a1-", 2)
+  )
+  plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(
+      x = .data$x,
+      y = .data$y,
+      structure = .data$structure,
+      alpha = .data$alpha
+    )
+  ) +
+    geom_glycan() +
+    ggplot2::scale_alpha_identity()
+
+  layer <- ggplot2::layer_grob(plot)[[1]]
+
+  expect_equal(
+    unname(purrr::map_dbl(layer$children, "glydraw_alpha")),
+    data$alpha
+  )
+
+  rendered <- grid::makeContent(layer$children[[1]])
+  cartoon <- rendered$children[[1]]
+  panel_index <- match("panel", cartoon$layout$name)
+  primitives <- cartoon$grobs[[panel_index]]$children
+  alpha_grob <- primitives[["glycan.alpha"]]
+  alpha_group <- alpha_grob$children[["glycan.alpha.group"]]
+
+  expect_s3_class(alpha_grob, "gTree")
+  expect_s3_class(alpha_group, "GridGroup")
+  expect_s3_class(alpha_grob$vp$mask, "GridMask")
+  expect_contains(
+    names(alpha_group$src$children),
+    c("glycan.edges", "glycan.node.mask", "glycan.node")
+  )
+})
+
+test_that("geom_glycan rejects alpha on incapable graphics devices", {
+  capabilities <- list(masks = NA, transformations = FALSE)
+
+  expect_no_error(.validate_cartoon_alpha_device(1, capabilities))
+  expect_snapshot(
+    error = TRUE,
+    .validate_cartoon_alpha_device(0.5, capabilities)
+  )
+})
+
 test_that("geom_glycan exports scaled cartoons as vector graphics", {
   data <- data.frame(
     x = 1,
@@ -219,7 +272,7 @@ test_that("geom_glycan exports scaled cartoons as vector graphics", {
       structure = .data$structure
     )
   ) +
-    geom_glycan(size = 0.6)
+    geom_glycan(size = 0.6, alpha = 0.5)
 
   pdf_file <- tempfile(fileext = ".pdf")
   grDevices::pdf(pdf_file, compress = FALSE)
