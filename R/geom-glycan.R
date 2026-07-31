@@ -104,6 +104,9 @@ vjust_red_end <- function() {
 #'   Use [vjust_red_end()] to anchor a horizontal cartoon at its reducing end.
 #' - `angle`, an optional rotation in degrees that defaults to `0`. Rotation is
 #'   applied after the cartoon is drawn, independently of `orient`.
+#' - `alpha`, an optional whole-cartoon transparency. The default, `NA`, is
+#'   opaque. Each cartoon is composited before alpha is applied so nodes
+#'   continue to occlude the linkage edges beneath them.
 #'
 #' @returns A ggplot2 layer that can be added to a [ggplot2::ggplot()] object.
 #'
@@ -205,7 +208,7 @@ geom_glycan <- function(
 #' Draw a panel of positioned glycan grobs
 #'
 #' @param data Data frame prepared by ggplot2 with `x`, `y`, `structure`,
-#'   `size`, `hjust`, `vjust`, and `angle` columns.
+#'   `size`, `hjust`, `vjust`, `angle`, and `alpha` columns.
 #' @param panel_params Panel scale parameters supplied by ggplot2.
 #' @param coord Coordinate system supplied by ggplot2.
 #' @param show_linkage Logical scalar passed to [glycanGrob()].
@@ -256,6 +259,7 @@ geom_glycan <- function(
   .validate_glycan_justification(coordinates$hjust, "hjust")
   .validate_glycan_justification(coordinates$vjust, "vjust")
   .validate_glycan_angles(coordinates$angle)
+  .validate_glycan_alphas(coordinates$alpha)
   structure_input <- coordinates$structure
   if (
     !is.null(highlight) &&
@@ -297,10 +301,21 @@ geom_glycan <- function(
       hjust = coordinates$hjust,
       vjust = coordinates$vjust,
       angle = coordinates$angle,
+      alpha = coordinates$alpha,
       index = seq_len(nrow(coordinates))
     ),
-    function(grob, x, y, size, hjust, vjust, angle, index) {
-      .position_glycan_grob(grob, x, y, size, hjust, vjust, angle, index)
+    function(grob, x, y, size, hjust, vjust, angle, alpha, index) {
+      .position_glycan_grob(
+        grob,
+        x,
+        y,
+        size,
+        hjust,
+        vjust,
+        angle,
+        alpha,
+        index
+      )
     }
   )
 
@@ -319,6 +334,7 @@ geom_glycan <- function(
 #' @param hjust Numeric horizontal justification.
 #' @param vjust Numeric vertical justification.
 #' @param angle Numeric rotation in degrees.
+#' @param alpha Numeric whole-cartoon transparency.
 #' @param index Integer row index used to create a unique grob name.
 #'
 #' @returns The input grob with a panel-positioning viewport and unique name.
@@ -331,6 +347,7 @@ geom_glycan <- function(
   hjust,
   vjust,
   angle,
+  alpha,
   index
 ) {
   grob$name <- paste0("geom_glycan.", index)
@@ -338,6 +355,7 @@ geom_glycan <- function(
   grob$glydraw_hjust <- hjust
   grob$glydraw_vjust <- vjust
   grob$glydraw_angle <- angle
+  grob$glydraw_alpha <- alpha
   grob$glydraw_border_px <- 0
   grob$glydraw_background <- FALSE
   grob$vp <- grid::viewport(
@@ -485,6 +503,24 @@ geom_glycan <- function(
   invisible(angle)
 }
 
+#' Validate mapped glycan transparency
+#'
+#' @param alpha Numeric vector of alpha aesthetic values.
+#'
+#' @returns `alpha`, invisibly. Throws an error when non-missing values are not
+#'   finite numbers between zero and one.
+#' @noRd
+.validate_glycan_alphas <- function(alpha) {
+  checkmate::assert_numeric(
+    alpha,
+    lower = 0,
+    upper = 1,
+    any.missing = TRUE,
+    finite = TRUE
+  )
+  invisible(alpha)
+}
+
 #' ggplot2 geom for glycan grobs
 #'
 #' @noRd
@@ -493,7 +529,13 @@ GeomGlycan <- ggplot2::ggproto(
   ggplot2::Geom,
   required_aes = c("x", "y", "structure"),
   non_missing_aes = c("size", "hjust", "vjust", "angle"),
-  default_aes = ggplot2::aes(size = 1, hjust = 0.5, vjust = 0.5, angle = 0),
+  default_aes = ggplot2::aes(
+    size = 1,
+    hjust = 0.5,
+    vjust = 0.5,
+    angle = 0,
+    alpha = NA
+  ),
   extra_params = "na.rm",
   draw_key = ggplot2::draw_key_blank,
   draw_panel = .draw_glycan_panel

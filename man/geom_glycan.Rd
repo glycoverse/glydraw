@@ -109,6 +109,9 @@ the end of a reducing-end annotation line, and \code{1} aligns its top bound.
 Use \code{\link[=vjust_red_end]{vjust_red_end()}} to anchor a horizontal cartoon at its reducing end.
 \item \code{angle}, an optional rotation in degrees that defaults to \code{0}. Rotation is
 applied after the cartoon is drawn, independently of \code{orient}.
+\item \code{alpha}, an optional whole-cartoon transparency. The default, \code{NA}, is
+opaque. Each cartoon is composited before alpha is applied so nodes
+continue to occlude the linkage edges beneath them.
 }
 }
 

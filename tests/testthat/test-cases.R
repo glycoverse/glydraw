@@ -398,6 +398,34 @@ test_that("Scale ggplot2 glycan annotations", {
   vdiffr::expect_doppelganger("ggplot2 glycan sizes", plot)
 })
 
+test_that("Fade ggplot2 glycan annotations without exposed edges", {
+  data <- data.frame(
+    x = c(1, 3),
+    y = 1.5,
+    alpha = c(0.3, 0.7),
+    structure = rep("Gal(b1-3)GalNAc(a1-", 2)
+  )
+  plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(
+      x = .data$x,
+      y = .data$y,
+      structure = .data$structure,
+      alpha = .data$alpha
+    )
+  ) +
+    geom_glycan() +
+    ggplot2::scale_alpha_identity() +
+    ggplot2::coord_cartesian(
+      xlim = c(0, 4),
+      ylim = c(0, 3),
+      expand = FALSE
+    ) +
+    ggplot2::theme_void()
+
+  vdiffr::expect_doppelganger("transparent ggplot2 glycans", plot)
+})
+
 test_that("Justify vertical ggplot2 glycan annotations", {
   data <- data.frame(
     x = c(1, 3, 5),

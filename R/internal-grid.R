@@ -217,15 +217,21 @@
 #' @returns A list of native grid grobs in drawing order.
 #' @noRd
 .cartoon_grid_primitives <- function(grob, layout, scale) {
+  alpha <- .cartoon_grid_alpha_context(grob)
+  mask_alpha <- if (alpha$primitive == 0) {
+    rep(0, nrow(grob$polygon_coor))
+  } else {
+    NULL
+  }
   primitives <- list(
-    .cartoon_grid_segments(grob, layout, scale),
+    .cartoon_grid_segments(grob, layout, scale, alpha$primitive),
     .cartoon_grid_polygons(
       grob,
       layout,
       scale,
       fill = rep("#FFFFFF", nrow(grob$polygon_coor)),
       colour = rep("white", nrow(grob$polygon_coor)),
-      alpha = NULL,
+      alpha = mask_alpha,
       name = "glycan.node.mask"
     ),
     .cartoon_grid_polygons(
@@ -234,16 +240,81 @@
       scale,
       fill = grob$filled_color,
       colour = rep("black", nrow(grob$polygon_coor)),
-      alpha = grob$polygon_coor$alpha,
+      alpha = grob$polygon_coor$alpha * alpha$primitive,
       name = "glycan.node"
     ),
-    .cartoon_grid_text(grob, layout, scale),
-    .cartoon_grid_wave(grob, layout, scale)
+    .cartoon_grid_text(grob, layout, scale, alpha$primitive),
+    .cartoon_grid_wave(grob, layout, scale, alpha$primitive)
   )
 
   primitives <- Filter(\(primitive) !inherits(primitive, "null"), primitives)
   names(primitives) <- vapply(primitives, \(primitive) primitive$name, "")
+  if (alpha$composite) {
+    primitives <- .composite_cartoon_alpha(primitives, alpha$value)
+  }
   primitives
+}
+
+#' Resolve the device-specific alpha strategy
+#'
+#' @param grob A prepared `glycanGrob`.
+#'
+#' @returns A list containing the resolved alpha, whether isolated compositing
+#'   is supported, and the fallback primitive alpha.
+#' @noRd
+.cartoon_grid_alpha_context <- function(grob) {
+  alpha <- grob$glydraw_alpha
+  if (is.null(alpha) || is.na(alpha)) {
+    alpha <- 1
+  }
+  capabilities <- grDevices::dev.capabilities()
+  composite <- alpha != 1 &&
+    is.character(capabilities$masks) &&
+    "alpha" %in% capabilities$masks &&
+    isTRUE(capabilities$transformations)
+
+  list(
+    value = alpha,
+    composite = composite,
+    primitive = if (composite) 1 else alpha
+  )
+}
+
+#' Apply transparency once to an isolated cartoon
+#'
+#' @param primitives Named list of native grid grobs in drawing order.
+#' @param alpha Numeric whole-cartoon transparency.
+#'
+#' @returns A named list containing one isolated, alpha-masked group.
+#' @noRd
+.composite_cartoon_alpha <- function(primitives, alpha) {
+  source <- grid::gTree(
+    children = rlang::exec(grid::gList, !!!primitives),
+    name = "glycan.alpha.source"
+  )
+  alpha_mask <- grid::as.mask(
+    grid::rectGrob(
+      gp = grid::gpar(
+        col = NA,
+        fill = scales::alpha("black", alpha)
+      ),
+      name = "glycan.alpha.mask"
+    ),
+    type = "alpha"
+  )
+  alpha_group <- grid::groupGrob(
+    source,
+    name = "glycan.alpha.group"
+  )
+
+  rlang::set_names(
+    list(grid::grobTree(
+      alpha_group,
+      vp = grid::viewport(mask = alpha_mask),
+      name = "glycan.alpha"
+    )),
+    "glycan.alpha"
+  )
 }
 
 #' Normalize grid coordinates into the drawing viewport
@@ -263,10 +334,11 @@
 #' @param grob A prepared `glycanGrob`.
 #' @param layout Grid layout metadata from `.cartoon_grid_layout()`.
 #' @param scale Positive whole-cartoon size multiplier.
+#' @param alpha Numeric primitive transparency used as a device fallback.
 #'
 #' @returns A `segments` grob, or a null grob for empty input.
 #' @noRd
-.cartoon_grid_segments <- function(grob, layout, scale) {
+.cartoon_grid_segments <- function(grob, layout, scale, alpha) {
   segments <- grob$connect_df
   if (nrow(segments) == 0) {
     return(grid::nullGrob())
@@ -302,8 +374,8 @@
       "native"
     ),
     gp = grid::gpar(
-      col = scales::alpha("black", segments$transparency),
-      fill = scales::alpha("black", segments$transparency),
+      col = scales::alpha("black", segments$transparency * alpha),
+      fill = scales::alpha("black", segments$transparency * alpha),
       lwd = rep(
         grob$edge_linewidth * ggplot2::.pt * scale,
         nrow(segments)
@@ -321,6 +393,7 @@
 #' @param grob A prepared `glycanGrob`.
 #' @param layout Grid layout metadata from `.cartoon_grid_layout()`.
 #' @param scale Positive whole-cartoon size multiplier.
+#' @param alpha Numeric primitive transparency used as a device fallback.
 #' @param fill,colour,alpha Per-point graphical properties.
 #' @param name Grob name.
 #'
@@ -450,7 +523,7 @@
 #'
 #' @returns A `text` grob, or a null grob for empty input.
 #' @noRd
-.cartoon_grid_text <- function(grob, layout, scale) {
+.cartoon_grid_text <- function(grob, layout, scale, alpha) {
   annotation <- if (grob$show_linkage) {
     grob$annotation_data$annotation
   } else {
@@ -482,7 +555,7 @@
     vjust = annotation$vjust,
     rot = annotation$angle,
     gp = grid::gpar(
-      col = scales::alpha("black", annotation$transparency),
+      col = scales::alpha("black", annotation$transparency * alpha),
       fontsize = annotation$text_size * ggplot2::.pt * scale,
       fontfamily = rep(grob$font_family, nrow(annotation)),
       lineheight = rep(1.2, nrow(annotation)),
@@ -497,10 +570,11 @@
 #' @param grob A prepared `glycanGrob`.
 #' @param layout Grid layout metadata from `.cartoon_grid_layout()`.
 #' @param scale Positive whole-cartoon size multiplier.
+#' @param alpha Numeric primitive transparency used as a device fallback.
 #'
 #' @returns A `polyline` grob, or a null grob when no wave is requested.
 #' @noRd
-.cartoon_grid_wave <- function(grob, layout, scale) {
+.cartoon_grid_wave <- function(grob, layout, scale, alpha) {
   wave <- grob$annotation_data$reducing_info$wave
   if (nrow(wave) == 0) {
     return(grid::nullGrob())
@@ -523,8 +597,8 @@
     ),
     id = rep(1, nrow(wave)),
     gp = grid::gpar(
-      col = "#000000",
-      fill = "#000000",
+      col = scales::alpha("black", alpha),
+      fill = scales::alpha("black", alpha),
       lwd = grob$edge_linewidth * ggplot2::.pt * scale,
       lty = 1,
       lineend = "butt",
