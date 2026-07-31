@@ -80,9 +80,8 @@ draw_cartoon(glycan, red_end = "PP-Dol")
 
 ### Plot one sketch-style glycan
 
-`draw_cartoon_sketch()` uses the optional
-[`ggsketch`](https://github.com/nrennie/ggsketch) package to give a
-glycan cartoon hand-drawn strokes and patterned residue fills.
+`draw_cartoon_sketch()` plots a glycan cartoon with hand-drawn strokes
+and patterned residue fills.
 
 ``` r
 library(glydraw)
