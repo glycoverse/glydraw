@@ -248,6 +248,16 @@ test_that("geom_glycan applies alpha without exposing edges through nodes", {
   )
 })
 
+test_that("geom_glycan rejects alpha on incapable graphics devices", {
+  capabilities <- list(masks = NA, transformations = FALSE)
+
+  expect_no_error(.validate_cartoon_alpha_device(1, capabilities))
+  expect_snapshot(
+    error = TRUE,
+    .validate_cartoon_alpha_device(0.5, capabilities)
+  )
+})
+
 test_that("geom_glycan exports scaled cartoons as vector graphics", {
   data <- data.frame(
     x = 1,
@@ -262,7 +272,7 @@ test_that("geom_glycan exports scaled cartoons as vector graphics", {
       structure = .data$structure
     )
   ) +
-    geom_glycan(size = 0.6)
+    geom_glycan(size = 0.6, alpha = 0.5)
 
   pdf_file <- tempfile(fileext = ".pdf")
   grDevices::pdf(pdf_file, compress = FALSE)

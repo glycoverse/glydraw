@@ -1,3 +1,12 @@
+# geom_glycan rejects alpha on incapable graphics devices
+
+    Code
+      .validate_cartoon_alpha_device(0.5, capabilities)
+    Condition
+      Error in `.validate_cartoon_alpha_device()`:
+      ! The active graphics device does not support the alpha aesthetic.
+      i Use a device that supports alpha masks and transformations, such as `grDevices::pdf()` or `grDevices::svg()`.
+
 # reducing-end justification helpers require matching orientations
 
     Code

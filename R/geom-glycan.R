@@ -106,7 +106,10 @@ vjust_red_end <- function() {
 #'   applied after the cartoon is drawn, independently of `orient`.
 #' - `alpha`, an optional whole-cartoon transparency. The default, `NA`, is
 #'   opaque. Each cartoon is composited before alpha is applied so nodes
-#'   continue to occlude the linkage edges beneath them.
+#'   continue to occlude the linkage edges beneath them. Non-opaque values
+#'   require a graphics device that supports alpha masks and transformations;
+#'   unsupported devices throw an error rather than render an inaccurate
+#'   cartoon.
 #'
 #' @returns A ggplot2 layer that can be added to a [ggplot2::ggplot()] object.
 #'
