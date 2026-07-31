@@ -52,24 +52,6 @@
 
 ### New features
 
-- [`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md)
-  and
-  [`geom_node_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_node_glycan.md)
-  gain an `alpha` aesthetic. Each cartoon is composited before
-  transparency is applied so nodes continue to occlude the linkage edges
-  beneath them. Graphics devices without alpha-mask and transformation
-  support throw an error for non-opaque values rather than render an
-  inaccurate cartoon.
-  ([\#85](https://github.com/glycoverse/glydraw/issues/85))
-- [`scale_x_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md),
-  [`scale_y_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md),
-  and
-  [`anno_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/anno_glycan.md)
-  gain an `orient` argument. Its `NULL` default automatically selects a
-  drawing orientation from the displayed axis position or annotation
-  side. Default justification follows compatible position-orientation
-  combinations and centers other combinations.
-  ([\#84](https://github.com/glycoverse/glydraw/issues/84))
 - [`anno_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/anno_glycan.md)
   uses glycan cartoons as row or column labels in ComplexHeatmap
   heatmaps, with clustering-aware ordering and the sizing, anchoring,
@@ -88,6 +70,15 @@
 - `font_family` style option controls the font used for text annotations
   across glycan cartoons, including alpha and beta anomer labels.
   ([\#69](https://github.com/glycoverse/glydraw/issues/69))
+- [`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md)
+  and
+  [`geom_node_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_node_glycan.md)
+  gain an `alpha` aesthetic. Each cartoon is composited before
+  transparency is applied so nodes continue to occlude the linkage edges
+  beneath them. Graphics devices without alpha-mask and transformation
+  support throw an error for non-opaque values rather than render an
+  inaccurate cartoon.
+  ([\#85](https://github.com/glycoverse/glydraw/issues/85))
 - Glycan grobs used by
   [`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md),
   [`geom_node_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_node_glycan.md),
@@ -104,34 +95,42 @@
   [\#66](https://github.com/glycoverse/glydraw/issues/66))
 - `orient` now accepts `"left"`, `"right"`, `"up"`, and `"down"` to draw
   glycans in any direction.
+  ([\#68](https://github.com/glycoverse/glydraw/issues/68))
 - `red_end` now accepts amino-acid sequences with one tagged glycosite,
   such as `"ABC<site>D</site>EFG"`. The site is bold and anchored to the
   reducing end, and the sequence rotates with the glycan orientation.
   ([\#78](https://github.com/glycoverse/glydraw/issues/78),
   [\#82](https://github.com/glycoverse/glydraw/issues/82))
-- New `red_end_length` style option controls the length of the
-  reducing-end line; at `0`, the line and all `red_end` decorations are
-  omitted while the axis-aligned core anomer annotation remains.
+- `red_end_length` style option controls the length of the reducing-end
+  line; at `0`, the line and all `red_end` decorations are omitted while
+  the axis-aligned core anomer annotation remains.
   ([\#80](https://github.com/glycoverse/glydraw/issues/80))
-- New `red_end_size` style option controls the size of custom `red_end`
-  text without changing the `"~"` wave.
+- `red_end_size` style option controls the size of custom `red_end` text
+  without changing the `"~"` wave.
   ([\#83](https://github.com/glycoverse/glydraw/issues/83))
+- [`scale_x_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md),
+  [`scale_y_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md),
+  and
+  [`anno_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/anno_glycan.md)
+  gain an `orient` argument. Its `NULL` default automatically selects a
+  drawing orientation from the displayed axis position or annotation
+  side. Default justification follows compatible position-orientation
+  combinations and centers other combinations.
+  ([\#84](https://github.com/glycoverse/glydraw/issues/84))
 - [`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md)
-  replaces `glydraw_style()` as the single reusable interface for tuning
-  cartoon appearance; `show_linkage` and `orient` are explicit drawing
-  controls instead of style fields, and explicit `red_end = NULL`
-  inherits the style value. New
+  is the reusable interface for tuning cartoon appearance; new
   [`style_glygen()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md),
   [`style_snfg()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md),
   and
   [`style_glycoworkbench()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md)
-  provide reusable presets for common glycan-drawing conventions.
+  presets support common glycan-drawing conventions.
   ([\#73](https://github.com/glycoverse/glydraw/issues/73),
   [\#79](https://github.com/glycoverse/glydraw/issues/79))
 
 ### Minor improvements and bug fixes
 
-- `Hex` residues now render as smooth, device-native circles across
+- [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
+  now renders `Hex` residues as smooth, device-native circles across
   standalone cartoons and embedded glycan grobs.
   ([\#76](https://github.com/glycoverse/glydraw/issues/76))
 - Linkage annotations now move beta labels slightly away from horizontal
