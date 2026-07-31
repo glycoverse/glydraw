@@ -162,6 +162,13 @@ object.
   Rotation is applied after the cartoon is drawn, independently of
   `orient`.
 
+- `alpha`, an optional whole-cartoon transparency. The default, `NA`, is
+  opaque. Each cartoon is composited before alpha is applied so nodes
+  continue to occlude the linkage edges beneath them. Non-opaque values
+  require a graphics device that supports alpha masks and
+  transformations; unsupported devices throw an error rather than render
+  an inaccurate cartoon.
+
 ## Examples
 
 ``` r

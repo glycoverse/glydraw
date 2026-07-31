@@ -52,6 +52,15 @@
 
 ### New features
 
+- [`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md)
+  and
+  [`geom_node_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_node_glycan.md)
+  gain an `alpha` aesthetic. Each cartoon is composited before
+  transparency is applied so nodes continue to occlude the linkage edges
+  beneath them. Graphics devices without alpha-mask and transformation
+  support throw an error for non-opaque values rather than render an
+  inaccurate cartoon.
+  ([\#85](https://github.com/glycoverse/glydraw/issues/85))
 - [`scale_x_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md),
   [`scale_y_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/scale_x_glycan.md),
   and

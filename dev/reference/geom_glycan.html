@@ -197,6 +197,12 @@ the end of a reducing-end annotation line, and <code>1</code> aligns its top bou
 Use <code><a href="hjust_red_end.html">vjust_red_end()</a></code> to anchor a horizontal cartoon at its reducing end.</p></li>
 <li><p><code>angle</code>, an optional rotation in degrees that defaults to <code>0</code>. Rotation is
 applied after the cartoon is drawn, independently of <code>orient</code>.</p></li>
+<li><p><code>alpha</code>, an optional whole-cartoon transparency. The default, <code>NA</code>, is
+opaque. Each cartoon is composited before alpha is applied so nodes
+continue to occlude the linkage edges beneath them. Non-opaque values
+require a graphics device that supports alpha masks and transformations;
+unsupported devices throw an error rather than render an inaccurate
+cartoon.</p></li>
 </ul></div>
 
     <div class="section level2">
