@@ -23,17 +23,12 @@ guide_glycan(
   reverse = FALSE,
   order = 0,
   size = 0.4,
-  orient = c("H", "V"),
+  orient = c("left", "right", "up", "down"),
   hjust = 0,
   vjust = vjust_red_end(),
   show_linkage = TRUE,
-  red_end = "",
-  fuc_orient = c("flex", "up"),
-  edge_linewidth = 0.8,
-  node_linewidth = 0.8,
-  node_size = 1,
-  colors = NULL,
-  style = NULL
+  style = style_glydraw(),
+  red_end = NULL
 )
 ```
 
@@ -97,8 +92,8 @@ guide_glycan(
 
 - orient:
 
-  Glycan drawing orientation, either `"H"` for horizontal or `"V"` for
-  vertical. Defaults to `"H"`.
+  Direction in which the glycan extends from its reducing end: one of
+  `"left"`, `"right"`, `"up"`, or `"down"`. Defaults to `"left"`.
 
 - hjust:
 
@@ -121,43 +116,16 @@ guide_glycan(
   Whether to show glycosidic linkage annotations inside the cartoons.
   Defaults to `TRUE`.
 
-- red_end:
-
-  Reducing-end annotation passed to
-  [`glycanGrob()`](https://glycoverse.github.io/glydraw/reference/glycanGrob.md).
-  Use `"~"` for a wave, or another string to display that text. Defaults
-  to `""`.
-
-- fuc_orient:
-
-  Fuc-like triangle orientation passed to
-  [`glycanGrob()`](https://glycoverse.github.io/glydraw/reference/glycanGrob.md).
-
-- edge_linewidth:
-
-  Linkage linewidth passed to
-  [`glycanGrob()`](https://glycoverse.github.io/glydraw/reference/glycanGrob.md).
-
-- node_linewidth:
-
-  Node-border linewidth passed to
-  [`glycanGrob()`](https://glycoverse.github.io/glydraw/reference/glycanGrob.md).
-
-- node_size:
-
-  Node-size multiplier passed to
-  [`glycanGrob()`](https://glycoverse.github.io/glydraw/reference/glycanGrob.md).
-
-- colors:
-
-  Optional named character vector of monosaccharide fill colors passed
-  to
-  [`glycanGrob()`](https://glycoverse.github.io/glydraw/reference/glycanGrob.md).
-
 - style:
 
-  A `glydraw_style` object that supplies rendering options. Explicitly
-  supplied rendering arguments override it.
+  A
+  [`style_glydraw()`](https://glycoverse.github.io/glydraw/reference/style_glydraw.md)
+  object that controls the cartoons' visual appearance.
+
+- red_end:
+
+  Reducing-end annotation. `NULL`, the default, uses `red_end` from
+  `style`. A non-`NULL` value overrides `style$red_end`.
 
 ## Value
 

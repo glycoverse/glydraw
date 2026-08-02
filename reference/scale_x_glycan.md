@@ -31,13 +31,9 @@ scale_x_glycan(
   nudge_x = 0,
   nudge_y = 0,
   show_linkage = TRUE,
-  red_end = "",
-  fuc_orient = c("flex", "up"),
-  edge_linewidth = 0.8,
-  node_linewidth = 0.8,
-  node_size = 1,
-  colors = NULL,
-  style = NULL
+  style = style_glydraw(),
+  red_end = NULL,
+  orient = NULL
 )
 
 scale_y_glycan(
@@ -55,13 +51,9 @@ scale_y_glycan(
   nudge_x = 0,
   nudge_y = 0,
   show_linkage = TRUE,
-  red_end = "",
-  fuc_orient = c("flex", "up"),
-  edge_linewidth = 0.8,
-  node_linewidth = 0.8,
-  node_size = 1,
-  colors = NULL,
-  style = NULL
+  style = style_glydraw(),
+  red_end = NULL,
+  orient = NULL
 )
 ```
 
@@ -112,15 +104,20 @@ scale_y_glycan(
 
 - hjust:
 
-  Horizontal justification. Vertical x-axis cartoons default to
-  [`hjust_red_end()`](https://glycoverse.github.io/glydraw/reference/hjust_red_end.md),
-  while horizontal y-axis cartoons default to `1`.
+  Horizontal justification. When omitted, cartoons on a top or bottom
+  axis with a vertical orientation use
+  [`hjust_red_end()`](https://glycoverse.github.io/glydraw/reference/hjust_red_end.md).
+  Cartoons on a left or right axis with a horizontal orientation use `1`
+  or `0`, respectively. Other position-orientation combinations use
+  `0.5`.
 
 - vjust:
 
-  Vertical justification. Vertical x-axis cartoons default to `0`, while
-  horizontal y-axis cartoons default to
+  Vertical justification. When omitted, cartoons on a top or bottom axis
+  with a vertical orientation use `0`. Cartoons on a left or right axis
+  with a horizontal orientation use
   [`vjust_red_end()`](https://glycoverse.github.io/glydraw/reference/hjust_red_end.md).
+  Other position-orientation combinations use `0.5`.
 
 - nudge_x:
 
@@ -141,44 +138,22 @@ scale_y_glycan(
   Whether to show glycosidic linkage annotations inside the cartoons.
   Defaults to `TRUE`.
 
-- red_end:
-
-  Reducing-end annotation passed to
-  [`glycanGrob()`](https://glycoverse.github.io/glydraw/reference/glycanGrob.md).
-  Use `"~"` for a wave, or another string to display that text. Defaults
-  to `""`.
-
-- fuc_orient:
-
-  Fuc-like triangle orientation passed to
-  [`glycanGrob()`](https://glycoverse.github.io/glydraw/reference/glycanGrob.md).
-
-- edge_linewidth:
-
-  Linkage linewidth passed to
-  [`glycanGrob()`](https://glycoverse.github.io/glydraw/reference/glycanGrob.md).
-
-- node_linewidth:
-
-  Node-border linewidth passed to
-  [`glycanGrob()`](https://glycoverse.github.io/glydraw/reference/glycanGrob.md).
-
-- node_size:
-
-  Node-size multiplier passed to
-  [`glycanGrob()`](https://glycoverse.github.io/glydraw/reference/glycanGrob.md).
-
-- colors:
-
-  Optional named character vector of monosaccharide fill colors passed
-  to
-  [`glycanGrob()`](https://glycoverse.github.io/glydraw/reference/glycanGrob.md).
-
 - style:
 
-  A `glydraw_style` object that supplies rendering options. Its
-  orientation is ignored because each scale determines the axis
-  direction. Explicitly supplied rendering arguments override it.
+  A
+  [`style_glydraw()`](https://glycoverse.github.io/glydraw/reference/style_glydraw.md)
+  object that controls the cartoons' visual appearance.
+
+- red_end:
+
+  Reducing-end annotation. `NULL`, the default, uses `red_end` from
+  `style`. A non-`NULL` value overrides `style$red_end`.
+
+- orient:
+
+  Glycan drawing orientation. `NULL`, the default, selects the
+  orientation from the displayed axis position: `"up"` for `"bottom"` or
+  `"top"`, `"left"` for `"left"`, and `"right"` for `"right"`.
 
 ## Value
 

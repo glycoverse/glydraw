@@ -1,16 +1,164 @@
 # Changelog
 
+## glydraw 0.8.0
+
+CRAN release: 2026-08-02
+
+### Breaking changes
+
+- Cartoon appearance is now configured with `style = style_glydraw(...)`
+  across
+  [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md),
+  [`glycanGrob()`](https://glycoverse.github.io/glydraw/reference/glycanGrob.md),
+  [`geom_glycan()`](https://glycoverse.github.io/glydraw/reference/geom_glycan.md),
+  [`guide_glycan()`](https://glycoverse.github.io/glydraw/reference/guide_glycan.md),
+  [`scale_x_glycan()`](https://glycoverse.github.io/glydraw/reference/scale_x_glycan.md),
+  [`scale_y_glycan()`](https://glycoverse.github.io/glydraw/reference/scale_x_glycan.md),
+  [`anno_glycan()`](https://glycoverse.github.io/glydraw/reference/anno_glycan.md),
+  and
+  [`export_cartoons()`](https://glycoverse.github.io/glydraw/reference/export_cartoons.md);
+  calls that pass `fuc_orient`, `edge_linewidth`, `node_linewidth`,
+  `node_size`, `font_family`, or `colors` directly should move those
+  arguments into
+  [`style_glydraw()`](https://glycoverse.github.io/glydraw/reference/style_glydraw.md).
+  `show_linkage` and `orient` remain explicit arguments and are no
+  longer accepted by
+  [`style_glydraw()`](https://glycoverse.github.io/glydraw/reference/style_glydraw.md),
+  while explicit `red_end` overrides the reusable style value.
+  ([\#73](https://github.com/glycoverse/glydraw/issues/73),
+  [\#79](https://github.com/glycoverse/glydraw/issues/79))
+- `colors` now accepts a complete SNFG palette in the format returned by
+  [`glydraw_colors()`](https://glycoverse.github.io/glydraw/reference/glydraw_colors.md);
+  sparse monosaccharide overrides are no longer supported.
+  ([\#72](https://github.com/glycoverse/glydraw/issues/72))
+- `glydraw_style()` has been renamed to
+  [`style_glydraw()`](https://glycoverse.github.io/glydraw/reference/style_glydraw.md)
+  and is no longer exported; replace calls to `glydraw_style()` with
+  [`style_glydraw()`](https://glycoverse.github.io/glydraw/reference/style_glydraw.md).
+  ([\#73](https://github.com/glycoverse/glydraw/issues/73))
+- `orient` no longer accepts `"H"` or `"V"`; calls using them now error
+  and should replace `"H"` with `"left"` and `"V"` with `"up"`.
+  ([\#68](https://github.com/glycoverse/glydraw/issues/68))
+- `red_end` in
+  [`style_glydraw()`](https://glycoverse.github.io/glydraw/reference/style_glydraw.md),
+  [`style_glygen()`](https://glycoverse.github.io/glydraw/reference/style_glydraw.md),
+  [`style_snfg()`](https://glycoverse.github.io/glydraw/reference/style_glydraw.md),
+  and
+  [`style_glycoworkbench()`](https://glycoverse.github.io/glydraw/reference/style_glydraw.md)
+  must now be a string. Set `red_end_length = 0` to omit the
+  reducing-end line and ignore any `red_end` wave or custom text while
+  retaining its axis-aligned core anomer annotation. Explicit
+  `red_end = NULL` on drawing interfaces continues to inherit `red_end`
+  from `style`.
+  ([\#80](https://github.com/glycoverse/glydraw/issues/80))
+
+### New features
+
+- [`anno_glycan()`](https://glycoverse.github.io/glydraw/reference/anno_glycan.md)
+  uses glycan cartoons as row or column labels in ComplexHeatmap
+  heatmaps, with clustering-aware ordering and the sizing, anchoring,
+  rotation, nudging, and styling controls of glycan axis scales.
+  ([\#67](https://github.com/glycoverse/glydraw/issues/67))
+- [`draw_cartoon_sketch()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon_sketch.md)
+  draws hand-sketched glycan cartoons with reproducible rough strokes,
+  patterned residue fills, optional drawing media, and the same layout,
+  annotation, orientation, highlighting, styling, sizing, and saving
+  behavior as
+  [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md).
+  Sketch cartoons always use their handwriting font, ignoring
+  `font_family` in style presets.
+  ([\#77](https://github.com/glycoverse/glydraw/issues/77),
+  [\#81](https://github.com/glycoverse/glydraw/issues/81))
+- `font_family` style option controls the font used for text annotations
+  across glycan cartoons, including alpha and beta anomer labels.
+  ([\#69](https://github.com/glycoverse/glydraw/issues/69))
+- [`geom_glycan()`](https://glycoverse.github.io/glydraw/reference/geom_glycan.md)
+  and
+  [`geom_node_glycan()`](https://glycoverse.github.io/glydraw/reference/geom_node_glycan.md)
+  gain an `alpha` aesthetic. Each cartoon is composited before
+  transparency is applied so nodes continue to occlude the linkage edges
+  beneath them. Graphics devices without alpha-mask and transformation
+  support throw an error for non-opaque values rather than render an
+  inaccurate cartoon.
+  ([\#85](https://github.com/glycoverse/glydraw/issues/85))
+- Glycan grobs used by
+  [`geom_glycan()`](https://glycoverse.github.io/glydraw/reference/geom_glycan.md),
+  [`geom_node_glycan()`](https://glycoverse.github.io/glydraw/reference/geom_node_glycan.md),
+  [`guide_glycan()`](https://glycoverse.github.io/glydraw/reference/guide_glycan.md),
+  [`scale_x_glycan()`](https://glycoverse.github.io/glydraw/reference/scale_x_glycan.md),
+  and
+  [`scale_y_glycan()`](https://glycoverse.github.io/glydraw/reference/scale_x_glycan.md)
+  now remain vector graphics at every size when exported to PDF or SVG;
+  [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md)
+  and repeated panel structures also render more efficiently with native
+  grid primitives without changing cartoon layout or appearance.
+  ([\#64](https://github.com/glycoverse/glydraw/issues/64),
+  [\#65](https://github.com/glycoverse/glydraw/issues/65),
+  [\#66](https://github.com/glycoverse/glydraw/issues/66))
+- `orient` now accepts `"left"`, `"right"`, `"up"`, and `"down"` to draw
+  glycans in any direction.
+  ([\#68](https://github.com/glycoverse/glydraw/issues/68))
+- `red_end` now accepts amino-acid sequences with one tagged glycosite,
+  such as `"ABC<site>D</site>EFG"`. The site is bold and anchored to the
+  reducing end, and the sequence rotates with the glycan orientation.
+  ([\#78](https://github.com/glycoverse/glydraw/issues/78),
+  [\#82](https://github.com/glycoverse/glydraw/issues/82))
+- `red_end_length` style option controls the length of the reducing-end
+  line; at `0`, the line and all `red_end` decorations are omitted while
+  the axis-aligned core anomer annotation remains.
+  ([\#80](https://github.com/glycoverse/glydraw/issues/80))
+- `red_end_size` style option controls the size of custom `red_end` text
+  without changing the `"~"` wave.
+  ([\#83](https://github.com/glycoverse/glydraw/issues/83))
+- [`scale_x_glycan()`](https://glycoverse.github.io/glydraw/reference/scale_x_glycan.md),
+  [`scale_y_glycan()`](https://glycoverse.github.io/glydraw/reference/scale_x_glycan.md),
+  and
+  [`anno_glycan()`](https://glycoverse.github.io/glydraw/reference/anno_glycan.md)
+  gain an `orient` argument. Its `NULL` default automatically selects a
+  drawing orientation from the displayed axis position or annotation
+  side. Default justification follows compatible position-orientation
+  combinations and centers other combinations.
+  ([\#84](https://github.com/glycoverse/glydraw/issues/84))
+- [`style_glydraw()`](https://glycoverse.github.io/glydraw/reference/style_glydraw.md)
+  is the reusable interface for tuning cartoon appearance; new
+  [`style_glygen()`](https://glycoverse.github.io/glydraw/reference/style_glydraw.md),
+  [`style_snfg()`](https://glycoverse.github.io/glydraw/reference/style_glydraw.md),
+  and
+  [`style_glycoworkbench()`](https://glycoverse.github.io/glydraw/reference/style_glydraw.md)
+  presets support common glycan-drawing conventions.
+  ([\#73](https://github.com/glycoverse/glydraw/issues/73),
+  [\#79](https://github.com/glycoverse/glydraw/issues/79))
+
+### Minor improvements and bug fixes
+
+- [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md)
+  now renders `Hex` residues as smooth, device-native circles across
+  standalone cartoons and embedded glycan grobs.
+  ([\#76](https://github.com/glycoverse/glydraw/issues/76))
+- Linkage annotations now move beta labels slightly away from horizontal
+  and skewed edge lines while leaving labels beside vertical edges
+  unchanged, including reducing-end annotations.
+  ([\#70](https://github.com/glycoverse/glydraw/issues/70))
+- Linkage-annotation collision handling now ignores the two labels
+  belonging to the same edge, preventing enlarged nodes from
+  unnecessarily reflecting an otherwise collision-free linkage.
+  ([\#75](https://github.com/glycoverse/glydraw/issues/75))
+- `style_glydraw(node_size = ...)` now distributes linkage-annotation
+  spacing adjustments across the node-to-label and label-to-label gaps,
+  keeping linkage notation readable with enlarged nodes.
+  ([\#74](https://github.com/glycoverse/glydraw/issues/74))
+
 ## glydraw 0.7.0
+
+CRAN release: 2026-07-25
 
 This version of glydraw introduced some `ggplot2` extensions.
 
 ### New features
 
-- New
-  [`glydraw_style()`](https://glycoverse.github.io/glydraw/reference/glydraw_style.md)
-  stores reusable glycan rendering options for standalone cartoons,
-  grobs, export, ggplot2 layers, guides, and glycan scales. Explicit
-  rendering arguments override the style.
+- New `glydraw_style()` stores reusable glycan rendering options for
+  standalone cartoons, grobs, export, ggplot2 layers, guides, and glycan
+  scales. Explicit rendering arguments override the style.
   ([\#55](https://github.com/glycoverse/glydraw/issues/55))
 - New
   [`geom_glycan()`](https://glycoverse.github.io/glydraw/reference/geom_glycan.md)

@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glydraw</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,7 +34,8 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/ggplot2-extension.html">glydraw as a ggplot2 extension</a></li>
+<li><a class="dropdown-item" href="../articles/complex-heatmap.html">glydraw with ComplexHeatmap</a></li>
+    <li><a class="dropdown-item" href="../articles/ggplot2-extension.html">glydraw as a ggplot2 extension</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -104,7 +105,7 @@ provide a third aesthetic in addition to <code>x</code> and
 <span>  <span class="co"># ===== Important Here =====</span></span>
 <span>  <span class="fu"><a href="../reference/geom_glycan.html">geom_glycan</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>structure <span class="op">=</span> <span class="va">glycan</span><span class="op">)</span>,  <span class="co"># provide a `structure` aesthetic</span></span>
-<span>    orient <span class="op">=</span> <span class="st">"V"</span>,             <span class="co"># set orientation to vertical</span></span>
+<span>    orient <span class="op">=</span> <span class="st">"up"</span>,             <span class="co"># set orientation to vertical</span></span>
 <span>    size <span class="op">=</span> <span class="fl">0.5</span>,               <span class="co"># default 1 is too large</span></span>
 <span>    vjust <span class="op">=</span> <span class="fl">0</span>,                <span class="co"># aligned to bottom</span></span>
 <span>    position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_nudge.html" class="external-link">position_nudge</a></span><span class="op">(</span>y <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span>
@@ -160,7 +161,7 @@ create a variety of plots.</p>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>structure <span class="op">=</span> <span class="va">glycan</span><span class="op">)</span>,</span>
 <span>    size <span class="op">=</span> <span class="fl">0.7</span>,</span>
 <span>    vjust <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>    orient <span class="op">=</span> <span class="st">"V"</span></span>
+<span>    orient <span class="op">=</span> <span class="st">"up"</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="co"># ==========================</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
@@ -219,7 +220,7 @@ glycan structures.</p>
 <span>    position <span class="op">=</span> <span class="st">"top"</span>,</span>
 <span>    size <span class="op">=</span> <span class="fl">0.2</span>,</span>
 <span>    show_linkage <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>    red_end <span class="op">=</span> <span class="st">"~"</span></span>
+<span>    style <span class="op">=</span> <span class="fu"><a href="../reference/style_glydraw.html">style_glydraw</a></span><span class="op">(</span>red_end <span class="op">=</span> <span class="st">"~"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="co"># ==========================</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>

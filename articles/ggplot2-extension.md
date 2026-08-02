@@ -51,7 +51,7 @@ ggplot(plot_data, aes(glycan, value)) +
   # ===== Important Here =====
   geom_glycan(
     aes(structure = glycan),  # provide a `structure` aesthetic
-    orient = "V",             # set orientation to vertical
+    orient = "up",             # set orientation to vertical
     size = 0.5,               # default 1 is too large
     vjust = 0,                # aligned to bottom
     position = position_nudge(y = 0.1)
@@ -124,7 +124,7 @@ ggplot(plot_data, aes(x, y)) +
     aes(structure = glycan),
     size = 0.7,
     vjust = 0,
-    orient = "V"
+    orient = "up"
   ) +
   # ==========================
   geom_hline(yintercept = 0) +
@@ -195,7 +195,7 @@ ggplot(plot_data, aes(branch, sample)) +
     position = "top",
     size = 0.2,
     show_linkage = FALSE,
-    red_end = "~"
+    style = style_glydraw(red_end = "~")
   ) +
   # ==========================
   coord_equal() +
