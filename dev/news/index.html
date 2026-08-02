@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glydraw</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.7.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.8.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,8 +39,11 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="glydraw-development-version">glydraw (development version)<a class="anchor" aria-label="anchor" href="#glydraw-development-version"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.8.0" id="glydraw-080">glydraw 0.8.0<a class="anchor" aria-label="anchor" href="#glydraw-080"></a></h2><p class="text-muted">CRAN release: 2026-08-02</p>
 <div class="section level3">
-<h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
+<h3 id="breaking-changes-0-8-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-8-0"></a></h3>
 <ul><li>Cartoon appearance is now configured with <code>style = style_glydraw(...)</code> across <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code>, <code><a href="../reference/glycanGrob.html">glycanGrob()</a></code>, <code><a href="../reference/geom_glycan.html">geom_glycan()</a></code>, <code><a href="../reference/guide_glycan.html">guide_glycan()</a></code>, <code><a href="../reference/scale_x_glycan.html">scale_x_glycan()</a></code>, <code><a href="../reference/scale_x_glycan.html">scale_y_glycan()</a></code>, <code><a href="../reference/anno_glycan.html">anno_glycan()</a></code>, and <code><a href="../reference/export_cartoons.html">export_cartoons()</a></code>; calls that pass <code>fuc_orient</code>, <code>edge_linewidth</code>, <code>node_linewidth</code>, <code>node_size</code>, <code>font_family</code>, or <code>colors</code> directly should move those arguments into <code><a href="../reference/style_glydraw.html">style_glydraw()</a></code>. <code>show_linkage</code> and <code>orient</code> remain explicit arguments and are no longer accepted by <code><a href="../reference/style_glydraw.html">style_glydraw()</a></code>, while explicit <code>red_end</code> overrides the reusable style value. (<a href="https://github.com/glycoverse/glydraw/issues/73" class="external-link">#73</a>, <a href="https://github.com/glycoverse/glydraw/issues/79" class="external-link">#79</a>)</li>
 <li>
 <code>colors</code> now accepts a complete SNFG palette in the format returned by <code><a href="../reference/glydraw_colors.html">glydraw_colors()</a></code>; sparse monosaccharide overrides are no longer supported. (<a href="https://github.com/glycoverse/glydraw/issues/72" class="external-link">#72</a>)</li>
@@ -52,7 +55,7 @@
 <code>red_end</code> in <code><a href="../reference/style_glydraw.html">style_glydraw()</a></code>, <code><a href="../reference/style_glydraw.html">style_glygen()</a></code>, <code><a href="../reference/style_glydraw.html">style_snfg()</a></code>, and <code><a href="../reference/style_glydraw.html">style_glycoworkbench()</a></code> must now be a string. Set <code>red_end_length = 0</code> to omit the reducing-end line and ignore any <code>red_end</code> wave or custom text while retaining its axis-aligned core anomer annotation. Explicit <code>red_end = NULL</code> on drawing interfaces continues to inherit <code>red_end</code> from <code>style</code>. (<a href="https://github.com/glycoverse/glydraw/issues/80" class="external-link">#80</a>)</li>
 </ul></div>
 <div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<h3 id="new-features-0-8-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-8-0"></a></h3>
 <ul><li>
 <code><a href="../reference/anno_glycan.html">anno_glycan()</a></code> uses glycan cartoons as row or column labels in ComplexHeatmap heatmaps, with clustering-aware ordering and the sizing, anchoring, rotation, nudging, and styling controls of glycan axis scales. (<a href="https://github.com/glycoverse/glydraw/issues/67" class="external-link">#67</a>)</li>
 <li>
@@ -76,7 +79,7 @@
 <code><a href="../reference/style_glydraw.html">style_glydraw()</a></code> is the reusable interface for tuning cartoon appearance; new <code><a href="../reference/style_glydraw.html">style_glygen()</a></code>, <code><a href="../reference/style_glydraw.html">style_snfg()</a></code>, and <code><a href="../reference/style_glydraw.html">style_glycoworkbench()</a></code> presets support common glycan-drawing conventions. (<a href="https://github.com/glycoverse/glydraw/issues/73" class="external-link">#73</a>, <a href="https://github.com/glycoverse/glydraw/issues/79" class="external-link">#79</a>)</li>
 </ul></div>
 <div class="section level3">
-<h3 id="minor-improvements-and-bug-fixes-development-version">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-development-version"></a></h3>
+<h3 id="minor-improvements-and-bug-fixes-0-8-0">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-0-8-0"></a></h3>
 <ul><li>
 <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> now renders <code>Hex</code> residues as smooth, device-native circles across standalone cartoons and embedded glycan grobs. (<a href="https://github.com/glycoverse/glydraw/issues/76" class="external-link">#76</a>)</li>
 <li>Linkage annotations now move beta labels slightly away from horizontal and skewed edge lines while leaving labels beside vertical edges unchanged, including reducing-end annotations. (<a href="https://github.com/glycoverse/glydraw/issues/70" class="external-link">#70</a>)</li>

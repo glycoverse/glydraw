@@ -2,6 +2,10 @@
 
 ## glydraw (development version)
 
+## glydraw 0.8.0
+
+CRAN release: 2026-08-02
+
 ### Breaking changes
 
 - Cartoon appearance is now configured with `style = style_glydraw(...)`
