@@ -118,18 +118,20 @@ Supply a returned style with <code>style =</code> to reuse its visual specificat
 <dt id="arg-red-end">red_end<a class="anchor" aria-label="anchor" href="#arg-red-end"></a></dt>
 <dd><p>Reducing-end annotation. Use <code>"~"</code> for a wave, any other
 string for custom text, or tag one amino-acid site as
-<code>"ABC&lt;site&gt;D&lt;/site&gt;EFG"</code>. Ignored when <code>red_end_length</code> is <code>0</code>.</p></dd>
+<code>"ABC&lt;site&gt;D&lt;/site&gt;EFG"</code>. Ignored when <code>red_end_length</code> is <code>0</code> or the
+glycan is an alditol.</p></dd>
 
 
 <dt id="arg-red-end-length">red_end_length<a class="anchor" aria-label="anchor" href="#arg-red-end-length"></a></dt>
 <dd><p>Length of the reducing-end line in plot coordinate
 units. Set to <code>0</code> to omit the line and any <code>red_end</code> wave or custom text
-while retaining the axis-aligned core anomer annotation.</p></dd>
+while retaining the axis-aligned core anomer annotation. Ignored for
+alditols.</p></dd>
 
 
 <dt id="arg-red-end-size">red_end_size<a class="anchor" aria-label="anchor" href="#arg-red-end-size"></a></dt>
 <dd><p>Size of custom text passed to <code>red_end</code>. The <code>"~"</code> wave
-is not affected.</p></dd>
+is not affected. Ignored for alditols.</p></dd>
 
 
 <dt id="arg-edge-linewidth">edge_linewidth<a class="anchor" aria-label="anchor" href="#arg-edge-linewidth"></a></dt>

@@ -3,6 +3,11 @@
 ## glydraw (development version)
 
 - [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
+  and all glycan-grob-based interfaces now mark alditols with a small
+  hollow black circle inside the core residue and omit reducing-end
+  lines and text regardless of `red_end` style options.
+  ([\#90](https://github.com/glycoverse/glydraw/issues/90))
+- [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
   and all glycan-grob-based interfaces now place substituent annotations
   opposite adjacent Fuc-like branches, preventing labels from
   overlapping those residues in every drawing orientation.
