@@ -86,6 +86,15 @@ test_that("Draw Fuc triangle orientation controls", {
   )
 })
 
+test_that("Draw unusual and furanose residues", {
+  glycan <- "D-Fuc(a1-2)Fucf(a1-3)D-Fucf(a1-"
+
+  vdiffr::expect_doppelganger(
+    "unusual and furanose residues",
+    draw_cartoon(glycan, show_linkage = FALSE)
+  )
+})
+
 test_that("Draw vertical flexible Fuc triangles", {
   glycan <- "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-4)GlcNAc(b1-"
   vdiffr::expect_doppelganger(

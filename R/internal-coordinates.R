@@ -231,8 +231,9 @@
 #'   are the only three child residues.
 #' @noRd
 .center_bisecting_glcnac <- function(child_pos) {
-  is_man <- child_pos$mono == "Man"
-  is_glcnac <- child_pos$mono == "GlcNAc"
+  base_mono <- .base_residue_monosaccharide(child_pos$mono)
+  is_man <- base_mono == "Man"
+  is_glcnac <- base_mono == "GlcNAc"
   if (sum(is_man) != 2 || sum(is_glcnac) != 1 || length(child_pos) != 3) {
     return(child_pos)
   }
@@ -971,7 +972,7 @@
   fuc_orient = c("flex", "up")
 ) {
   fuc_orient <- rlang::arg_match(fuc_orient)
-  glycoform <- igraph::V(structure)$mono
+  glycoform <- .base_residue_monosaccharide(igraph::V(structure)$mono)
   if (fuc_orient == "up") {
     return(glycoform)
   }
@@ -998,7 +999,9 @@
 #'   shapes, and a `"Left"` suffix for left-pointing shapes.
 #' @noRd
 .fucose_directional_glycoform <- function(structure, coor, fuc_pos) {
-  mono <- igraph::V(structure)[[fuc_pos]]$mono
+  mono <- .base_residue_monosaccharide(
+    igraph::V(structure)[[fuc_pos]]$mono
+  )
   parent_pos <- as.integer(igraph::neighbors(structure, fuc_pos, mode = "in"))
   if (length(parent_pos) == 0) {
     return(mono)

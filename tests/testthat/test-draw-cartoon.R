@@ -11,6 +11,52 @@ test_that("draw_cartoon works with valid branched glycan structure", {
   )
 })
 
+test_that("draw_cartoon labels unusual configurations and furanose rings", {
+  structure <- "D-Fuc(a1-2)Fucf(a1-3)D-Fucf(a1-"
+
+  grob <- glycanGrob(structure, show_linkage = FALSE)
+  center <- dplyr::filter(
+    grob$annotation_data$annotation,
+    .data$annotation_type == "residue_center"
+  )
+  polygon_centers <- grob$polygon_coor |>
+    dplyr::distinct(.data$mono, .data$center_x, .data$center_y)
+
+  expect_equal(center$annot, c("D", "f", "Df"))
+  expect_equal(
+    center$annot_label,
+    c('"D"', 'italic("f")', '"D"*italic("f")')
+  )
+  expect_equal(center$text_size, rep(4.5, 3))
+  expect_equal(center$x, polygon_centers$center_x)
+  expect_equal(center$y, polygon_centers$center_y)
+  expect_equal(
+    grob$annotation_data$show_without_linkage$annot,
+    c("D", "f", "Df")
+  )
+})
+
+test_that("all concrete residue forms map to SNFG glyphs", {
+  monos <- glyrepr::available_monosaccharides("concrete")
+  base_monos <- .base_residue_monosaccharide(monos)
+  structure <- igraph::make_empty_graph(length(monos), directed = TRUE)
+  igraph::V(structure)$mono <- monos
+  coor <- cbind(x = seq_along(monos), y = 0)
+  residues <- .cartoon_residue_data(
+    structure,
+    coor,
+    fuc_orient = "up"
+  )
+  polygons <- .residue_polygon_data(residues, .default_node_point_size)
+
+  expect_setequal(setdiff(base_monos, names(glycan_dict)), character())
+  expect_setequal(unique(polygons$mono), monos)
+  expect_equal(
+    .residue_center_label(c("Fuc", "D-Fuc", "Fucf", "D-Fucf")),
+    c("", "D", "f", "Df")
+  )
+})
+
 test_that("draw_cartoon uses ggplot2 fixed panel sizing", {
   structure <- "Gal(b1-3)GalNAc(a1-"
 

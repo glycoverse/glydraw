@@ -220,7 +220,9 @@
   orient <- rlang::arg_match(orient)
   base_offset <- 0.4
   diagonal_hexnac_offset <- 0.45
-  mono <- igraph::V(structure)[[anchor_ver]]$mono
+  mono <- .base_residue_monosaccharide(
+    igraph::V(structure)[[anchor_ver]]$mono
+  )
   glycoform <- glycan_dict[[mono]][[1]]
   needs_extra_offset <- .needs_diagonal_hexnac_offset(
     anchor_x,
@@ -1058,6 +1060,39 @@
   annotation
 }
 
+#' Build center labels for unusual configurations and furanose rings
+#'
+#' @param structure An igraph glycan graph whose vertices include `mono`.
+#' @param coor A numeric coordinate matrix with columns `x` and `y`, one row
+#'   per graph vertex.
+#' @param node_size Numeric node-size multiplier used to scale center text with
+#'   its residue glyph.
+#'
+#' @returns A data frame with one centered annotation row for every residue
+#'   needing an explicit configuration or furanose label.
+#' @noRd
+.residue_center_annotation_data <- function(
+  structure,
+  coor,
+  node_size = 1
+) {
+  label <- .residue_center_label(igraph::V(structure)$mono)
+  label_pos <- which(!is.na(label) & nzchar(label))
+  data.frame(
+    vertice = as.character(label_pos),
+    annot = label[label_pos],
+    x = as.numeric(coor[label_pos, "x"]),
+    y = as.numeric(coor[label_pos, "y"]),
+    hjust = rep(0.5, length(label_pos)),
+    vjust = rep(0.5, length(label_pos)),
+    text_size = rep(
+      .residue_center_text_size * node_size,
+      length(label_pos)
+    ),
+    stringsAsFactors = FALSE
+  )
+}
+
 #' Build substituent annotation rows
 #'
 #' @param structure An igraph glycan graph whose vertices may include `sub`.
@@ -1205,6 +1240,28 @@
 #' @noRd
 .quote_plotmath_text <- function(annot) {
   encodeString(annot, quote = '"')
+}
+
+#' Format residue-center labels as plotmath
+#'
+#' @param label A character vector returned by `.residue_center_label()`.
+#'
+#' @returns Plotmath strings with configuration letters upright and furanose
+#'   markers italicized.
+#' @noRd
+.residue_center_plotmath_label <- function(label) {
+  has_furanose_marker <- endsWith(label, "f")
+  configuration <- sub("f$", "", label)
+  italic_f <- 'italic("f")'
+  ifelse(
+    has_furanose_marker & nzchar(configuration),
+    paste0(.quote_plotmath_text(configuration), "*", italic_f),
+    ifelse(
+      has_furanose_marker,
+      italic_f,
+      .quote_plotmath_text(configuration)
+    )
+  )
 }
 
 # Recover plain text previously stored for plotmath parsing.
