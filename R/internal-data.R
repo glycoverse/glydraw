@@ -129,7 +129,7 @@ glycan_dict <- list(
 
   'Pen' = c('Pen', 'glyWhite'),
   'Ara' = c('Pen', 'glyGreen'),
-  'Lyx' = c('Pne', 'glyYellow'),
+  'Lyx' = c('Pen', 'glyYellow'),
   'Xyl' = c('Pen', 'glyOrange'),
   'Rib' = c('Pen', 'glyPink'),
 
@@ -265,6 +265,43 @@ glycan_shape <- list(
   )
 )
 
+.furanose_marker_pattern <- "f(?=(?:NAc|NGc|N|A|5Ac|5Gc)?$)"
+.residue_center_text_size <- 4.5
+
+#' Get the natural, ringless form used to select an SNFG glyph
+#'
+#' @param mono A character vector of concrete or generic monosaccharide names.
+#'
+#' @returns A character vector with explicit unusual-configuration prefixes and
+#'   furanose markers removed.
+#' @noRd
+.base_residue_monosaccharide <- function(mono) {
+  unconfigured <- sub("^[DL]-", "", mono)
+  sub(
+    .furanose_marker_pattern,
+    "",
+    unconfigured,
+    perl = TRUE
+  )
+}
+
+#' Get the text drawn inside residues with explicit stereochemistry
+#'
+#' @param mono A character vector of concrete or generic monosaccharide names.
+#'
+#' @returns A character vector containing `"D"` or `"L"` for unusual
+#'   configurations, `"f"` for furanoses, both for their combination, and an
+#'   empty string for ordinary residues.
+#' @noRd
+.residue_center_label <- function(mono) {
+  has_configuration <- grepl("^[DL]-", mono)
+  configuration <- ifelse(has_configuration, substr(mono, 1, 1), "")
+  unconfigured <- sub("^[DL]-", "", mono)
+  ringless <- .base_residue_monosaccharide(mono)
+  ring <- ifelse(unconfigured != ringless, "f", "")
+  paste0(configuration, ring)
+}
+
 .fucose_like_layout_monosaccharides <- c(
   "dHex",
   "Fuc",
@@ -313,7 +350,8 @@ glycan_shape <- list(
 #'   linkage-specific Fuc-like branch offsets.
 #' @noRd
 .is_fucose_like_layout_monosaccharide <- function(mono) {
-  mono %in% .fucose_like_layout_monosaccharides
+  .base_residue_monosaccharide(mono) %in%
+    .fucose_like_layout_monosaccharides
 }
 
 #' Identify residues that use Fuc-like directional shapes
@@ -324,7 +362,8 @@ glycan_shape <- list(
 #'   directional glycoform names when `fuc_orient = "flex"`.
 #' @noRd
 .is_fucose_like_orient_monosaccharide <- function(mono) {
-  mono %in% .fucose_like_orient_monosaccharides
+  .base_residue_monosaccharide(mono) %in%
+    .fucose_like_orient_monosaccharides
 }
 
 #' Get internal directional Fuc-like glycoform names

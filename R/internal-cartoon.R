@@ -488,6 +488,8 @@ GeomGlydrawResidue <- ggplot2::ggproto(
 #'   size.
 #' @param show_linkage Logical scalar indicating whether linkage annotations
 #'   will be drawn.
+#' @param fuc_orient Orientation strategy for Fuc-like triangles, either
+#'   `"flex"` or `"up"`.
 #'
 #' @returns A list with `annotation`, the complete text annotation data frame;
 #'   `show_without_linkage`, substituent and custom reducing-end text rows that
@@ -506,14 +508,27 @@ GeomGlydrawResidue <- ggplot2::ggproto(
   red_end_length = 0.6,
   red_end_size = 6,
   font_family = "",
-  floating = NULL
+  floating = NULL,
+  fuc_orient = c("flex", "up")
 ) {
   orient <- rlang::arg_match(orient)
+  fuc_orient <- rlang::arg_match(fuc_orient)
   visible_vertices <- if (is.null(floating)) {
     seq_len(length(structure))
   } else {
     floating$visible_vertices
   }
+  residue_center_annotation <- .residue_center_annotation_data(
+    structure,
+    coor,
+    node_size = node_size,
+    fuc_orient = fuc_orient
+  ) |>
+    dplyr::filter(.data$vertice %in% as.character(visible_vertices)) |>
+    dplyr::mutate(
+      annotation_type = "residue_center",
+      show_without_linkage = TRUE
+    )
   substituent_annotation <- .substituent_annotation_data(
     structure,
     coor,
@@ -550,7 +565,8 @@ GeomGlydrawResidue <- ggplot2::ggproto(
       annotation_type = "reducing_end",
       show_without_linkage = .data$is_red_end_text
     )
-  visible_without_linkage <- nrow(substituent_annotation) > 0 ||
+  visible_without_linkage <- nrow(residue_center_annotation) > 0 ||
+    nrow(substituent_annotation) > 0 ||
     nrow(floating_count_annotation) > 0 ||
     any(reducing_annotation$show_without_linkage)
   if (show_linkage || visible_without_linkage) {
@@ -587,6 +603,7 @@ GeomGlydrawResidue <- ggplot2::ggproto(
   struc_annotation <- dplyr::bind_rows(
     linkage_annotation,
     floating_linkage_annotation,
+    residue_center_annotation,
     substituent_annotation,
     floating_count_annotation,
     reducing_annotation
@@ -648,6 +665,12 @@ GeomGlydrawResidue <- ggplot2::ggproto(
   if (!"angle" %in% names(annotation)) {
     annotation$angle <- 0
   }
+  if (!"annotation_type" %in% names(annotation)) {
+    annotation$annotation_type <- NA_character_
+  }
+  if (!"text_size" %in% names(annotation)) {
+    annotation$text_size <- NA_real_
+  }
   annotation |>
     dplyr::mutate(
       is_red_end_text = dplyr::if_else(
@@ -663,13 +686,15 @@ GeomGlydrawResidue <- ggplot2::ggproto(
       hjust = dplyr::if_else(is.na(.data$hjust), 0.5, .data$hjust),
       vjust = dplyr::if_else(is.na(.data$vjust), 0.5, .data$vjust),
       angle = dplyr::if_else(is.na(.data$angle), 0, .data$angle),
-      text_size = dplyr::if_else(
-        .data$is_red_end_text,
-        red_end_size,
-        6
+      text_size = dplyr::case_when(
+        !is.na(.data$text_size) ~ .data$text_size,
+        .data$is_red_end_text ~ red_end_size,
+        TRUE ~ 6
       ),
       annot_label = dplyr::case_when(
         .data$is_aa_sequence ~ .data$annot,
+        .data$annotation_type == "residue_center" ~
+          .residue_center_plotmath_label(.data$annot),
         .data$annot == "?" ~ '~"?"',
         .data$annot == "??" ~ '~"?"',
         grepl("^\\?\\d+", .data$annot) ~ '~"?"',
@@ -897,7 +922,8 @@ GeomGlydrawResidue <- ggplot2::ggproto(
 #' @param plot A ggplot object.
 #' @param annotation_data A list returned by `.cartoon_text_annotation_data()`.
 #' @param show_linkage A logical scalar. `TRUE` draws all text; `FALSE` draws
-#'   only substituent and custom reducing-end text when present.
+#'   only residue-center, substituent, and custom reducing-end text when
+#'   present.
 #' @param font_family Font family used for text annotations.
 #'
 #' @returns A ggplot object with zero or one added text layer.

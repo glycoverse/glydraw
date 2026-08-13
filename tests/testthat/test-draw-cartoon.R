@@ -11,6 +11,90 @@ test_that("draw_cartoon works with valid branched glycan structure", {
   )
 })
 
+test_that("draw_cartoon labels unusual configurations and furanose rings", {
+  structure <- "D-Fuc(a1-2)Fucf(a1-3)D-Fucf(a1-"
+
+  grob <- glycanGrob(structure, show_linkage = FALSE)
+  center <- dplyr::filter(
+    grob$annotation_data$annotation,
+    .data$annotation_type == "residue_center"
+  )
+  inputs <- .prepare_cartoon_inputs(structure, NULL, "left", "")
+  glycoform <- .residue_glycoforms(
+    inputs$structure,
+    inputs$coor,
+    "flex"
+  )
+  offset <- .residue_center_glyph_offset(glycoform)
+
+  expect_equal(center$annot, c("D", "f", "Df"))
+  expect_equal(
+    center$annot_label,
+    c('"D"', 'italic("f")', '"D"*italic("f")')
+  )
+  expect_equal(center$text_size, rep(4.5, 3))
+  expect_equal(center$x, inputs$coor[, "x"] + offset[, "x"])
+  expect_equal(center$y, inputs$coor[, "y"] + offset[, "y"])
+  expect_equal(
+    grob$annotation_data$show_without_linkage$annot,
+    c("D", "f", "Df")
+  )
+
+  up_grob <- glycanGrob(
+    structure,
+    show_linkage = FALSE,
+    style = style_glydraw(fuc_orient = "up")
+  )
+  up_center <- dplyr::filter(
+    up_grob$annotation_data$annotation,
+    .data$annotation_type == "residue_center"
+  )
+  expect_equal(up_center$x, inputs$coor[, "x"])
+  expect_equal(
+    up_center$y,
+    inputs$coor[, "y"] - .default_node_point_size / 3
+  )
+})
+
+test_that("Fuc-like triangle labels follow shape centroids", {
+  glyphs <- c("Fuc", "FucUp", "FucRight", "FucLeft", "FucNAc")
+  radius <- .default_node_point_size
+  expected <- rbind(
+    c(x = 0, y = -radius / 3),
+    c(x = 0, y = radius / 3),
+    c(x = -radius / 3, y = 0),
+    c(x = radius / 3, y = 0),
+    c(x = 0, y = 0)
+  )
+
+  expect_equal(.residue_center_glyph_offset(glyphs), expected)
+  expect_equal(
+    .residue_center_glyph_offset(glyphs, node_size = 1.5),
+    expected * 1.5
+  )
+})
+
+test_that("all concrete residue forms map to SNFG glyphs", {
+  monos <- glyrepr::available_monosaccharides("concrete")
+  base_monos <- .base_residue_monosaccharide(monos)
+  structure <- igraph::make_empty_graph(length(monos), directed = TRUE)
+  igraph::V(structure)$mono <- monos
+  coor <- cbind(x = seq_along(monos), y = 0)
+  residues <- .cartoon_residue_data(
+    structure,
+    coor,
+    fuc_orient = "up"
+  )
+  polygons <- .residue_polygon_data(residues, .default_node_point_size)
+
+  expect_setequal(setdiff(base_monos, names(glycan_dict)), character())
+  expect_setequal(unique(polygons$mono), monos)
+  expect_equal(
+    .residue_center_label(c("Fuc", "D-Fuc", "Fucf", "D-Fucf")),
+    c("", "D", "f", "Df")
+  )
+})
+
 test_that("draw_cartoon uses ggplot2 fixed panel sizing", {
   structure <- "Gal(b1-3)GalNAc(a1-"
 
