@@ -279,6 +279,10 @@ test_that("Draw substituent annotations", {
     "unknown substituent linkage annotation",
     draw_cartoon(unknown_linkage)
   )
+  vdiffr::expect_doppelganger(
+    "substituent annotation avoids Fuc-like branch",
+    draw_cartoon("Fuc(a1-6)GlcNAc3Me(b1-")
+  )
 })
 
 test_that("Draw reducing-end O-Fuc glycans", {

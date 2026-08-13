@@ -1161,8 +1161,10 @@
 #'
 #' @returns A data frame with columns `vertice`, `annot`, `x`, `y`, `hjust`,
 #'   and `vjust`. Unknown linkage prefixes such as `?` are removed from
-#'   `annot`. Returns an empty data frame with the same columns when no
-#'   substituents are present.
+#'   `annot`. Labels move to the opposite side of their residue when an
+#'   adjacent Fuc-like residue occupies the default annotation direction.
+#'   Returns an empty data frame with the same columns when no substituents are
+#'   present.
 #' @noRd
 .substituent_annotation_data <- function(
   structure,
@@ -1196,30 +1198,48 @@
   }
 
   offset_distance <- .scaled_annotation_offset(0.28, node_size)
-  offset <- .rotate_cartoon_vector(
+  default_offset <- .rotate_cartoon_vector(
     c(x = 0, y = offset_distance),
     orient
   )
-  hjust <- if (offset[["x"]] > 0) {
-    0
-  } else if (offset[["x"]] < 0) {
-    1
-  } else {
-    0.5
-  }
-  vjust <- if (offset[["y"]] > 0) {
-    0
-  } else if (offset[["y"]] < 0) {
-    1
-  } else {
-    0.5
-  }
+  offsets <- t(vapply(
+    sub_pos,
+    function(pos) {
+      neighbors <- as.integer(igraph::neighbors(structure, pos, mode = "all"))
+      fuc_like <- neighbors[
+        .is_fucose_like_layout_monosaccharide(
+          igraph::V(structure)[neighbors]$mono
+        )
+      ]
+      if (length(fuc_like) == 0) {
+        return(default_offset)
+      }
+
+      branch_vectors <- sweep(
+        coor[fuc_like, , drop = FALSE],
+        2,
+        coor[pos, ],
+        "-"
+      )
+      branch_projection <- as.vector(branch_vectors %*% default_offset)
+      occupies_default_side <- branch_projection > 0
+      if (any(occupies_default_side)) -default_offset else default_offset
+    },
+    numeric(2)
+  ))
+  colnames(offsets) <- c("x", "y")
+  hjust <- unname(
+    ifelse(offsets[, "x"] > 0, 0, ifelse(offsets[, "x"] < 0, 1, 0.5))
+  )
+  vjust <- unname(
+    ifelse(offsets[, "y"] > 0, 0, ifelse(offsets[, "y"] < 0, 1, 0.5))
+  )
 
   data.frame(
     vertice = as.character(sub_pos),
     annot = sub("^\\?+", "", sub[sub_pos]),
-    x = as.numeric(coor[sub_pos, "x"] + offset["x"]),
-    y = as.numeric(coor[sub_pos, "y"] + offset["y"]),
+    x = as.numeric(coor[sub_pos, "x"] + offsets[, "x"]),
+    y = as.numeric(coor[sub_pos, "y"] + offsets[, "y"]),
     hjust = hjust,
     vjust = vjust,
     stringsAsFactors = FALSE
@@ -1230,8 +1250,8 @@
 #'
 #' @param annotation A substituent annotation data frame returned by
 #'   `.substituent_annotation_data()`.
-#' @param orient Drawing orientation, one of `"left"`, `"right"`, `"up"`, or
-#'   `"down"`.
+#' @param orient Drawing orientation. Retained for internal call compatibility;
+#'   actual bound directions are derived from each annotation's justification.
 #'
 #' @returns A data frame with numeric columns `x` and `y`. Horizontal labels
 #'   return top bound points; vertical labels return right-side bound points.
@@ -1245,12 +1265,21 @@
     return(data.frame(x = numeric(0), y = numeric(0)))
   }
 
-  direction <- .rotate_cartoon_vector(c(x = 0, y = 1), orient)
+  direction_x <- ifelse(
+    annotation$hjust == 0,
+    1,
+    ifelse(annotation$hjust == 1, -1, 0)
+  )
+  direction_y <- ifelse(
+    annotation$vjust == 0,
+    1,
+    ifelse(annotation$vjust == 1, -1, 0)
+  )
   data.frame(
     x = annotation$x +
-      direction[["x"]] * .substituent_label_width(annotation$annot),
+      direction_x * .substituent_label_width(annotation$annot),
     y = annotation$y +
-      direction[["y"]] * .substituent_label_height(annotation$annot)
+      direction_y * .substituent_label_height(annotation$annot)
   )
 }
 
