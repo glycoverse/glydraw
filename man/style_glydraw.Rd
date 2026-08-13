@@ -62,14 +62,16 @@ style_glycoworkbench(
 
 \item{red_end}{Reducing-end annotation. Use \code{"~"} for a wave, any other
 string for custom text, or tag one amino-acid site as
-\code{"ABC<site>D</site>EFG"}. Ignored when \code{red_end_length} is \code{0}.}
+\code{"ABC<site>D</site>EFG"}. Ignored when \code{red_end_length} is \code{0} or the
+glycan is an alditol.}
 
 \item{red_end_length}{Length of the reducing-end line in plot coordinate
 units. Set to \code{0} to omit the line and any \code{red_end} wave or custom text
-while retaining the axis-aligned core anomer annotation.}
+while retaining the axis-aligned core anomer annotation. Ignored for
+alditols.}
 
 \item{red_end_size}{Size of custom text passed to \code{red_end}. The \code{"~"} wave
-is not affected.}
+is not affected. Ignored for alditols.}
 
 \item{edge_linewidth}{Linewidth of glycosidic linkages.}
 

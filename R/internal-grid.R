@@ -238,6 +238,7 @@
       alpha = grob$polygon_coor$alpha,
       name = "glycan.node"
     ),
+    .cartoon_grid_alditol_marker(grob, layout, scale),
     .cartoon_grid_text(grob, layout, scale),
     .cartoon_grid_wave(grob, layout, scale)
   )
@@ -248,6 +249,48 @@
     primitives <- .composite_cartoon_alpha(primitives, alpha)
   }
   primitives
+}
+
+#' Draw the hollow black core marker used for alditols
+#'
+#' @param grob A prepared `glycanGrob`.
+#' @param layout Grid layout metadata from `.cartoon_grid_layout()`.
+#' @param scale Positive whole-cartoon size multiplier.
+#'
+#' @returns A circle grob, or a null grob when the glycan is not an alditol.
+#' @noRd
+.cartoon_grid_alditol_marker <- function(grob, layout, scale) {
+  marker <- grob$alditol_marker
+  if (is.null(marker) || nrow(marker) == 0) {
+    return(grid::nullGrob())
+  }
+
+  grid::circleGrob(
+    x = grid::unit(
+      .normalize_cartoon_grid_coordinates(
+        marker$center_x,
+        layout$panel_ranges$x
+      ),
+      "native"
+    ),
+    y = grid::unit(
+      .normalize_cartoon_grid_coordinates(
+        marker$center_y,
+        layout$panel_ranges$y
+      ),
+      "native"
+    ),
+    r = grid::unit(
+      .cartoon_circle_radius_inches(marker$radius, scale),
+      "in"
+    ),
+    gp = grid::gpar(
+      col = scales::alpha("black", marker$alpha),
+      fill = NA,
+      lwd = grob$node_linewidth * ggplot2::.pt * scale
+    ),
+    name = "glycan.alditol"
+  )
 }
 
 #' Resolve and validate whole-cartoon transparency

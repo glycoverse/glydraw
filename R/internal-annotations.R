@@ -1617,7 +1617,7 @@
 #' @param red_end A string. `""` draws only the current reducing-end line,
 #'   `"~"` draws a wavy end, a string with one `<site>` tag draws an amino-acid
 #'   sequence, and any other string draws custom text. Ignored when
-#'   `red_end_length` is `0`.
+#'   `red_end_length` is `0`. Alditols ignore all reducing-end arguments.
 #' @param red_end_length Length of the reducing-end line in plot coordinate
 #'   units. At `0`, the line and all `red_end` decorations are omitted while
 #'   the core anomer annotation remains.
@@ -1641,6 +1641,9 @@
 ) {
   orient <- rlang::arg_match(orient)
   checkmate::assert_string(red_end, na.ok = FALSE)
+  if (.is_alditol_structure(structure)) {
+    return(.empty_reducing_end_annotation_data())
+  }
   anomer <- igraph::graph_attr(structure, "anomer")
   if (.has_no_reducing_end_anomer(anomer)) {
     return(.empty_reducing_end_annotation_data())

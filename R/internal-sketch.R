@@ -44,7 +44,7 @@
 .sketch_cartoon_base_layers <- function(grob, sketch) {
   node_layers <- .sketch_cartoon_node_layers(grob, sketch)
 
-  ggplot2::ggplot() +
+  plot <- ggplot2::ggplot() +
     ggsketch::geom_sketch_segment(
       data = grob$connect_df,
       ggplot2::aes(
@@ -76,6 +76,17 @@
     ggplot2::coord_fixed(ratio = 1, clip = "off") +
     ggplot2::theme_void() +
     ggplot2::theme(legend.position = "none")
+  if (nrow(grob$alditol_marker) > 0) {
+    plot <- plot +
+      .geom_glydraw_residue(
+        data = grob$alditol_marker,
+        alpha = grob$alditol_marker$alpha,
+        fill = NA,
+        colour = "black",
+        linewidth = grob$node_linewidth
+      )
+  }
+  plot
 }
 
 #' Build one independently seeded sketch layer per residue

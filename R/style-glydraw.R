@@ -9,12 +9,14 @@
 #' @param fuc_orient Fuc-like triangle orientation: `"flex"` or `"up"`.
 #' @param red_end Reducing-end annotation. Use `"~"` for a wave, any other
 #'   string for custom text, or tag one amino-acid site as
-#'   `"ABC<site>D</site>EFG"`. Ignored when `red_end_length` is `0`.
+#'   `"ABC<site>D</site>EFG"`. Ignored when `red_end_length` is `0` or the
+#'   glycan is an alditol.
 #' @param red_end_length Length of the reducing-end line in plot coordinate
 #'   units. Set to `0` to omit the line and any `red_end` wave or custom text
-#'   while retaining the axis-aligned core anomer annotation.
+#'   while retaining the axis-aligned core anomer annotation. Ignored for
+#'   alditols.
 #' @param red_end_size Size of custom text passed to `red_end`. The `"~"` wave
-#'   is not affected.
+#'   is not affected. Ignored for alditols.
 #' @param edge_linewidth Linewidth of glycosidic linkages.
 #' @param node_linewidth Linewidth of node borders.
 #' @param node_size Multiplier for the default node size.
