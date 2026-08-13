@@ -18,12 +18,14 @@
   }
 
   parts <- purrr::map(seq_len(nrow(floating_parts)), function(i) {
-    list(
+    part <- list(
       part_id = floating_parts$part_id[[i]],
       root = floating_parts$root_node[[i]],
       nodes = floating_parts$nodes[[i]],
       linkage = floating_parts$linkage[[i]]
     )
+    part$topology <- .floating_part_topology(structure, part)
+    part
   })
   floating_nodes <- unlist(purrr::map(parts, "nodes"), use.names = FALSE)
   main_nodes <- setdiff(seq_len(igraph::vcount(structure)), floating_nodes)
@@ -37,12 +39,13 @@
 
   signatures <- purrr::map_chr(
     parts,
-    \(.part) .floating_part_signature(structure, .part)
+    \(.part) .part$topology$signature
   )
   signature_levels <- unique(signatures)
   groups <- purrr::map(signature_levels, function(signature) {
     members <- parts[signatures == signature]
     representative <- members[[1]]
+    representative_nodes <- representative$topology$nodes
     representative_coor <- .component_residue_coordinates(
       structure,
       representative$nodes
@@ -52,6 +55,15 @@
       count = length(members),
       members = members,
       representative = representative,
+      member_node_maps = purrr::map(
+        members,
+        \(.member) {
+          stats::setNames(
+            representative_nodes,
+            .member$topology$nodes
+          )
+        }
+      ),
       local_coor = representative_coor
     )
   })
@@ -98,7 +110,6 @@
       group$coor <- representative_coor
       group$root <- representative$root
       group$linkage <- representative$linkage
-      group$member_nodes <- purrr::map(group$members, "nodes")
       group$member_layouts <- member_layouts
       group$count_x <- min(representative_coor[, "x"]) -
         .floating_count_gap
@@ -161,32 +172,48 @@
   component_coor[match(nodes, component_nodes), , drop = FALSE]
 }
 
-.floating_part_signature <- function(structure, part) {
-  paste(
-    part$linkage,
-    .floating_subtree_signature(structure, part$root),
-    sep = "|"
+.floating_part_topology <- function(structure, part) {
+  subtree <- .floating_subtree_topology(structure, part$root)
+  list(
+    signature = paste(part$linkage, subtree$signature, sep = "|"),
+    nodes = subtree$nodes
   )
 }
 
-.floating_subtree_signature <- function(structure, vertex) {
+.floating_subtree_topology <- function(structure, vertex) {
   children <- as.integer(igraph::neighbors(structure, vertex, mode = "out"))
-  child_signatures <- purrr::map_chr(children, function(child) {
+  child_topologies <- purrr::map(children, function(child) {
     edge <- igraph::get_edge_ids(structure, c(vertex, child), directed = TRUE)
-    paste(
-      igraph::E(structure)[edge]$linkage,
-      .floating_subtree_signature(structure, child),
-      sep = ":"
+    subtree <- .floating_subtree_topology(structure, child)
+    list(
+      signature = paste(
+        igraph::E(structure)[edge]$linkage,
+        subtree$signature,
+        sep = ":"
+      ),
+      nodes = subtree$nodes,
+      root = child
     )
   })
-  child_signatures <- sort(child_signatures)
-  paste0(
-    igraph::V(structure)[vertex]$mono,
-    "{",
-    igraph::V(structure)[vertex]$sub,
-    "}[",
-    paste(child_signatures, collapse = ","),
-    "]"
+  child_order <- order(
+    purrr::map_chr(child_topologies, "signature"),
+    purrr::map_int(child_topologies, "root")
+  )
+  child_topologies <- child_topologies[child_order]
+
+  list(
+    signature = paste0(
+      igraph::V(structure)[vertex]$mono,
+      "{",
+      igraph::V(structure)[vertex]$sub,
+      "}[",
+      paste(purrr::map_chr(child_topologies, "signature"), collapse = ","),
+      "]"
+    ),
+    nodes = c(
+      as.integer(vertex),
+      unlist(purrr::map(child_topologies, "nodes"), use.names = FALSE)
+    )
   )
 }
 
@@ -284,11 +311,19 @@
 
   representative_highlights <- unlist(
     purrr::map(floating$groups, function(group) {
-      highlighted_positions <- unique(unlist(purrr::map(
-        group$member_nodes,
-        \(.nodes) which(.nodes %in% highlight)
-      )))
-      group$representative$nodes[highlighted_positions]
+      unlist(
+        purrr::map(
+          group$member_node_maps,
+          function(node_map) {
+            highlighted_nodes <- intersect(
+              names(node_map),
+              as.character(highlight)
+            )
+            unname(node_map[highlighted_nodes])
+          }
+        ),
+        use.names = FALSE
+      )
     }),
     use.names = FALSE
   )

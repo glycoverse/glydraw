@@ -1026,6 +1026,40 @@ test_that("identical floating cartoons are merged with a count", {
   expect_equal(nrow(virtual), 1)
 })
 
+test_that("merged floating highlights follow topology across node order", {
+  structure <- igraph::make_empty_graph(7, directed = TRUE)
+  structure <- igraph::add_edges(
+    structure,
+    c(2, 3, 2, 4, 5, 6, 5, 7)
+  )
+  igraph::V(structure)$name <- as.character(seq_len(7))
+  igraph::V(structure)$mono <- c(
+    "GlcNAc",
+    "Man",
+    "Gal",
+    "GlcNAc",
+    "Man",
+    "GlcNAc",
+    "Gal"
+  )
+  igraph::V(structure)$sub <- rep("", 7)
+  igraph::E(structure)$linkage <- rep("?1-?", 4)
+  floating_parts <- tibble::tibble(
+    part_id = 1:2,
+    root_node = c(2L, 5L),
+    nodes = list(2:4, 5:7),
+    linkage = rep("?1-?", 2)
+  )
+
+  floating <- .layout_cartoon_coordinates(
+    structure,
+    floating_parts
+  )$floating
+  highlight <- .merge_floating_highlights(6L, floating)
+
+  expect_setequal(highlight, c(4L, 6L))
+})
+
 test_that("draw_cartoon left-aligns vertical substituent labels", {
   structure <- "Neu5Ac9Ac(a2-3)Gal6S(b1-"
 
