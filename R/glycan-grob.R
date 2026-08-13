@@ -80,7 +80,8 @@ glycanGrob <- function(
     red_end_length = style$red_end_length,
     red_end_size = style$red_end_size,
     font_family = style$font_family,
-    floating = floating
+    floating = floating,
+    fuc_orient = style$fuc_orient
   )
   connect_df <- .cartoon_segment_data(
     structure,

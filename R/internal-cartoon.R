@@ -488,6 +488,8 @@ GeomGlydrawResidue <- ggplot2::ggproto(
 #'   size.
 #' @param show_linkage Logical scalar indicating whether linkage annotations
 #'   will be drawn.
+#' @param fuc_orient Orientation strategy for Fuc-like triangles, either
+#'   `"flex"` or `"up"`.
 #'
 #' @returns A list with `annotation`, the complete text annotation data frame;
 #'   `show_without_linkage`, substituent and custom reducing-end text rows that
@@ -506,9 +508,11 @@ GeomGlydrawResidue <- ggplot2::ggproto(
   red_end_length = 0.6,
   red_end_size = 6,
   font_family = "",
-  floating = NULL
+  floating = NULL,
+  fuc_orient = c("flex", "up")
 ) {
   orient <- rlang::arg_match(orient)
+  fuc_orient <- rlang::arg_match(fuc_orient)
   visible_vertices <- if (is.null(floating)) {
     seq_len(length(structure))
   } else {
@@ -517,7 +521,8 @@ GeomGlydrawResidue <- ggplot2::ggproto(
   residue_center_annotation <- .residue_center_annotation_data(
     structure,
     coor,
-    node_size = node_size
+    node_size = node_size,
+    fuc_orient = fuc_orient
   ) |>
     dplyr::filter(.data$vertice %in% as.character(visible_vertices)) |>
     dplyr::mutate(

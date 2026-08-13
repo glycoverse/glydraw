@@ -19,8 +19,13 @@ test_that("draw_cartoon labels unusual configurations and furanose rings", {
     grob$annotation_data$annotation,
     .data$annotation_type == "residue_center"
   )
-  polygon_centers <- grob$polygon_coor |>
-    dplyr::distinct(.data$mono, .data$center_x, .data$center_y)
+  inputs <- .prepare_cartoon_inputs(structure, NULL, "left", "")
+  glycoform <- .residue_glycoforms(
+    inputs$structure,
+    inputs$coor,
+    "flex"
+  )
+  offset <- .residue_center_glyph_offset(glycoform)
 
   expect_equal(center$annot, c("D", "f", "Df"))
   expect_equal(
@@ -28,11 +33,44 @@ test_that("draw_cartoon labels unusual configurations and furanose rings", {
     c('"D"', 'italic("f")', '"D"*italic("f")')
   )
   expect_equal(center$text_size, rep(4.5, 3))
-  expect_equal(center$x, polygon_centers$center_x)
-  expect_equal(center$y, polygon_centers$center_y)
+  expect_equal(center$x, inputs$coor[, "x"] + offset[, "x"])
+  expect_equal(center$y, inputs$coor[, "y"] + offset[, "y"])
   expect_equal(
     grob$annotation_data$show_without_linkage$annot,
     c("D", "f", "Df")
+  )
+
+  up_grob <- glycanGrob(
+    structure,
+    show_linkage = FALSE,
+    style = style_glydraw(fuc_orient = "up")
+  )
+  up_center <- dplyr::filter(
+    up_grob$annotation_data$annotation,
+    .data$annotation_type == "residue_center"
+  )
+  expect_equal(up_center$x, inputs$coor[, "x"])
+  expect_equal(
+    up_center$y,
+    inputs$coor[, "y"] - .default_node_point_size / 3
+  )
+})
+
+test_that("Fuc-like triangle labels follow shape centroids", {
+  glyphs <- c("Fuc", "FucUp", "FucRight", "FucLeft", "FucNAc")
+  radius <- .default_node_point_size
+  expected <- rbind(
+    c(x = 0, y = -radius / 3),
+    c(x = 0, y = radius / 3),
+    c(x = -radius / 3, y = 0),
+    c(x = radius / 3, y = 0),
+    c(x = 0, y = 0)
+  )
+
+  expect_equal(.residue_center_glyph_offset(glyphs), expected)
+  expect_equal(
+    .residue_center_glyph_offset(glyphs, node_size = 1.5),
+    expected * 1.5
   )
 })
 
