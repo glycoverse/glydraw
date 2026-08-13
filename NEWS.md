@@ -1,6 +1,6 @@
 # glydraw (development version)
 
-* `draw_cartoon()` and all glycan-grob-based interfaces now place substituent annotations opposite adjacent Fuc-like branches, preventing labels from overlapping those residues in every drawing orientation.
+* `draw_cartoon()` and all glycan-grob-based interfaces now place substituent annotations opposite adjacent Fuc-like branches, preventing labels from overlapping those residues in every drawing orientation. (#89)
 * `draw_cartoon()` and all glycan-grob-based interfaces now render unusual absolute configurations and furanose residues supported by glyrepr and glyparse, with centered labels such as `D`, `f`, and `Df` inside their natural SNFG glyphs. (#88)
 
 # glydraw 0.8.0
