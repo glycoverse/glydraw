@@ -21,6 +21,23 @@ test_that("draw_cartoon_sketch shows linkage annotations by default", {
   expect_length(hidden_text, 0)
 })
 
+test_that("draw_cartoon_sketch draws the alditol core marker", {
+  wurcs <- paste0(
+    "WURCS=2.0/3,4,3/",
+    "[h2122h_2*NCC/3=O][a1122h-1b_1-5][a1122h-1a_1-5]/",
+    "1-2-3-3/a4-b1_b3-c1_b6-d1"
+  )
+  plot <- draw_cartoon_sketch(wurcs, seed = 1)
+  marker_layers <- Filter(
+    \(layer) inherits(layer$geom, "GeomGlydrawResidue"),
+    plot$layers
+  )
+
+  expect_length(marker_layers, 1)
+  expect_equal(marker_layers[[1]]$aes_params$fill, NA)
+  expect_equal(marker_layers[[1]]$aes_params$colour, "black")
+})
+
 test_that("draw_cartoon_sketch uses one handwriting font for text labels", {
   plot <- draw_cartoon_sketch(
     "Gal(b1-3)GalNAc(a1-",

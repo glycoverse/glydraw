@@ -77,6 +77,51 @@ test_that("Hex residues use native circle grobs", {
   )
 })
 
+test_that("alditols use a hollow black marker without reducing-end annotations", {
+  wurcs <- paste0(
+    "WURCS=2.0/3,4,3/",
+    "[h2122h_2*NCC/3=O][a1122h-1b_1-5][a1122h-1a_1-5]/",
+    "1-2-3-3/a4-b1_b3-c1_b6-d1"
+  )
+  grob <- glycanGrob(
+    wurcs,
+    red_end = "Reducing end",
+    style = style_glydraw(
+      red_end = "~",
+      red_end_length = 1.5,
+      red_end_size = 12
+    )
+  )
+
+  expect_equal(nrow(grob$alditol_marker), 1)
+  expect_equal(grob$alditol_marker$center_x, 0)
+  expect_equal(grob$alditol_marker$center_y, 0)
+  expect_equal(
+    grob$alditol_marker$radius,
+    .default_node_point_size * .alditol_marker_radius_multiplier
+  )
+  expect_equal(
+    vapply(grob$annotation_data$reducing_info, nrow, integer(1)),
+    c(annotation = 0L, segment = 0L, wave = 0L, bounds = 0L)
+  )
+  expect_disjoint(grob$connect_df$segment_type, "reducing_end")
+
+  content <- grid::makeContent(grob)
+  primitives <- content$children[[1]]$children[[2]]$children
+  marker <- primitives[["glycan.alditol"]]
+  expect_s3_class(marker, "circle")
+  expect_equal(marker$gp$fill, NA)
+  expect_equal(marker$gp$col, scales::alpha("black", 1))
+  expect_equal(marker$gp$lwd, style_glydraw()$node_linewidth * ggplot2::.pt)
+})
+
+test_that("non-alditols retain reducing-end annotations without a marker", {
+  grob <- glycanGrob("Gal(b1-3)GalNAc(a1-")
+
+  expect_equal(nrow(grob$alditol_marker), 0)
+  expect_equal(nrow(grob$annotation_data$reducing_info$segment), 1)
+})
+
 test_that("glycanGrob converts to the existing cartoon plot contract", {
   colors <- glydraw_colors()
   colors["glyYellow"] <- "#123456"

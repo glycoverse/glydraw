@@ -8,6 +8,7 @@
 .cartoon_panel_expansion <- 0.05
 .node_size_linkage_threshold <- 1.4
 .node_size_upper_boundary <- 2
+.alditol_marker_radius_multiplier <- 0.18
 
 #' Validate node-size input
 #'
@@ -470,6 +471,69 @@ GeomGlydrawResidue <- ggplot2::ggproto(
   gly_list[visible_vertices, , drop = FALSE]
 }
 
+#' Check whether a glycan graph represents an alditol
+#'
+#' @param structure An igraph glycan graph.
+#'
+#' @returns A logical scalar.
+#' @noRd
+.is_alditol_structure <- function(structure) {
+  isTRUE(igraph::graph_attr(structure, "alditol"))
+}
+
+#' Build the hollow black core marker used for alditols
+#'
+#' @param structure An igraph glycan graph.
+#' @param coor A numeric coordinate matrix with columns `x` and `y`.
+#' @param gly_list A data frame returned by `.cartoon_residue_data()`.
+#' @param node_size Numeric node-size multiplier.
+#'
+#' @returns A zero- or one-row data frame compatible with the residue-circle
+#'   drawing layer.
+#' @noRd
+.alditol_marker_data <- function(structure, coor, gly_list, node_size = 1) {
+  marker <- data.frame(
+    point_x = numeric(),
+    point_y = numeric(),
+    center_x = numeric(),
+    center_y = numeric(),
+    radius = numeric(),
+    primitive = character(),
+    group = character(),
+    alpha = numeric(),
+    stringsAsFactors = FALSE
+  )
+  if (!.is_alditol_structure(structure)) {
+    return(marker)
+  }
+
+  root <- length(structure)
+  core_row <- match(root, as.integer(rownames(gly_list)))
+  if (is.na(core_row)) {
+    return(marker)
+  }
+  offset <- .residue_center_glyph_offset(
+    gly_list$glycoform[[core_row]],
+    node_size
+  )
+  center_x <- coor[root, "x"] + offset[1, "x"]
+  center_y <- coor[root, "y"] + offset[1, "y"]
+
+  data.frame(
+    point_x = center_x,
+    point_y = center_y,
+    center_x = center_x,
+    center_y = center_y,
+    radius = .default_node_point_size *
+      node_size *
+      .alditol_marker_radius_multiplier,
+    primitive = "circle",
+    group = "glycan.alditol",
+    alpha = gly_list$transparency[[core_row]],
+    stringsAsFactors = FALSE
+  )
+}
+
 #' Build all text annotation data for a cartoon
 #'
 #' @param structure An igraph glycan graph.
@@ -832,6 +896,7 @@ GeomGlydrawResidue <- ggplot2::ggproto(
 .assemble_cartoon_plot <- function(
   connect_df,
   polygon_coor,
+  alditol_marker,
   filled_color,
   annotation_data,
   show_linkage,
@@ -844,6 +909,7 @@ GeomGlydrawResidue <- ggplot2::ggproto(
   gly_graph <- .cartoon_base_layers(
     connect_df,
     polygon_coor,
+    alditol_marker,
     filled_color,
     edge_linewidth,
     node_linewidth
@@ -883,11 +949,12 @@ GeomGlydrawResidue <- ggplot2::ggproto(
 .cartoon_base_layers <- function(
   connect_df,
   polygon_coor,
+  alditol_marker,
   filled_color,
   edge_linewidth,
   node_linewidth
 ) {
-  ggplot2::ggplot() +
+  plot <- ggplot2::ggplot() +
     ggplot2::geom_segment(
       data = connect_df,
       ggplot2::aes(
@@ -915,6 +982,17 @@ GeomGlydrawResidue <- ggplot2::ggproto(
     ggplot2::coord_fixed(ratio = 1, clip = "off") +
     ggplot2::theme_void() +
     ggplot2::theme(legend.position = "none")
+  if (nrow(alditol_marker) > 0) {
+    plot <- plot +
+      .geom_glydraw_residue(
+        data = alditol_marker,
+        alpha = alditol_marker$alpha,
+        fill = NA,
+        colour = "black",
+        linewidth = node_linewidth
+      )
+  }
+  plot
 }
 
 #' Add the appropriate text layers to a cartoon

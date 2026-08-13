@@ -19,6 +19,16 @@ test_that("Draw G97345NY", {
   vdiffr::expect_doppelganger("G97345NY", draw_cartoon(glycan))
 })
 
+test_that("Draw an alditol", {
+  wurcs <- paste0(
+    "WURCS=2.0/3,4,3/",
+    "[h2122h_2*NCC/3=O][a1122h-1b_1-5][a1122h-1a_1-5]/",
+    "1-2-3-3/a4-b1_b3-c1_b6-d1"
+  )
+
+  vdiffr::expect_doppelganger("alditol", draw_cartoon(wurcs))
+})
+
 test_that("Draw G77550KK", {
   glycan <- "Neu5Ac(a2-3)Gal(b1-3)[Fuc(a1-2)Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-3)[Gal(b1-4)[Fuc(a1-3)]GlcNAc(b1-6)]Gal(b1-4)GlcNAc(b1-6)]GalNAc(a1-"
   vdiffr::expect_doppelganger("G77550KK", draw_cartoon(glycan))

@@ -68,6 +68,12 @@ glycanGrob <- function(
     gly_list,
     .default_node_point_size * style$node_size
   )
+  alditol_marker <- .alditol_marker_data(
+    structure,
+    coor,
+    gly_list,
+    style$node_size
+  )
   filled_color <- .resolve_residue_fill_colors(polygon_coor, style$colors)
   annotation_data <- .cartoon_text_annotation_data(
     structure,
@@ -94,6 +100,7 @@ glycanGrob <- function(
   grid::gTree(
     connect_df = connect_df,
     polygon_coor = polygon_coor,
+    alditol_marker = alditol_marker,
     reducing_end_coor = c(
       x = unname(coor[nrow(coor), "x"]),
       y = unname(coor[nrow(coor), "y"])
@@ -128,6 +135,7 @@ glycanGrob <- function(
   .assemble_cartoon_plot(
     grob$connect_df,
     grob$polygon_coor,
+    grob$alditol_marker,
     grob$filled_color,
     grob$annotation_data,
     grob$show_linkage,
