@@ -61,6 +61,12 @@ CRAN release: 2026-08-02
   heatmaps, with clustering-aware ordering and the sizing, anchoring,
   rotation, nudging, and styling controls of glycan axis scales.
   ([\#67](https://github.com/glycoverse/glydraw/issues/67))
+- [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
+  now draws normalized floating glycan parts from glyrepr and glyparse,
+  using one SNFG bracket for either explicit or implicit attachment
+  candidates. Repeated identical floating cartoons are merged with a
+  count such as `3x`.
+  ([\#87](https://github.com/glycoverse/glydraw/issues/87))
 - [`draw_cartoon_sketch()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon_sketch.md)
   draws hand-sketched glycan cartoons with reproducible rough strokes,
   patterned residue fills, optional drawing media, and the same layout,
@@ -243,9 +249,8 @@ CRAN release: 2026-07-14
 ### Breaking changes
 
 - [`export_cartoons()`](https://glycoverse.github.io/glydraw/dev/reference/export_cartoons.md)
-  no longer supports
-  [`glyexp::experiment()`](https://glycoverse.github.io/glyexp/reference/experiment.html)
-  input, and `glyexp` is no longer a package dependency.
+  no longer supports `glyexp::experiment()` input, and `glyexp` is no
+  longer a package dependency.
   ([\#33](https://github.com/glycoverse/glydraw/issues/33))
 - Specifying optional arguments in a positional manner is no longer
   supported. Please use `arg = value` instead.
@@ -420,10 +425,8 @@ CRAN release: 2026-07-14
 ### Minor improvements and bug fixes
 
 - Now we use `ggview` instead of `ggimage` for size fixing, which relies
-  on
-  [`rstudioapi::viewer()`](https://rstudio.github.io/rstudioapi/reference/viewer.html)
-  to display the plot. You might feel some difference in the display
-  effect, but the SNFG itself keeps the same.
+  on `rstudioapi::viewer()` to display the plot. You might feel some
+  difference in the display effect, but the SNFG itself keeps the same.
 
 ## glydraw 0.2.0
 
