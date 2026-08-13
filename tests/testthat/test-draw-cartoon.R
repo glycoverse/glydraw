@@ -1191,6 +1191,36 @@ test_that("draw_cartoon aligns substituent labels in new directions", {
   expect_lt(down_x_range[[1]], down_substituent$x - 0.5)
 })
 
+test_that("substituent annotations avoid adjacent Fuc-like branches", {
+  structures <- c(
+    "Fuc(a1-6)GlcNAc3Me(b1-",
+    "Fuc(a1-3)GlcNAc3Me(b1-",
+    "Qui(a1-6)GlcNAc3Me(b1-"
+  )
+
+  purrr::walk(structures, function(structure) {
+    purrr::walk(c("left", "right", "up", "down"), function(orient) {
+      inputs <- .prepare_cartoon_inputs(structure, NULL, orient, "")
+      mono <- igraph::V(inputs$structure)$mono
+      fuc_like <- which(.is_fucose_like_layout_monosaccharide(mono))
+      substituted <- which(igraph::V(inputs$structure)$sub != "")
+      annotation <- .substituent_annotation_data(
+        inputs$structure,
+        inputs$coor,
+        orient
+      )
+      label_offset <- c(
+        x = annotation$x - inputs$coor[substituted, "x"],
+        y = annotation$y - inputs$coor[substituted, "y"]
+      )
+      branch_offset <- inputs$coor[fuc_like, ] -
+        inputs$coor[substituted, ]
+
+      expect_lt(sum(label_offset * branch_offset), 0)
+    })
+  })
+})
+
 test_that("draw_cartoon works with linkage hidden", {
   structure <- "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-"
 
