@@ -304,13 +304,18 @@ GeomGlydrawResidue <- ggplot2::ggproto(
   }
 
   structure <- .as_single_glycan_structure(structure)
+  floating_parts <- glyrepr::structure_floating_parts(structure)
   structure <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
   highlight <- .validate_highlight_indices(highlight, length(structure))
   orient <- rlang::arg_match(orient)
+  layout <- .layout_cartoon_coordinates(structure, floating_parts)
+  layout <- .orient_cartoon_layout(layout, orient)
+  highlight <- .merge_floating_highlights(highlight, layout$floating)
 
   list(
     structure = structure,
-    coor = .oriented_cartoon_coordinates(structure, orient),
+    coor = layout$coor,
+    floating = layout$floating,
     highlight = highlight,
     orient = orient
   )
@@ -437,7 +442,8 @@ GeomGlydrawResidue <- ggplot2::ggproto(
   structure,
   coor,
   highlight = NULL,
-  fuc_orient = c("flex", "up")
+  fuc_orient = c("flex", "up"),
+  visible_vertices = seq_len(length(structure))
 ) {
   fuc_orient <- rlang::arg_match(fuc_orient)
   gly_list <- data.frame(
@@ -461,7 +467,7 @@ GeomGlydrawResidue <- ggplot2::ggproto(
     "glycoform",
     "transparency"
   )
-  gly_list
+  gly_list[visible_vertices, , drop = FALSE]
 }
 
 #' Build all text annotation data for a cartoon
@@ -499,21 +505,37 @@ GeomGlydrawResidue <- ggplot2::ggproto(
   show_linkage = TRUE,
   red_end_length = 0.6,
   red_end_size = 6,
-  font_family = ""
+  font_family = "",
+  floating = NULL
 ) {
   orient <- rlang::arg_match(orient)
+  visible_vertices <- if (is.null(floating)) {
+    seq_len(length(structure))
+  } else {
+    floating$visible_vertices
+  }
   substituent_annotation <- .substituent_annotation_data(
     structure,
     coor,
     orient,
     node_size = node_size
-  )
+  ) |>
+    dplyr::filter(.data$vertice %in% as.character(visible_vertices)) |>
+    dplyr::mutate(
+      annotation_type = "substituent",
+      show_without_linkage = TRUE
+    )
+  floating_count_annotation <- .floating_count_annotation_data(
+    floating
+  ) |>
+    dplyr::mutate(
+      annotation_type = "floating_count",
+      show_without_linkage = TRUE
+    )
   substituent_bounds <- .substituent_annotation_bounds(
     substituent_annotation,
     orient
   )
-  substituent_annotation <- substituent_annotation |>
-    dplyr::mutate(show_without_linkage = TRUE)
   reducing_info <- .reducing_end_annotation_data(
     structure,
     coor,
@@ -524,27 +546,49 @@ GeomGlydrawResidue <- ggplot2::ggproto(
     font_family
   )
   reducing_annotation <- reducing_info$annotation |>
-    dplyr::mutate(show_without_linkage = .data$is_red_end_text)
+    dplyr::mutate(
+      annotation_type = "reducing_end",
+      show_without_linkage = .data$is_red_end_text
+    )
   visible_without_linkage <- nrow(substituent_annotation) > 0 ||
+    nrow(floating_count_annotation) > 0 ||
     any(reducing_annotation$show_without_linkage)
   if (show_linkage || visible_without_linkage) {
     linkage_annotation <- .linkage_annotation_data(
       structure,
       coor,
       node_size = node_size,
-      orient = orient
+      orient = orient,
+      visible_vertices = visible_vertices
     ) |>
-      dplyr::mutate(show_without_linkage = FALSE)
+      dplyr::mutate(
+        annotation_type = "linkage",
+        show_without_linkage = FALSE
+      )
+    floating_linkage_annotation <- .floating_linkage_annotation_data(
+      structure,
+      coor,
+      orient,
+      floating,
+      node_size
+    ) |>
+      dplyr::mutate(
+        annotation_type = "floating_linkage",
+        show_without_linkage = FALSE
+      )
   } else {
     linkage_annotation <- .empty_linkage_annotation_data() |>
-      dplyr::mutate(show_without_linkage = logical())
+      dplyr::mutate(
+        annotation_type = character(),
+        show_without_linkage = logical()
+      )
+    floating_linkage_annotation <- linkage_annotation
   }
   struc_annotation <- dplyr::bind_rows(
     linkage_annotation,
-    substituent_annotation
-  )
-  struc_annotation <- dplyr::bind_rows(
-    struc_annotation,
+    floating_linkage_annotation,
+    substituent_annotation,
+    floating_count_annotation,
     reducing_annotation
   )
   struc_annotation <- .separate_overlapping_annotations(struc_annotation)
@@ -673,17 +717,71 @@ GeomGlydrawResidue <- ggplot2::ggproto(
   structure,
   coor,
   reducing_segment,
-  gly_list
+  gly_list,
+  floating = NULL
 ) {
+  visible_vertices <- if (is.null(floating)) {
+    seq_len(length(structure))
+  } else {
+    floating$visible_vertices
+  }
+  edges <- igraph::as_edgelist(structure, names = FALSE)
+  visible_edges <- if (nrow(edges) == 0) {
+    logical()
+  } else {
+    edges[, 1] %in% visible_vertices & edges[, 2] %in% visible_vertices
+  }
+  edges <- edges[visible_edges, , drop = FALSE]
   gly_connect <- .connection_segment_data(structure, coor)
+  gly_connect <- purrr::map(gly_connect, \(.coordinate) {
+    .coordinate[visible_edges]
+  })
   connect_df <- data.frame(
     start_x = gly_connect$start_x,
     start_y = gly_connect$start_y,
     end_x = gly_connect$end_x,
-    end_y = gly_connect$end_y
+    end_y = gly_connect$end_y,
+    transparency = if (nrow(edges) == 0) {
+      numeric()
+    } else {
+      gly_list$transparency[
+        match(edges[, 2], as.integer(rownames(gly_list)))
+      ]
+    },
+    segment_type = rep("glycosidic", length(gly_connect$start_x))
   )
-  connect_df <- dplyr::bind_rows(connect_df, reducing_segment)
-  connect_df$transparency <- gly_list$transparency[seq_len(nrow(connect_df))]
+  reducing_transparency <- gly_list$transparency[
+    match(length(structure), as.integer(rownames(gly_list)))
+  ]
+  reducing_segment$transparency <- rep(
+    reducing_transparency,
+    nrow(reducing_segment)
+  )
+  reducing_segment$segment_type <- rep(
+    "reducing_end",
+    nrow(reducing_segment)
+  )
+  connect_df <- dplyr::bind_rows(
+    connect_df,
+    reducing_segment
+  )
+  if (!is.null(floating)) {
+    virtual_segments <- floating$virtual_segments
+    virtual_segments$transparency <- gly_list$transparency[
+      match(
+        virtual_segments$root,
+        as.integer(rownames(gly_list))
+      )
+    ]
+    virtual_segments$root <- NULL
+    bracket_segments <- floating$bracket_segments
+    bracket_segments$transparency <- 1
+    connect_df <- dplyr::bind_rows(
+      connect_df,
+      virtual_segments,
+      bracket_segments
+    )
+  }
   connect_df
 }
 

@@ -305,6 +305,27 @@ test_that("Draw nested Xyl-Gal-Fuc side chain", {
   )
 })
 
+test_that("Draw floating WURCS parts", {
+  glycans <- floating_wurcs_examples()
+
+  vdiffr::expect_doppelganger(
+    "multiple floating parts",
+    draw_cartoon(glycans[["multiple_parts"]])
+  )
+  vdiffr::expect_doppelganger(
+    "implicit floating part",
+    draw_cartoon(glycans[["implicit_part"]])
+  )
+  vdiffr::expect_doppelganger(
+    "explicit floating part",
+    draw_cartoon(glycans[["explicit_part"]])
+  )
+  vdiffr::expect_doppelganger(
+    "repeated floating part",
+    draw_cartoon(glycans[["repeated_part"]])
+  )
+})
+
 test_that("Exported cartoons preserve Fuc orientation", {
   glycan <- "Fuc(a1-3)[Fuc(a1-6)]GlcNAc(b1-4)GlcNAc(b1-"
   temp_dir <- tempfile()

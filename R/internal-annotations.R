@@ -296,74 +296,36 @@
   structure,
   coor,
   node_size = 1,
-  orient = c("left", "right", "up", "down")
+  orient = c("left", "right", "up", "down"),
+  visible_vertices = seq_len(length(structure))
 ) {
   if (igraph::ecount(structure) == 0) {
     return(.empty_linkage_annotation_data())
   }
   orient <- rlang::arg_match(orient)
 
-  child_vertices <- seq_len(length(structure) - 1)
-  parent_vertices <- .parent_vertices_for_annotations(structure)
-  linkage_labels <- strsplit(
-    igraph::E(structure)$linkage[child_vertices],
-    "-",
-    fixed = TRUE
-  )
-  row_count <- 2L * length(child_vertices)
-  annotation <- data.frame(
-    vertice = rep(as.character(child_vertices), each = 2L),
-    annot = character(row_count),
-    x = numeric(row_count),
-    y = numeric(row_count),
-    segment_start_x = numeric(row_count),
-    segment_start_y = numeric(row_count),
-    segment_end_x = numeric(row_count),
-    segment_end_y = numeric(row_count),
-    stringsAsFactors = FALSE
-  )
-
-  for (ver in child_vertices) {
-    par_ver <- parent_vertices[[ver]]
-    offsets <- .linkage_label_offsets(
-      structure,
-      coor,
-      child_ver = ver,
-      parent_ver = par_ver,
-      orient = orient
-    )
-    label_positions <- .linkage_label_positions(
-      coor[ver, "x"],
-      coor[ver, "y"],
-      coor[par_ver, "x"],
-      coor[par_ver, "y"],
-      chil_offset = offsets[["child"]],
-      par_offset = offsets[["parent"]],
-      chil_perpendicular_nudge = .beta_perpendicular_nudge_for_linkage(
-        linkage_labels[[ver]][[1]],
-        coor[ver, "x"],
-        coor[par_ver, "x"]
-      ),
-      node_size = node_size
-    )
-    rows <- 2L * ver - c(1L, 0L)
-    annotation$annot[rows] <- linkage_labels[[ver]][1:2]
-    annotation$x[rows] <- c(
-      label_positions$chil[[1]] + coor[ver, "x"],
-      label_positions$par[[1]] + coor[par_ver, "x"]
-    )
-    annotation$y[rows] <- c(
-      label_positions$chil[[2]] + coor[ver, "y"],
-      label_positions$par[[2]] + coor[par_ver, "y"]
-    )
-    annotation$segment_start_x[rows] <- coor[ver, "x"]
-    annotation$segment_start_y[rows] <- coor[ver, "y"]
-    annotation$segment_end_x[rows] <- coor[par_ver, "x"]
-    annotation$segment_end_y[rows] <- coor[par_ver, "y"]
+  edges <- igraph::as_edgelist(structure, names = FALSE)
+  visible_edges <- edges[, 1] %in%
+    visible_vertices &
+    edges[, 2] %in% visible_vertices
+  child_vertices <- edges[visible_edges, 2]
+  child_vertices <- sort(as.integer(child_vertices))
+  if (length(child_vertices) == 0) {
+    return(.empty_linkage_annotation_data())
   }
 
-  annotation$annot <- .normalize_linkage_labels(annotation$annot)
-  annotation
+  purrr::map_dfr(
+    child_vertices,
+    \(.vertex) {
+      .linkage_annotation_rows(
+        structure,
+        coor,
+        .vertex,
+        node_size,
+        orient
+      )
+    }
+  )
 }
 
 #' Build an empty linkage annotation table
@@ -409,8 +371,20 @@
   orient = c("left", "right", "up", "down")
 ) {
   orient <- rlang::arg_match(orient)
-  par_ver <- .parent_vertex_for_annotation(structure, ver)
-  labels <- strsplit(igraph::E(structure)[ver]$linkage, '-')[[1]]
+  parent_edge <- as.integer(igraph::incident(structure, ver, mode = "in"))
+  if (length(parent_edge) != 1) {
+    cli::cli_abort(
+      "A linkage annotation child must have exactly one parent edge."
+    )
+  }
+  endpoints <- igraph::ends(structure, parent_edge, names = FALSE)
+  par_ver <- as.integer(endpoints[[1, 1]])
+  labels <- strsplit(
+    igraph::E(structure)[parent_edge]$linkage,
+    "-",
+    fixed = TRUE
+  )[[1]]
+  labels <- .normalize_linkage_labels(labels)
   offsets <- .linkage_label_offsets(
     structure,
     coor,
@@ -449,6 +423,90 @@
       segment_end = coor[par_ver, ]
     )
   )
+}
+
+.floating_linkage_annotation_data <- function(
+  structure,
+  coor,
+  orient = c("left", "right", "up", "down"),
+  floating = NULL,
+  node_size = 1
+) {
+  if (is.null(floating)) {
+    return(.empty_linkage_annotation_data())
+  }
+  orient <- rlang::arg_match(orient)
+
+  purrr::map_dfr(floating$groups, function(group) {
+    segment <- group$segment[1, ]
+    labels <- strsplit(group$linkage, "-", fixed = TRUE)[[1]]
+    labels <- .normalize_linkage_labels(labels)
+    offsets <- c(
+      child = .linkage_label_offset(
+        structure,
+        group$root,
+        segment$start_x,
+        segment$start_y,
+        segment$end_x,
+        segment$end_y,
+        role = "child",
+        orient = orient
+      ),
+      parent = 0.4
+    )
+    label_positions <- .linkage_label_positions(
+      segment$start_x,
+      segment$start_y,
+      segment$end_x,
+      segment$end_y,
+      chil_offset = offsets[["child"]],
+      par_offset = offsets[["parent"]],
+      node_size = node_size
+    )
+
+    dplyr::bind_rows(
+      .linkage_annotation_row(
+        ver = group$root,
+        annot = labels[[1]],
+        annot_coor = as.vector(label_positions$chil) +
+          c(x = segment$start_x, y = segment$start_y),
+        segment_start = c(x = segment$start_x, y = segment$start_y),
+        segment_end = c(x = segment$end_x, y = segment$end_y)
+      ),
+      .linkage_annotation_row(
+        ver = group$root,
+        annot = labels[[2]],
+        annot_coor = as.vector(label_positions$par) +
+          c(x = segment$end_x, y = segment$end_y),
+        segment_start = c(x = segment$start_x, y = segment$start_y),
+        segment_end = c(x = segment$end_x, y = segment$end_y)
+      )
+    )
+  })
+}
+
+.floating_count_annotation_data <- function(floating = NULL) {
+  if (is.null(floating)) {
+    return(.empty_linkage_annotation_data())
+  }
+  repeated <- Filter(\(.group) .group$count > 1, floating$groups)
+  if (length(repeated) == 0) {
+    return(.empty_linkage_annotation_data())
+  }
+
+  purrr::map_dfr(repeated, function(group) {
+    data.frame(
+      vertice = as.character(group$root),
+      annot = paste0(group$count, "x"),
+      x = group$count_x,
+      y = group$count_y,
+      segment_start_x = NA_real_,
+      segment_start_y = NA_real_,
+      segment_end_x = NA_real_,
+      segment_end_y = NA_real_,
+      stringsAsFactors = FALSE
+    )
+  })
 }
 
 #' Find the parent vertex used for linkage annotations

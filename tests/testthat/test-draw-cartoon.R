@@ -957,6 +957,109 @@ test_that("bisecting GlcNAc is centered without linkage information", {
   )
 })
 
+test_that("draw_cartoon lays out normalized floating WURCS parts", {
+  cartoons <- purrr::map(floating_wurcs_examples(), draw_cartoon)
+
+  purrr::walk(cartoons, expect_s3_class, "glydraw_cartoon")
+  purrr::walk(cartoons, function(cartoon) {
+    built <- ggplot2::ggplot_build(cartoon)
+    finite_coordinates <- purrr::map_lgl(
+      built$data,
+      function(layer) {
+        coordinates <- unlist(
+          layer[intersect(names(layer), c("x", "y", "xend", "yend"))]
+        )
+        all(is.finite(coordinates))
+      }
+    )
+    expect_equal(finite_coordinates, rep(TRUE, length(finite_coordinates)))
+  })
+})
+
+test_that("floating brackets span the whole main glycan", {
+  inputs <- .prepare_cartoon_inputs(
+    floating_wurcs_examples()[["multiple_parts"]],
+    NULL,
+    "left",
+    ""
+  )
+  main_y <- inputs$coor[inputs$floating$main_nodes, "y"]
+  vertical_bracket <- dplyr::filter(
+    inputs$floating$bracket_segments,
+    .data$start_x == .data$end_x
+  )
+
+  expect_equal(
+    c(vertical_bracket$start_y, vertical_bracket$end_y),
+    range(main_y) + c(-0.25, 0.25)
+  )
+})
+
+test_that("SNFG drawing ignores floating candidate scope", {
+  structures <- glyrepr::as_glycan_structure(c(
+    implicit = "{Fuc(?1-?)}Gal(?1-?)GlcNAc(?1-",
+    explicit = "{Fuc(?1-?)|1,2}Gal(?1-?)GlcNAc(?1-"
+  ))
+  implicit <- glycanGrob(structures[[1]])
+  explicit <- glycanGrob(structures[[2]])
+
+  expect_equal(implicit$connect_df, explicit$connect_df)
+  expect_equal(implicit$polygon_coor, explicit$polygon_coor)
+  expect_equal(
+    implicit$annotation_data$annotation,
+    explicit$annotation_data$annotation
+  )
+})
+
+test_that("identical floating cartoons are merged with a count", {
+  grob <- glycanGrob(floating_wurcs_examples()[["repeated_part"]])
+  count <- dplyr::filter(
+    grob$annotation_data$annotation,
+    .data$annotation_type == "floating_count"
+  )
+  virtual <- dplyr::filter(
+    grob$connect_df,
+    .data$segment_type == "floating_attachment"
+  )
+
+  expect_equal(count$annot, "3x")
+  expect_equal(nrow(virtual), 1)
+})
+
+test_that("merged floating highlights follow topology across node order", {
+  structure <- igraph::make_empty_graph(7, directed = TRUE)
+  structure <- igraph::add_edges(
+    structure,
+    c(2, 3, 2, 4, 5, 6, 5, 7)
+  )
+  igraph::V(structure)$name <- as.character(seq_len(7))
+  igraph::V(structure)$mono <- c(
+    "GlcNAc",
+    "Man",
+    "Gal",
+    "GlcNAc",
+    "Man",
+    "GlcNAc",
+    "Gal"
+  )
+  igraph::V(structure)$sub <- rep("", 7)
+  igraph::E(structure)$linkage <- rep("?1-?", 4)
+  floating_parts <- tibble::tibble(
+    part_id = 1:2,
+    root_node = c(2L, 5L),
+    nodes = list(2:4, 5:7),
+    linkage = rep("?1-?", 2)
+  )
+
+  floating <- .layout_cartoon_coordinates(
+    structure,
+    floating_parts
+  )$floating
+  highlight <- .merge_floating_highlights(6L, floating)
+
+  expect_setequal(highlight, c(4L, 6L))
+})
+
 test_that("draw_cartoon left-aligns vertical substituent labels", {
   structure <- "Neu5Ac9Ac(a2-3)Gal6S(b1-"
 
