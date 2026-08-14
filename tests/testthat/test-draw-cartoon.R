@@ -1082,7 +1082,7 @@ test_that("floating brackets span the whole main glycan", {
 test_that("SNFG drawing ignores floating candidate scope", {
   structures <- glyrepr::as_glycan_structure(c(
     implicit = "{Fuc(?1-?)}Gal(?1-?)GlcNAc(?1-",
-    explicit = "{Fuc(?1-?)|1,2}Gal(?1-?)GlcNAc(?1-"
+    explicit = "{Fuc(?1-?)|2,3}Gal(?1-?)GlcNAc(?1-"
   ))
   implicit <- glycanGrob(structures[[1]])
   explicit <- glycanGrob(structures[[2]])
@@ -1093,6 +1093,20 @@ test_that("SNFG drawing ignores floating candidate scope", {
     implicit$annotation_data$annotation,
     explicit$annotation_data$annotation
   )
+})
+
+test_that("draw_cartoon accepts cross-component floating candidates", {
+  structure <- glyrepr::as_glycan_structure(
+    "{Fuc(a1-2)|2,3}{Man(a1-3)|1,3}Glc(a1-"
+  )
+  grob <- glycanGrob(structure)
+  virtual <- dplyr::filter(
+    grob$connect_df,
+    .data$segment_type == "floating_attachment"
+  )
+
+  expect_s3_class(draw_cartoon(structure), "glydraw_cartoon")
+  expect_equal(nrow(virtual), 2L)
 })
 
 test_that("identical floating cartoons are merged with a count", {
