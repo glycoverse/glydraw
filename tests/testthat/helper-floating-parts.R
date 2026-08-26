@@ -1,42 +1,30 @@
-floating_wurcs_examples <- function() {
+floating_iupac_examples <- function() {
   c(
     multiple_parts = paste0(
-      "WURCS=2.0/6,15,14/",
-      "[a2122h-1b_1-5_2*NCC/3=O][a1122h-1b_1-5]",
-      "[a1122h-1a_1-5][a1221m-1a_1-5][a2112h-1b_1-5]",
-      "[Aad21122h-2a_2-6_5*NCC/3=O]/",
-      "1-1-2-3-3-4-1-4-5-6-1-4-5-1-5/",
-      "a4-b1_a6-f1_b4-c1_c3-d1_c6-e1_g3-h1_g4-i1_k3-l1_",
-      "k4-m1_n4-o1_i?-j2_g1-a?|b?|c?|d?|e?|f?}_",
-      "k1-a?|b?|c?|d?|e?|f?}_n1-a?|b?|c?|d?|e?|f?}"
+      "{Fuc(a1-3)[Gal(b1-4)]GlcNAc(b1-?)|10,11,12,13,14,15}",
+      "{Gal(b1-4)GlcNAc(b1-?)|10,11,12,13,14,15}",
+      "{Neu5Ac(a2-?)Gal(b1-4)[Fuc(a1-3)]GlcNAc(b1-?)|",
+      "10,11,12,13,14,15}",
+      "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)",
+      "[Fuc(a1-6)]GlcNAc(b1-"
     ),
     implicit_part = paste0(
-      "WURCS=2.0/6,11,10/",
-      "[a2122h-1x_1-5_2*NCC/3=O][a2122h-1b_1-5_2*NCC/3=O]",
-      "[a1122h-1b_1-5][a1122h-1a_1-5][a2112h-1b_1-5]",
-      "[Aad21122h-2a_2-6_5*NCC/3=O]/",
-      "1-2-3-4-2-5-2-4-2-5-6/",
-      "a4-b1_b4-c1_c3-d1_c4-g1_c6-h1_d2-e1_e4-f1_h2-i1_",
-      "i4-j1_k2-a6|b6|c6|d6|e6|f6|g6|h6|i6|j6}"
+      "{Neu5Ac(a2-6)}Gal(b1-4)GlcNAc(b1-2)Man(a1-3)",
+      "[GlcNAc(b1-4)][Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]",
+      "Man(b1-4)GlcNAc(b1-4)GlcNAc(?1-"
     ),
     explicit_part = paste0(
-      "WURCS=2.0/6,11,10/",
-      "[a2122h-1x_1-5_2*NCC/3=O][a2122h-1b_1-5_2*NCC/3=O]",
-      "[a1122h-1b_1-5][a1122h-1a_1-5][a2112h-1b_1-5]",
-      "[a1221m-1a_1-5]/",
-      "1-2-3-4-2-5-4-2-6-2-5/",
-      "a4-b1_a6-i1_b4-c1_c3-d1_c6-g1_d2-e1_e4-f1_g2-h1_",
-      "j4-k1_j1-d4|d6|g4|g6}"
+      "{Gal(b1-4)GlcNAc(b1-4/6)|5,7}Gal(b1-4)GlcNAc(b1-2)",
+      "Man(a1-3)[GlcNAc(b1-2)Man(a1-6)]Man(b1-4)",
+      "GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc(?1-"
     ),
     repeated_part = paste0(
-      "WURCS=2.0/4,14,13/",
-      "[a2122h-1x_1-5_2*NCC/3=O][a1122h-1x_1-5]",
-      "[a2112h-1x_1-5][a1221m-1x_1-5]/",
-      "1-1-2-2-1-3-1-3-2-1-3-4-4-4/",
-      "a?-b1_b?-c1_c?-d1_c?-i1_d?-e1_d?-g1_e?-f1_g?-h1_",
-      "i?-j1_j?-k1_l1-a?|b?|c?|d?|e?|f?|g?|h?|i?|j?|k?}_",
-      "m1-a?|b?|c?|d?|e?|f?|g?|h?|i?|j?|k?}_",
-      "n1-a?|b?|c?|d?|e?|f?|g?|h?|i?|j?|k?}"
+      "{Fuc(?1-?)|4,5,6,7,8,9,10,11,12,13,14}",
+      "{Fuc(?1-?)|4,5,6,7,8,9,10,11,12,13,14}",
+      "{Fuc(?1-?)|4,5,6,7,8,9,10,11,12,13,14}",
+      "Gal(?1-?)GlcNAc(?1-?)Man(?1-?)",
+      "[Gal(?1-?)GlcNAc(?1-?)[Gal(?1-?)GlcNAc(?1-?)]Man(?1-?)]",
+      "Man(?1-?)GlcNAc(?1-?)GlcNAc(?1-"
     )
   )
 }

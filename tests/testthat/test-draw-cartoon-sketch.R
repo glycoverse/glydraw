@@ -22,12 +22,8 @@ test_that("draw_cartoon_sketch shows linkage annotations by default", {
 })
 
 test_that("draw_cartoon_sketch draws the alditol core marker", {
-  wurcs <- paste0(
-    "WURCS=2.0/3,4,3/",
-    "[h2122h_2*NCC/3=O][a1122h-1b_1-5][a1122h-1a_1-5]/",
-    "1-2-3-3/a4-b1_b3-c1_b6-d1"
-  )
-  plot <- draw_cartoon_sketch(wurcs, seed = 1)
+  glycan <- "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc-ol(?1-"
+  plot <- draw_cartoon_sketch(glycan, seed = 1)
   marker_layers <- Filter(
     \(layer) inherits(layer$geom, "GeomGlydrawResidue"),
     plot$layers

@@ -1041,8 +1041,8 @@ test_that("bisecting GlcNAc is centered without linkage information", {
   )
 })
 
-test_that("draw_cartoon lays out normalized floating WURCS parts", {
-  cartoons <- purrr::map(floating_wurcs_examples(), draw_cartoon)
+test_that("draw_cartoon lays out normalized floating parts", {
+  cartoons <- purrr::map(floating_iupac_examples(), draw_cartoon)
 
   purrr::walk(cartoons, expect_s3_class, "glydraw_cartoon")
   purrr::walk(cartoons, function(cartoon) {
@@ -1062,7 +1062,7 @@ test_that("draw_cartoon lays out normalized floating WURCS parts", {
 
 test_that("floating brackets span the whole main glycan", {
   inputs <- .prepare_cartoon_inputs(
-    floating_wurcs_examples()[["multiple_parts"]],
+    floating_iupac_examples()[["multiple_parts"]],
     NULL,
     "left",
     ""
@@ -1110,7 +1110,7 @@ test_that("draw_cartoon accepts cross-component floating candidates", {
 })
 
 test_that("identical floating cartoons are merged with a count", {
-  grob <- glycanGrob(floating_wurcs_examples()[["repeated_part"]])
+  grob <- glycanGrob(floating_iupac_examples()[["repeated_part"]])
   count <- dplyr::filter(
     grob$annotation_data$annotation,
     .data$annotation_type == "floating_count"
