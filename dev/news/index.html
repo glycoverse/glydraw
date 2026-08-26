@@ -40,11 +40,13 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="glydraw-development-version">glydraw (development version)<a class="anchor" aria-label="anchor" href="#glydraw-development-version"></a></h2>
 <ul><li>
-<code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and all glycan-grob-based interfaces now mark alditols with a small hollow black circle inside the core residue and omit reducing-end lines and text regardless of <code>red_end</code> style options. (<a href="https://github.com/glycoverse/glydraw/issues/90" class="external-link">#90</a>)</li>
+<code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and all glycan-grob-based interfaces now identify alditols with a small hollow black circle inside the core residue and omit reducing-end lines and text regardless of <code>red_end</code> style options. (<a href="https://github.com/glycoverse/glydraw/issues/90" class="external-link">#90</a>)</li>
 <li>
 <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and all glycan-grob-based interfaces now place substituent annotations opposite adjacent Fuc-like branches, preventing labels from overlapping those residues in every drawing orientation. (<a href="https://github.com/glycoverse/glydraw/issues/89" class="external-link">#89</a>)</li>
 <li>
-<code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and all glycan-grob-based interfaces now render unusual absolute configurations and furanose residues supported by glyrepr and glyparse, with centered labels such as <code>D</code>, <code>f</code>, and <code>Df</code> inside their natural SNFG glyphs. (<a href="https://github.com/glycoverse/glydraw/issues/88" class="external-link">#88</a>)</li>
+<code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and all glycan-grob-based interfaces now render furanose residues and unusual absolute configurations supported by <code>glyrepr</code> and <code>glyparse</code>, with centered <code>D</code>, <code>f</code>, or <code>Df</code> labels inside their natural SNFG glyphs. (<a href="https://github.com/glycoverse/glydraw/issues/88" class="external-link">#88</a>)</li>
+<li>
+<code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and all glycan-grob-based interfaces now support floating glycan parts, including explicit and implicit attachment candidates; repeated identical parts are merged with a count such as <code>3x</code>. (<a href="https://github.com/glycoverse/glydraw/issues/87" class="external-link">#87</a>)</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.8.0" id="glydraw-080">glydraw 0.8.0<a class="anchor" aria-label="anchor" href="#glydraw-080"></a></h2><p class="text-muted">CRAN release: 2026-08-02</p>
