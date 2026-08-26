@@ -10,7 +10,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/glycoverse/glydraw/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/glycoverse/glydraw/blob/v0.9.0/DESCRIPTION)
 
 Fu B, Feng X (2026). *glydraw: Draw Beautiful Symbol Nomenclature for
 Glycans*. R package version 0.9.0,
