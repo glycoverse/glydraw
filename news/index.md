@@ -1,5 +1,28 @@
 # Changelog
 
+## glydraw 0.9.0
+
+- [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md)
+  and all glycan-grob-based interfaces now identify alditols with a
+  small hollow black circle inside the core residue and omit
+  reducing-end lines and text regardless of `red_end` style options.
+  ([\#90](https://github.com/glycoverse/glydraw/issues/90))
+- [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md)
+  and all glycan-grob-based interfaces now place substituent annotations
+  opposite adjacent Fuc-like branches, preventing labels from
+  overlapping those residues in every drawing orientation.
+  ([\#89](https://github.com/glycoverse/glydraw/issues/89))
+- [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md)
+  and all glycan-grob-based interfaces now render furanose residues and
+  unusual absolute configurations supported by `glyrepr` and `glyparse`,
+  with centered `D`, `f`, or `Df` labels inside their natural SNFG
+  glyphs. ([\#88](https://github.com/glycoverse/glydraw/issues/88))
+- [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md)
+  and all glycan-grob-based interfaces now support floating glycan
+  parts, including explicit and implicit attachment candidates; repeated
+  identical parts are merged with a count such as `3x`.
+  ([\#87](https://github.com/glycoverse/glydraw/issues/87))
+
 ## glydraw 0.8.0
 
 CRAN release: 2026-08-02
@@ -59,6 +82,12 @@ CRAN release: 2026-08-02
   heatmaps, with clustering-aware ordering and the sizing, anchoring,
   rotation, nudging, and styling controls of glycan axis scales.
   ([\#67](https://github.com/glycoverse/glydraw/issues/67))
+- [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md)
+  now draws normalized floating glycan parts from glyrepr and glyparse,
+  using one SNFG bracket for either explicit or implicit attachment
+  candidates. Repeated identical floating cartoons are merged with a
+  count such as `3x`.
+  ([\#87](https://github.com/glycoverse/glydraw/issues/87))
 - [`draw_cartoon_sketch()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon_sketch.md)
   draws hand-sketched glycan cartoons with reproducible rough strokes,
   patterned residue fills, optional drawing media, and the same layout,
@@ -241,9 +270,8 @@ CRAN release: 2026-07-14
 ### Breaking changes
 
 - [`export_cartoons()`](https://glycoverse.github.io/glydraw/reference/export_cartoons.md)
-  no longer supports
-  [`glyexp::experiment()`](https://glycoverse.github.io/glyexp/reference/experiment.html)
-  input, and `glyexp` is no longer a package dependency.
+  no longer supports `glyexp::experiment()` input, and `glyexp` is no
+  longer a package dependency.
   ([\#33](https://github.com/glycoverse/glydraw/issues/33))
 - Specifying optional arguments in a positional manner is no longer
   supported. Please use `arg = value` instead.
@@ -418,10 +446,8 @@ CRAN release: 2026-07-14
 ### Minor improvements and bug fixes
 
 - Now we use `ggview` instead of `ggimage` for size fixing, which relies
-  on
-  [`rstudioapi::viewer()`](https://rstudio.github.io/rstudioapi/reference/viewer.html)
-  to display the plot. You might feel some difference in the display
-  effect, but the SNFG itself keeps the same.
+  on `rstudioapi::viewer()` to display the plot. You might feel some
+  difference in the display effect, but the SNFG itself keeps the same.
 
 ## glydraw 0.2.0
 

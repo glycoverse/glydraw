@@ -71,18 +71,18 @@ style_glycoworkbench(
 
   Reducing-end annotation. Use `"~"` for a wave, any other string for
   custom text, or tag one amino-acid site as `"ABC<site>D</site>EFG"`.
-  Ignored when `red_end_length` is `0`.
+  Ignored when `red_end_length` is `0` or the glycan is an alditol.
 
 - red_end_length:
 
   Length of the reducing-end line in plot coordinate units. Set to `0`
   to omit the line and any `red_end` wave or custom text while retaining
-  the axis-aligned core anomer annotation.
+  the axis-aligned core anomer annotation. Ignored for alditols.
 
 - red_end_size:
 
   Size of custom text passed to `red_end`. The `"~"` wave is not
-  affected.
+  affected. Ignored for alditols.
 
 - edge_linewidth:
 

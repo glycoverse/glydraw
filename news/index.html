@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glydraw</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.9.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,6 +38,17 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.9.0" id="glydraw-090">glydraw 0.9.0<a class="anchor" aria-label="anchor" href="#glydraw-090"></a></h2>
+<ul><li>
+<code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and all glycan-grob-based interfaces now identify alditols with a small hollow black circle inside the core residue and omit reducing-end lines and text regardless of <code>red_end</code> style options. (<a href="https://github.com/glycoverse/glydraw/issues/90" class="external-link">#90</a>)</li>
+<li>
+<code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and all glycan-grob-based interfaces now place substituent annotations opposite adjacent Fuc-like branches, preventing labels from overlapping those residues in every drawing orientation. (<a href="https://github.com/glycoverse/glydraw/issues/89" class="external-link">#89</a>)</li>
+<li>
+<code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and all glycan-grob-based interfaces now render furanose residues and unusual absolute configurations supported by <code>glyrepr</code> and <code>glyparse</code>, with centered <code>D</code>, <code>f</code>, or <code>Df</code> labels inside their natural SNFG glyphs. (<a href="https://github.com/glycoverse/glydraw/issues/88" class="external-link">#88</a>)</li>
+<li>
+<code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and all glycan-grob-based interfaces now support floating glycan parts, including explicit and implicit attachment candidates; repeated identical parts are merged with a count such as <code>3x</code>. (<a href="https://github.com/glycoverse/glydraw/issues/87" class="external-link">#87</a>)</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.8.0" id="glydraw-080">glydraw 0.8.0<a class="anchor" aria-label="anchor" href="#glydraw-080"></a></h2><p class="text-muted">CRAN release: 2026-08-02</p>
 <div class="section level3">
 <h3 id="breaking-changes-0-8-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-8-0"></a></h3>
@@ -55,6 +66,8 @@
 <h3 id="new-features-0-8-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-8-0"></a></h3>
 <ul><li>
 <code><a href="../reference/anno_glycan.html">anno_glycan()</a></code> uses glycan cartoons as row or column labels in ComplexHeatmap heatmaps, with clustering-aware ordering and the sizing, anchoring, rotation, nudging, and styling controls of glycan axis scales. (<a href="https://github.com/glycoverse/glydraw/issues/67" class="external-link">#67</a>)</li>
+<li>
+<code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> now draws normalized floating glycan parts from glyrepr and glyparse, using one SNFG bracket for either explicit or implicit attachment candidates. Repeated identical floating cartoons are merged with a count such as <code>3x</code>. (<a href="https://github.com/glycoverse/glydraw/issues/87" class="external-link">#87</a>)</li>
 <li>
 <code><a href="../reference/draw_cartoon_sketch.html">draw_cartoon_sketch()</a></code> draws hand-sketched glycan cartoons with reproducible rough strokes, patterned residue fills, optional drawing media, and the same layout, annotation, orientation, highlighting, styling, sizing, and saving behavior as <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code>. Sketch cartoons always use their handwriting font, ignoring <code>font_family</code> in style presets. (<a href="https://github.com/glycoverse/glydraw/issues/77" class="external-link">#77</a>, <a href="https://github.com/glycoverse/glydraw/issues/81" class="external-link">#81</a>)</li>
 <li>
@@ -129,7 +142,7 @@
 <div class="section level3">
 <h3 id="breaking-changes-0-6-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-6-0"></a></h3>
 <ul><li>
-<code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> no longer supports <code><a href="https://glycoverse.github.io/glyexp/reference/experiment.html" class="external-link">glyexp::experiment()</a></code> input, and <code>glyexp</code> is no longer a package dependency. (<a href="https://github.com/glycoverse/glydraw/issues/33" class="external-link">#33</a>)</li>
+<code><a href="../reference/export_cartoons.html">export_cartoons()</a></code> no longer supports <code>glyexp::experiment()</code> input, and <code>glyexp</code> is no longer a package dependency. (<a href="https://github.com/glycoverse/glydraw/issues/33" class="external-link">#33</a>)</li>
 <li>Specifying optional arguments in a positional manner is no longer supported. Please use <code>arg = value</code> instead. (<a href="https://github.com/glycoverse/glydraw/issues/40" class="external-link">#40</a>)</li>
 </ul></div>
 <div class="section level3">
@@ -222,7 +235,7 @@
 </ul></div>
 <div class="section level3">
 <h3 id="minor-improvements-and-bug-fixes-0-3-0">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-0-3-0"></a></h3>
-<ul><li>Now we use <code>ggview</code> instead of <code>ggimage</code> for size fixing, which relies on <code><a href="https://rstudio.github.io/rstudioapi/reference/viewer.html" class="external-link">rstudioapi::viewer()</a></code> to display the plot. You might feel some difference in the display effect, but the SNFG itself keeps the same.</li>
+<ul><li>Now we use <code>ggview</code> instead of <code>ggimage</code> for size fixing, which relies on <code>rstudioapi::viewer()</code> to display the plot. You might feel some difference in the display effect, but the SNFG itself keeps the same.</li>
 </ul></div>
 </div>
     <div class="section level2">
