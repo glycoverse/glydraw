@@ -1,8 +1,9 @@
 # glydraw (development version)
 
-* `draw_cartoon()` and all glycan-grob-based interfaces now mark alditols with a small hollow black circle inside the core residue and omit reducing-end lines and text regardless of `red_end` style options. (#90)
+* `draw_cartoon()` and all glycan-grob-based interfaces now identify alditols with a small hollow black circle inside the core residue and omit reducing-end lines and text regardless of `red_end` style options. (#90)
 * `draw_cartoon()` and all glycan-grob-based interfaces now place substituent annotations opposite adjacent Fuc-like branches, preventing labels from overlapping those residues in every drawing orientation. (#89)
-* `draw_cartoon()` and all glycan-grob-based interfaces now render unusual absolute configurations and furanose residues supported by glyrepr and glyparse, with centered labels such as `D`, `f`, and `Df` inside their natural SNFG glyphs. (#88)
+* `draw_cartoon()` and all glycan-grob-based interfaces now render furanose residues and unusual absolute configurations supported by `glyrepr` and `glyparse`, with centered `D`, `f`, or `Df` labels inside their natural SNFG glyphs. (#88)
+* `draw_cartoon()` and all glycan-grob-based interfaces now support floating glycan parts, including explicit and implicit attachment candidates; repeated identical parts are merged with a count such as `3x`. (#87)
 
 # glydraw 0.8.0
 
