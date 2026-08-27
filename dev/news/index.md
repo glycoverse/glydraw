@@ -2,6 +2,10 @@
 
 ## glydraw (development version)
 
+## glydraw 0.9.0
+
+CRAN release: 2026-08-26
+
 - [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
   and all glycan-grob-based interfaces now identify alditols with a
   small hollow black circle inside the core residue and omit
