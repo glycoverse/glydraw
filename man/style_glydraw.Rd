@@ -97,7 +97,9 @@ by \code{\link[=glydraw_colors]{glydraw_colors()}}. Names must be complete and m
 reducing-end-to-leaf path as a straight backbone, with perpendicular
 side chains. Ties prefer the incoming linkage, then the same residue,
 then graph vertex order. Branched side chains are arranged recursively;
-spacing can increase to avoid residue overlap.}
+spacing can increase to avoid residue overlap. Subtrees containing a
+residue with four or more children fan out using diagonal connections
+from that residue onward to keep links from running through residues.}
 }
 \value{
 A \code{glydraw_style} object.

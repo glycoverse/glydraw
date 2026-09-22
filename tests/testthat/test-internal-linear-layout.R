@@ -76,3 +76,35 @@ test_that("linear style reaches ggplot layers, guides, and scales", {
     layer
   expect_s3_class(ggplot2::ggplotGrob(plot), "gtable")
 })
+
+test_that("high-degree linear branches do not draw links through residues", {
+  cases <- c(
+    "Gal(b1-2)[Gal(b1-3)][Gal(b1-4)][Gal(b1-6)]Glc",
+    "Gal(b1-2)[Gal(b1-3)][Gal(b1-4)][Gal(b1-6)][Gal(b1-?)]Glc",
+    "Gal(b1-2)[Gal(b1-3)][Gal(b1-4)][Gal(b1-6)]Glc(b1-4)Glc",
+    "Gal(b1-2)Gal(b1-2)[Gal(b1-3)Gal(b1-3)][Gal(b1-4)][Gal(b1-6)]Glc",
+    "Gal(b1-4)Gal(b1-4)Gal(b1-4)[Gal(b1-2)[Gal(b1-3)][Gal(b1-4)][Gal(b1-6)]Glc(a1-6)]Glc"
+  )
+  for (glycan in cases) {
+    for (orient in c("left", "right", "up", "down")) {
+      input <- .prepare_cartoon_inputs(glycan, NULL, orient, layout = "linear")
+      coor <- input$coor
+      edges <- igraph::as_edgelist(input$structure, names = FALSE)
+      expect_equal(all(is.finite(coor)), TRUE)
+      expect_equal(anyDuplicated(as.data.frame(coor)), 0L)
+      for (i in seq_len(nrow(edges))) {
+        ends <- edges[i, ]
+        start <- coor[ends[1], ]
+        delta <- coor[ends[2], ] - start
+        other <- coor[-ends, , drop = FALSE]
+        relative <- sweep(other, 2, start)
+        projection <- pmax(
+          0,
+          pmin(1, as.vector(relative %*% delta) / sum(delta^2))
+        )
+        distance <- sqrt(rowSums((relative - projection %o% delta)^2))
+        expect_gt(min(distance), .default_node_point_size)
+      }
+    }
+  }
+})

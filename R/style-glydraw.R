@@ -11,7 +11,9 @@
 #'   reducing-end-to-leaf path as a straight backbone, with perpendicular
 #'   side chains. Ties prefer the incoming linkage, then the same residue,
 #'   then graph vertex order. Branched side chains are arranged recursively;
-#'   spacing can increase to avoid residue overlap.
+#'   spacing can increase to avoid residue overlap. Subtrees containing a
+#'   residue with four or more children fan out using diagonal connections
+#'   from that residue onward to keep links from running through residues.
 #' @param fuc_orient Fuc-like triangle orientation: `"flex"` or `"up"`.
 #' @param red_end Reducing-end annotation. Use `"~"` for a wave, any other
 #'   string for custom text, or tag one amino-acid site as
