@@ -6,6 +6,12 @@
 #' constructors provide presets matching common glycan-drawing conventions.
 #' Supply a returned style with `style =` to reuse its visual specification.
 #'
+#' @param layout `r lifecycle::badge("experimental")` Layout algorithm.
+#'   `"SNFG"` preserves the default layout. `"linear"` draws the longest
+#'   reducing-end-to-leaf path as a straight backbone, with perpendicular
+#'   side chains. Ties prefer the incoming linkage, then the same residue,
+#'   then graph vertex order. Branched side chains are arranged recursively;
+#'   spacing can increase to avoid residue overlap.
 #' @param fuc_orient Fuc-like triangle orientation: `"flex"` or `"up"`.
 #' @param red_end Reducing-end annotation. Use `"~"` for a wave, any other
 #'   string for custom text, or tag one amino-acid site as
@@ -31,6 +37,9 @@
 #' @returns A `glydraw_style` object.
 #'
 #' @examples
+#' xylan <- "Xyl(b1-4)[Ara(a1-3)]Xyl(b1-4)Xyl"
+#' draw_cartoon(xylan, style = style_glydraw(layout = "linear"))
+#'
 #' serif_style <- style_glydraw(font_family = "serif")
 #' draw_cartoon("Gal(b1-3)GalNAc(a1-", style = serif_style)
 #'
@@ -48,9 +57,11 @@ style_glydraw <- function(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "",
-  colors = glydraw_colors()
+  colors = glydraw_colors(),
+  layout = "SNFG"
 ) {
   .make_glydraw_style(
+    layout = layout,
     fuc_orient = fuc_orient,
     red_end = red_end,
     edge_linewidth = edge_linewidth,
@@ -74,9 +85,11 @@ style_glygen <- function(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "arial",
-  colors = glydraw_colors()
+  colors = glydraw_colors(),
+  layout = "SNFG"
 ) {
   .make_glydraw_style(
+    layout = layout,
     fuc_orient = fuc_orient,
     red_end = red_end,
     edge_linewidth = edge_linewidth,
@@ -100,9 +113,11 @@ style_snfg <- function(
   node_linewidth = 0.8,
   node_size = 1.15,
   font_family = "arial",
-  colors = glydraw_colors()
+  colors = glydraw_colors(),
+  layout = "SNFG"
 ) {
   .make_glydraw_style(
+    layout = layout,
     fuc_orient = fuc_orient,
     red_end = red_end,
     edge_linewidth = edge_linewidth,
@@ -137,9 +152,11 @@ style_glycoworkbench <- function(
     glyLightBlue = "#EDFEFF",
     glyBrown = "#8F663B",
     glyRed = "#E53222"
-  )
+  ),
+  layout = "SNFG"
 ) {
   .make_glydraw_style(
+    layout = layout,
     fuc_orient = fuc_orient,
     red_end = red_end,
     edge_linewidth = edge_linewidth,
@@ -161,8 +178,10 @@ style_glycoworkbench <- function(
   font_family,
   colors,
   red_end_length,
-  red_end_size
+  red_end_size,
+  layout = "SNFG"
 ) {
+  checkmate::assert_choice(layout, c("SNFG", "linear"))
   checkmate::assert_choice(fuc_orient, c("flex", "up"))
   if (is.null(red_end)) {
     cli::cli_abort(c(
@@ -185,6 +204,7 @@ style_glycoworkbench <- function(
 
   structure(
     list(
+      layout = layout,
       fuc_orient = fuc_orient,
       red_end = red_end,
       edge_linewidth = edge_linewidth,

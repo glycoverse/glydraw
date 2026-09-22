@@ -9,10 +9,14 @@
 .floating_component_gap <- 1
 .floating_count_gap <- 0.5
 
-.layout_cartoon_coordinates <- function(structure, floating_parts) {
+.layout_cartoon_coordinates <- function(
+  structure,
+  floating_parts,
+  layout = "SNFG"
+) {
   if (nrow(floating_parts) == 0) {
     return(list(
-      coor = .calculate_residue_coordinates(structure),
+      coor = .calculate_residue_coordinates(structure, layout),
       floating = NULL
     ))
   }
@@ -35,7 +39,11 @@
     ncol = 2,
     dimnames = list(NULL, c("x", "y"))
   )
-  coor[main_nodes, ] <- .component_residue_coordinates(structure, main_nodes)
+  coor[main_nodes, ] <- .component_residue_coordinates(
+    structure,
+    main_nodes,
+    layout
+  )
 
   signatures <- purrr::map_chr(
     parts,
@@ -48,7 +56,8 @@
     representative_nodes <- representative$topology$nodes
     representative_coor <- .component_residue_coordinates(
       structure,
-      representative$nodes
+      representative$nodes,
+      layout
     )
     list(
       signature = signature,
@@ -98,7 +107,8 @@
       member_layouts <- purrr::map(group$members, function(member) {
         member_coor <- .component_residue_coordinates(
           structure,
-          member$nodes
+          member$nodes,
+          layout
         )
         member_coor[, "x"] <- member_coor[, "x"] + x_offset
         member_coor[, "y"] <- member_coor[, "y"] + y_offset
@@ -165,9 +175,9 @@
   )
 }
 
-.component_residue_coordinates <- function(structure, nodes) {
+.component_residue_coordinates <- function(structure, nodes, layout = "SNFG") {
   component <- igraph::induced_subgraph(structure, vids = nodes)
-  component_coor <- .calculate_residue_coordinates(component)
+  component_coor <- .calculate_residue_coordinates(component, layout)
   component_nodes <- as.integer(igraph::V(component)$name)
   component_coor[match(nodes, component_nodes), , drop = FALSE]
 }

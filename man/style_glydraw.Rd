@@ -16,7 +16,8 @@ style_glydraw(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "",
-  colors = glydraw_colors()
+  colors = glydraw_colors(),
+  layout = "SNFG"
 )
 
 style_glygen(
@@ -28,7 +29,8 @@ style_glygen(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "arial",
-  colors = glydraw_colors()
+  colors = glydraw_colors(),
+  layout = "SNFG"
 )
 
 style_snfg(
@@ -40,7 +42,8 @@ style_snfg(
   node_linewidth = 0.8,
   node_size = 1.15,
   font_family = "arial",
-  colors = glydraw_colors()
+  colors = glydraw_colors(),
+  layout = "SNFG"
 )
 
 style_glycoworkbench(
@@ -54,7 +57,8 @@ style_glycoworkbench(
   font_family = "arial",
   colors = c(glyWhite = "#FFFFFF", glyBlue = "#0000F0", glyGreen = "#5AC54B", glyYellow =
     "#FFFF54", glyOrange = "#F7EAD7", glyPink = "#FFFFFF", glyPurple = "#B726C1",
-    glyLightBlue = "#EDFEFF", glyBrown = "#8F663B", glyRed = "#E53222")
+    glyLightBlue = "#EDFEFF", glyBrown = "#8F663B", glyRed = "#E53222"),
+  layout = "SNFG"
 )
 }
 \arguments{
@@ -87,6 +91,13 @@ uses the graphics device's default font.}
 
 \item{colors}{A named character vector of SNFG colors in the format returned
 by \code{\link[=glydraw_colors]{glydraw_colors()}}. Names must be complete and match that palette.}
+
+\item{layout}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}} Layout algorithm.
+\code{"SNFG"} preserves the default layout. \code{"linear"} draws the longest
+reducing-end-to-leaf path as a straight backbone, with perpendicular
+side chains. Ties prefer the incoming linkage, then the same residue,
+then graph vertex order. Branched side chains are arranged recursively;
+spacing can increase to avoid residue overlap.}
 }
 \value{
 A \code{glydraw_style} object.
@@ -110,6 +121,9 @@ Supply a returned style with \verb{style =} to reuse its visual specification.
 
 }}
 \examples{
+xylan <- "Xyl(b1-4)[Ara(a1-3)]Xyl(b1-4)Xyl"
+draw_cartoon(xylan, style = style_glydraw(layout = "linear"))
+
 serif_style <- style_glydraw(font_family = "serif")
 draw_cartoon("Gal(b1-3)GalNAc(a1-", style = serif_style)
 

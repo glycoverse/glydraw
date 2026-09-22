@@ -1,5 +1,7 @@
 # glydraw (development version)
 
+* Glycan styles gain an experimental `layout` argument: `"SNFG"` retains the default layout, while `"linear"` draws straight backbones with perpendicular side chains for polysaccharides. (@leonardblaschek, #8)
+
 # glydraw 0.9.0
 
 * `draw_cartoon()` and all glycan-grob-based interfaces now identify alditols with a small hollow black circle inside the core residue and omit reducing-end lines and text regardless of `red_end` style options. (#90)

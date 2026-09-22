@@ -918,7 +918,10 @@
 #'   Coordinates are horizontal drawing coordinates before optional vertical
 #'   orientation rotation.
 #' @noRd
-.calculate_residue_coordinates <- function(structure) {
+.calculate_residue_coordinates <- function(structure, layout = "SNFG") {
+  if (layout == "linear") {
+    return(.linear_residue_coordinates(structure))
+  }
   coor <- .initialize_residue_coordinates(structure)
   coor <- .spread_rough_child_subtrees(structure, coor)
   coor <- .orient_fucose_branch_subtrees(structure, coor)

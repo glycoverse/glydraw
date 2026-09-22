@@ -294,7 +294,8 @@ GeomGlydrawResidue <- ggplot2::ggproto(
   structure,
   highlight,
   orient = c("left", "right", "up", "down"),
-  red_end = ""
+  red_end = "",
+  layout = "SNFG"
 ) {
   checkmate::assert_string(red_end, na.ok = FALSE)
   if (!is.null(highlight) && !glyrepr::is_glycan_structure(structure)) {
@@ -309,7 +310,7 @@ GeomGlydrawResidue <- ggplot2::ggproto(
   structure <- glyrepr::get_structure_graphs(structure, return_list = FALSE)
   highlight <- .validate_highlight_indices(highlight, length(structure))
   orient <- rlang::arg_match(orient)
-  layout <- .layout_cartoon_coordinates(structure, floating_parts)
+  layout <- .layout_cartoon_coordinates(structure, floating_parts, layout)
   layout <- .orient_cartoon_layout(layout, orient)
   highlight <- .merge_floating_highlights(highlight, layout$floating)
 

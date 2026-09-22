@@ -110,6 +110,7 @@ scale_x_glycan <- function(
     red_end = red_end,
     red_end_length = style$red_end_length,
     red_end_size = style$red_end_size,
+    layout = style$layout,
     fuc_orient = style$fuc_orient,
     edge_linewidth = style$edge_linewidth,
     node_linewidth = style$node_linewidth,
@@ -179,6 +180,7 @@ scale_y_glycan <- function(
     red_end = red_end,
     red_end_length = style$red_end_length,
     red_end_size = style$red_end_size,
+    layout = style$layout,
     fuc_orient = style$fuc_orient,
     edge_linewidth = style$edge_linewidth,
     node_linewidth = style$node_linewidth,
@@ -244,6 +246,7 @@ scale_y_glycan <- function(
   red_end,
   red_end_length,
   red_end_size,
+  layout = "SNFG",
   fuc_orient,
   edge_linewidth,
   node_linewidth,
@@ -263,6 +266,7 @@ scale_y_glycan <- function(
     red_end = red_end,
     red_end_length = red_end_length,
     red_end_size = red_end_size,
+    layout = layout,
     fuc_orient = fuc_orient,
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
@@ -293,6 +297,7 @@ scale_y_glycan <- function(
     glycan_red_end = options$red_end,
     glycan_red_end_length = options$red_end_length,
     glycan_red_end_size = options$red_end_size,
+    glycan_layout = options$layout,
     glycan_fuc_orient = options$fuc_orient,
     glycan_edge_linewidth = options$edge_linewidth,
     glycan_node_linewidth = options$node_linewidth,
@@ -405,6 +410,7 @@ scale_y_glycan <- function(
   red_end,
   red_end_length,
   red_end_size,
+  layout = "SNFG",
   fuc_orient,
   edge_linewidth,
   node_linewidth,
@@ -428,6 +434,7 @@ scale_y_glycan <- function(
   checkmate::assert_string(font_family, na.ok = FALSE)
   .validate_node_size(node_size)
   colors <- .validate_colors(colors)
+  checkmate::assert_choice(layout, c("SNFG", "linear"))
   fuc_orient <- rlang::arg_match(fuc_orient, c("flex", "up"))
   show_linkage <- .resolve_linkage_visibility(show_linkage, node_size)
 
@@ -443,6 +450,7 @@ scale_y_glycan <- function(
     red_end = red_end,
     red_end_length = red_end_length,
     red_end_size = red_end_size,
+    layout = layout,
     fuc_orient = fuc_orient,
     edge_linewidth = edge_linewidth,
     node_linewidth = node_linewidth,
@@ -517,6 +525,7 @@ scale_y_glycan <- function(
     orient = params$glycan_orient,
     style = style_glydraw(
       red_end = params$glycan_red_end,
+      layout = params$glycan_layout,
       fuc_orient = params$glycan_fuc_orient,
       edge_linewidth = params$glycan_edge_linewidth,
       node_linewidth = params$glycan_node_linewidth,
@@ -767,6 +776,7 @@ GuideGlycanAxis <- ggplot2::ggproto(
       glycan_red_end = "",
       glycan_red_end_length = 0.6,
       glycan_red_end_size = 6,
+      glycan_layout = "SNFG",
       glycan_fuc_orient = "flex",
       glycan_edge_linewidth = 0.8,
       glycan_node_linewidth = 0.8,
