@@ -2,6 +2,12 @@
 
 ## glydraw (development version)
 
+- Glycan styles gain an experimental `layout` argument: `"SNFG"` retains
+  the default layout, while `"linear"` draws straight backbones with
+  perpendicular side chains for polysaccharides.
+  ([@leonardblaschek](https://github.com/leonardblaschek),
+  [\#8](https://github.com/glycoverse/glydraw/issues/8))
+
 ## glydraw 0.9.0
 
 CRAN release: 2026-08-26

@@ -137,6 +137,9 @@ available settings.
 ``` r
 
 style_glydraw()
+#> $layout
+#> [1] "SNFG"
+#> 
 #> $fuc_orient
 #> [1] "flex"
 #> 
@@ -434,7 +437,7 @@ outfile <- file.path(tempdir(), "n-core.png")
 
 save_cartoon(cartoon, outfile, scale = 2)
 outfile
-#> [1] "/tmp/Rtmp0Zjoji/n-core.png"
+#> [1] "/tmp/RtmpTgtbru/n-core.png"
 ```
 
 `glydraw` does not expose separate `width` and `height` controls because

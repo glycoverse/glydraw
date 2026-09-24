@@ -19,7 +19,8 @@ style_glydraw(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "",
-  colors = glydraw_colors()
+  colors = glydraw_colors(),
+  layout = "SNFG"
 )
 
 style_glygen(
@@ -31,7 +32,8 @@ style_glygen(
   node_linewidth = 0.8,
   node_size = 1,
   font_family = "arial",
-  colors = glydraw_colors()
+  colors = glydraw_colors(),
+  layout = "SNFG"
 )
 
 style_snfg(
@@ -43,7 +45,8 @@ style_snfg(
   node_linewidth = 0.8,
   node_size = 1.15,
   font_family = "arial",
-  colors = glydraw_colors()
+  colors = glydraw_colors(),
+  layout = "SNFG"
 )
 
 style_glycoworkbench(
@@ -57,7 +60,8 @@ style_glycoworkbench(
   font_family = "arial",
   colors = c(glyWhite = "#FFFFFF", glyBlue = "#0000F0", glyGreen = "#5AC54B", glyYellow =
     "#FFFF54", glyOrange = "#F7EAD7", glyPink = "#FFFFFF", glyPurple = "#B726C1",
-    glyLightBlue = "#EDFEFF", glyBrown = "#8F663B", glyRed = "#E53222")
+    glyLightBlue = "#EDFEFF", glyBrown = "#8F663B", glyRed = "#E53222"),
+  layout = "SNFG"
 )
 ```
 
@@ -110,6 +114,17 @@ style_glycoworkbench(
   [`glydraw_colors()`](https://glycoverse.github.io/glydraw/dev/reference/glydraw_colors.md).
   Names must be complete and match that palette.
 
+- layout:
+
+  **\[experimental\]** Layout algorithm. `"SNFG"` preserves the default
+  layout. `"linear"` draws the longest reducing-end-to-leaf path as a
+  straight backbone, with perpendicular side chains. Ties prefer the
+  incoming linkage, then the same residue, then graph vertex order.
+  Branched side chains are arranged recursively; spacing can increase to
+  avoid residue overlap. Subtrees containing a residue with four or more
+  children fan out using diagonal connections from that residue onward
+  to keep links from running through residues.
+
 ## Value
 
 A `glydraw_style` object.
@@ -127,6 +142,10 @@ A `glydraw_style` object.
 ## Examples
 
 ``` r
+xylan <- "Xyl(b1-4)[Ara(a1-3)]Xyl(b1-4)Xyl"
+draw_cartoon(xylan, style = style_glydraw(layout = "linear"))
+
+
 serif_style <- style_glydraw(font_family = "serif")
 draw_cartoon("Gal(b1-3)GalNAc(a1-", style = serif_style)
 
