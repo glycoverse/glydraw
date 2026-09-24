@@ -119,6 +119,7 @@ guide_glycan <- function(
     glycan_red_end = red_end,
     glycan_red_end_length = style$red_end_length,
     glycan_red_end_size = style$red_end_size,
+    glycan_layout = style$layout,
     glycan_fuc_orient = style$fuc_orient,
     glycan_edge_linewidth = style$edge_linewidth,
     glycan_node_linewidth = style$node_linewidth,
@@ -181,6 +182,7 @@ guide_glycan <- function(
     orient = params$glycan_orient,
     style = style_glydraw(
       red_end = params$glycan_red_end,
+      layout = params$glycan_layout,
       fuc_orient = params$glycan_fuc_orient,
       edge_linewidth = params$glycan_edge_linewidth,
       node_linewidth = params$glycan_node_linewidth,
@@ -381,6 +383,7 @@ GuideGlycan <- ggplot2::ggproto(
       glycan_red_end = "",
       glycan_red_end_length = 0.6,
       glycan_red_end_size = 6,
+      glycan_layout = "SNFG",
       glycan_fuc_orient = "flex",
       glycan_edge_linewidth = 0.8,
       glycan_node_linewidth = 0.8,

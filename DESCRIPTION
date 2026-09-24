@@ -18,6 +18,7 @@ Suggests:
     ggraph,
     ggsketch (>= 2.0.0),
     knitr,
+    lifecycle,
     ragg,
     rmarkdown,
     systemfonts,

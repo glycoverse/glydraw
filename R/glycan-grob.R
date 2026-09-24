@@ -27,6 +27,7 @@ glycanGrob <- function(
   checkmate::assert_class(style, "glydraw_style")
   red_end <- .resolve_red_end(red_end, style)
   style <- .make_glydraw_style(
+    layout = style$layout,
     fuc_orient = style$fuc_orient,
     red_end = red_end,
     edge_linewidth = style$edge_linewidth,
@@ -41,7 +42,8 @@ glycanGrob <- function(
     structure,
     highlight,
     orient,
-    style$red_end
+    style$red_end,
+    layout = style$layout
   )
   structure <- inputs$structure
   coor <- inputs$coor

@@ -174,6 +174,7 @@ geom_glycan <- function(
   params <- rlang::list2(
     show_linkage = show_linkage,
     orient = orient,
+    layout = style$layout,
     fuc_orient = style$fuc_orient,
     red_end = red_end,
     red_end_length = style$red_end_length,
@@ -236,6 +237,7 @@ geom_glycan <- function(
   coord,
   show_linkage = TRUE,
   orient = "left",
+  layout = "SNFG",
   fuc_orient = "flex",
   red_end = "",
   red_end_length = 0.6,
@@ -283,6 +285,7 @@ geom_glycan <- function(
       orient = orient,
       highlight = highlight,
       style = style_glydraw(
+        layout = layout,
         fuc_orient = fuc_orient,
         red_end = red_end,
         edge_linewidth = edge_linewidth,
