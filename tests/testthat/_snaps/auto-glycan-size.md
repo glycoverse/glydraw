@@ -13,4 +13,3 @@
     Condition
       Error in `.validate_output_scale()`:
       ! Assertion on 'scale' failed: Must be finite.
-
