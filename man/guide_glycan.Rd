@@ -14,7 +14,7 @@ guide_glycan(
   ncol = NULL,
   reverse = FALSE,
   order = 0,
-  size = 0.4,
+  size = auto_glycan_size(),
   orient = c("left", "right", "up", "down"),
   hjust = 0,
   vjust = vjust_red_end(),
@@ -57,8 +57,9 @@ this guide among multiple guides. This controls the order in which
 multiple guides are displayed, not the contents of the guide itself.
 If 0 (default), the order is determined by a secret algorithm.}
 
-\item{size}{Positive scalar that uniformly scales each legend-label cartoon.
-Defaults to \code{0.4}.}
+\item{size}{Whole-cartoon sizing. The default, \code{\link[=auto_glycan_size]{auto_glycan_size()}}, fits
+the collection of legend cartoons to a graphics-device-based size budget.
+A positive number uses a fixed scale multiplier.}
 
 \item{orient}{Direction in which the glycan extends from its reducing end:
 one of \code{"left"}, \code{"right"}, \code{"up"}, or \code{"down"}. Defaults to \code{"left"}.}

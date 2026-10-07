@@ -27,6 +27,79 @@ test_that("geom_glycan maps structures to x and y positions", {
   expect_setequal(GeomGlycan$required_aes, c("x", "y", "structure"))
 })
 
+test_that("automatic panel sizes adapt to the drawing viewport", {
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off(), add = TRUE)
+  data <- data.frame(
+    x = c(1, 2),
+    y = 1,
+    structure = c("Gal(b1-3)GalNAc(a1-", "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-")
+  )
+  plot <- ggplot2::ggplot(data, ggplot2::aes(x, y, structure = structure)) +
+    geom_glycan(orient = "up", vjust = 0, angle = 20) +
+    ggplot2::coord_cartesian(xlim = c(0, 3), ylim = c(0, 3), expand = FALSE)
+  layer <- ggplot2::layer_grob(plot)[[1]]
+  render <- function(width, height) {
+    grid::pushViewport(grid::viewport(
+      width = grid::unit(width, "in"),
+      height = grid::unit(height, "in")
+    ))
+    on.exit(grid::popViewport())
+    grid::makeContent(layer)
+  }
+  small <- render(2, 2)
+  large <- render(4, 4)
+  small_scales <- unname(vapply(small$children, \(grob) grob$glydraw_scale, 0))
+  large_scales <- unname(vapply(large$children, \(grob) grob$glydraw_scale, 0))
+
+  expect_equal(small_scales, rep(small_scales[[1]], 2))
+  expect_lt(max(small_scales), min(large_scales))
+  expect_lte(max(large_scales), 1)
+  for (i in seq_along(small$children)) {
+    bounds <- .glycan_bounds_inches(small$children[[i]])
+    anchor <- c(x = data$x[[i]] / 3 * 2, y = 2 / 3)
+    expect_gte(bounds[["left"]] + anchor[["x"]], 0)
+    expect_lte(bounds[["right"]] + anchor[["x"]], 2)
+    expect_gte(bounds[["bottom"]] + anchor[["y"]], 0)
+    expect_lte(bounds[["top"]] + anchor[["y"]], 2)
+    expect_equal(
+      small$children[[i]]$polygon_coor,
+      layer$children[[i]]$polygon_coor
+    )
+  }
+  grid::pushViewport(grid::viewport(
+    width = grid::unit(2, "in"),
+    height = grid::unit(2, "in")
+  ))
+  repeated <- grid::makeContent(small)
+  grid::popViewport()
+  expect_equal(
+    unname(vapply(repeated$children, \(grob) grob$glydraw_scale, 0)),
+    small_scales
+  )
+})
+
+test_that("mapped numeric sizes override automatic sizing", {
+  data <- data.frame(
+    x = 1:2,
+    y = 1,
+    size = c(0.3, 0.7),
+    structure = "GalNAc(a1-"
+  )
+  plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(x, y, structure = structure, size = size)
+  ) +
+    geom_glycan() +
+    ggplot2::scale_size_identity()
+  layer <- ggplot2::layer_grob(plot)[[1]]
+  expect_identical(layer$glydraw_fit, FALSE)
+  expect_equal(
+    unname(vapply(layer$children, \(grob) grob$glydraw_scale, 0)),
+    data$size
+  )
+})
+
 test_that("geom_glycan red_end overrides its style", {
   style <- style_glydraw(red_end = "~")
 

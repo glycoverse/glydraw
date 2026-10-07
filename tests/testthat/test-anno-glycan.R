@@ -84,6 +84,56 @@ test_that("anno_glycan creates row and column annotation functions", {
   )
 })
 
+test_that("automatic annotations fit their slice with consistent residue sizes", {
+  skip_if_not_installed("ComplexHeatmap")
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off(), add = TRUE)
+  structures <- c(
+    "GlcNAc(b1-",
+    "Gal(b1-4)[Fuc(a1-3)]GlcNAc(b1-",
+    "Neu5Ac(a2-3)Gal(b1-4)[Fuc(a1-3)]GlcNAc(b1-"
+  )
+  for (which in c("row", "column")) {
+    annotation <- anno_glycan(structures, which = which, angle = 30)
+    env <- annotation@var_env
+    labels <- .glycan_annotation_grob(
+      env$grobs,
+      c(3, 1),
+      which,
+      env$side,
+      env$fit,
+      env$fit_grobs
+    )
+    render <- function(size) {
+      grid::pushViewport(grid::viewport(
+        width = grid::unit(size, "in"),
+        height = grid::unit(size, "in")
+      ))
+      grid::pushViewport(labels$vp)
+      on.exit(grid::popViewport(2))
+      grid::makeContent(labels)
+    }
+    small <- render(0.4)
+    large <- render(1)
+    scales <- unname(vapply(small$children, \(grob) grob$glydraw_scale, 0))
+    expect_equal(scales, rep(scales[[1]], 2))
+    expect_lt(
+      max(scales),
+      min(vapply(large$children, \(grob) grob$glydraw_scale, 0))
+    )
+    expect_equal(
+      unname(vapply(small$children, \(grob) grob$glydraw_annotation_index, 0)),
+      c(3, 1)
+    )
+    bounds <- .glycan_collection_bounds(small$children)
+    along <- if (which == "row") bounds[, 3:4] else bounds[, 1:2]
+    expect_lte(max(along[, 2]) - min(along[, 1]), 0.4 / 2 * 0.8 + 1e-10)
+    subset <- annotation[c(3, 1)]
+    expect_length(subset@var_env$fit_grobs, 3)
+    expect_length(subset@var_env$grobs, 2)
+  }
+})
+
 test_that("anno_glycan orientation follows side and can be overridden", {
   skip_if_not_installed("ComplexHeatmap")
   structure <- "Gal(b1-3)GalNAc(a1-"

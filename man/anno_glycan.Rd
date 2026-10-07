@@ -8,7 +8,7 @@ anno_glycan(
   structure,
   which = c("column", "row"),
   side = NULL,
-  size = 0.4,
+  size = auto_glycan_size(),
   angle = 0,
   hjust = NULL,
   vjust = NULL,
@@ -35,8 +35,9 @@ observations.}
 accept \code{"bottom"} or \code{"top"}; row annotations accept \code{"left"} or
 \code{"right"}. Defaults to the corresponding glycan scale position.}
 
-\item{size}{Positive scalar that uniformly scales each cartoon. Defaults to
-\code{0.4}.}
+\item{size}{Whole-cartoon sizing. The default, \code{\link[=auto_glycan_size]{auto_glycan_size()}}, fits
+cartoons to the annotation space and row or column spacing. A positive
+number uses a fixed scale multiplier.}
 
 \item{angle}{Rotation in degrees applied to each cartoon independently of
 its drawing orientation. Defaults to \code{0}.}

@@ -11,6 +11,7 @@ geom_glycan(
   position = "identity",
   ...,
   angle = 0,
+  size = auto_glycan_size(),
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
   highlight = NULL,
@@ -40,6 +41,10 @@ Defaults to \code{"identity"}.}
 supplied as an aesthetic or a fixed layer value. It rotates each completed
 cartoon around its mapped position independently of \code{orient}. Defaults to
 \code{0}.}
+
+\item{size}{Whole-cartoon sizing. The default, \code{\link[=auto_glycan_size]{auto_glycan_size()}}, shrinks
+cartoons to fit the panel and neighbouring anchors when drawn. A positive
+number uses a fixed scale multiplier, as does a mapped \code{size} aesthetic.}
 
 \item{show_linkage}{Show glycosidic linkage annotations or not. Default is
 TRUE. Substituent annotations are always shown.}
@@ -77,9 +82,10 @@ A ggplot2 layer that can be added to a \code{\link[ggplot2:ggplot]{ggplot2::ggpl
 \description{
 \code{geom_glycan()} draws one glycan cartoon for each data row. Each cartoon is
 anchored at its mapped \code{x} and \code{y} position and retains the structure-derived
-dimensions and appearance used by \code{\link[=draw_cartoon]{draw_cartoon()}}. The optional \code{size}
-aesthetic scales the complete cartoon uniformly, including nodes, lines,
-text, and spacing, without changing their relative appearance. Like points
+dimensions and appearance used by \code{\link[=draw_cartoon]{draw_cartoon()}}. By default,
+\code{size = auto_glycan_size()} fits the cartoons to the actual panel space.
+A numeric \code{size} argument or aesthetic scales the complete cartoon uniformly,
+including nodes, lines, text, and spacing. Like points
 and text, the cartoons do not expand the position scales beyond their anchor
 coordinates. Use scale expansion or explicit coordinate limits when the
 cartoons need more room around the panel edges. Unlike standalone cartoons

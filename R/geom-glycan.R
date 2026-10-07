@@ -52,9 +52,10 @@ vjust_red_end <- function() {
 #'
 #' `geom_glycan()` draws one glycan cartoon for each data row. Each cartoon is
 #' anchored at its mapped `x` and `y` position and retains the structure-derived
-#' dimensions and appearance used by [draw_cartoon()]. The optional `size`
-#' aesthetic scales the complete cartoon uniformly, including nodes, lines,
-#' text, and spacing, without changing their relative appearance. Like points
+#' dimensions and appearance used by [draw_cartoon()]. By default,
+#' `size = auto_glycan_size()` fits the cartoons to the actual panel space.
+#' A numeric `size` argument or aesthetic scales the complete cartoon uniformly,
+#' including nodes, lines, text, and spacing. Like points
 #' and text, the cartoons do not expand the position scales beyond their anchor
 #' coordinates. Use scale expansion or explicit coordinate limits when the
 #' cartoons need more room around the panel edges. Unlike standalone cartoons
@@ -74,6 +75,9 @@ vjust_red_end <- function() {
 #'   supplied as an aesthetic or a fixed layer value. It rotates each completed
 #'   cartoon around its mapped position independently of `orient`. Defaults to
 #'   `0`.
+#' @param size Whole-cartoon sizing. The default, [auto_glycan_size()], shrinks
+#'   cartoons to fit the panel and neighbouring anchors when drawn. A positive
+#'   number uses a fixed scale multiplier, as does a mapped `size` aesthetic.
 #' @param na.rm If `FALSE`, the default, missing values are removed with a
 #'   warning. If `TRUE`, missing values are silently removed.
 #' @param show.legend Logical. Should this layer be included in the legends?
@@ -155,6 +159,7 @@ geom_glycan <- function(
   position = "identity",
   ...,
   angle = 0,
+  size = auto_glycan_size(),
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
   highlight = NULL,
@@ -164,6 +169,7 @@ geom_glycan <- function(
   inherit.aes = TRUE,
   red_end = NULL
 ) {
+  sizing <- .resolve_glycan_size(size, 1, validate = FALSE)
   orient <- rlang::arg_match(orient)
   red_end <- .resolve_red_end(red_end, style)
   show_linkage <- .resolve_linkage_visibility(
@@ -172,6 +178,8 @@ geom_glycan <- function(
   )
 
   params <- rlang::list2(
+    fit = sizing$fit,
+    size_limit = sizing$size,
     show_linkage = show_linkage,
     orient = orient,
     layout = style$layout,
@@ -188,6 +196,9 @@ geom_glycan <- function(
     na.rm = na.rm,
     ...
   )
+  if (!sizing$fit) {
+    params$size <- sizing$size
+  }
   if (!missing(angle)) {
     params$angle <- angle
   }
@@ -248,7 +259,9 @@ geom_glycan <- function(
   font_family = "",
   colours = NULL,
   highlight = NULL,
-  na.rm = FALSE
+  na.rm = FALSE,
+  fit = TRUE,
+  size_limit = 1
 ) {
   if (nrow(data) == 0) {
     return(grid::nullGrob())
@@ -303,7 +316,7 @@ geom_glycan <- function(
       grob = grob_cache[structure_index],
       x = coordinates$x,
       y = coordinates$y,
-      size = coordinates$size,
+      size = coordinates$size * if (fit) size_limit else 1,
       hjust = coordinates$hjust,
       vjust = coordinates$vjust,
       angle = coordinates$angle,
@@ -325,8 +338,11 @@ geom_glycan <- function(
     }
   )
 
-  grid::grobTree(
+  grid::gTree(
     children = rlang::exec(grid::gList, !!!grobs),
+    glydraw_fit = fit,
+    glydraw_positions = coordinates[c("x", "y")],
+    cl = "glycan_panel",
     name = "geom_glycan"
   )
 }
@@ -544,5 +560,11 @@ GeomGlycan <- ggplot2::ggproto(
   ),
   extra_params = "na.rm",
   draw_key = ggplot2::draw_key_blank,
+  setup_params = function(data, params) {
+    if ("size" %in% names(data)) {
+      params$fit <- FALSE
+    }
+    params
+  },
   draw_panel = .draw_glycan_panel
 )

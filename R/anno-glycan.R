@@ -26,8 +26,9 @@
 #' @param side Side on which the annotation is placed. Column annotations
 #'   accept `"bottom"` or `"top"`; row annotations accept `"left"` or
 #'   `"right"`. Defaults to the corresponding glycan scale position.
-#' @param size Positive scalar that uniformly scales each cartoon. Defaults to
-#'   `0.4`.
+#' @param size Whole-cartoon sizing. The default, [auto_glycan_size()], fits
+#'   cartoons to the annotation space and row or column spacing. A positive
+#'   number uses a fixed scale multiplier.
 #' @param angle Rotation in degrees applied to each cartoon independently of
 #'   its drawing orientation. Defaults to `0`.
 #' @param orient Glycan drawing orientation. `NULL`, the default, selects the
@@ -91,7 +92,7 @@ anno_glycan <- function(
   structure,
   which = c("column", "row"),
   side = NULL,
-  size = 0.4,
+  size = auto_glycan_size(),
   angle = 0,
   hjust = NULL,
   vjust = NULL,
@@ -122,10 +123,11 @@ anno_glycan <- function(
   )
   checkmate::assert_flag(show_name)
   red_end <- .resolve_red_end(red_end, style)
+  sizing <- .resolve_glycan_size(size, 0.4)
 
   options <- .validate_glycan_label_options(
     orient = orient,
-    size = size,
+    size = sizing$size,
     angle = angle,
     hjust = justification$hjust,
     vjust = justification$vjust,
@@ -145,6 +147,11 @@ anno_glycan <- function(
   )
   params <- .glycan_annotation_label_params(options, side)
   grobs <- .build_glycan_annotation_grobs(structure, params)
+  fit <- sizing$fit
+  if (fit) {
+    grobs <- .fit_glycan_label_size(grobs, identical(which, "row"))
+  }
+  fit_grobs <- grobs
 
   if (identical(which, "row") && is.null(width)) {
     width <- .glycan_label_extent(grobs, "width")
@@ -155,7 +162,7 @@ anno_glycan <- function(
 
   fun <- function(index, k, n) {
     grid::grid.draw(
-      .glycan_annotation_grob(grobs, index, which, side)
+      .glycan_annotation_grob(grobs, index, which, side, fit, fit_grobs)
     )
   }
   ComplexHeatmap::AnnotationFunction(
@@ -166,6 +173,8 @@ anno_glycan <- function(
       grobs = grobs,
       which = which,
       side = side,
+      fit = fit,
+      fit_grobs = fit_grobs,
       .glycan_annotation_grob = .glycan_annotation_grob
     ),
     n = length(grobs),
@@ -286,7 +295,14 @@ anno_glycan <- function(
 #'
 #' @returns A positioned `gTree` containing the requested labels.
 #' @noRd
-.glycan_annotation_grob <- function(grobs, index, which, side) {
+.glycan_annotation_grob <- function(
+  grobs,
+  index,
+  which,
+  side,
+  fit = FALSE,
+  fit_grobs = grobs
+) {
   labels <- grobs[index]
   n_labels <- length(labels)
   if (n_labels == 0) {
@@ -324,6 +340,11 @@ anno_glycan <- function(
   grid::gTree(
     children = rlang::exec(grid::gList, !!!children),
     vp = viewport,
+    glydraw_fit = fit,
+    glydraw_fit_reference = fit_grobs,
+    glydraw_positions = positions,
+    glydraw_vertical = identical(which, "row"),
+    cl = "glycan_axis_labels",
     name = paste0("anno_glycan.", which, ".labels")
   )
 }

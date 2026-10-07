@@ -13,6 +13,7 @@
 #' @param show.legend Logical. Should this layer be included in legends?
 #' @param ... Arguments passed to [geom_glycan()], including fixed aesthetics,
 #'   drawing controls, and `style`.
+#' @inheritParams geom_glycan
 #'
 #' @section Aesthetics:
 #' `geom_node_glycan()` understands the same aesthetics as [geom_glycan()].
@@ -40,7 +41,8 @@ geom_node_glycan <- function(
   data = NULL,
   position = "identity",
   show.legend = NA,
-  ...
+  ...,
+  size = auto_glycan_size()
 ) {
   rlang::check_installed("ggraph", reason = "to use `geom_node_glycan()`")
   mapping <- .add_node_position_aesthetics(mapping)
@@ -52,6 +54,7 @@ geom_node_glycan <- function(
     position = position,
     show.legend = show.legend,
     inherit.aes = FALSE,
+    size = size,
     ...
   )
 }

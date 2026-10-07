@@ -395,7 +395,7 @@ test_that("Draw glycans as ggplot2 annotations", {
       structure = .data$structure
     )
   ) +
-    geom_glycan() +
+    geom_glycan(size = 1) +
     ggplot2::coord_cartesian(
       xlim = c(0, 4),
       ylim = c(0, 3),
@@ -454,7 +454,7 @@ test_that("Justify vertical ggplot2 glycan annotations", {
   ) +
     ggplot2::geom_hline(yintercept = 1, colour = "grey80") +
     ggplot2::geom_point() +
-    geom_glycan(orient = "up", vjust = 0, hjust = 0.5) +
+    geom_glycan(size = 1, orient = "up", vjust = 0, hjust = 0.5) +
     ggplot2::coord_cartesian(
       xlim = c(0, 6),
       ylim = c(0, 5),
@@ -484,7 +484,7 @@ test_that("Render glycan x-axis labels", {
     ggplot2::aes(x = .data$structure, y = .data$value)
   ) +
     ggplot2::geom_col() +
-    scale_x_glycan()
+    scale_x_glycan(size = 0.4)
 
   vdiffr::expect_doppelganger("glycan x-axis labels", plot)
 })
@@ -511,4 +511,55 @@ test_that("Render glycan legend labels", {
     )
 
   vdiffr::expect_doppelganger("glycan legend labels", plot)
+})
+
+test_that("Automatically size glycans above bars", {
+  data <- data.frame(
+    glycan = c("Gal(b1-3)GalNAc(a1-", "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"),
+    value = c(1, 2)
+  )
+  plot <- ggplot2::ggplot(data, ggplot2::aes(glycan, value)) +
+    ggplot2::geom_col(fill = "grey70") +
+    geom_glycan(
+      ggplot2::aes(structure = glycan),
+      orient = "up",
+      vjust = 0,
+      position = ggplot2::position_nudge(y = 0.1)
+    ) +
+    ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0, 0.4))) +
+    ggplot2::theme_classic() +
+    ggplot2::theme(
+      axis.text.x = ggplot2::element_blank(),
+      axis.ticks.x = ggplot2::element_blank()
+    )
+  vdiffr::expect_doppelganger(
+    "automatically sized glycan bars",
+    plot
+  )
+})
+
+test_that("Automatically size branched heatmap axis labels", {
+  structures <- c(
+    "GlcNAc(??-",
+    "Gal(??-?)GlcNAc(??-",
+    "Gal(??-?)[Fuc(??-?)]GlcNAc(??-",
+    "Neu5Ac(??-?)Gal(??-?)GlcNAc(??-",
+    "Neu5Ac(??-?)Gal(??-?)[Fuc(??-?)]GlcNAc(??-"
+  )
+  data <- expand.grid(branch = structures, sample = paste0("Sample ", 1:5))
+  data$value <- seq_len(nrow(data))
+  plot <- ggplot2::ggplot(data, ggplot2::aes(branch, sample)) +
+    ggplot2::geom_tile(ggplot2::aes(fill = value), colour = "white") +
+    scale_x_glycan(
+      position = "top",
+      show_linkage = FALSE,
+      style = style_glydraw(red_end = "~")
+    ) +
+    ggplot2::coord_equal() +
+    ggplot2::theme_void() +
+    ggplot2::theme(axis.text.y = ggplot2::element_text())
+  vdiffr::expect_doppelganger(
+    "automatically sized glycan heatmap",
+    plot
+  )
 })

@@ -21,6 +21,7 @@ reference:
       - scale_x_glycan
   - title: Reuse glycan graphics
     contents:
+      - auto_glycan_size
       - anno_glycan
       - glycanGrob
       - glydraw_colors
