@@ -101,6 +101,32 @@ test_that("guide_glycan replaces legend text with glycan cartoons", {
   expect_no_error(ggplot2::ggplotGrob(plot))
 })
 
+test_that("automatic legend labels share a size that fits a small device", {
+  grDevices::pdf(NULL, width = 3, height = 3)
+  on.exit(grDevices::dev.off(), add = TRUE)
+  structures <- c(
+    "Gal(b1-3)GalNAc(a1-",
+    "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-"
+  )
+  data <- data.frame(structure = structures, value = 1:2)
+  plot <- ggplot2::ggplot(
+    data,
+    ggplot2::aes(structure, value, fill = structure)
+  ) +
+    ggplot2::geom_col() +
+    ggplot2::guides(fill = guide_glycan())
+  table <- .glycan_legend_table(plot)
+  labels <- Filter(\(grob) inherits(grob, "glycan_legend_label"), table$grobs)
+  scales <- unname(vapply(
+    labels,
+    \(label) label$children[[1]]$glydraw_scale,
+    0
+  ))
+  expect_length(scales, 2)
+  expect_equal(scales, rep(scales[[1]], 2))
+  expect_lt(max(scales), 0.4)
+})
+
 test_that("guide_glycan accepts mapped glycan structure vectors", {
   structures <- glyrepr::as_glycan_structure(c(
     "GalNAc(a1-",

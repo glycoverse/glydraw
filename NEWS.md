@@ -1,5 +1,7 @@
 # glydraw (development version)
 
+* New `auto_glycan_size()` is the default `size` for `geom_glycan()`, `geom_node_glycan()`, glycan axis scales, `guide_glycan()`, and `anno_glycan()`, fitting complete cartoons to panel space, label spacing, or device-based layout budgets while keeping residue sizes consistent within each collection. Numeric `size` arguments and mapped sizes retain fixed sizing; `max_size` limits the automatic scale.
+
 * Glycan styles gain an experimental `layout` argument: `"SNFG"` retains the default layout, while `"linear"` draws straight backbones with perpendicular side chains for polysaccharides. (@leonardblaschek, #8)
 
 # glydraw 0.9.0

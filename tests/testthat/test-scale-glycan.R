@@ -82,6 +82,43 @@ test_that("scale_x_glycan draws vertical cartoon labels", {
   expect_no_error(ggplot2::ggplotGrob(plot))
 })
 
+test_that("automatic axis labels adapt to density and output dimensions", {
+  grDevices::pdf(NULL, width = 3, height = 3)
+  on.exit(grDevices::dev.off(), add = TRUE)
+  structures <- c(
+    "GlcNAc(b1-",
+    "Gal(b1-3)GalNAc(a1-",
+    "Gal(b1-3)[GlcNAc(b1-6)]GalNAc(a1-"
+  )
+  data <- data.frame(structure = structures, value = 1:3)
+  plot <- ggplot2::ggplot(data, ggplot2::aes(structure, value)) +
+    ggplot2::geom_col()
+  labels <- .axis_glycan_labels(plot + scale_x_glycan(), "axis-b")
+  fixed <- .axis_glycan_labels(plot + scale_x_glycan(size = 0.4), "axis-b")
+  expect_identical(labels$glydraw_fit, TRUE)
+  scales <- unname(vapply(labels$children, \(grob) grob$glydraw_scale, 0))
+  expect_equal(scales, rep(scales[[1]], 3))
+  expect_lt(
+    max(scales),
+    min(vapply(fixed$children, \(grob) grob$glydraw_scale, 0))
+  )
+  grid::pushViewport(grid::viewport(
+    width = grid::unit(0.6, "in"),
+    height = grid::grobHeight(labels)
+  ))
+  narrow <- grid::makeContent(labels)
+  grid::popViewport()
+  expect_lt(
+    max(vapply(narrow$children, \(grob) grob$glydraw_scale, 0)),
+    min(scales)
+  )
+  flipped <- .axis_glycan_labels(
+    plot + scale_x_glycan() + ggplot2::coord_flip(),
+    "axis-l"
+  )
+  expect_identical(flipped$glydraw_vertical, TRUE)
+})
+
 test_that("scale_y_glycan draws horizontal cartoon labels", {
   data <- data.frame(
     structure = c(

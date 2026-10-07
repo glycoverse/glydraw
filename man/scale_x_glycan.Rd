@@ -13,7 +13,7 @@ scale_x_glycan(
   position = "bottom",
   sec.axis = ggplot2::waiver(),
   continuous.limits = NULL,
-  size = 0.4,
+  size = auto_glycan_size(),
   angle = 0,
   hjust = hjust_red_end(),
   vjust = 0,
@@ -33,7 +33,7 @@ scale_y_glycan(
   position = "left",
   sec.axis = ggplot2::waiver(),
   continuous.limits = NULL,
-  size = 0.4,
+  size = auto_glycan_size(),
   angle = 0,
   hjust = 1,
   vjust = vjust_red_end(),
@@ -63,8 +63,9 @@ to remove the title.}
 \item{continuous.limits}{Continuous limits used to position the discrete
 scale.}
 
-\item{size}{Positive scalar that uniformly scales each axis-label cartoon.
-Defaults to \code{0.4}.}
+\item{size}{Whole-cartoon sizing. The default, \code{\link[=auto_glycan_size]{auto_glycan_size()}}, fits
+labels to the available axis space. A positive number uses a fixed scale
+multiplier.}
 
 \item{angle}{Rotation in degrees applied to each axis-label cartoon,
 independently of the cartoon orientation. Defaults to \code{0}.}

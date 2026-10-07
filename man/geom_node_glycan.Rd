@@ -9,7 +9,8 @@ geom_node_glycan(
   data = NULL,
   position = "identity",
   show.legend = NA,
-  ...
+  ...,
+  size = auto_glycan_size()
 )
 }
 \arguments{
@@ -26,6 +27,10 @@ uses the node data calculated by \code{\link[ggraph:ggraph]{ggraph::ggraph()}}.}
 
 \item{...}{Arguments passed to \code{\link[=geom_glycan]{geom_glycan()}}, including fixed aesthetics,
 drawing controls, and \code{style}.}
+
+\item{size}{Whole-cartoon sizing. The default, \code{\link[=auto_glycan_size]{auto_glycan_size()}}, shrinks
+cartoons to fit the panel and neighbouring anchors when drawn. A positive
+number uses a fixed scale multiplier, as does a mapped \code{size} aesthetic.}
 }
 \value{
 A ggplot2 layer that can be added to a \code{\link[ggraph:ggraph]{ggraph::ggraph()}} plot.

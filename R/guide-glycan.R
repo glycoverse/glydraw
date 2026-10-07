@@ -9,8 +9,9 @@
 #' [glyrepr::glycan_structure()] vectors.
 #'
 #' @inheritParams ggplot2::guide_legend
-#' @param size Positive scalar that uniformly scales each legend-label cartoon.
-#'   Defaults to `0.4`.
+#' @param size Whole-cartoon sizing. The default, [auto_glycan_size()], fits
+#'   the collection of legend cartoons to a graphics-device-based size budget.
+#'   A positive number uses a fixed scale multiplier.
 #' @param orient Direction in which the glycan extends from its reducing end:
 #'   one of `"left"`, `"right"`, `"up"`, or `"down"`. Defaults to `"left"`.
 #' @param hjust Horizontal cartoon justification between `0` and `1`, or
@@ -59,7 +60,7 @@ guide_glycan <- function(
   ncol = NULL,
   reverse = FALSE,
   order = 0,
-  size = 0.4,
+  size = auto_glycan_size(),
   orient = c("left", "right", "up", "down"),
   hjust = 0,
   vjust = vjust_red_end(),
@@ -69,7 +70,7 @@ guide_glycan <- function(
 ) {
   hjust_is_missing <- missing(hjust)
   vjust_is_missing <- missing(vjust)
-  .validate_output_scale(size)
+  sizing <- .resolve_glycan_size(size, 0.4)
   orient <- rlang::arg_match(orient)
   if (hjust_is_missing && .is_vertical_glycan_orientation(orient)) {
     hjust <- hjust_red_end()
@@ -111,7 +112,8 @@ guide_glycan <- function(
     reverse = reverse,
     order = order,
     position = position,
-    glycan_size = size,
+    glycan_size = sizing$size,
+    glycan_fit = sizing$fit,
     glycan_orient = orient,
     glycan_hjust = hjust,
     glycan_vjust = vjust,
@@ -156,13 +158,66 @@ guide_glycan <- function(
     gap <- grid::unit(gap, "cm")
   }
 
-  purrr::map(
+  labels <- purrr::map(
     as.character(key$.label),
     .new_glycan_legend_label,
     params = params,
     gap = gap,
     position = position
   )
+  if (params$glycan_fit) {
+    device <- grDevices::dev.size("in")
+    widths <- vapply(
+      labels,
+      function(label) {
+        grid::convertWidth(grid::grobWidth(label), "in", valueOnly = TRUE)
+      },
+      numeric(1)
+    )
+    heights <- vapply(
+      labels,
+      function(label) {
+        grid::convertHeight(grid::grobHeight(label), "in", valueOnly = TRUE)
+      },
+      numeric(1)
+    )
+    nrow <- params$nrow
+    ncol <- params$ncol
+    if (is.null(nrow)) {
+      nrow <- if (identical(params$direction, "horizontal")) {
+        1L
+      } else {
+        length(labels)
+      }
+    }
+    if (is.null(ncol)) {
+      ncol <- ceiling(length(labels) / nrow)
+    }
+    gap_in <- grid::convertWidth(gap, "in", valueOnly = TRUE)
+    gap_width <- if (position %in% c("left", "right")) gap_in else 0
+    gap_height <- if (position %in% c("top", "bottom")) gap_in else 0
+    factor <- min(
+      .glycan_fit_ratio(
+        0.35 * device[[1]] / ncol - gap_width,
+        max(widths) - gap_width
+      ),
+      .glycan_fit_ratio(
+        0.6 * device[[2]] / nrow - gap_height,
+        max(heights) - gap_height
+      )
+    )
+    if (factor < 1) {
+      params$glycan_size <- params$glycan_size * factor
+      labels <- purrr::map(
+        as.character(key$.label),
+        .new_glycan_legend_label,
+        params = params,
+        gap = gap,
+        position = position
+      )
+    }
+  }
+  labels
 }
 
 #' Construct one glycan cartoon legend label
@@ -376,6 +431,7 @@ GuideGlycan <- ggplot2::ggproto(
     ggplot2::GuideLegend$params,
     list(
       glycan_size = 0.4,
+      glycan_fit = TRUE,
       glycan_orient = "left",
       glycan_hjust = 0,
       glycan_vjust = .vjust_red_end,
