@@ -101,6 +101,26 @@ test_that("guide_glycan replaces legend text with glycan cartoons", {
   expect_no_error(ggplot2::ggplotGrob(plot))
 })
 
+test_that("automatic legend sizing agrees for equivalent row and column layouts", {
+  grDevices::pdf(NULL, width = 10, height = 2)
+  on.exit(grDevices::dev.off(), add = TRUE)
+  structure <- "Gal(b1-3)GalNAc(a1-"
+  scales <- function(nrow = NULL, ncol = NULL) {
+    guide <- guide_glycan(direction = "vertical", nrow = nrow, ncol = ncol)
+    labels <- .build_glycan_legend_labels(
+      key = data.frame(.label = rep(structure, 10)),
+      elements = list(text_position = "right", spacing_x = grid::unit(2, "mm")),
+      params = guide$params
+    )
+    unname(vapply(labels, \(label) label$children[[1]]$glydraw_scale, 0))
+  }
+  columns <- scales(ncol = 2)
+  rows <- scales(nrow = 5)
+  expect_length(columns, 10)
+  expect_equal(columns, rows)
+  expect_gt(min(columns), min(scales(nrow = 10)))
+})
+
 test_that("automatic legend labels share a size that fits a small device", {
   grDevices::pdf(NULL, width = 3, height = 3)
   on.exit(grDevices::dev.off(), add = TRUE)

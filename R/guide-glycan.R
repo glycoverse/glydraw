@@ -184,7 +184,9 @@ guide_glycan <- function(
     nrow <- params$nrow
     ncol <- params$ncol
     if (is.null(nrow)) {
-      nrow <- if (identical(params$direction, "horizontal")) {
+      nrow <- if (!is.null(ncol)) {
+        ceiling(length(labels) / ncol)
+      } else if (identical(params$direction, "horizontal")) {
         1L
       } else {
         length(labels)

@@ -88,21 +88,19 @@
   )
   # Anchors on or outside an edge cannot be contained by scaling alone.
   # Retain their placement; scale expansion remains the caller's control.
-  inside <- positions$x > 0 &
-    positions$x < size[["width"]] &
-    positions$y > 0 &
-    positions$y < size[["height"]]
+  inside_x <- positions$x > 0 & positions$x < size[["width"]]
+  inside_y <- positions$y > 0 & positions$y < size[["height"]]
   factor <- min(
     factor,
-    .glycan_fit_ratio(0.95 * positions$x[inside], -bounds[inside, 1]),
+    .glycan_fit_ratio(0.95 * positions$x[inside_x], -bounds[inside_x, 1]),
     .glycan_fit_ratio(
-      0.95 * (size[["width"]] - positions$x[inside]),
-      bounds[inside, 2]
+      0.95 * (size[["width"]] - positions$x[inside_x]),
+      bounds[inside_x, 2]
     ),
-    .glycan_fit_ratio(0.95 * positions$y[inside], -bounds[inside, 3]),
+    .glycan_fit_ratio(0.95 * positions$y[inside_y], -bounds[inside_y, 3]),
     .glycan_fit_ratio(
-      0.95 * (size[["height"]] - positions$y[inside]),
-      bounds[inside, 4]
+      0.95 * (size[["height"]] - positions$y[inside_y]),
+      bounds[inside_y, 4]
     )
   )
   # A pair needs separation on at least one axis. Coincident anchors are
