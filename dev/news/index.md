@@ -2,6 +2,21 @@
 
 ## glydraw (development version)
 
+- New
+  [`auto_glycan_size()`](https://glycoverse.github.io/glydraw/dev/reference/auto_glycan_size.md)
+  is the default `size` for
+  [`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md),
+  [`geom_node_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_node_glycan.md),
+  glycan axis scales,
+  [`guide_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/guide_glycan.md),
+  and
+  [`anno_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/anno_glycan.md),
+  fitting complete cartoons to panel space, label spacing, or
+  device-based layout budgets while keeping residue sizes consistent
+  within each collection. Numeric `size` arguments and mapped sizes
+  retain fixed sizing; `max_size` limits the automatic scale.
+  ([\#94](https://github.com/glycoverse/glydraw/issues/94))
+
 - Glycan styles gain an experimental `layout` argument: `"SNFG"` retains
   the default layout, while `"linear"` draws straight backbones with
   perpendicular side chains for polysaccharides.

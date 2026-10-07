@@ -15,7 +15,8 @@ geom_node_glycan(
   data = NULL,
   position = "identity",
   show.legend = NA,
-  ...
+  ...,
+  size = auto_glycan_size()
 )
 ```
 
@@ -47,6 +48,14 @@ geom_node_glycan(
   Arguments passed to
   [`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md),
   including fixed aesthetics, drawing controls, and `style`.
+
+- size:
+
+  Whole-cartoon sizing. The default,
+  [`auto_glycan_size()`](https://glycoverse.github.io/glydraw/dev/reference/auto_glycan_size.md),
+  shrinks cartoons to fit the panel and neighbouring anchors when drawn.
+  A positive number uses a fixed scale multiplier, as does a mapped
+  `size` aesthetic.
 
 ## Value
 

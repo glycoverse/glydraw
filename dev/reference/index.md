@@ -27,6 +27,8 @@
 
 ## Reuse glycan graphics
 
+- [`auto_glycan_size()`](https://glycoverse.github.io/glydraw/dev/reference/auto_glycan_size.md)
+  : Fit glycan cartoons to the available plotting space
 - [`anno_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/anno_glycan.md)
   : Use glycan cartoons as ComplexHeatmap labels
 - [`glycanGrob()`](https://glycoverse.github.io/glydraw/dev/reference/glycanGrob.md)

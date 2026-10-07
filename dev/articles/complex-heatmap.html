@@ -119,7 +119,6 @@ splitting.</p>
 <span>    glycan <span class="op">=</span> <span class="fu"><a href="../reference/anno_glycan.html">anno_glycan</a></span><span class="op">(</span></span>
 <span>      <span class="va">structures</span>,</span>
 <span>      which <span class="op">=</span> <span class="st">"row"</span>,</span>
-<span>      size <span class="op">=</span> <span class="fl">0.2</span>,</span>
 <span>      show_linkage <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
@@ -151,7 +150,6 @@ reducing end anchoring each cartoon next to the heatmap. The
 <span>      <span class="va">structures</span>,</span>
 <span>      which <span class="op">=</span> <span class="st">"column"</span>,</span>
 <span>      side <span class="op">=</span> <span class="st">"top"</span>,</span>
-<span>      size <span class="op">=</span> <span class="fl">0.2</span>,</span>
 <span>      show_linkage <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
@@ -162,14 +160,25 @@ reducing end anchoring each cartoon next to the heatmap. The
 <h2 id="control-the-annotation-appearance">Control the annotation appearance<a class="anchor" aria-label="anchor" href="#control-the-annotation-appearance"></a>
 </h2>
 <p>The annotation accepts the same drawing controls that glycan scales
-use. <code>size</code>, <code>angle</code>, <code>hjust</code>,
+use. Its default <code>size = auto_glycan_size()</code> fits cartoons to
+the actual annotation viewport and row or column spacing when drawn. The
+annotation uses a common scale for its cartoons, including across
+equal-spaced heatmap slices, so large branches do not cause inconsistent
+residue sizes. The reserved annotation extent is estimated when
+<code><a href="../reference/anno_glycan.html">anno_glycan()</a></code> is created; create it on the intended output
+device to obtain an appropriate initial layout.</p>
+<p>Set <code>size = auto_glycan_size(max_size = 0.3)</code> to limit the
+automatic size, or <code>size = 0.2</code> to use a fixed multiplier.
+<code>size</code>, <code>angle</code>, <code>hjust</code>,
 <code>vjust</code>, <code>nudge_x</code>, and <code>nudge_y</code>
 adjust placement; <code>show_linkage</code>, <code>style</code>, and
 <code>red_end</code> control the cartoons themselves. The required row
 <code>width</code> or column <code>height</code> is calculated
 automatically from the rendered cartoons. Supply a
 <code><a href="https://rdrr.io/r/grid/unit.html" class="external-link">grid::unit()</a></code> value only when you need a fixed annotation
-extent.</p>
+extent. When using automatic sizing, a fixed annotation extent also
+limits the cartoon size. Very dense annotations may need a larger output
+device to keep linkage text readable.</p>
 <p>This example uses compact labels with linkage text suppressed, a wavy
 reducing end, and a right-side row annotation.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">

@@ -52,7 +52,7 @@ ggplot(plot_data, aes(glycan, value)) +
   geom_glycan(
     aes(structure = glycan),  # provide a `structure` aesthetic
     orient = "up",             # set orientation to vertical
-    size = 0.5,               # default 1 is too large
+    size = auto_glycan_size(), # fit to the available panel space (the default)
     vjust = 0,                # aligned to bottom
     position = position_nudge(y = 0.1)
   ) +
@@ -96,9 +96,18 @@ You may also have noticed that
 [`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md)
 inherits all the styling arguments from
 [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md).
-You will often need to adjust these arguments, because placing glycan
-cartoons in a figure requires careful attention to ensure that they look
-good alongside the other components. There are no universal defaults.
+The default `size = auto_glycan_size()` shrinks complete cartoons to fit
+the actual panel dimensions, panel edges, and spacing between glycan
+anchors. Each panel uses a common scale so residue sizes remain
+comparable across structures. This also works in facets and when you
+change the export size. Nodes, linkage text, and line widths scale
+together.
+
+Use `size = auto_glycan_size(max_size = 0.7)` to set an upper limit, or
+a number such as `size = 0.5` to retain a fixed multiplier. A mapped
+numeric `size` aesthetic also retains fixed sizing. Automatic sizing
+does not move anchors, expand scales, or detect other plot layers, so
+keep enough scale expansion for cartoons positioned above bars.
 
 With a little creativity,
 [`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md)
@@ -193,7 +202,6 @@ ggplot(plot_data, aes(branch, sample)) +
   # ===== Important Here =====
   scale_x_glycan(
     position = "top",
-    size = 0.2,
     show_linkage = FALSE,
     style = style_glydraw(red_end = "~")
   ) +
@@ -216,6 +224,16 @@ and
 respectively. These defaults anchor the cartoons in the heatmap at their
 reducing ends, rather than at their centers. You can change `hjust` or
 `vjust` to a numeric value if needed.
+
+Axis cartoons also default to `size = auto_glycan_size()`. Their size
+adapts to the output dimensions and the spacing between labels, which
+keeps branched glycans from covering neighbouring columns. The axis
+initially reserves a bounded label area and refines the size when drawn.
+Supply a numeric `size` when you need identical physical sizes across
+figures.
+[`guide_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/guide_glycan.md)
+uses the same automatic specification to keep its collection of legend
+labels within a size budget based on the graphics device.
 
 ## `guide_glycan()`
 

@@ -13,7 +13,7 @@ anno_glycan(
   structure,
   which = c("column", "row"),
   side = NULL,
-  size = 0.4,
+  size = auto_glycan_size(),
   angle = 0,
   hjust = NULL,
   vjust = NULL,
@@ -52,7 +52,10 @@ anno_glycan(
 
 - size:
 
-  Positive scalar that uniformly scales each cartoon. Defaults to `0.4`.
+  Whole-cartoon sizing. The default,
+  [`auto_glycan_size()`](https://glycoverse.github.io/glydraw/dev/reference/auto_glycan_size.md),
+  fits cartoons to the annotation space and row or column spacing. A
+  positive number uses a fixed scale multiplier.
 
 - angle:
 

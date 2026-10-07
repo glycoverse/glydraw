@@ -68,7 +68,6 @@ Heatmap(
     glycan = anno_glycan(
       structures,
       which = "row",
-      size = 0.2,
       show_linkage = FALSE
     )
   )
@@ -102,7 +101,6 @@ Heatmap(
       structures,
       which = "column",
       side = "top",
-      size = 0.2,
       show_linkage = FALSE
     )
   )
@@ -114,12 +112,25 @@ Heatmap(
 ## Control the annotation appearance
 
 The annotation accepts the same drawing controls that glycan scales use.
-`size`, `angle`, `hjust`, `vjust`, `nudge_x`, and `nudge_y` adjust
-placement; `show_linkage`, `style`, and `red_end` control the cartoons
-themselves. The required row `width` or column `height` is calculated
-automatically from the rendered cartoons. Supply a
+Its default `size = auto_glycan_size()` fits cartoons to the actual
+annotation viewport and row or column spacing when drawn. The annotation
+uses a common scale for its cartoons, including across equal-spaced
+heatmap slices, so large branches do not cause inconsistent residue
+sizes. The reserved annotation extent is estimated when
+[`anno_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/anno_glycan.md)
+is created; create it on the intended output device to obtain an
+appropriate initial layout.
+
+Set `size = auto_glycan_size(max_size = 0.3)` to limit the automatic
+size, or `size = 0.2` to use a fixed multiplier. `size`, `angle`,
+`hjust`, `vjust`, `nudge_x`, and `nudge_y` adjust placement;
+`show_linkage`, `style`, and `red_end` control the cartoons themselves.
+The required row `width` or column `height` is calculated automatically
+from the rendered cartoons. Supply a
 [`grid::unit()`](https://rdrr.io/r/grid/unit.html) value only when you
-need a fixed annotation extent.
+need a fixed annotation extent. When using automatic sizing, a fixed
+annotation extent also limits the cartoon size. Very dense annotations
+may need a larger output device to keep linkage text readable.
 
 This example uses compact labels with linkage text suppressed, a wavy
 reducing end, and a right-side row annotation.

@@ -55,7 +55,8 @@ default position aesthetics and supports ggraph's <code>filter</code> aesthetic.
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  size <span class="op">=</span> <span class="fu"><a href="auto_glycan_size.html">auto_glycan_size</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -85,6 +86,12 @@ uses the node data calculated by <code><a href="https://ggraph.data-imaginist.co
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Arguments passed to <code><a href="geom_glycan.html">geom_glycan()</a></code>, including fixed aesthetics,
 drawing controls, and <code>style</code>.</p></dd>
+
+
+<dt id="arg-size">size<a class="anchor" aria-label="anchor" href="#arg-size"></a></dt>
+<dd><p>Whole-cartoon sizing. The default, <code><a href="auto_glycan_size.html">auto_glycan_size()</a></code>, shrinks
+cartoons to fit the panel and neighbouring anchors when drawn. A positive
+number uses a fixed scale multiplier, as does a mapped <code>size</code> aesthetic.</p></dd>
 
 </dl></div>
     <div class="section level2">

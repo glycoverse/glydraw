@@ -22,7 +22,7 @@ guide_glycan(
   ncol = NULL,
   reverse = FALSE,
   order = 0,
-  size = 0.4,
+  size = auto_glycan_size(),
   orient = c("left", "right", "up", "down"),
   hjust = 0,
   vjust = vjust_red_end(),
@@ -87,8 +87,10 @@ guide_glycan(
 
 - size:
 
-  Positive scalar that uniformly scales each legend-label cartoon.
-  Defaults to `0.4`.
+  Whole-cartoon sizing. The default,
+  [`auto_glycan_size()`](https://glycoverse.github.io/glydraw/dev/reference/auto_glycan_size.md),
+  fits the collection of legend cartoons to a graphics-device-based size
+  budget. A positive number uses a fixed scale multiplier.
 
 - orient:
 

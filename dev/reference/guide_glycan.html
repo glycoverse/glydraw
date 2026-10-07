@@ -66,7 +66,7 @@ may be glycan structure strings supported by <code><a href="https://glycoverse.g
 <span>  ncol <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  reverse <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  order <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  size <span class="op">=</span> <span class="fl">0.4</span>,</span>
+<span>  size <span class="op">=</span> <span class="fu"><a href="auto_glycan_size.html">auto_glycan_size</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  orient <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"left"</span>, <span class="st">"right"</span>, <span class="st">"up"</span>, <span class="st">"down"</span><span class="op">)</span>,</span>
 <span>  hjust <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  vjust <span class="op">=</span> <span class="fu"><a href="hjust_red_end.html">vjust_red_end</a></span><span class="op">(</span><span class="op">)</span>,</span>
@@ -130,8 +130,9 @@ If 0 (default), the order is determined by a secret algorithm.</p></dd>
 
 
 <dt id="arg-size">size<a class="anchor" aria-label="anchor" href="#arg-size"></a></dt>
-<dd><p>Positive scalar that uniformly scales each legend-label cartoon.
-Defaults to <code>0.4</code>.</p></dd>
+<dd><p>Whole-cartoon sizing. The default, <code><a href="auto_glycan_size.html">auto_glycan_size()</a></code>, fits
+the collection of legend cartoons to a graphics-device-based size budget.
+A positive number uses a fixed scale multiplier.</p></dd>
 
 
 <dt id="arg-orient">orient<a class="anchor" aria-label="anchor" href="#arg-orient"></a></dt>

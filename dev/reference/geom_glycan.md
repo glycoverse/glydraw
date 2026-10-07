@@ -4,12 +4,13 @@
 is anchored at its mapped `x` and `y` position and retains the
 structure-derived dimensions and appearance used by
 [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md).
-The optional `size` aesthetic scales the complete cartoon uniformly,
-including nodes, lines, text, and spacing, without changing their
-relative appearance. Like points and text, the cartoons do not expand
-the position scales beyond their anchor coordinates. Use scale expansion
-or explicit coordinate limits when the cartoons need more room around
-the panel edges. Unlike standalone cartoons returned by
+By default, `size = auto_glycan_size()` fits the cartoons to the actual
+panel space. A numeric `size` argument or aesthetic scales the complete
+cartoon uniformly, including nodes, lines, text, and spacing. Like
+points and text, the cartoons do not expand the position scales beyond
+their anchor coordinates. Use scale expansion or explicit coordinate
+limits when the cartoons need more room around the panel edges. Unlike
+standalone cartoons returned by
 [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md),
 cartoons in this layer have no output border or background.
 
@@ -23,6 +24,7 @@ geom_glycan(
   position = "identity",
   ...,
   angle = 0,
+  size = auto_glycan_size(),
   show_linkage = TRUE,
   orient = c("left", "right", "up", "down"),
   highlight = NULL,
@@ -69,6 +71,14 @@ geom_glycan(
   this can be supplied as an aesthetic or a fixed layer value. It
   rotates each completed cartoon around its mapped position
   independently of `orient`. Defaults to `0`.
+
+- size:
+
+  Whole-cartoon sizing. The default,
+  [`auto_glycan_size()`](https://glycoverse.github.io/glydraw/dev/reference/auto_glycan_size.md),
+  shrinks cartoons to fit the panel and neighbouring anchors when drawn.
+  A positive number uses a fixed scale multiplier, as does a mapped
+  `size` aesthetic.
 
 - show_linkage:
 

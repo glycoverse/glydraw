@@ -24,7 +24,7 @@ scale_x_glycan(
   position = "bottom",
   sec.axis = ggplot2::waiver(),
   continuous.limits = NULL,
-  size = 0.4,
+  size = auto_glycan_size(),
   angle = 0,
   hjust = hjust_red_end(),
   vjust = 0,
@@ -44,7 +44,7 @@ scale_y_glycan(
   position = "left",
   sec.axis = ggplot2::waiver(),
   continuous.limits = NULL,
-  size = 0.4,
+  size = auto_glycan_size(),
   angle = 0,
   hjust = 1,
   vjust = vjust_red_end(),
@@ -94,8 +94,10 @@ scale_y_glycan(
 
 - size:
 
-  Positive scalar that uniformly scales each axis-label cartoon.
-  Defaults to `0.4`.
+  Whole-cartoon sizing. The default,
+  [`auto_glycan_size()`](https://glycoverse.github.io/glydraw/dev/reference/auto_glycan_size.md),
+  fits labels to the available axis space. A positive number uses a
+  fixed scale multiplier.
 
 - angle:
 

@@ -54,7 +54,7 @@ follow row or column clustering, reordering, and splitting.</p>
 <span>  <span class="va">structure</span>,</span>
 <span>  which <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"column"</span>, <span class="st">"row"</span><span class="op">)</span>,</span>
 <span>  side <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  size <span class="op">=</span> <span class="fl">0.4</span>,</span>
+<span>  size <span class="op">=</span> <span class="fu"><a href="auto_glycan_size.html">auto_glycan_size</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  angle <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  hjust <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  vjust <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -92,8 +92,9 @@ accept <code>"bottom"</code> or <code>"top"</code>; row annotations accept <code
 
 
 <dt id="arg-size">size<a class="anchor" aria-label="anchor" href="#arg-size"></a></dt>
-<dd><p>Positive scalar that uniformly scales each cartoon. Defaults to
-<code>0.4</code>.</p></dd>
+<dd><p>Whole-cartoon sizing. The default, <code><a href="auto_glycan_size.html">auto_glycan_size()</a></code>, fits
+cartoons to the annotation space and row or column spacing. A positive
+number uses a fixed scale multiplier.</p></dd>
 
 
 <dt id="arg-angle">angle<a class="anchor" aria-label="anchor" href="#arg-angle"></a></dt>
