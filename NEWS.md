@@ -1,6 +1,6 @@
 # glydraw (development version)
 
-* `draw_cartoons()` draws glycan vectors in an SNFG grid with automatic or explicit row and column counts and a configurable input limit of 36 glycans by default.
+* `draw_cartoons()` draws glycan vectors in an SNFG grid with automatic or explicit row and column counts and a configurable input limit of 36 glycans by default. (#95)
 
 * New `auto_glycan_size()` is the default `size` for `geom_glycan()`, `geom_node_glycan()`, glycan axis scales, `guide_glycan()`, and `anno_glycan()`, fitting complete cartoons to panel space, label spacing, or device-based layout budgets while keeping residue sizes consistent within each collection. Numeric `size` arguments and mapped sizes retain fixed sizing; `max_size` limits the automatic scale. (#94)
 
