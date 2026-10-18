@@ -221,6 +221,8 @@ draw_cartoon(glycan, style = style_glydraw(fuc_orient = "up"))
 
 - [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
   : Draw a Symbol Nomenclature For Glycan (SNFG)
+- [`draw_cartoons()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoons.md)
+  : Draw a grid of SNFG glycan cartoons
 - [`draw_cartoon_sketch()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon_sketch.md)
   : Draw a sketch-style glycan cartoon
 - [`print(`*`<glydraw_cartoon>`*`)`](https://glycoverse.github.io/glydraw/dev/reference/print.glydraw_cartoon.md)

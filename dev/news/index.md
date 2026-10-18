@@ -2,6 +2,11 @@
 
 ## glydraw (development version)
 
+- [`draw_cartoons()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoons.md)
+  draws glycan vectors in an SNFG grid with automatic or explicit row
+  and column counts and a configurable input limit of 36 glycans by
+  default. ([\#95](https://github.com/glycoverse/glydraw/issues/95))
+
 - New
   [`auto_glycan_size()`](https://glycoverse.github.io/glydraw/dev/reference/auto_glycan_size.md)
   is the default `size` for
