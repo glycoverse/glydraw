@@ -146,5 +146,10 @@ export_cartoons.glyrepr_structure <- function(
   safe_names <- fs::path_sanitize(as.character(glycans), replacement = "_")
   safe_names <- ifelse(nchar(safe_names) == 0, "glycan", safe_names)
   safe_names <- substr(safe_names, 1, 180)
-  make.unique(safe_names, sep = "_")
+  # Reserve names case-insensitively so distinct cartoons cannot overwrite
+  # each other on Windows and other case-insensitive filesystems.
+  folded_names <- tolower(safe_names)
+  unique_names <- make.unique(folded_names, sep = "_")
+  suffixes <- substring(unique_names, nchar(folded_names) + 1L)
+  paste0(safe_names, suffixes)
 }
