@@ -2,6 +2,10 @@
 
 ## glydraw (development version)
 
+- [`export_cartoons()`](https://glycoverse.github.io/glydraw/dev/reference/export_cartoons.md)
+  now disambiguates names that differ only by case, preventing cartoons
+  from overwriting one another on case-insensitive filesystems.
+
 - [`draw_cartoons()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoons.md)
   draws glycan vectors in an SNFG grid with automatic or explicit row
   and column counts and a configurable input limit of 36 glycans by
