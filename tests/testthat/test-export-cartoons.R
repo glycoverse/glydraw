@@ -288,3 +288,26 @@ test_that("export_cartoons preserves Greek labels in custom-font PDFs", {
   expect_length(files, 1)
   expect_gt(file.size(files), 0)
 })
+
+
+test_that("export filenames are unique on case-insensitive filesystems", {
+  filenames <- glydraw:::.sanitize_export_filenames(c("Glycan", "glycan", "GLYCAN_1"))
+
+  expect_identical(filenames, c("Glycan", "glycan_2", "GLYCAN_1"))
+  expect_false(anyDuplicated(tolower(filenames)) > 0L)
+})
+
+test_that("case-only glycan names do not overwrite cartoons during export", {
+  glycans <- c(
+    Glycan = "Man(a1-3)Man(b1-4)GlcNAc(b1-",
+    glycan = "Gal(b1-4)GlcNAc(b1-"
+  )
+  temp_dir <- tempfile()
+  on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
+
+  suppressMessages(result <- export_cartoons(glycans, temp_dir))
+
+  expect_length(result, 2)
+  files <- fs::dir_ls(temp_dir, glob = "*.png")
+  expect_setequal(fs::path_file(files), c("Glycan.png", "glycan_1.png"))
+})
