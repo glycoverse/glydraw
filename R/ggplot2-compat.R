@@ -35,12 +35,13 @@ levels.glyrepr_structure <- function(x) {
 #' no separately stored levels to drop.
 #'
 #' @param x A `glyrepr_structure` vector.
-#' @param ... Unused.
+#' @param ... Must be empty. Unused arguments raise an error.
 #'
 #' @returns `x` unchanged.
 #' @noRd
 #' @exportS3Method base::droplevels
 droplevels.glyrepr_structure <- function(x, ...) {
+  rlang::check_dots_empty()
   x
 }
 

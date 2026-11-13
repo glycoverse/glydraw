@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{A ggplot2 object returned by \code{\link[=draw_cartoon]{draw_cartoon()}}.}
 
-\item{...}{Ignored.}
+\item{...}{Must be empty. Unused arguments raise an error.}
 
 \item{newpage}{Draw the plot on a new page.}
 

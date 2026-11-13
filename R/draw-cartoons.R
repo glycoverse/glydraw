@@ -34,6 +34,7 @@ draw_cartoons <- function(
   ncol = NULL,
   max_n = 36
 ) {
+  rlang::check_dots_empty()
   checkmate::assert_count(max_n, positive = TRUE)
   checkmate::assert_count(nrow, positive = TRUE, null.ok = TRUE)
   checkmate::assert_count(ncol, positive = TRUE, null.ok = TRUE)
@@ -65,7 +66,6 @@ draw_cartoons <- function(
   grobs <- lapply(seq_len(n), function(i) {
     glycanGrob(
       structure[[i]],
-      ...,
       show_linkage = show_linkage,
       orient = orient,
       highlight = highlight,

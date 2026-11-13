@@ -5,7 +5,7 @@
 #'
 #' @param cartoon A ggplot2 object returned by [draw_cartoon()].
 #' @param file File name of glycan cartoon.
-#' @param ... Ignored.
+#' @param ... Must be empty. Unused arguments raise an error.
 #' @param dpi Deprecated and ignored. Use `scale` to change the output size.
 #' @param scale Numeric output-size multiplier. The default `1` saves the
 #'   cartoon at its natural fixed size; `2` saves the same cartoon with twice
@@ -36,6 +36,7 @@
 #' save_cartoon(cartoon, tempfile(fileext = ".png"))
 #' @export
 save_cartoon <- function(cartoon, file, ..., dpi = 300, scale = 1) {
+  rlang::check_dots_empty()
   checkmate::assert_class(cartoon, "glydraw_cartoon")
   if (!missing(dpi)) {
     .warn_ignored_dpi()

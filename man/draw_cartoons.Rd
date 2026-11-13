@@ -21,7 +21,7 @@ draw_cartoons(
 \item{structure}{A \code{\link[glyrepr:glycan_structure]{glyrepr::glycan_structure()}} vector or a character
 vector of glycan structure strings supported by \code{\link[glyparse:auto_parse]{glyparse::auto_parse()}}.}
 
-\item{...}{Ignored.}
+\item{...}{Must be empty. Unused arguments raise an error.}
 
 \item{show_linkage}{Show glycosidic linkage annotations or not. Default is
 TRUE. Substituent annotations are always shown.}
