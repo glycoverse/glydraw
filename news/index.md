@@ -1,6 +1,61 @@
 # Changelog
 
+## glydraw 0.10.0
+
+### Breaking changes
+
+- Cartoon drawing, printing, saving, and export functions now error on
+  unused arguments in `...`, as does
+  [`droplevels()`](https://rdrr.io/r/base/droplevels.html) for glycan
+  structure vectors. Remove unused arguments, pass appearance options
+  through
+  [`style_glydraw()`](https://glycoverse.github.io/glydraw/reference/style_glydraw.md)
+  when drawing, and use `scale` to set the output size when saving or
+  exporting. ([\#97](https://github.com/glycoverse/glydraw/issues/97))
+
+### New features
+
+- New
+  [`auto_glycan_size()`](https://glycoverse.github.io/glydraw/reference/auto_glycan_size.md)
+  is the default for
+  [`geom_glycan()`](https://glycoverse.github.io/glydraw/reference/geom_glycan.md),
+  [`geom_node_glycan()`](https://glycoverse.github.io/glydraw/reference/geom_node_glycan.md),
+  glycan axis scales,
+  [`guide_glycan()`](https://glycoverse.github.io/glydraw/reference/guide_glycan.md),
+  and
+  [`anno_glycan()`](https://glycoverse.github.io/glydraw/reference/anno_glycan.md).
+  Cartoons fit the available space with a consistent residue size within
+  each collection. Use `max_size` to cap automatic sizing, or supply a
+  numeric or mapped `size` for fixed sizing.
+  ([\#94](https://github.com/glycoverse/glydraw/issues/94))
+- New
+  [`draw_cartoons()`](https://glycoverse.github.io/glydraw/reference/draw_cartoons.md)
+  draws a vector of glycans as a grid of SNFG cartoons. It chooses the
+  grid dimensions automatically, or you can set `nrow` and `ncol`. Use
+  `max_n` to change the default limit of 36 glycans.
+  ([\#95](https://github.com/glycoverse/glydraw/issues/95))
+- [`style_glydraw()`](https://glycoverse.github.io/glydraw/reference/style_glydraw.md)
+  and the other style presets gain an experimental `layout = "linear"`
+  option that draws polysaccharides with a straight backbone and
+  perpendicular side chains. The default is `layout = "SNFG"`.
+  ([@leonardblaschek](https://github.com/leonardblaschek),
+  [\#8](https://github.com/glycoverse/glydraw/issues/8),
+  [\#93](https://github.com/glycoverse/glydraw/issues/93))
+
+### Minor improvements and bug fixes
+
+- [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md)
+  and related cartoon interfaces now report misspelled or unsupported
+  arguments passed through `...`.
+  ([\#97](https://github.com/glycoverse/glydraw/issues/97))
+- [`export_cartoons()`](https://glycoverse.github.io/glydraw/reference/export_cartoons.md)
+  now creates distinct filenames for names that differ only by case, so
+  both cartoons are saved on case-insensitive file systems.
+  ([\#96](https://github.com/glycoverse/glydraw/issues/96))
+
 ## glydraw 0.9.0
+
+CRAN release: 2026-08-26
 
 - [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md)
   and all glycan-grob-based interfaces now identify alditols with a

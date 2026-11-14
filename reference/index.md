@@ -4,6 +4,8 @@
 
 - [`draw_cartoon()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon.md)
   : Draw a Symbol Nomenclature For Glycan (SNFG)
+- [`draw_cartoons()`](https://glycoverse.github.io/glydraw/reference/draw_cartoons.md)
+  : Draw a grid of SNFG glycan cartoons
 - [`draw_cartoon_sketch()`](https://glycoverse.github.io/glydraw/reference/draw_cartoon_sketch.md)
   : Draw a sketch-style glycan cartoon
 - [`print(`*`<glydraw_cartoon>`*`)`](https://glycoverse.github.io/glydraw/reference/print.glydraw_cartoon.md)
@@ -27,6 +29,8 @@
 
 ## Reuse glycan graphics
 
+- [`auto_glycan_size()`](https://glycoverse.github.io/glydraw/reference/auto_glycan_size.md)
+  : Fit glycan cartoons to the available plotting space
 - [`anno_glycan()`](https://glycoverse.github.io/glydraw/reference/anno_glycan.md)
   : Use glycan cartoons as ComplexHeatmap labels
 - [`glycanGrob()`](https://glycoverse.github.io/glydraw/reference/glycanGrob.md)

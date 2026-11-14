@@ -36,7 +36,7 @@ export_cartoons(
 
 - ...:
 
-  Ignored.
+  Must be empty. Unused arguments raise an error.
 
 - file_ext:
 

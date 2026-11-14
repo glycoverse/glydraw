@@ -18,7 +18,7 @@ print(x, ..., newpage = is.null(vp), vp = NULL)
 
 - ...:
 
-  Ignored.
+  Must be empty. Unused arguments raise an error.
 
 - newpage:
 

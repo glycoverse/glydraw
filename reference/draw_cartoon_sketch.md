@@ -42,7 +42,7 @@ draw_cartoon_sketch(
 
 - ...:
 
-  Ignored.
+  Must be empty. Unused arguments raise an error.
 
 - show_linkage:
 

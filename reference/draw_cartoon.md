@@ -28,7 +28,7 @@ draw_cartoon(
 
 - ...:
 
-  Ignored.
+  Must be empty. Unused arguments raise an error.
 
 - show_linkage:
 
