@@ -1,14 +1,19 @@
 # glydraw (development version)
 
-* Drawing, saving, exporting, and printing interfaces now reject previously ignored `...` arguments with `rlang::check_dots_empty()` instead of silently accepting typos or unsupported options. Drawing wrappers validate their own arguments and no longer forward unused dots to `glycanGrob()`. The `droplevels()` compatibility method also rejects unused arguments. Use `style = style_glydraw(...)` for appearance and `scale` for export size.
+## Breaking changes
 
-* `export_cartoons()` now disambiguates names that differ only by case, preventing cartoons from overwriting one another on case-insensitive filesystems.
+* Cartoon drawing, printing, saving, and export functions now error on unused arguments in `...`, as does `droplevels()` for glycan structure vectors. Remove unused arguments, pass appearance options through `style_glydraw()` when drawing, and use `scale` to set the output size when saving or exporting. (#97)
 
-* `draw_cartoons()` draws glycan vectors in an SNFG grid with automatic or explicit row and column counts and a configurable input limit of 36 glycans by default. (#95)
+## New features
 
-* New `auto_glycan_size()` is the default `size` for `geom_glycan()`, `geom_node_glycan()`, glycan axis scales, `guide_glycan()`, and `anno_glycan()`, fitting complete cartoons to panel space, label spacing, or device-based layout budgets while keeping residue sizes consistent within each collection. Numeric `size` arguments and mapped sizes retain fixed sizing; `max_size` limits the automatic scale. (#94)
+* New `auto_glycan_size()` is the default for `geom_glycan()`, `geom_node_glycan()`, glycan axis scales, `guide_glycan()`, and `anno_glycan()`. Cartoons fit the available space with a consistent residue size within each collection. Use `max_size` to cap automatic sizing, or supply a numeric or mapped `size` for fixed sizing. (#94)
+* New `draw_cartoons()` draws a vector of glycans as a grid of SNFG cartoons. It chooses the grid dimensions automatically, or you can set `nrow` and `ncol`. Use `max_n` to change the default limit of 36 glycans. (#95)
+* `style_glydraw()` and the other style presets gain an experimental `layout = "linear"` option that draws polysaccharides with a straight backbone and perpendicular side chains. The default is `layout = "SNFG"`. (@leonardblaschek, #8, #93)
 
-* Glycan styles gain an experimental `layout` argument: `"SNFG"` retains the default layout, while `"linear"` draws straight backbones with perpendicular side chains for polysaccharides. (@leonardblaschek, #8)
+## Minor improvements and bug fixes
+
+* `draw_cartoon()` and related cartoon interfaces now report misspelled or unsupported arguments passed through `...`. (#97)
+* `export_cartoons()` now creates distinct filenames for names that differ only by case, so both cartoons are saved on case-insensitive file systems. (#96)
 
 # glydraw 0.9.0
 
