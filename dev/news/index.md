@@ -2,47 +2,56 @@
 
 ## glydraw (development version)
 
-- Drawing, saving, exporting, and printing interfaces now reject
-  previously ignored `...` arguments with
-  [`rlang::check_dots_empty()`](https://rlang.r-lib.org/reference/check_dots_empty.html)
-  instead of silently accepting typos or unsupported options. Drawing
-  wrappers validate their own arguments and no longer forward unused
-  dots to
-  [`glycanGrob()`](https://glycoverse.github.io/glydraw/dev/reference/glycanGrob.md).
-  The [`droplevels()`](https://rdrr.io/r/base/droplevels.html)
-  compatibility method also rejects unused arguments. Use
-  `style = style_glydraw(...)` for appearance and `scale` for export
-  size.
+### Breaking changes
 
-- [`export_cartoons()`](https://glycoverse.github.io/glydraw/dev/reference/export_cartoons.md)
-  now disambiguates names that differ only by case, preventing cartoons
-  from overwriting one another on case-insensitive filesystems.
+- Cartoon drawing, printing, saving, and export functions now error on
+  unused arguments in `...`, as does
+  [`droplevels()`](https://rdrr.io/r/base/droplevels.html) for glycan
+  structure vectors. Remove unused arguments, pass appearance options
+  through
+  [`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md)
+  when drawing, and use `scale` to set the output size when saving or
+  exporting. ([\#97](https://github.com/glycoverse/glydraw/issues/97))
 
-- [`draw_cartoons()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoons.md)
-  draws glycan vectors in an SNFG grid with automatic or explicit row
-  and column counts and a configurable input limit of 36 glycans by
-  default. ([\#95](https://github.com/glycoverse/glydraw/issues/95))
+### New features
 
 - New
   [`auto_glycan_size()`](https://glycoverse.github.io/glydraw/dev/reference/auto_glycan_size.md)
-  is the default `size` for
+  is the default for
   [`geom_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_glycan.md),
   [`geom_node_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/geom_node_glycan.md),
   glycan axis scales,
   [`guide_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/guide_glycan.md),
   and
-  [`anno_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/anno_glycan.md),
-  fitting complete cartoons to panel space, label spacing, or
-  device-based layout budgets while keeping residue sizes consistent
-  within each collection. Numeric `size` arguments and mapped sizes
-  retain fixed sizing; `max_size` limits the automatic scale.
+  [`anno_glycan()`](https://glycoverse.github.io/glydraw/dev/reference/anno_glycan.md).
+  Cartoons fit the available space with a consistent residue size within
+  each collection. Use `max_size` to cap automatic sizing, or supply a
+  numeric or mapped `size` for fixed sizing.
   ([\#94](https://github.com/glycoverse/glydraw/issues/94))
-
-- Glycan styles gain an experimental `layout` argument: `"SNFG"` retains
-  the default layout, while `"linear"` draws straight backbones with
-  perpendicular side chains for polysaccharides.
+- New
+  [`draw_cartoons()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoons.md)
+  draws a vector of glycans as a grid of SNFG cartoons. It chooses the
+  grid dimensions automatically, or you can set `nrow` and `ncol`. Use
+  `max_n` to change the default limit of 36 glycans.
+  ([\#95](https://github.com/glycoverse/glydraw/issues/95))
+- [`style_glydraw()`](https://glycoverse.github.io/glydraw/dev/reference/style_glydraw.md)
+  and the other style presets gain an experimental `layout = "linear"`
+  option that draws polysaccharides with a straight backbone and
+  perpendicular side chains. The default is `layout = "SNFG"`.
   ([@leonardblaschek](https://github.com/leonardblaschek),
-  [\#8](https://github.com/glycoverse/glydraw/issues/8))
+  [\#8](https://github.com/glycoverse/glydraw/issues/8),
+  [\#93](https://github.com/glycoverse/glydraw/issues/93))
+
+### Minor improvements and bug fixes
+
+- [`draw_cartoon()`](https://glycoverse.github.io/glydraw/dev/reference/draw_cartoon.md)
+  and related cartoon interfaces now report misspelled or unsupported
+  arguments passed through `...`.
+  ([\#97](https://github.com/glycoverse/glydraw/issues/97))
+- [`export_cartoons()`](https://glycoverse.github.io/glydraw/dev/reference/export_cartoons.md)
+  now creates distinct filenames for names that differ only by case, so
+  both cartoons are saved on case-insensitive file systems.
+  ([\#96](https://github.com/glycoverse/glydraw/issues/96))
 
 ## glydraw 0.9.0
 
