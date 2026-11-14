@@ -2,6 +2,8 @@
 
 ## glydraw (development version)
 
+## glydraw 0.10.0
+
 ### Breaking changes
 
 - Cartoon drawing, printing, saving, and export functions now error on

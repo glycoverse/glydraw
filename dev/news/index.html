@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">glydraw</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.9.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.10.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,19 +39,22 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="glydraw-development-version">glydraw (development version)<a class="anchor" aria-label="anchor" href="#glydraw-development-version"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.10.0" id="glydraw-0100">glydraw 0.10.0<a class="anchor" aria-label="anchor" href="#glydraw-0100"></a></h2>
 <div class="section level3">
-<h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
+<h3 id="breaking-changes-0-10-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-10-0"></a></h3>
 <ul><li>Cartoon drawing, printing, saving, and export functions now error on unused arguments in <code>...</code>, as does <code><a href="https://rdrr.io/r/base/droplevels.html" class="external-link">droplevels()</a></code> for glycan structure vectors. Remove unused arguments, pass appearance options through <code><a href="../reference/style_glydraw.html">style_glydraw()</a></code> when drawing, and use <code>scale</code> to set the output size when saving or exporting. (<a href="https://github.com/glycoverse/glydraw/issues/97" class="external-link">#97</a>)</li>
 </ul></div>
 <div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<h3 id="new-features-0-10-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-10-0"></a></h3>
 <ul><li>New <code><a href="../reference/auto_glycan_size.html">auto_glycan_size()</a></code> is the default for <code><a href="../reference/geom_glycan.html">geom_glycan()</a></code>, <code><a href="../reference/geom_node_glycan.html">geom_node_glycan()</a></code>, glycan axis scales, <code><a href="../reference/guide_glycan.html">guide_glycan()</a></code>, and <code><a href="../reference/anno_glycan.html">anno_glycan()</a></code>. Cartoons fit the available space with a consistent residue size within each collection. Use <code>max_size</code> to cap automatic sizing, or supply a numeric or mapped <code>size</code> for fixed sizing. (<a href="https://github.com/glycoverse/glydraw/issues/94" class="external-link">#94</a>)</li>
 <li>New <code><a href="../reference/draw_cartoons.html">draw_cartoons()</a></code> draws a vector of glycans as a grid of SNFG cartoons. It chooses the grid dimensions automatically, or you can set <code>nrow</code> and <code>ncol</code>. Use <code>max_n</code> to change the default limit of 36 glycans. (<a href="https://github.com/glycoverse/glydraw/issues/95" class="external-link">#95</a>)</li>
 <li>
 <code><a href="../reference/style_glydraw.html">style_glydraw()</a></code> and the other style presets gain an experimental <code>layout = "linear"</code> option that draws polysaccharides with a straight backbone and perpendicular side chains. The default is <code>layout = "SNFG"</code>. (<a href="https://github.com/leonardblaschek" class="external-link">@leonardblaschek</a>, <a href="https://github.com/glycoverse/glydraw/issues/8" class="external-link">#8</a>, <a href="https://github.com/glycoverse/glydraw/issues/93" class="external-link">#93</a>)</li>
 </ul></div>
 <div class="section level3">
-<h3 id="minor-improvements-and-bug-fixes-development-version">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-development-version"></a></h3>
+<h3 id="minor-improvements-and-bug-fixes-0-10-0">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-0-10-0"></a></h3>
 <ul><li>
 <code><a href="../reference/draw_cartoon.html">draw_cartoon()</a></code> and related cartoon interfaces now report misspelled or unsupported arguments passed through <code>...</code>. (<a href="https://github.com/glycoverse/glydraw/issues/97" class="external-link">#97</a>)</li>
 <li>
