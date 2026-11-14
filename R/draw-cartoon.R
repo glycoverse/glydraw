@@ -2,7 +2,7 @@
 #'
 #' @param structure A [glyrepr::glycan_structure()] scalar,
 #'   or a string of any glycan structure text nomenclatures supported by [glyparse::auto_parse()].
-#' @param ... Ignored.
+#' @param ... Must be empty. Unused arguments raise an error.
 #' @param show_linkage Show glycosidic linkage annotations or not. Default is
 #'   TRUE. Substituent annotations are always shown.
 #' @param orient Direction in which the glycan extends from its reducing end:
@@ -38,9 +38,9 @@ draw_cartoon <- function(
   style = style_glydraw(),
   red_end = NULL
 ) {
+  rlang::check_dots_empty()
   glycanGrob(
     structure,
-    ...,
     show_linkage = show_linkage,
     orient = orient,
     highlight = highlight,
@@ -53,7 +53,7 @@ draw_cartoon <- function(
 #' Print glycan cartoon
 #'
 #' @param x A ggplot2 object returned by [draw_cartoon()].
-#' @param ... Ignored.
+#' @param ... Must be empty. Unused arguments raise an error.
 #' @param newpage Draw the plot on a new page.
 #' @param vp A grid viewport object or viewport name.
 #'
@@ -65,6 +65,7 @@ print.glydraw_cartoon <- function(
   newpage = is.null(vp),
   vp = NULL
 ) {
+  rlang::check_dots_empty()
   raster <- .render_cartoon_raster(x)
   .draw_cartoon_raster(
     raster,

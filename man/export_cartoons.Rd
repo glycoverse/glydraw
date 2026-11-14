@@ -25,7 +25,7 @@ any glycan structure text nomenclatures supported by
 \item{dirname}{Directory name to save the cartoons. If it does not exist,
 it is created.}
 
-\item{...}{Ignored.}
+\item{...}{Must be empty. Unused arguments raise an error.}
 
 \item{file_ext}{File extension supported by \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}}. Defaults to "png".}
 

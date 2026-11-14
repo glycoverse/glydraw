@@ -11,7 +11,7 @@ save_cartoon(cartoon, file, ..., dpi = 300, scale = 1)
 
 \item{file}{File name of glycan cartoon.}
 
-\item{...}{Ignored.}
+\item{...}{Must be empty. Unused arguments raise an error.}
 
 \item{dpi}{Deprecated and ignored. Use \code{scale} to change the output size.}
 

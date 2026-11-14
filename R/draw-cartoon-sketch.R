@@ -53,6 +53,7 @@ draw_cartoon_sketch <- function(
   medium = NULL,
   red_end = NULL
 ) {
+  rlang::check_dots_empty()
   rlang::check_installed(
     "ggsketch",
     version = "2.0.0",
@@ -60,7 +61,6 @@ draw_cartoon_sketch <- function(
   )
   grob <- glycanGrob(
     structure,
-    ...,
     show_linkage = show_linkage,
     orient = orient,
     highlight = highlight,

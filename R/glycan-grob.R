@@ -23,6 +23,7 @@ glycanGrob <- function(
   style = style_glydraw(),
   red_end = NULL
 ) {
+  rlang::check_dots_empty()
   orient <- rlang::arg_match(orient, error_call = NULL)
   checkmate::assert_class(style, "glydraw_style")
   red_end <- .resolve_red_end(red_end, style)

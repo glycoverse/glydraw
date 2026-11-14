@@ -1,5 +1,7 @@
 # glydraw (development version)
 
+* Drawing, saving, exporting, and printing interfaces now reject previously ignored `...` arguments with `rlang::check_dots_empty()` instead of silently accepting typos or unsupported options. Drawing wrappers validate their own arguments and no longer forward unused dots to `glycanGrob()`. The `droplevels()` compatibility method also rejects unused arguments. Use `style = style_glydraw(...)` for appearance and `scale` for export size.
+
 * `export_cartoons()` now disambiguates names that differ only by case, preventing cartoons from overwriting one another on case-insensitive filesystems.
 
 * `draw_cartoons()` draws glycan vectors in an SNFG grid with automatic or explicit row and column counts and a configurable input limit of 36 glycans by default. (#95)
