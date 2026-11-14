@@ -21,7 +21,7 @@ save_cartoon(cartoon, file, ..., dpi = 300, scale = 1)
 
 - ...:
 
-  Ignored.
+  Must be empty. Unused arguments raise an error.
 
 - dpi:
 

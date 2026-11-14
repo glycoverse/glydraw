@@ -2,6 +2,18 @@
 
 ## glydraw (development version)
 
+- Drawing, saving, exporting, and printing interfaces now reject
+  previously ignored `...` arguments with
+  [`rlang::check_dots_empty()`](https://rlang.r-lib.org/reference/check_dots_empty.html)
+  instead of silently accepting typos or unsupported options. Drawing
+  wrappers validate their own arguments and no longer forward unused
+  dots to
+  [`glycanGrob()`](https://glycoverse.github.io/glydraw/dev/reference/glycanGrob.md).
+  The [`droplevels()`](https://rdrr.io/r/base/droplevels.html)
+  compatibility method also rejects unused arguments. Use
+  `style = style_glydraw(...)` for appearance and `scale` for export
+  size.
+
 - [`export_cartoons()`](https://glycoverse.github.io/glydraw/dev/reference/export_cartoons.md)
   now disambiguates names that differ only by case, preventing cartoons
   from overwriting one another on case-insensitive filesystems.
